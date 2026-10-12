@@ -6,6 +6,7 @@ import json
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 from xml.etree import ElementTree as ET
 
@@ -132,6 +133,27 @@ class ExecutedCapabilityEvidenceTests(unittest.TestCase):
         suite.remove(missing)
         self.write(suite)
         with self.assertRaisesRegex(ValueError, "Incomplete independent readback"):
+            qualify(ROOT, self.xml)
+
+    def test_undeclared_or_unimplemented_native_method_fails_closed(self):
+        self.write(self.valid_suite())
+        with patch("qualify_capabilities.ast.literal_eval", return_value={}):
+            with self.assertRaisesRegex(ValueError, "Missing or undeclared typed native method"):
+                qualify(ROOT, self.xml)
+
+    def test_duplicate_junit_case_fails_closed(self):
+        suite = self.valid_suite()
+        existing = suite.findall("testcase")[0]
+        ET.SubElement(suite, "testcase", dict(existing.attrib))
+        self.write(suite)
+        with self.assertRaisesRegex(ValueError, "Duplicate JUnit execution identity"):
+            qualify(ROOT, self.xml)
+
+    def test_suite_error_count_fails_closed(self):
+        suite = self.valid_suite()
+        suite.set("errors", "1")
+        self.write(suite)
+        with self.assertRaisesRegex(ValueError, "JUnit suite reports errors"):
             qualify(ROOT, self.xml)
 
     def test_skipped_native_denial_fails_closed(self):
