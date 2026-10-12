@@ -111,6 +111,16 @@ jobs:
         env:
           PYTHONPATH: services/planning/src:services/lifecycle/src:services/inventory/src:services/planning/tests
         run: python -m pytest --import-mode=importlib -q services/inventory/tests/test_migration_collection_coverage.py services/inventory/tests/test_migration_collection_evidence.py services/planning/tests/test_migration_readiness.py services/planning/tests/test_migration_owner_contract.py tests/contracts/test_inventory_planning_contract.py services/planning/tests/test_owner_operation_contracts.py services/planning/tests/test_planning_lifecycle_producer_contract.py services/planning/tests/test_migration_flows_http.py services/planning/tests/test_migration_api_selection.py services/lifecycle/tests/test_migration_readiness.py services/lifecycle/tests/test_native_owners.py services/planning/tests/test_migration_support.py
+      - name: Verify executable Inventory/Catalogue/Assurance consumer boundaries
+        run: python scripts/contracts/measured_consumers.py --output "$RUNNER_TEMP/contract-assurance-consumers.json"
+      - name: Retain measured producer-consumer validation receipts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: contract-assurance-consumers-${{ github.sha }}
+          path: ${{ runner.temp }}/contract-assurance-consumers.json
+          if-no-files-found: warn
+          retention-days: 14
 
   laravel-runtime-routes:
     name: Live Laravel routes / OpenAPI (${{ matrix.app }})
