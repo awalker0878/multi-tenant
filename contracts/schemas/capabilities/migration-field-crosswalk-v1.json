@@ -174,7 +174,7 @@
         "properties": {
           "canonical_id": {
             "type": "string",
-            "pattern": "^(source|target|owner)\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*){1,8}$"
+            "pattern": "^(source|target|owner)\\.[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*){0,8}$"
           },
           "scope": {
             "enum": [
