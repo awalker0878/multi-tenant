@@ -110,20 +110,30 @@ def qualify(root: Path, xml: Path) -> dict:
     ]
     if len(readback) != 12:
         raise ValueError("Incomplete independent readback denial matrix")
+    native_methods = {
+        row["v1_alias"] for row in methods.values()
+        if row["implementation"]["handler"].endswith("/migration_method.py")
+    }
+    native_source = root / "workers/lifecycle/src/lifecycle_worker/infrastructure/migration_method.py"
+    native_module = ast.parse(native_source.read_text())
+    native_node = next((item.value for item in native_module.body
+                        if isinstance(item, ast.Assign)
+                        and any(isinstance(target, ast.Name) and target.id == "OPERATIONS"
+                                for target in item.targets)), None)
+    if native_node is None:
+        raise ValueError("Missing canonical typed native dispatch table")
+    native_operations = ast.literal_eval(native_node)
+    if set(native_operations) != native_methods:
+        raise ValueError("Missing or undeclared typed native method implementation: "
+                         + repr(sorted(native_methods ^ set(native_operations))))
     for method, record in methods.items():
         handler_path = record["implementation"]["handler"]
         if not handler_path.endswith("/migration_method.py"):
             continue
-        module = ast.parse((root / handler_path).read_text())
-        node = next((n.value for n in module.body
-                     if isinstance(n, ast.Assign)
-                     and any(isinstance(t, ast.Name) and t.id == "OPERATIONS"
-                             for t in n.targets)), None)
-        if node is None:
-            raise ValueError("Missing typed native dispatch table: " + method)
-        implementations = ast.literal_eval(node)
         alias = record["v1_alias"]
-        for stage in implementations.get(alias, {}):
+        if not native_operations[alias]:
+            raise ValueError("Native method has no executable operations: " + method)
+        for stage in native_operations[alias]:
             if not any(stage in rows for rows in record["stages"].values()):
                 raise ValueError("Unreachable native stage implementation: " + method + "/" + stage)
             for source_platform in data["platforms"]:
