@@ -34,9 +34,12 @@ def main() -> int:
     outcome = assess(observations=combine(args.input_directory))
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(outcome, indent=2) + "\n", encoding="utf-8")
-    missing = outcome["summary"]["unqualified_http_operations"]
+    missing = (outcome["summary"]["unqualified_http_operations"]
+               + outcome["summary"]["unqualified_canonical_releases"])
     by_claim = {}
-    for row in outcome["coverage"]:
+    for row in [*outcome["coverage"], *(
+            release for release in outcome["release_coverage"]
+            if release["kind"] != "openapi")]:
         for claim in row["missing"]:
             by_claim[claim] = by_claim.get(claim, 0) + 1
     print(json.dumps({"summary": outcome["summary"], "missing_by_claim": by_claim},

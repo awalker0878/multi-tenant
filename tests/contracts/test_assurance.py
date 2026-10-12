@@ -76,6 +76,7 @@ class AssuranceCoverageTests(unittest.TestCase):
         output = inventory(self.root)
         self.assertEqual(len(output["releases"]), 2)
         self.assertEqual(len(output["operations"]), 1)
+        self.assertEqual(assess(self.root)["summary"]["unqualified_canonical_releases"], 2)
         self.assertEqual(output["operations"][0]["key"],
                          operation_key("sample", "GET", self.op))
         self.assertEqual(output["operations"][0]["consumers"], ["other"])

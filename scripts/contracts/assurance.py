@@ -178,7 +178,7 @@ def assess(root: Path = ROOT, observations: list[dict] | None = None) -> dict:
                 raise ValueError(f"Active HTTP release has no complete operation coverage: {path}")
             qualified = all(member["qualified"] for member in members)
             missing = sorted({claim for member in members for claim in member["missing"]})
-            verified = sorted({claim for member in members for claim in member["verified"]})
+            verified = sorted(set.intersection(*(set(member["verified"]) for member in members)))
             required = sorted({claim for member in members for claim in member["required"]})
         else:
             required = ["producer", "consumer"]
