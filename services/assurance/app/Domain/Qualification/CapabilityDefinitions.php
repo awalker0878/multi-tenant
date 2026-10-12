@@ -15,5 +15,5 @@ final class CapabilityDefinitions
 
     public const array METHODS = ['cold_export', 'rebuild_restore', 'application_delta', 'file_delta', 'block_replication'];
 
-    public const array LEGACY_METHODS = ['VM_COLD_EXPORT', 'APPLICATION_REBUILD_RESTORE', 'VM_SNAPSHOT_BASELINE_APP_DELTA', 'VM_SNAPSHOT_BASELINE_FILE_DELTA', 'EXTERNAL_BLOCK_REPLICATION'];
+    public const array WIRE_METHODS = ['VM_COLD_EXPORT', 'APPLICATION_REBUILD_RESTORE', 'VM_SNAPSHOT_BASELINE_APP_DELTA', 'VM_SNAPSHOT_BASELINE_FILE_DELTA', 'EXTERNAL_BLOCK_REPLICATION'];
 }

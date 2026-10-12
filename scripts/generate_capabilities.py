@@ -52,7 +52,7 @@ def projections(data):
     text += f'DEFINITION_VERSION = {data["definition_version"]!r}\nDEFINITION_SHA256 = {checksum!r}\n'
     for name in ('platforms', 'dimensions', 'actions', 'strategies', 'guests', 'operations', 'retest_triggers', 'modes'):
         text += f'{name.upper()} = {tuple(data[name])!r}\n'
-    text += f'METHODS = {tuple(methods)!r}\nLEGACY_METHODS = {tuple(aliases)!r}\n'
+    text += f'METHODS = {tuple(methods)!r}\nWIRE_METHODS = {tuple(aliases)!r}\n'
     text += f'RECOVERY_MODES = {tuple(k for k in data["modes"] if k not in {"rehearsal", "cutover"})!r}\n'
     tables = {
         'METHOD_ALIASES': ('str, str', aliases),
@@ -75,7 +75,7 @@ def projections(data):
     php += '/** Generated definition metadata; Assurance decisions remain independent. */\nfinal class CapabilityDefinitions\n{\n'
     php += f"    public const string SHA256 = '{checksum}';\n\n"
     php += f"    public const string VERSION = '{data['definition_version']}';\n\n"
-    for name, value in [('PLATFORMS', data['platforms']), ('METHODS', list(methods)), ('LEGACY_METHODS', list(aliases))]:
+    for name, value in [('PLATFORMS', data['platforms']), ('METHODS', list(methods)), ('WIRE_METHODS', list(aliases))]:
         php += f"    public const array {name} = [" + ', '.join(repr(v) for v in value) + '];\n\n'
     php = php.rstrip() + '\n}\n'
     output[ROOT / 'services/assurance/app/Domain/Qualification/CapabilityDefinitions.php'] = php

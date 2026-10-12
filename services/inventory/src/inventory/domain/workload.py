@@ -4,13 +4,13 @@ import re
 from typing import Any
 
 from inventory.domain.ahv import AHV_FIELDS, validate_profile
-from inventory.domain.capability_definitions import LEGACY_METHODS
+from inventory.domain.capability_definitions import WIRE_METHODS
 from inventory.domain.discovery import Rejected, canonical, identifier, number, shape, text
 from inventory.domain.source_profile import validate_devices, validate_source
 from inventory.domain.vmware import FIELDS as VMWARE_FIELDS
 from inventory.domain.vmware import validate_profile as validate_vmware_profile
 
-METHODS = LEGACY_METHODS
+METHODS = WIRE_METHODS
 OWNER_FIELDS = (
     "application_consistency",
     "dependencies",

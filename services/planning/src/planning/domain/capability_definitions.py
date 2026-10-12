@@ -77,7 +77,7 @@ METHODS = (
     "file_delta",
     "block_replication",
 )
-LEGACY_METHODS = (
+WIRE_METHODS = (
     "VM_COLD_EXPORT",
     "APPLICATION_REBUILD_RESTORE",
     "VM_SNAPSHOT_BASELINE_APP_DELTA",

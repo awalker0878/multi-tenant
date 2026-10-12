@@ -23,7 +23,7 @@ class CapabilityDefinitionsTest(unittest.TestCase):
         for root, package in generator.PYTHON.items():
             self.assertEqual(source, projected[ROOT / f'{root}/src/{package}/domain/capability_definitions.py'])
 
-    def test_new_method_cannot_claim_an_unimplemented_handler(self):
+    def test_metadata_generator_does_not_certify_new_handler(self):
         data = json.loads(generator.SOURCE.read_text())
         method = copy.deepcopy(data['methods']['cold_export'])
         method['v1_alias'] = 'UNIMPLEMENTED_NATIVE_METHOD'
