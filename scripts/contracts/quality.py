@@ -80,6 +80,10 @@ def request_breaks(old: dict, new: dict, before: dict, after: dict, at: str) -> 
     ra, rb = set(a.get("required", [])), set(b.get("required", []))
     if rb - ra:
         failures.append(at + ": new required request properties " + repr(sorted(rb - ra)))
+    if "items" in b and "items" not in a:
+        failures.append(at + ": array item validation newly restricted")
+    if "items" in a and "items" in b:
+        failures.extend(request_breaks(a["items"], b["items"], before, after, at + "/items"))
     for key, value in a.get("properties", {}).items():
         if key not in b.get("properties", {}):
             if b.get("additionalProperties") is False:
@@ -108,6 +112,16 @@ def response_breaks(old: dict, new: dict, before: dict, after: dict, at: str) ->
         failures.append(at + ": previously required response properties became optional")
     if a.get("additionalProperties") is False and b.get("additionalProperties") is not False:
         failures.append(at + ": response allows unknown fields")
+    for lo, hi in (("minimum", "maximum"), ("minLength", "maxLength"),
+                   ("minItems", "maxItems")):
+        if lo in a and (lo not in b or b[lo] < a[lo]):
+            failures.append(at + ": response minimum guarantee weakened")
+        if hi in a and (hi not in b or b[hi] > a[hi]):
+            failures.append(at + ": response maximum guarantee weakened")
+    if "items" in a and "items" not in b:
+        failures.append(at + ": response array item guarantee removed")
+    if "items" in a and "items" in b:
+        failures.extend(response_breaks(a["items"], b["items"], before, after, at + "/items"))
     for key, item in a.get("properties", {}).items():
         if key not in b.get("properties", {}):
             failures.append(at + ": response field removed " + key)
@@ -147,6 +161,12 @@ def api_breakages(old: dict, new: dict) -> list[str]:
                 continue
             if prior.get("security", old.get("security", [])) != current.get("security", new.get("security", [])):
                 failures.append(at + ": security/authorization requirements changed")
+            if prior.get("operationId") != current.get("operationId"):
+                failures.append(at + ": generated-client operationId changed")
+            if prior.get("requestBody", {}).get("required") is not True and current.get("requestBody", {}).get("required") is True:
+                failures.append(at + ": request body newly required")
+            if set((prior.get("requestBody") or {}).get("content", {})) != set((current.get("requestBody") or {}).get("content", {})):
+                failures.append(at + ": request media types changed")
             req_before, req_after = body(prior), body(current)
             if req_before is not None:
                 if req_after is None:
@@ -166,6 +186,8 @@ def api_breakages(old: dict, new: dict) -> list[str]:
                 if status not in current.get("responses", {}):
                     failures.append(at + ": response status removed " + status)
                     continue
+                if set(response.get("content", {})) != set(current["responses"][status].get("content", {})):
+                    failures.append(at + ": response media type changed " + status)
                 oa, na = body(prior, status), body(current, status)
                 if oa is not None and na is None:
                     failures.append(at + ": response payload removed " + status)
@@ -188,6 +210,16 @@ def event_breakages(old: dict, new: dict) -> list[str]:
             failures.append("Event channel removed: " + key)
         elif successor.get("address") != channel.get("address"):
             failures.append("Event channel address changed: " + key)
+    for key, channel in old.get("channels", {}).items():
+        target = new.get("channels", {}).get(key, {})
+        if target and target.get("x-delivery") != channel.get("x-delivery"):
+            failures.append("Event delivery semantics changed: " + key)
+        if target and target.get("messages") != channel.get("messages"):
+            failures.append("Event channel message bindings changed: " + key)
+    for key, message in old.get("components", {}).get("messages", {}).items():
+        newer = new.get("components", {}).get("messages", {}).get(key)
+        if not newer or newer.get("payload") != message.get("payload"):
+            failures.append("Event payload schema binding changed: " + key)
     for key, op in old.get("operations", {}).items():
         if key not in new.get("operations", {}) or new["operations"][key].get("action") != op.get("action"):
             failures.append("Event publish/subscribe operation removed/changed: " + key)
@@ -201,6 +233,11 @@ def quality_schema(path: str, schema: dict, policy: dict) -> None:
     parsed = urlparse(uid) if isinstance(uid, str) else None
     if not parsed or parsed.scheme != "https" or not parsed.hostname or parsed.fragment:
         raise ValueError("New canonical schema must have stable absolute HTTPS $id: " + path)
+    stem, _ = version(path)
+    tail = stem.split("/")[-1]
+    if not (parsed.path.endswith(tail + "-v" + path.rsplit("-v", 1)[-1].split(".json")[0])
+            or parsed.path.endswith(path.split("/")[-1])):
+        raise ValueError("New schema $id must identify its canonical name and version: " + path)
     Draft202012Validator.check_schema(schema)
     if schema.get("type") == "object" and schema.get("additionalProperties") is not False:
         raise ValueError("New top-level object schema must reject undeclared fields: " + path)
@@ -243,6 +280,13 @@ def quality_api(path: str, doc: dict, error: dict, policy: dict) -> None:
                            param.get("name", "").lower() == policy["idempotency_header"].lower()]
                 if len(headers) != 1 or headers[0].get("required") is not True:
                     raise ValueError("Mutation requires mandatory Idempotency-Key: " + label)
+                header_schema = headers[0].get("schema", {})
+                if (header_schema.get("type") != "string"
+                        or type(header_schema.get("minLength")) is not int
+                        or header_schema["minLength"] < 16
+                        or type(header_schema.get("maxLength")) is not int
+                        or header_schema["maxLength"] > 256):
+                    raise ValueError("Mutation idempotency header must be bounded and strong: " + label)
                 setting = op.get("x-idempotency", {})
                 if (not isinstance(setting, dict) or
                         setting.get("scope") != policy["idempotency_scope"] or
@@ -274,6 +318,12 @@ def quality_event(path: str, doc: dict, policy: dict, root: Path) -> None:
             raise ValueError("Channel missing at-least-once delivery contract: " + key)
         if (delivery.get("ordering_key") != "tenant_id"
                 or delivery.get("deduplication_key") != "event_id"
+                or delivery.get("acknowledgment") != "after-commit"
+                or delivery.get("backoff_strategy") != "exponential-jitter"
+                or type(delivery.get("dead_letter_retention_seconds")) is not int
+                or delivery["dead_letter_retention_seconds"] < 86400
+                or type(delivery.get("deduplication_window_seconds")) is not int
+                or delivery["deduplication_window_seconds"] < 3600
                 or not isinstance(delivery.get("dead_letter_address"), str)
                 or not delivery["dead_letter_address"] or
                 type(delivery.get("max_attempts")) is not int or not 1 <= delivery["max_attempts"] <= 100):
