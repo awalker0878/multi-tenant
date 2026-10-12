@@ -100,12 +100,12 @@ def test_failure_suspends_review_until_a_new_decision(tmp_path: Path) -> None:
     # A signed observation with one missing method/mode must never
     # masquerade as a qualified installed provider release.
     missing = next(iter(method_modes))
-    observed["cases"].pop(missing)
+    original_method_case = observed["cases"].pop(missing)
     publisher.publish(assignment | {"decision_sha256": "c" * 64})
     state = json.loads(output.read_text())
     denied = json.loads(base64.b64decode(state["records"]["c" * 64]["content_base64"]))
     assert denied["adapter_conformant"] is False
-    observed["cases"][missing] = cases[missing]
+    observed["cases"][missing] = original_method_case
     artifact.write_text("drift")
     publisher.publish(assignment | {"decision_sha256": "b" * 64})
     assert "b" * 64 in json.loads(output.read_text())["suspended"]
