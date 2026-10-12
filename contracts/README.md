@@ -101,3 +101,10 @@ being copied into the working tree.
 For the independent two-stage external clearance process, historically unresolved
 removals and per-copy dependency evidence, see
 [contract retirement and installed-copy removal](../docs/contracts/retirement-approval.md).
+
+## Execution-backed assurance
+
+Operation-by-operation producer, consumer, authorization and isolation qualification
+is now fail-closed. See [contract assurance](../docs/contracts/assurance.md)
+for the current evidence generators, CI report and the remaining unqualified
+interfaces. Byte parity and route matching alone do not grant qualification.
