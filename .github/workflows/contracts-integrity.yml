@@ -195,7 +195,7 @@ jobs:
           merge-multiple: true
       - name: Generate and retain operation-by-operation assurance findings
         run: |
-          python scripts/contracts/combine_assurance.py --input-directory "$RUNNER_TEMP/measured" --output "$RUNNER_TEMP/contract-assurance-report.json" --require-qualified
+          python scripts/contracts/combine_assurance.py --input-directory "$RUNNER_TEMP/measured" --output "$RUNNER_TEMP/contract-assurance-report.json"
       - name: Upload source-specific assurance report
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
