@@ -132,6 +132,34 @@ def check_wheel(component: str, wheel: Path, root: Path = ROOT) -> dict:
     }
 
 
+def check_console_frontend(browser: Path) -> int:
+    manifest = browser / "manifest.json"
+    if not manifest.is_file():
+        raise ValueError("Console runtime image lacks compiled Vite manifest")
+    contents = json.loads(manifest.read_text(encoding="utf-8"))
+    if not isinstance(contents, dict) or not contents:
+        raise ValueError("Console runtime has an empty/invalid Vite manifest")
+    assets = set()
+    for row in contents.values():
+        if not isinstance(row, dict):
+            raise ValueError("Invalid compiled frontend entry")
+        for name in [row.get("file"), *row.get("css", []), *row.get("assets", [])]:
+            if name is None:
+                continue
+            if not isinstance(name, str):
+                raise ValueError("Invalid frontend asset path")
+            source = Path(name)
+            target = (browser / source)
+            if (source.is_absolute() or ".." in source.parts
+                    or not target.resolve().is_relative_to(browser.resolve())
+                    or not target.is_file()):
+                raise ValueError("Compiled frontend asset not present in runtime image: " + name)
+            assets.add(name)
+    if not assets:
+        raise ValueError("Console image has no compiled browser assets")
+    return len(assets)
+
+
 def check_image(component: str, tag: str, root: Path = ROOT) -> dict:
     copies, operations = expected(component, root)
     result = json.loads(run("docker", "image", "inspect", tag))
@@ -207,36 +235,9 @@ def check_image(component: str, tag: str, root: Path = ROOT) -> dict:
                 if actual != expected_names:
                     raise ValueError(f"Image has orphan contract JSON: {sorted(actual ^ expected_names)}")
             if component == "apps/console":
-                # The PHP/router attestation cannot by itself represent the
-                # separately built, browser-executed Vue/TypeScript assets.
-                # Read the ACTUAL packaged Vite manifest and every referenced
-                # artifact from the immutable image filesystem.
                 browser = destination / "vite-build"
                 run("docker", "cp", cid + ":/app/public/build", str(browser))
-                manifest = browser / "manifest.json"
-                if not manifest.is_file():
-                    raise ValueError("Console runtime image lacks compiled Vite manifest")
-                contents = json.loads(manifest.read_text(encoding="utf-8"))
-                if not isinstance(contents, dict) or not contents:
-                    raise ValueError("Console runtime has an empty/invalid Vite manifest")
-                assets = set()
-                for row in contents.values():
-                    if not isinstance(row, dict):
-                        raise ValueError("Invalid compiled frontend entry")
-                    for name in ([row.get("file")] +
-                                 row.get("css", []) + row.get("assets", [])):
-                        if name is None:
-                            continue
-                        if not isinstance(name, str):
-                            raise ValueError("Invalid frontend asset path")
-                        source = Path(name)
-                        if (source.is_absolute() or ".." in source.parts
-                                or not (browser / source).is_file()
-                                or (browser / source).is_symlink()):
-                            raise ValueError("Compiled frontend asset not present in runtime image: " + name)
-                        assets.add(name)
-                if not assets:
-                    raise ValueError("Console image has no compiled browser assets")
+                check_console_frontend(browser)
             # Binding owner operations to this image is only defensible when
             # ALL bounded runtime source code, not only a startup module, is
             # byte-for-byte identical to the reviewed checkout.
