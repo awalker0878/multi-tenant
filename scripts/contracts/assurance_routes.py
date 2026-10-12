@@ -92,12 +92,8 @@ def prove(app: str, route_list: Path | None = None, root: Path = ROOT,
                 "result": "PASS", "release_sha256": op["release_sha256"],
                 "test": check_name + ":actual_ASGI_200_validated",
             })
-            if app == "planning-lifecycle":
-                rows.append({
-                    "key": key, "claim": "authorization", "source": "live-denial",
-                    "result": "PASS", "release_sha256": op["release_sha256"],
-                    "test": check_name + ":invalid_workload_403",
-                })
+            # The dedicated Python authentication probe owns denial evidence;
+            # never publish a duplicate claim for the same operation.
     for observation in rows:
         observation["run_id"] = os.environ.get("GITHUB_RUN_ID")
         observation["revision"] = os.environ.get("GITHUB_SHA")

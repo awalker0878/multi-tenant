@@ -68,8 +68,9 @@ def assemble(name: str, root: Path = ROOT) -> dict:
         value = read(source, root)
         if name == "catalogue-internal-v1.json" and component == "PlanningInput":
             value.pop("components", None)
+            value = normalized(value)
         if component == "CurrentPlanningIntent":
-            value = current_intent(value)
+            value = normalized(current_intent(value))
         elif component != "MigrationInput":  # current embedded v4 wire payload
             value = normalized(value)
         output["components"]["schemas"][component] = value
