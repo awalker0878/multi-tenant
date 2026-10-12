@@ -25,6 +25,12 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      require_full_qualification:
+        description: Fail unless every active interface has executed evidence
+        required: true
+        type: boolean
+        default: false
 permissions:
   contents: read
   pull-requests: read
@@ -197,8 +203,14 @@ jobs:
           path: ${{ runner.temp }}/measured
           merge-multiple: true
       - name: Generate and retain operation-by-operation assurance findings
+        env:
+          REQUIRE_FULL_QUALIFICATION: ${{ inputs.require_full_qualification || 'false' }}
         run: |
-          python scripts/contracts/combine_assurance.py --input-directory "$RUNNER_TEMP/measured" --output "$RUNNER_TEMP/contract-assurance-report.json"
+          if [ "$REQUIRE_FULL_QUALIFICATION" = "true" ]; then
+            python scripts/contracts/combine_assurance.py --input-directory "$RUNNER_TEMP/measured" --output "$RUNNER_TEMP/contract-assurance-report.json" --require-qualified
+          else
+            python scripts/contracts/combine_assurance.py --input-directory "$RUNNER_TEMP/measured" --output "$RUNNER_TEMP/contract-assurance-report.json"
+          fi
       - name: Upload source-specific assurance report
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
