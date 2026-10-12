@@ -356,6 +356,33 @@ components:
             with self.assertRaisesRegex(ValueError, "Shipped contract copies missing"):
                 verify_runtime_inventory({"active_releases": []}, root)
 
+    def test_registered_but_unused_package_fails(self):
+        from runtime_inventory import verify_runtime_inventory
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            canonical = root / "contracts/openapi/demo-v1.json"
+            consumer = root / "apps/demo/resources/contracts/demo-v1.json"
+            canonical.parent.mkdir(parents=True)
+            consumer.parent.mkdir(parents=True)
+            canonical.write_text("{}")
+            consumer.write_text("{}")
+            registry = {"active_releases": [{
+                "path": "contracts/openapi/demo-v1.json",
+                "copies": ["apps/demo/resources/contracts/demo-v1.json"],
+            }]}
+            with self.assertRaisesRegex(ValueError, "no executable consumer"):
+                verify_runtime_inventory(registry, root)
+
+    def test_retirement_checker_rejects_stale_active_script(self):
+        from retirement_integrity import verify_retired_references
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            executable = root / "scripts/demo.py"
+            executable.parent.mkdir(parents=True)
+            executable.write_text("schema = 'contracts/openapi/demo-v1.json'\\n")
+            with self.assertRaisesRegex(ValueError, "Retired contracts still referenced"):
+                verify_retired_references(root, {"contracts/openapi/demo-v1.json"})
+
     def test_retired_canonical_file_cannot_reappear(self):
         from check import check_consumer_registry
         from check import load as real_load

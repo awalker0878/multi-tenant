@@ -7,6 +7,7 @@ on:
       - 'workers/**'
       - 'apps/console/**'
       - 'architecture/contract-consumers.json'
+      - 'architecture/retired-contract-releases.json'
       - 'scripts/contracts/**'
       - 'scripts/p01/contracts/**'
       - 'scripts/p03/**'
@@ -38,6 +39,8 @@ jobs:
         run: python -m pip install --disable-pip-version-check -r scripts/contracts/requirements.txt
       - name: Check canonical embedded readiness projection
         run: python scripts/contracts/generate_readiness.py
+      - name: Reject stale executable dependencies on retired canonical contracts
+        run: python scripts/contracts/retirement_integrity.py
       - name: Check generated owner authority response projections
         run: python scripts/contracts/generate_authority_releases.py --check
       - name: Check assembled contract bundles
