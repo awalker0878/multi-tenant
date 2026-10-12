@@ -73,8 +73,14 @@ def get_app(owner: str):
 
 
 async def probe(owner: str) -> tuple[list[dict], list[str]]:
-    app = get_app(owner)
     operations = inventory()["operations"]
+    try:
+        app = get_app(owner)
+    except Exception as error:
+        # A missing development secret or service bootstrap is NOT proof of
+        # a denial. Preserve the coverage report, mark all owned probes absent,
+        # and let the aggregate release gate fail closed.
+        return [], [owner + " router-unavailable:" + type(error).__name__]
     measured = []
     unresolved = []
     for op in operations:
