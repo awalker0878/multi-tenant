@@ -26,7 +26,7 @@ def classify(paths: list[str] | None) -> dict[str, bool]:
         "services/planning/", "services/inventory/", "services/lifecycle/",
         "workers/lifecycle/", "workers/inventory/", "scripts/p07/", "scripts/p08/",
         "scripts/p09/", "scripts/p10/", "scripts/p04/", "scripts/p05/", "scripts/p06/")
-    authority = shared or touches("services/assurance/", "contracts/fixtures/qualification-", "scripts/contracts/")
+    authority = shared or contract or touches("services/assurance/", "contracts/fixtures/qualification-", "scripts/contracts/")
     routes = shared or contract or touches("services/governance/", "services/catalogue/", "services/assurance/")
     return dict(docs=docs, contracts=shared or product or contract or touches("deploy/"),
                 security=security, native=native, authority=authority, routes=routes)
