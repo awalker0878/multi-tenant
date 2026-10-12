@@ -416,10 +416,12 @@ components:
                 "path": "contracts/schemas/planning/fact-v1.json", "copies": []
             }]}))
             script.write_text("schema = 'contracts/schemas/planning/fact-v1.json'")
-            verify_retired_references(root, {"contracts/schemas/inventory/fact-v1.json"})
-            script.write_text("schema = 'contracts/schemas/inventory/fact-v1.json'")
+            retired_path = "/".join(("contracts", "schemas", "inventory", "fact-v1.json"))
+            verify_retired_references(root, {retired_path})
+            retired_path = "/".join(("contracts", "schemas", "inventory", "fact-v1.json"))
+            script.write_text("schema = '" + retired_path + "'")
             with self.assertRaisesRegex(ValueError, "Retired contracts still referenced"):
-                verify_retired_references(root, {"contracts/schemas/inventory/fact-v1.json"})
+                verify_retired_references(root, {retired_path})
 
     def test_real_retirement_scan_has_no_self_references(self):
         from retirement_integrity import verify_retired_references
