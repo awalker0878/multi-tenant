@@ -295,7 +295,17 @@ def check_readiness_projection():
 def check_consumer_registry():
     registry = load("architecture/contract-consumers.json")
     inventory = registry["contracts"]
-    retired = set(load("architecture/retired-contract-releases.json")["retired"])
+    retirement = load("architecture/retired-contract-releases.json")
+    retired = set(retirement["retired"])
+    reviews = retirement.get("reviews", {})
+    if set(reviews) != retired:
+        raise ValueError("Every retired contract requires a per-path retirement review")
+    for path, review in reviews.items():
+        if not isinstance(review, dict) or not all(
+            isinstance(review.get(field), str) and review[field]
+            for field in ("reason", "internal_consumer_review", "external_consumer_review", "decision")
+        ):
+            raise ValueError(f"Retirement review incomplete: {path}")
     active = {entry["path"] for entry in registry["active_releases"]}
     if retired & active:
         raise ValueError("Retired canonical contract is registered as active")
@@ -381,6 +391,19 @@ def check_consumer_registry():
         for installed in entry.get("copies", []):
             if (ROOT / installed).read_bytes() != (ROOT / path).read_bytes():
                 raise ValueError(f"Active contract installed-copy drift: {installed}")
+    # A canonical bundle cannot be left in the checkout as undocumented history.
+    canonical = set()
+    for area in ("asyncapi", "capabilities", "openapi", "platforms", "schemas"):
+        for suffix in ("*.json", "*.yaml", "*.yml"):
+            canonical.update(
+                str(path.relative_to(ROOT))
+                for path in (ROOT / "contracts" / area).rglob(suffix)
+            )
+    if canonical != set(names):
+        raise ValueError("Canonical contracts outside active releases: " + repr(sorted(canonical - set(names)))
+                         + "; active releases without canonical files: " + repr(sorted(set(names) - canonical)))
+    from retirement_integrity import verify_retired_references
+    verify_retired_references(ROOT, retired)
     verify_runtime_inventory(registry, ROOT)
 
 
