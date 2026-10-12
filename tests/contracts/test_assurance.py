@@ -2,10 +2,12 @@
 from __future__ import annotations
 
 import json
+import os
 import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts/contracts"))
@@ -92,6 +94,23 @@ class AssuranceCoverageTests(unittest.TestCase):
         data = assess(self.root, [self.evidence(claim) for claim in claims])
         self.assertEqual(data["summary"]["qualified_http_operations"], 1)
         self.assertEqual(data["summary"]["verified_claims"], 5)
+
+    def test_release_gate_rejects_unattested_evidence(self):
+        claims = ["route", "producer", "consumer", "authorization", "tenant_isolation"]
+        rows = [self.evidence(claim) for claim in claims]
+        with patch.dict(os.environ, {
+            "GITHUB_RUN_ID": "123", "GITHUB_SHA": "a" * 40
+        }):
+            with self.assertRaisesRegex(ValueError, "Unattested operation evidence"):
+                assess(self.root, rows, require_provenance=True)
+            for row in rows:
+                row["run_id"] = "123"
+                row["revision"] = "a" * 40
+            self.assertEqual(assess(self.root, rows, require_provenance=True)
+                             ["summary"]["qualified_http_operations"], 1)
+            rows[0]["revision"] = "b" * 40
+            with self.assertRaisesRegex(ValueError, "Unattested operation evidence"):
+                assess(self.root, rows, require_provenance=True)
 
     def test_stale_and_counterfeit_evidence_is_rejected(self):
         with self.assertRaisesRegex(ValueError, "Stale operation evidence"):
