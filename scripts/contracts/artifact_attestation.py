@@ -63,6 +63,31 @@ def expected(component: str, root: Path = ROOT) -> tuple[list[dict], list[dict]]
         raise ValueError(f"No registered owner operations for built component: {component}")
     return copies, operations
 
+def consumed_bindings(component: str, root: Path = ROOT) -> list[dict]:
+    """Declare consumer API bindings; only an installed copy proves packaged bytes."""
+    owner = COMPONENTS[component][0]
+    ledger = json.loads((root / "architecture/contract-consumers.json").read_text())
+    operation_map = inventory(root)["operations"]
+    installed = {
+        row["canonical"] for row in ledger["active_releases"]
+        for copy in row.get("copies", [])
+        if "/".join(Path(copy).parts[:2]) == component
+    }
+    bindings = []
+    for release in ledger["active_releases"]:
+        if owner not in release["consumers"]:
+            continue
+        operations = [op for op in operation_map if op["release"] == release["path"]]
+        bindings.append({
+            "canonical": release["path"],
+            "canonical_sha256": sha((root / release["path"]).read_bytes()),
+            "evidence": ("verified-installed-copy" if release["path"] in installed
+                         else "declared-consumption-only"),
+            "operation_keys": sorted(op["key"] for op in operations),
+        })
+    return sorted(bindings, key=lambda row: row["canonical"])
+
+
 
 def check_wheel(component: str, wheel: Path, root: Path = ROOT) -> dict:
     if COMPONENTS[component][1] != "python":
@@ -103,6 +128,7 @@ def check_wheel(component: str, wheel: Path, root: Path = ROOT) -> dict:
         "kind": "wheel", "artifact_sha256": sha(wheel.read_bytes()),
         "source_revision": os.environ.get("GITHUB_SHA"),
         "installed_copies": copies, "owner_operations": operations,
+        "consumed_releases": consumed_bindings(component, root),
     }
 
 
@@ -190,6 +216,7 @@ def check_image(component: str, tag: str, root: Path = ROOT) -> dict:
         "kind": "oci", "artifact_sha256": image_id.removeprefix("sha256:"),
         "source_revision": revision, "installed_copies": copies,
         "owner_operations": operations,
+        "consumed_releases": consumed_bindings(component, root),
     }
 
 
