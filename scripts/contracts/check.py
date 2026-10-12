@@ -413,7 +413,8 @@ def check_consumer_registry():
     if canonical != set(names):
         raise ValueError("Canonical contracts outside active releases: " + repr(sorted(canonical - set(names)))
                          + "; active releases without canonical files: " + repr(sorted(set(names) - canonical)))
-    from retirement_integrity import verify_retired_references
+    from retirement_integrity import verify_retired_references, verify_retirement_decisions
+    verify_retirement_decisions(ROOT, retired, reviews)
     verify_retired_references(ROOT, retired)
     verify_runtime_inventory(registry, ROOT)
 

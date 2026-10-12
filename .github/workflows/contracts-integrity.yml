@@ -8,6 +8,7 @@ on:
       - 'apps/console/**'
       - 'architecture/contract-consumers.json'
       - 'architecture/retired-contract-releases.json'
+      - 'architecture/retirement-unverified-baseline.txt'
       - 'scripts/contracts/**'
       - 'scripts/p01/contracts/**'
       - 'scripts/p03/**'
