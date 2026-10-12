@@ -117,6 +117,9 @@ class HttpQualityTests(unittest.TestCase):
         new["paths"]["/v2/things"]["post"]["responses"]["201"]["content"]["application/json"]["schema"]["properties"] = {}
         self.assertIn("response field removed", repr(api_breakages(old, new)))
         new = copy.deepcopy(old)
+        new["paths"]["/v2/things"]["post"]["responses"]["201"]["content"]["application/json"]["schema"]["properties"]["extra"] = {"type": "string"}
+        self.assertIn("strict consumer sees new response fields", repr(api_breakages(old, new)))
+        new = copy.deepcopy(old)
         del new["paths"]["/v2/things"]["post"]["responses"]["409"]
         self.assertIn("response status removed", repr(api_breakages(old, new)))
 
