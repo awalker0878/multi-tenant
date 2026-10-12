@@ -196,6 +196,38 @@ def check_image(component: str, tag: str, root: Path = ROOT) -> dict:
                 expected_names = {Path(x["path"]).name for x in copies}
                 if actual != expected_names:
                     raise ValueError(f"Image has orphan contract JSON: {sorted(actual ^ expected_names)}")
+            # Binding owner operations to this image is only defensible when
+            # ALL bounded runtime source code, not only a startup module, is
+            # byte-for-byte identical to the reviewed checkout.
+            if COMPONENTS[component][1] == "php":
+                for folder in ("app", "routes"):
+                    source_root = root / component / folder
+                    packaged_root = destination / ("runtime-" + folder)
+                    run("docker", "cp", cid + ":/app/" + folder, str(packaged_root))
+                    source_files = {
+                        str(file.relative_to(source_root)): sha(file.read_bytes())
+                        for file in source_root.rglob("*.php")
+                    }
+                    packaged_files = {
+                        str(file.relative_to(packaged_root)): sha(file.read_bytes())
+                        for file in packaged_root.rglob("*.php")
+                    }
+                    if not source_files or source_files != packaged_files:
+                        raise ValueError(f"Image differs from reviewed PHP runtime sources: {component}/{folder}")
+            else:
+                if not local_root.is_dir():
+                    run("docker", "cp", cid + ":" + app_root, str(local_root))
+                source_root = root / component / "src" / pkg
+                source_files = {
+                    str(file.relative_to(source_root)): sha(file.read_bytes())
+                    for file in source_root.rglob("*.py")
+                }
+                packaged_files = {
+                    str(file.relative_to(local_root)): sha(file.read_bytes())
+                    for file in local_root.rglob("*.py")
+                }
+                if not source_files or source_files != packaged_files:
+                    raise ValueError(f"Image differs from reviewed Python runtime sources: {component}")
             if COMPONENTS[component][1] == "python" and copies:
                 found = set()
                 for namespace in ("inputs", "contracts", "messaging"):
