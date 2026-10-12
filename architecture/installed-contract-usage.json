@@ -3,19 +3,6 @@
   "description": "Production loader, package inclusion and generator evidence for every active installed JSON copy. This is not authorization to delete canonical releases.",
   "copies": [
     {
-      "copy": "apps/console/resources/contracts/migration-feature-policy-v1.json",
-      "canonical": "contracts/capabilities/migration-feature-policy-v1.json",
-      "loader": "apps/console/resources/js/pages/inventory/Migration.vue",
-      "load_kind": "literal",
-      "packaging": "apps/console/Dockerfile",
-      "packaging_marker": "COPY --from=dependencies /app/resources/contracts/ ./resources/contracts/",
-      "package_data": null,
-      "package_data_marker": null,
-      "generator": "contracts/source/capabilities/migration-feature-policy-v1/manifest.json",
-      "generation_mode": "generated_or_source_assembled",
-      "ci": ".github/workflows/contracts-integrity.yml"
-    },
-    {
       "copy": "apps/console/resources/contracts/catalogue-v1.0.1.json",
       "canonical": "contracts/openapi/catalogue-v1.0.1.json",
       "loader": "apps/console/app/Infrastructure/Catalogue/CatalogueClient.php",
@@ -26,6 +13,32 @@
       "package_data_marker": null,
       "generator": "scripts/p03/generate_clients.py",
       "generation_mode": "generated_or_source_assembled",
+      "ci": ".github/workflows/contracts-integrity.yml"
+    },
+    {
+      "copy": "apps/console/resources/contracts/governance-change-v1.json",
+      "canonical": "contracts/schemas/events/governance-change-v1.json",
+      "loader": "apps/console/app/Infrastructure/Notifications/GovernanceNotificationDecoder.php",
+      "load_kind": "literal",
+      "packaging": "apps/console/Dockerfile",
+      "packaging_marker": "COPY --from=dependencies /app/resources/contracts/ ./resources/contracts/",
+      "package_data": null,
+      "package_data_marker": null,
+      "generator": null,
+      "generation_mode": "canonical_snapshot",
+      "ci": ".github/workflows/contracts-integrity.yml"
+    },
+    {
+      "copy": "apps/console/resources/contracts/identity-change-v1.json",
+      "canonical": "contracts/schemas/events/identity-change-v1.json",
+      "loader": "apps/console/app/Infrastructure/Notifications/GovernanceNotificationDecoder.php",
+      "load_kind": "literal",
+      "packaging": "apps/console/Dockerfile",
+      "packaging_marker": "COPY --from=dependencies /app/resources/contracts/ ./resources/contracts/",
+      "package_data": null,
+      "package_data_marker": null,
+      "generator": null,
+      "generation_mode": "canonical_snapshot",
       "ci": ".github/workflows/contracts-integrity.yml"
     },
     {
@@ -81,6 +94,19 @@
       "ci": ".github/workflows/contracts-integrity.yml"
     },
     {
+      "copy": "apps/console/resources/contracts/migration-feature-policy-v1.json",
+      "canonical": "contracts/capabilities/migration-feature-policy-v1.json",
+      "loader": "apps/console/resources/js/pages/inventory/Migration.vue",
+      "load_kind": "literal",
+      "packaging": "apps/console/Dockerfile",
+      "packaging_marker": "COPY --from=dependencies /app/resources/contracts/ ./resources/contracts/",
+      "package_data": null,
+      "package_data_marker": null,
+      "generator": "contracts/source/capabilities/migration-feature-policy-v1/manifest.json",
+      "generation_mode": "generated_or_source_assembled",
+      "ci": ".github/workflows/contracts-integrity.yml"
+    },
+    {
       "copy": "apps/console/resources/contracts/planning-migration-v1.6.json",
       "canonical": "contracts/openapi/planning-migration-v1.6.json",
       "loader": "apps/console/app/Infrastructure/Planning/PlanningClient.php",
@@ -107,19 +133,6 @@
       "ci": ".github/workflows/contracts-integrity.yml"
     },
     {
-      "copy": "services/catalogue/resources/contracts/intent-v1.json",
-      "canonical": "contracts/schemas/catalogue/intent-v1.json",
-      "loader": "services/catalogue/app/Infrastructure/Catalogue/SchemaIntentValidator.php",
-      "load_kind": "literal",
-      "packaging": "services/catalogue/Dockerfile",
-      "packaging_marker": "COPY --from=dependencies /app/resources/ ./resources/",
-      "package_data": null,
-      "package_data_marker": null,
-      "generator": null,
-      "generation_mode": "canonical_snapshot",
-      "ci": ".github/workflows/contracts-integrity.yml"
-    },
-    {
       "copy": "services/catalogue/resources/contracts/foundation-event.json",
       "canonical": "contracts/schemas/events/catalogue-foundation-recorded-v1.json",
       "loader": "services/catalogue/app/Infrastructure/Messaging/EventCodec.php",
@@ -133,14 +146,14 @@
       "ci": ".github/workflows/contracts-integrity.yml"
     },
     {
-      "copy": "services/planning/src/planning/infrastructure/messaging/foundation-event.json",
-      "canonical": "contracts/schemas/events/catalogue-foundation-recorded-v1.json",
-      "loader": "services/planning/src/planning/infrastructure/messaging/codec.py",
+      "copy": "services/catalogue/resources/contracts/intent-v1.json",
+      "canonical": "contracts/schemas/catalogue/intent-v1.json",
+      "loader": "services/catalogue/app/Infrastructure/Catalogue/SchemaIntentValidator.php",
       "load_kind": "literal",
-      "packaging": "services/planning/Dockerfile",
-      "packaging_marker": "COPY src/ ./src/",
-      "package_data": "services/planning/pyproject.toml",
-      "package_data_marker": "\"planning.infrastructure.messaging\" = [\"*.json\"]",
+      "packaging": "services/catalogue/Dockerfile",
+      "packaging_marker": "COPY --from=dependencies /app/resources/ ./resources/",
+      "package_data": null,
+      "package_data_marker": null,
       "generator": null,
       "generation_mode": "canonical_snapshot",
       "ci": ".github/workflows/contracts-integrity.yml"
@@ -152,19 +165,6 @@
       "load_kind": "literal",
       "packaging": "services/governance/Dockerfile",
       "packaging_marker": "COPY --from=dependencies /app/resources/ ./resources/",
-      "package_data": null,
-      "package_data_marker": null,
-      "generator": null,
-      "generation_mode": "canonical_snapshot",
-      "ci": ".github/workflows/contracts-integrity.yml"
-    },
-    {
-      "copy": "apps/console/resources/contracts/governance-change-v1.json",
-      "canonical": "contracts/schemas/events/governance-change-v1.json",
-      "loader": "apps/console/app/Infrastructure/Notifications/GovernanceNotificationDecoder.php",
-      "load_kind": "literal",
-      "packaging": "apps/console/Dockerfile",
-      "packaging_marker": "COPY --from=dependencies /app/resources/contracts/ ./resources/contracts/",
       "package_data": null,
       "package_data_marker": null,
       "generator": null,
@@ -185,19 +185,6 @@
       "ci": ".github/workflows/contracts-integrity.yml"
     },
     {
-      "copy": "apps/console/resources/contracts/identity-change-v1.json",
-      "canonical": "contracts/schemas/events/identity-change-v1.json",
-      "loader": "apps/console/app/Infrastructure/Notifications/GovernanceNotificationDecoder.php",
-      "load_kind": "literal",
-      "packaging": "apps/console/Dockerfile",
-      "packaging_marker": "COPY --from=dependencies /app/resources/contracts/ ./resources/contracts/",
-      "package_data": null,
-      "package_data_marker": null,
-      "generator": null,
-      "generation_mode": "canonical_snapshot",
-      "ci": ".github/workflows/contracts-integrity.yml"
-    },
-    {
       "copy": "services/governance/resources/contracts/support-change-v1.json",
       "canonical": "contracts/schemas/events/support-change-v1.json",
       "loader": "services/governance/app/Infrastructure/Messaging/SupportEventEncoder.php",
@@ -206,6 +193,32 @@
       "packaging_marker": "COPY --from=dependencies /app/resources/ ./resources/",
       "package_data": null,
       "package_data_marker": null,
+      "generator": null,
+      "generation_mode": "canonical_snapshot",
+      "ci": ".github/workflows/contracts-integrity.yml"
+    },
+    {
+      "copy": "services/lifecycle/src/lifecycle/infrastructure/contracts/migration-readiness-v2.2.json",
+      "canonical": "contracts/schemas/planning/migration-readiness-v2.2.json",
+      "loader": "services/lifecycle/src/lifecycle/domain/migration_readiness.py",
+      "load_kind": "literal",
+      "packaging": "services/lifecycle/Dockerfile",
+      "packaging_marker": "COPY src/ ./src/",
+      "package_data": "services/lifecycle/pyproject.toml",
+      "package_data_marker": "\"lifecycle.infrastructure.contracts\" = [\"*.json\"]",
+      "generator": null,
+      "generation_mode": "canonical_snapshot",
+      "ci": ".github/workflows/contracts-integrity.yml"
+    },
+    {
+      "copy": "services/lifecycle/src/lifecycle/infrastructure/contracts/placement-reservation-v1.json",
+      "canonical": "contracts/schemas/planning/placement-reservation-v1.json",
+      "loader": "services/lifecycle/src/lifecycle/interfaces/placement_reservations.py",
+      "load_kind": "literal",
+      "packaging": "services/lifecycle/Dockerfile",
+      "packaging_marker": "COPY src/ ./src/",
+      "package_data": "services/lifecycle/pyproject.toml",
+      "package_data_marker": "\"lifecycle.infrastructure.contracts\" = [\"*.json\"]",
       "generator": null,
       "generation_mode": "canonical_snapshot",
       "ci": ".github/workflows/contracts-integrity.yml"
@@ -226,6 +239,19 @@
     {
       "copy": "services/planning/src/planning/infrastructure/inputs/catalogue-input-v1.json",
       "canonical": "contracts/schemas/planning/catalogue-input-v1.json",
+      "loader": "services/planning/src/planning/infrastructure/owner_contracts.py",
+      "load_kind": "planning_typed",
+      "packaging": "services/planning/Dockerfile",
+      "packaging_marker": "COPY src/ ./src/",
+      "package_data": "services/planning/pyproject.toml",
+      "package_data_marker": "\"planning.infrastructure.inputs\" = [\"*.json\"]",
+      "generator": null,
+      "generation_mode": "canonical_snapshot",
+      "ci": ".github/workflows/contracts-integrity.yml"
+    },
+    {
+      "copy": "services/planning/src/planning/infrastructure/inputs/governance-delegation-response-v1.json",
+      "canonical": "contracts/schemas/planning/governance-delegation-response-v1.json",
       "loader": "services/planning/src/planning/infrastructure/owner_contracts.py",
       "load_kind": "planning_typed",
       "packaging": "services/planning/Dockerfile",
@@ -276,21 +302,21 @@
       "ci": ".github/workflows/contracts-integrity.yml"
     },
     {
-      "copy": "services/lifecycle/src/lifecycle/infrastructure/contracts/migration-readiness-v2.2.json",
-      "canonical": "contracts/schemas/planning/migration-readiness-v2.2.json",
-      "loader": "services/lifecycle/src/lifecycle/domain/migration_readiness.py",
-      "load_kind": "literal",
-      "packaging": "services/lifecycle/Dockerfile",
+      "copy": "services/planning/src/planning/infrastructure/inputs/migration-support-v2.json",
+      "canonical": "contracts/schemas/planning/migration-support-v2.json",
+      "loader": "services/planning/src/planning/infrastructure/owner_contracts.py",
+      "load_kind": "planning_typed",
+      "packaging": "services/planning/Dockerfile",
       "packaging_marker": "COPY src/ ./src/",
-      "package_data": "services/lifecycle/pyproject.toml",
-      "package_data_marker": "\"lifecycle.infrastructure.contracts\" = [\"*.json\"]",
+      "package_data": "services/planning/pyproject.toml",
+      "package_data_marker": "\"planning.infrastructure.inputs\" = [\"*.json\"]",
       "generator": null,
       "generation_mode": "canonical_snapshot",
       "ci": ".github/workflows/contracts-integrity.yml"
     },
     {
-      "copy": "services/planning/src/planning/infrastructure/inputs/migration-support-v2.json",
-      "canonical": "contracts/schemas/planning/migration-support-v2.json",
+      "copy": "services/planning/src/planning/infrastructure/inputs/placement-reservation-v1.json",
+      "canonical": "contracts/schemas/planning/placement-reservation-v1.json",
       "loader": "services/planning/src/planning/infrastructure/owner_contracts.py",
       "load_kind": "planning_typed",
       "packaging": "services/planning/Dockerfile",
@@ -310,6 +336,19 @@
       "packaging_marker": "COPY src/ ./src/",
       "package_data": "services/planning/pyproject.toml",
       "package_data_marker": "\"planning.infrastructure.inputs\" = [\"*.json\"]",
+      "generator": null,
+      "generation_mode": "canonical_snapshot",
+      "ci": ".github/workflows/contracts-integrity.yml"
+    },
+    {
+      "copy": "services/planning/src/planning/infrastructure/messaging/foundation-event.json",
+      "canonical": "contracts/schemas/events/catalogue-foundation-recorded-v1.json",
+      "loader": "services/planning/src/planning/infrastructure/messaging/codec.py",
+      "load_kind": "literal",
+      "packaging": "services/planning/Dockerfile",
+      "packaging_marker": "COPY src/ ./src/",
+      "package_data": "services/planning/pyproject.toml",
+      "package_data_marker": "\"planning.infrastructure.messaging\" = [\"*.json\"]",
       "generator": null,
       "generation_mode": "canonical_snapshot",
       "ci": ".github/workflows/contracts-integrity.yml"

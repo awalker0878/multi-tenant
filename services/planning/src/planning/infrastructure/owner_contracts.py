@@ -10,6 +10,12 @@ import re
 
 # (owner, HTTP verb, anchored path pattern, installed schema basename)
 OWNER_OPERATIONS: tuple[tuple[str, str, str, str], ...] = (
+    ("GOVERNANCE", "POST",
+     r"/v1/tenants/[^/]+/delegated-authorizations",
+     "governance-delegation-response-v1"),
+    ("CAPACITY", "POST",
+     r"/internal/tenants/[^/]+/placement-reservations/checks",
+     "placement-reservation-v1"),
     ("CATALOGUE", "GET",
      r"/v1/tenants/[^/]+/planning-inputs/[^/]+/[^/]+/[^/]+/[^/]+",
      "catalogue-input-v1"),

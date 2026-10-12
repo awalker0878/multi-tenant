@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.multi-tenant.local/contracts/schemas/planning/governance-delegation-response-v1.json",
+  "title": "Current Governance delegated authorization response validated by Planning",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "allowed": {
+      "const": true
+    },
+    "delegation_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "actor_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "delegating_service": {
+      "const": "console"
+    },
+    "audience": {
+      "enum": [
+        "catalogue",
+        "inventory",
+        "planning",
+        "assurance"
+      ]
+    },
+    "tenant_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "action": {
+      "type": "string"
+    },
+    "scope": {
+      "$ref": "#/$defs/Scope"
+    },
+    "expires_at": {
+      "type": "string"
+    },
+    "evaluated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "authority_use": {
+      "const": "request_bound"
+    }
+  },
+  "required": [
+    "allowed",
+    "delegation_id",
+    "actor_id",
+    "delegating_service",
+    "audience",
+    "tenant_id",
+    "action",
+    "scope",
+    "expires_at",
+    "evaluated_at",
+    "authority_use"
+  ],
+  "$defs": {
+    "Scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "site_id",
+        "environment",
+        "resource_id"
+      ],
+      "properties": {
+        "site_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 64
+        },
+        "environment": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 64
+        },
+        "resource_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 128
+        }
+      }
+    }
+  }
+}

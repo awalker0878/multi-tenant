@@ -36,8 +36,7 @@ def request(
     schema_name: str | None = None,
 ) -> dict[str, Any]:
     try:
-        resolved_contract = (contract_for_operation(owner, method, path, schema_name)
-                             if owner in {"CATALOGUE", "INVENTORY", "ASSURANCE"} else None)
+        resolved_contract = contract_for_operation(owner, method, path, schema_name)
         u = urlsplit(os.environ[owner + "_URL"])
         ca = os.environ[owner + "_CA_FILE"]
         if (
@@ -80,15 +79,11 @@ def request(
             result = decode(raw)
             if not isinstance(result, dict):
                 raise ValueError
-            if resolved_contract is not None:
-                name = resolved_contract
-                schema = json.loads(
-                    files("planning.infrastructure.inputs").joinpath(name + ".json").read_text()
-                )
-                if not Draft202012Validator(schema, format_checker=FormatChecker()).is_valid(
-                    result
-                ):
-                    raise ValueError
+            schema = json.loads(
+                files("planning.infrastructure.inputs").joinpath(resolved_contract + ".json").read_text()
+            )
+            if not Draft202012Validator(schema, format_checker=FormatChecker()).is_valid(result):
+                raise ValueError
             return result
         finally:
             connection.close()

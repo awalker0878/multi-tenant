@@ -161,10 +161,12 @@ def check_owner_operation_bindings():
         ("INVENTORY", "migration-input-v4"),
         ("ASSURANCE", "qualification-v2.1"),
         ("ASSURANCE", "migration-support-v2"),
+        ("GOVERNANCE", "governance-delegation-response-v1"),
+        ("CAPACITY", "placement-reservation-v1"),
     }
     present = set()
     for owner, method, pattern, schema in operations:
-        if owner not in {"CATALOGUE", "INVENTORY", "ASSURANCE"} or method not in {"GET", "POST"}:
+        if owner not in {"CATALOGUE", "INVENTORY", "ASSURANCE", "GOVERNANCE", "CAPACITY"} or method not in {"GET", "POST"}:
             raise ValueError(f"Invalid owner operation: {owner}:{method}:{schema}")
         re.compile(pattern)
         present.add((owner, schema))
@@ -173,7 +175,7 @@ def check_owner_operation_bindings():
         item = releases.get(canonical)
         if (item is None or installed not in item.get("copies", [])
                 or "planning" not in item.get("consumers", [])
-                or item["owner"] != owner.lower()):
+                or item["owner"] != ("lifecycle" if owner == "CAPACITY" else owner.lower())):
             raise ValueError(f"Runtime owner-operation contract missing from registry: {canonical}")
         if not (ROOT / installed).is_file() or (ROOT / canonical).read_bytes() != (ROOT / installed).read_bytes():
             raise ValueError(f"Runtime owner-operation schema drift: {installed}")

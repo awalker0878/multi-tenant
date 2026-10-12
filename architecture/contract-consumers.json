@@ -81,8 +81,9 @@
       "catalogue"
     ],
     "contracts/openapi/governance-delegation-v1.1.json": [
+      "console",
       "governance",
-      "console"
+      "planning"
     ],
     "contracts/openapi/governance-directory-v1.json": [
       "governance",
@@ -309,6 +310,14 @@
     ],
     "contracts/schemas/common/error-v2.json": [
       "contract-platform"
+    ],
+    "contracts/schemas/planning/governance-delegation-response-v1.json": [
+      "governance",
+      "planning"
+    ],
+    "contracts/schemas/planning/placement-reservation-v1.json": [
+      "lifecycle",
+      "planning"
     ]
   },
   "scope": "Implemented consumers: Planning consumes Catalogue reference facts; Console uses Governance identity APIs and five tenant-administration notifications as refresh hints. Diagnostics are owned by all seven applications. No shared SQL authority is implied.",
@@ -509,7 +518,8 @@
       "path": "contracts/openapi/governance-delegation-v1.1.json",
       "owner": "governance",
       "consumers": [
-        "console"
+        "console",
+        "planning"
       ],
       "copies": [],
       "source_manifest": null,
@@ -1015,6 +1025,18 @@
       "depends_on": []
     },
     {
+      "path": "contracts/schemas/planning/governance-delegation-response-v1.json",
+      "owner": "governance",
+      "consumers": [
+        "planning"
+      ],
+      "copies": [
+        "services/planning/src/planning/infrastructure/inputs/governance-delegation-response-v1.json"
+      ],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
       "path": "contracts/schemas/planning/inventory-input-v1.json",
       "owner": "inventory",
       "consumers": [
@@ -1080,6 +1102,19 @@
       ],
       "copies": [
         "services/planning/src/planning/infrastructure/inputs/migration-support-v2.json"
+      ],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/schemas/planning/placement-reservation-v1.json",
+      "owner": "lifecycle",
+      "consumers": [
+        "planning"
+      ],
+      "copies": [
+        "services/planning/src/planning/infrastructure/inputs/placement-reservation-v1.json",
+        "services/lifecycle/src/lifecycle/infrastructure/contracts/placement-reservation-v1.json"
       ],
       "source_manifest": null,
       "depends_on": []

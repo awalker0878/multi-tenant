@@ -3,6 +3,9 @@
 import asyncio
 import json
 import re
+from importlib.resources import files
+
+from jsonschema import Draft202012Validator, FormatChecker
 from collections.abc import Callable
 from typing import Any
 
@@ -54,6 +57,14 @@ class PlacementReservationApp:
                 payload = await asyncio.to_thread(
                     self.service.transition, tenant, body["plan_digest"], operation
                 )
+            # Validate the real owner response before it crosses a service boundary.
+            # A malformed receipt must never authorize a capacity decision.
+            schema = json.loads(
+                files("lifecycle.infrastructure.contracts")
+                .joinpath("placement-reservation-v1.json").read_text()
+            )
+            if not Draft202012Validator(schema, format_checker=FormatChecker()).is_valid(payload):
+                raise ValueError("placement_receipt_contract_invalid")
             status = 200
         except Held as error:
             status, payload = 423, {"error": str(error)}
