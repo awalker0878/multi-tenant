@@ -246,6 +246,13 @@ def quality_schema(path: str, schema: dict, policy: dict) -> None:
 def quality_api(path: str, doc: dict, error: dict, policy: dict) -> None:
     if doc.get("openapi") != "3.1.0":
         raise ValueError("New OpenAPI release must use 3.1.0: " + path)
+    _, file_version = version(path)
+    text_version = doc.get("info", {}).get("version")
+    if not isinstance(text_version, str) or not re.fullmatch(r"[0-9]+(?:\.[0-9]+){0,2}", text_version):
+        raise ValueError("New API must declare numeric semantic info.version: " + path)
+    parsed_version = tuple((list(map(int, text_version.split("."))) + [0, 0, 0])[:3])
+    if parsed_version != file_version:
+        raise ValueError("OpenAPI info.version does not match versioned canonical filename: " + path)
     declared = doc.get("components", {}).get("securitySchemes", {})
     defined_error = doc.get("components", {}).get("schemas", {}).get("Error")
     stripped = {key: val for key, val in error.items() if key not in ("$id", "$schema")}
