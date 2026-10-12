@@ -32,7 +32,7 @@ def good_api():
         "operationId": "createThing",
         "security": [{"Caller": []}],
         "parameters": [{"name": "Idempotency-Key", "in": "header",
-                        "required": True, "schema": {"type": "string", "minLength": 24}}],
+                        "required": True, "schema": {"type": "string", "minLength": 24, "maxLength": 128}}],
         "requestBody": {"required": True, "content": {
             "application/json": {"schema": {
                 "type": "object", "additionalProperties": False,
@@ -158,7 +158,7 @@ class SchemaAndEvents(unittest.TestCase):
                 "messages": {"changed": {"$ref": "#/components/messages/Changed"}},
                 "x-delivery": {"guarantee": "at-least-once", "ordering_key": "tenant_id",
                                "deduplication_key": "event_id", "dead_letter_address": "pulse.dlq.v2",
-                               "max_attempts": 5},
+                               "max_attempts": 5, "acknowledgment": "after-commit", "backoff_strategy": "exponential-jitter", "dead_letter_retention_seconds": 604800, "deduplication_window_seconds": 86400},
             }
             event = {
                 "asyncapi": "3.0.0",
