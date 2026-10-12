@@ -111,3 +111,6 @@ interfaces. Byte parity and route matching alone do not grant qualification.
 
 Current operation assurance and built-artifact verification are documented in
 [Contract assurance phases](../docs/contracts/assurance-phases.md).
+
+New contract release admission, security/error/idempotency/event rules and
+semantic versioning: [Phase 3 release quality](../docs/contracts/release-quality.md).
