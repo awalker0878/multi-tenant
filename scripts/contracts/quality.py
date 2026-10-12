@@ -191,6 +191,10 @@ def api_breakages(old: dict, new: dict) -> list[str]:
                 failures.append(at + ": security/authorization requirements changed")
             if prior.get("operationId") != current.get("operationId"):
                 failures.append(at + ": generated-client operationId changed")
+            if prior.get("x-idempotency") != current.get("x-idempotency"):
+                failures.append(at + ": idempotency scope, retention or conflict semantics changed")
+            if prior.get("x-public-operation") != current.get("x-public-operation"):
+                failures.append(at + ": public access contract changed")
             if prior.get("requestBody", {}).get("required") is not True and current.get("requestBody", {}).get("required") is True:
                 failures.append(at + ": request body newly required")
             if set((prior.get("requestBody") or {}).get("content", {})) != set((current.get("requestBody") or {}).get("content", {})):

@@ -142,6 +142,15 @@ class HttpQualityTests(unittest.TestCase):
         response["headers"] = {"ETag": {"schema": {"type": "string"}}}
         self.assertIn("header guarantees", repr(api_breakages(old_api, replacement)))
 
+    def test_idempotency_and_public_contract_changes_require_new_major(self):
+        old = good_api()
+        new = copy.deepcopy(old)
+        new["paths"]["/v2/things"]["post"]["x-idempotency"]["ttl_seconds"] = 300
+        self.assertIn("idempotency", repr(api_breakages(old, new)))
+        new = copy.deepcopy(old)
+        new["paths"]["/v2/things"]["post"]["x-public-operation"] = True
+        self.assertIn("public access", repr(api_breakages(old, new)))
+
     def test_schema_required_and_enum_narrowing_are_breaking(self):
         old = {"type": "object", "required": ["id"], "additionalProperties": False,
                "properties": {"id": {"enum": ["a", "b"]}}}
