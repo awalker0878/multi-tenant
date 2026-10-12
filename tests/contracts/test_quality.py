@@ -198,6 +198,7 @@ class GitPublicationTests(unittest.TestCase):
             base = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip()
             new = good_api()
             new["paths"] = {"/v2/replaced": new["paths"]["/v2/things"]}
+            new["info"]["version"] = "2.1.0"
             replacement = "contracts/openapi/things-v2.1.json"
             (root / replacement).write_text(json.dumps(new))
             (root / "architecture/contract-consumers.json").write_text(json.dumps({
@@ -206,6 +207,7 @@ class GitPublicationTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "Breaking change requires a NEW MAJOR"):
                 check_new_releases(root, base)
             (root / replacement).unlink()
+            new["info"]["version"] = "3.0.0"
             replacement = "contracts/openapi/things-v3.json"
             (root / replacement).write_text(json.dumps(new))
             (root / "architecture/contract-consumers.json").write_text(json.dumps({
