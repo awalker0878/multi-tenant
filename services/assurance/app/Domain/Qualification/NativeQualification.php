@@ -37,7 +37,7 @@ final class NativeQualification
             $receipt = $this->verify($proof, $keys, 'observer', $scope, $now);
             $this->native($receipt, $scope);
             $this->require(($receipt['adapter_conformant'] ?? null) === true, 'adapter_runtime_mismatch');
-            $this->require(($receipt['method_modes'] ?? null) === ($record['method_modes'] ?? null), 'installed_method_mode_evidence_drift');
+            $this->require(self::canonical($receipt['method_modes'] ?? null) === self::canonical($record['method_modes'] ?? null), 'installed_method_mode_evidence_drift');
             $evidence[] = $proof['sha256'];
             $observers[] = $receipt['subject_id'];
             $observerKeys[] = $receipt['_key_sha256'];
@@ -62,7 +62,7 @@ final class NativeQualification
         $this->require($now - $runtime['observed_at'] <= 60
             && $runtime['expires_at'] <= $runtime['observed_at'] + 120, 'runtime_observation_stale');
         $this->require(($runtime['adapter_conformant'] ?? null) === true, 'adapter_runtime_mismatch');
-        $this->require(($runtime['method_modes'] ?? null) === ($record['method_modes'] ?? null), 'installed_method_mode_review_drift');
+        $this->require(self::canonical($runtime['method_modes'] ?? null) === self::canonical($record['method_modes'] ?? null), 'installed_method_mode_review_drift');
         $this->require(($runtime['decision_sha256'] ?? null) === $bundle['decision']['sha256'], 'runtime_decision_unbound');
         $expiry = min($expiry, $runtime['expires_at']);
         $this->require(($record['dimensions'] ?? []) === ($runtime['dimensions'] ?? null), 'runtime_dimensions_changed');

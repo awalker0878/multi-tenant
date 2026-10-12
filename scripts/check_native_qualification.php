@@ -15,6 +15,11 @@ $result = $resolver->resolve($fixture['bundle'], $fixture['keys'], $fixture['sco
 if ($result['verification']['valid'] !== true || $result['version'] !== 2) {
     throw new RuntimeException('signed_native_record_failed');
 }
+$unordered = array_reverse($fixture['bundle']['record']['method_modes'], true);
+if (NativeQualification::canonical($unordered)
+    !== NativeQualification::canonical($fixture['bundle']['record']['method_modes'])) {
+    throw new RuntimeException('method_matrix_canonicalization_failed');
+}
 foreach (['unresolved', 'tampered', 'signature', 'foreign', 'expired', 'role', 'runtime', 'definition', 'missing_method', 'false_support'] as $fault) {
     $bundle = $fixture['bundle'];
     $keys = $fixture['keys'];
