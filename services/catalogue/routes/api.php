@@ -30,6 +30,6 @@ Route::prefix('/v1/tenants/{tenant}')->whereUuid('tenant')->group(function (): v
     }
 });
 
-Route::get('/v1/tenants/{tenant}/planning-inputs/{application}/{environment}/{site}/{revision}', PlanningInputController::class)->whereUuid(['tenant', 'application', 'environment', 'site', 'revision']);
+Route::get('/v1/tenants/{tenant}/planning-inputs/{application}/{environment}/{site}/{revision}', PlanningInputController::class)->whereUuid(['tenant', 'application', 'environment', 'site', 'revision']);->middleware(\App\Http\Middleware\RequireBearerHeader::class);
 
-Route::get('/internal/tenants/{tenant}/applications/{application}/environments/{environment}/current-planning-intent', CurrentPlanningIntentController::class)->whereUuid(['tenant', 'application', 'environment']);
+Route::get('/internal/tenants/{tenant}/applications/{application}/environments/{environment}/current-planning-intent', CurrentPlanningIntentController::class)->whereUuid(['tenant', 'application', 'environment'])->middleware(\App\Http\Middleware\RequireBearerHeader::class);
