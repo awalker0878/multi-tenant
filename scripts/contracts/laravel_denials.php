@@ -34,7 +34,7 @@ foreach ($registry['active_releases'] as $entry) {
                 continue;
             }
             $security = $operation['security'] ?? ($spec['security'] ?? []);
-            if ($security === [] || $security === [{}]) {
+            if ($security === [] || $security === [[]]) {
                 continue;
             }
             $expected++;
