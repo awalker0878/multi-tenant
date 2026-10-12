@@ -51,7 +51,7 @@ Lifecycle migration admission now requires an independently credentialed `catalo
 
 ## E4 qualified-transformation provenance
 
-The newly published `schemas/planning/independent-e4-field-provenance-v1.json` defines an independently attestable E4 field proof: Catalogue revision/digest, workload and field, exact source profile and desired/observed field hashes, proof/plan/acceptance digests, level, decision, revocation and validity interval. **It is a prerequisite for a future versioned migration-readiness wire release, not a currently commissioned execution grant.** The active wire v2/v2.2 admission validator intentionally **holds required qualified transformations**, because v2 field dispositions do not carry an independently verifiable E4 reference. Do not relax that invariant by accepting `evidence_source=independent_e4` alone; activate these transformations only after an authenticated Assurance proof lookup and a complete versioned producer/consumer rollout with negative tests.
+The proposed E4 field-provenance model formerly represented by a non-commissioned schema defines an independently attestable E4 field proof: Catalogue revision/digest, workload and field, exact source profile and desired/observed field hashes, proof/plan/acceptance digests, level, decision, revocation and validity interval. **It is a prerequisite for a future versioned migration-readiness wire release, not a currently commissioned execution grant.** The active wire v2/v2.2 admission validator intentionally **holds required qualified transformations**, because v2 field dispositions do not carry an independently verifiable E4 reference. Do not relax that invariant by accepting `evidence_source=independent_e4` alone; activate these transformations only after an authenticated Assurance proof lookup and a complete versioned producer/consumer rollout with negative tests.
 
 ## Executable consumer inventory and conformance
 
@@ -59,8 +59,7 @@ The editable active-release registry is checked against a **separate observation
 of deployed code** in `scripts/contracts/runtime_inventory.py`. Executable
 PHP/Python/TypeScript/Vue references to packaged JSON inside each bounded
 product must resolve to exactly one registered byte-identical canonical
-release. A retired copy may remain in a package only while it is not referenced
-by deployed code. The checker also requires every shipped AsyncAPI release and
+release. Retired or test-only copies do not remain in deployed packages. Tests read their canonical contract directly, and every shipped copy must have an active declared consumer. The checker also requires every shipped AsyncAPI release and
 its event payload schemas to appear in the active inventory; removing records
 from both editable registry maps is not sufficient to bypass this check.
 
@@ -180,3 +179,7 @@ Current owner-boundary releases additionally include `inventory-collection-worke
 ## Active-only contract cleanup
 
 Superseded versioned canonical releases and historical-only consumer bundles do not remain in the checkout. Retirement decisions are recorded in `architecture/retired-contract-releases.json`; Git history holds the old bytes. `inventory-input-v1.json` remains an **active current API component** because `inventory-native-input-v1.3` embeds its PlanningInput response and Planning installs it. The release registry enumerates that installed copy. Current native provisioning boundaries (`lifecycle-native-boundary-v1`, `worker-native-effect-v1`) remain until current independent safety coverage can replace them. The P07 generator that wrote the superseded `lifecycle-native-jobs-v1` contract was removed; the active job release is v1.1.
+
+### 2026-10-11 canonical cleanup closeout
+
+Canonical native-boundary, worker-effect, adapter-package, inventory-fact and planning-fact qualification contracts are registered as active. Historical-only Inventory collection-page v1.4, commissioning-evidence v1 and proposed E4 provenance v1 files have been retired from the current tree; their designs remain available in Git history. The Governance support OpenAPI test now reads its current canonical contract rather than shipping a test-only service copy. The Console feature-policy copy is retained because the Vue migration page imports it at build time. Retirement manifest reviews record the limit of repository-only evidence: they do not attest independently verified external-consumer absence.

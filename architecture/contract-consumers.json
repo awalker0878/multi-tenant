@@ -316,6 +316,24 @@
     "contracts/schemas/planning/inventory-input-v1.json": [
       "inventory",
       "planning"
+    ],
+    "contracts/openapi/lifecycle-native-boundary-v1.json": [
+      "lifecycle",
+      "lifecycle-workers"
+    ],
+    "contracts/openapi/worker-native-effect-v1.json": [
+      "lifecycle-workers",
+      "lifecycle"
+    ],
+    "contracts/schemas/expansion/adapter-package-v1.json": [
+      "planning"
+    ],
+    "contracts/schemas/inventory/fact-v1.1.json": [
+      "inventory",
+      "inventory-workers"
+    ],
+    "contracts/schemas/planning/fact-v1.json": [
+      "planning"
     ]
   },
   "scope": "Implemented consumers: Planning consumes Catalogue reference facts; Console uses Governance identity APIs and five tenant-administration notifications as refresh hints. Diagnostics are owned by all seven applications. No shared SQL authority is implied.",
@@ -598,9 +616,7 @@
       "consumers": [
         "console"
       ],
-      "copies": [
-        "services/governance/resources/contracts/governance-support-v1.json"
-      ],
+      "copies": [],
       "source_manifest": null,
       "depends_on": []
     },
@@ -1082,6 +1098,52 @@
       "copies": [
         "services/planning/src/planning/infrastructure/inputs/inventory-input-v1.json"
       ],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/openapi/lifecycle-native-boundary-v1.json",
+      "owner": "lifecycle",
+      "consumers": [
+        "lifecycle-workers"
+      ],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/openapi/worker-native-effect-v1.json",
+      "owner": "lifecycle-workers",
+      "consumers": [
+        "lifecycle"
+      ],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/schemas/expansion/adapter-package-v1.json",
+      "owner": "planning",
+      "consumers": [],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/schemas/inventory/fact-v1.1.json",
+      "owner": "inventory",
+      "consumers": [
+        "inventory-workers"
+      ],
+      "copies": [],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/schemas/planning/fact-v1.json",
+      "owner": "planning",
+      "consumers": [],
+      "copies": [],
       "source_manifest": null,
       "depends_on": []
     }
