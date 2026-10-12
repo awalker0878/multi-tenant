@@ -181,8 +181,18 @@ def check_image(component: str, tag: str, root: Path = ROOT) -> dict:
                 raise ValueError(f"Image executable entrypoint differs from release source: {component}")
             # Copy every shipped contract JSON folder, not only individual
             # expected files. Extra packaged schemas may not silently ship.
-            if copies:
+            if COMPONENTS[component][1] == "python":
                 run("docker", "cp", cid + ":" + app_root, str(local_root))
+            else:
+                try:
+                    run("docker", "cp", cid + ":" + app_root, str(local_root))
+                except subprocess.CalledProcessError:
+                    if copies:
+                        raise
+                    # A PHP component without installed copies may omit the
+                    # resources/contracts directory. Extra JSON, if present,
+                    # must still be detected below.
+
             for item in copies:
                 if COMPONENTS[component][1] == "php":
                     packaged = local_root / Path(item["path"]).name
@@ -191,7 +201,7 @@ def check_image(component: str, tag: str, root: Path = ROOT) -> dict:
                     packaged = local_root / Path(*Path(path).parts[1:])
                 if not packaged.is_file() or sha(packaged.read_bytes()) != item["sha256"]:
                     raise ValueError(f"Image missing/mismatched installed contract: {item['path']}")
-            if COMPONENTS[component][1] == "php" and copies:
+            if COMPONENTS[component][1] == "php":
                 actual = {p.name for p in local_root.glob("*.json")}
                 expected_names = {Path(x["path"]).name for x in copies}
                 if actual != expected_names:
@@ -228,7 +238,7 @@ def check_image(component: str, tag: str, root: Path = ROOT) -> dict:
                 }
                 if not source_files or source_files != packaged_files:
                     raise ValueError(f"Image differs from reviewed Python runtime sources: {component}")
-            if COMPONENTS[component][1] == "python" and copies:
+            if COMPONENTS[component][1] == "python":
                 found = set()
                 for namespace in ("inputs", "contracts", "messaging"):
                     folder = local_root / "infrastructure" / namespace
