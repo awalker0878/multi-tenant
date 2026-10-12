@@ -20,10 +20,15 @@ def test_active_inventory_v4_is_the_exact_installed_planning_schema() -> None:
         (ROOT / "services/planning/src/planning/infrastructure/inputs/migration-input-v4.json").read_text()
     )
     api = json.loads(
-        (ROOT / "contracts/openapi/inventory-native-input-v1.2.json").read_text()
+        (ROOT / "contracts/openapi/inventory-native-input-v1.3.json").read_text()
     )
-    response = next(iter(api["paths"].values()))["get"]["responses"]["200"]["content"]["application/json"]["schema"]
-    assert canonical == installed == response
+    endpoint = (
+        "/internal/tenants/{tenant}/migration-inputs/"
+        "{application}/{environment}/{site}/{revision}/{digest}"
+    )
+    response_ref = api["paths"][endpoint]["get"]["responses"]["200"]["content"]["application/json"]["schema"]
+    assert response_ref == {"$ref": "#/components/schemas/MigrationInput"}
+    assert canonical == installed == api["components"]["schemas"]["MigrationInput"]
     Draft202012Validator.check_schema(installed)
     assert "collection_coverages" in installed["properties"]
     assert "source_associations" in installed["properties"]
