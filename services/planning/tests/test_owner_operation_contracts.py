@@ -29,6 +29,8 @@ SHA = "a" * 64
     ("ASSURANCE", "POST", f"/v1/tenants/{TENANT}/migration-qualifications", "migration-support-v2"),
     ("ASSURANCE", "POST", f"/v1/tenants/{TENANT}/planning-qualification-v2", "qualification-v2.1"),
     ("ASSURANCE", "POST", f"/internal/tenants/{TENANT}/qualification-checks", "qualification-v2.1"),
+    ("GOVERNANCE", "POST", f"/v1/tenants/{TENANT}/delegated-authorizations", "governance-delegation-response-v1"),
+    ("CAPACITY", "POST", f"/internal/tenants/{TENANT}/placement-reservations/checks", "placement-reservation-v1"),
 ])
 def test_runtime_operation_has_one_immutable_schema(owner, method, path, expected):
     assert contract_for_operation(owner, method, path) == expected
@@ -42,7 +44,7 @@ def test_runtime_operation_has_one_immutable_schema(owner, method, path, expecte
 def test_undocumented_owner_route_fails_closed():
     with pytest.raises(ValueError):
         contract_for_operation("ASSURANCE", "POST", f"/internal/tenants/{TENANT}/unregistered")
-    assert len(OWNER_OPERATIONS) == 7
+    assert len(OWNER_OPERATIONS) == 9
 
 
 def test_real_owner_transport_validates_qualified_assurance_response(monkeypatch):
@@ -151,3 +153,84 @@ def test_catalogue_current_owner_response_uses_real_published_intent(monkeypatch
     assert invalid.value.status == 503
     with pytest.raises(Rejected):
         owners.request("CATALOGUE", "GET", path, schema_name="catalogue-current-v1")
+
+
+def test_capacity_and_governance_owner_responses_are_schema_and_scope_validated(monkeypatch):
+    from copy import deepcopy
+
+    scope = {"site_id": SITE, "environment": ENV, "resource_id": APP}
+    delegation = {
+        "allowed": True, "delegation_id": TENANT, "actor_id": APP,
+        "delegating_service": "console", "audience": "planning", "tenant_id": TENANT,
+        "action": "plan.read", "scope": scope,
+        "expires_at": "2026-10-12T15:00:00Z", "evaluated_at": "2026-10-12T14:59:00Z",
+        "authority_use": "request_bound",
+    }
+    reservation = {
+        "schema_version": 1, "reservation_id": APP, "tenant_id": TENANT,
+        "plan_digest": SHA, "request_digest": SHA, "placement_sha256": SHA,
+        "generation_id": ENV, "policy_sha256": SHA,
+        "allocations": [{
+            "workload_id": APP, "pool_id": SHA, "native_ref": "provider-host",
+            "vector": {"vcpus": 2, "memory_mib": 4096, "storage_gib": 20, "addresses": 1},
+        }],
+        "state": "reserved", "observed_at": 2000000000, "expires_at": 2000000030,
+        "revision": 1, "native_write_authorized": False,
+    }
+    wire = [delegation]
+
+    class Response:
+        status = 200
+
+        def read(self, n):
+            return json.dumps(wire[0]).encode()
+
+        def getheader(self, name, default=None):
+            return "identity"
+
+    class Connection:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def request(self, method, path, data, headers):
+            assert method == "POST" and path.startswith(("/v1/tenants/", "/internal/tenants/"))
+
+        def getresponse(self):
+            return Response()
+
+        def close(self):
+            pass
+
+    for owner in ("GOVERNANCE", "CAPACITY"):
+        monkeypatch.setenv(owner + "_URL", "https://owner.example")
+        monkeypatch.setenv(owner + "_CA_FILE", "/tmp/ca.pem")
+    monkeypatch.setattr(owners, "mounted_secret", lambda _: "test-only-token")
+    monkeypatch.setattr(owners.ssl, "create_default_context", lambda **kwargs: object())
+    monkeypatch.setattr(owners.http.client, "HTTPSConnection", Connection)
+
+    routes = [
+        ("GOVERNANCE", f"/v1/tenants/{TENANT}/delegated-authorizations",
+         {"action": "plan.read", "scope": scope}, delegation),
+        ("CAPACITY", f"/internal/tenants/{TENANT}/placement-reservations/checks",
+         {"plan_digest": SHA}, reservation),
+    ]
+    for owner, path, body, success in routes:
+        wire[0] = success
+        assert owners.request(owner, "POST", path, body) == success
+        violations = [
+            {**success, "tenant_id": SITE},
+            {**success, "unexpected": True},
+        ]
+        if owner == "GOVERNANCE":
+            violations.extend([{**success, "scope": {**scope, "site_id": TENANT}},
+                               {**success, "audience": "inventory"}])
+        else:
+            violations.extend([{**success, "native_write_authorized": True},
+                               {**success, "plan_digest": "f" * 64},
+                               {**success, "allocations": [{**success["allocations"][0],
+                                                             "vector": {"vcpus": "2"}}]}])
+        for invalid in violations:
+            wire[0] = deepcopy(invalid)
+            with pytest.raises(Rejected) as error:
+                owners.request(owner, "POST", path, body)
+            assert error.value.status == 503

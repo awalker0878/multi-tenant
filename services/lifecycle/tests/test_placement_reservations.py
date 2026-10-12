@@ -270,3 +270,21 @@ def test_aggregated_vector_rejects_mixed_classified_and_unclassified_allocations
     selected["placement_sha256"] = digest(selected["allocations"])
     with pytest.raises(Held, match="placement_vector_class_totals_inconsistent"):
         service.reserve(selected["scope"]["tenant_id"], selected)
+
+
+def test_authenticated_cross_tenant_cannot_observe_or_transition_another_reservation(
+    database: Postgres,
+) -> None:
+    source = Snapshots()
+    service = PlacementReservations(database, source, lambda: source.now)
+    selected = request(source, 4)
+    tenant = selected["scope"]["tenant_id"]
+    other_tenant = str(uuid4())
+    accepted = service.reserve(tenant, selected)
+    assert service.check(tenant, selected["plan_digest"])["reservation_id"] == accepted["reservation_id"]
+    with pytest.raises(Held, match="placement_reservation_missing"):
+        service.check(other_tenant, selected["plan_digest"])
+    with pytest.raises(Held, match="placement_transition_invalid"):
+        service.transition(other_tenant, selected["plan_digest"], "release")
+    with pytest.raises(Held, match="placement_scope_invalid"):
+        service.reserve(other_tenant, selected)

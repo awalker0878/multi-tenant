@@ -85,6 +85,22 @@ def request(
             )
             if not Draft202012Validator(schema, format_checker=FormatChecker()).is_valid(result):
                 raise ValueError
+            # A valid JSON shape must also belong to the actual request scope.
+            # Never let an authorized service credential substitute for tenant authority.
+            if owner == "CAPACITY":
+                tenant = path.split("/")[3]
+                if (result["tenant_id"] != tenant or body is None
+                        or result["plan_digest"] != body["plan_digest"]):
+                    raise ValueError
+            elif owner == "GOVERNANCE":
+                tenant = path.split("/")[3]
+                if (result["tenant_id"] != tenant or body is None
+                        or result["scope"] != body["scope"]
+                        or result["action"] != body["action"]
+                        or result["audience"] != "planning"
+                        or result["delegating_service"] != "console"
+                        or result["authority_use"] != "request_bound"):
+                    raise ValueError
             return result
         finally:
             connection.close()

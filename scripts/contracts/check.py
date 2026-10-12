@@ -11,7 +11,7 @@ from check_events import check_events
 from check_registry import check_consumer_registry, check_owner_operation_bindings
 from check_http import (
     check_native_candidates, check_implemented_api_contracts,
-    check_uuid_policy, check_error_policy,
+    check_uuid_policy, check_error_policy, check_owner_response_projections,
 )
 
 
@@ -33,6 +33,7 @@ def main():
     check_consumer_registry()
     check_owner_operation_bindings()
     check_implemented_api_contracts()
+    check_owner_response_projections()
     check_uuid_policy()
     check_error_policy()
     print(json.dumps(dict(status="PASS", sources=sources, bundles=bundles, unique_ids=id_count, schema_count=schema_count, paths=paths, operations=ops)))
