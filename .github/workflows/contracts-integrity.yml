@@ -77,6 +77,8 @@ jobs:
           python scripts/p03/generate_clients.py --check
           python scripts/p04/generate_clients.py --check
           python scripts/p06/generate_contracts.py --check
+      - name: Verify every owned operation and installed contract has an artifact job
+        run: python scripts/contracts/runtime_binding_coverage.py
       - name: Derive complete typed provider-consumer dependency graph
         run: python scripts/contracts/dependency_graph.py --output "$RUNNER_TEMP/contract-dependency-graph.json"
       - name: Check wire versions, schemas, route parity and consumer drift
