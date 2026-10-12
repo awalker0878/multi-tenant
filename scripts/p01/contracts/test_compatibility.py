@@ -5,6 +5,7 @@ import subprocess
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from compatibility import approved_clearance, check, compare
 
@@ -117,9 +118,20 @@ class ActiveContractTests(unittest.TestCase):
         self.clearances(self.approval())
         stage = self.commit()
         self.remove_current(reviewed=True)
-        result = check(self.root, stage)
+        with patch("compatibility.verify_github_approval") as remote_review:
+            result = check(self.root, stage)
+        remote_review.assert_called_once()
         self.assertEqual(result["removed_from_review_base"], [PATH])
         self.assertEqual(result["staged_new_retirements"], [PATH])
+
+    def test_approved_record_fails_closed_without_github_verification(self):
+        self.clearances(self.approval())
+        stage = self.commit()
+        self.remove_current(reviewed=True)
+        with patch("compatibility.verify_github_approval",
+                   side_effect=ValueError("independent GitHub review unavailable")):
+            with self.assertRaisesRegex(ValueError, "independent GitHub review unavailable"):
+                check(self.root, stage)
 
     def test_approved_clearance_checks_hash_and_independent_review(self):
         approval = self.approval()

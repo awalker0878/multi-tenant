@@ -27,6 +27,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  pull-requests: read
 jobs:
   integrity:
     runs-on: ubuntu-24.04
@@ -46,6 +47,7 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
           EVENT_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
           EVENT_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           if [ "$EVENT_NAME" = pull_request ]; then

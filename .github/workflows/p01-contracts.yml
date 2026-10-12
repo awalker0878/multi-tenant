@@ -7,6 +7,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  pull-requests: read
 jobs:
   contracts:
     name: Foundation contracts
@@ -38,6 +39,7 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
           EVENT_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
           EVENT_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           export JAVA_HOME="$JAVA_HOME_17_X64"
