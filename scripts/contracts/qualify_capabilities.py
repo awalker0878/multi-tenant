@@ -10,6 +10,7 @@ provider credentials, execution authority, or a production-ready migration.
 from __future__ import annotations
 
 import argparse
+import ast
 import hashlib
 import json
 import re
@@ -33,15 +34,30 @@ def tests_from_xml(path: Path) -> list[dict]:
         raise ValueError("Worker JUnit execution evidence missing: " + str(path))
     tree = ET.parse(path)
     items = []
+    seen = set()
+    suites = list(tree.iter("testsuite"))
+    if not suites:
+        raise ValueError("JUnit contains no executed test suite")
+    for suite in suites:
+        for status in ("failures", "errors", "skipped"):
+            if int(suite.get(status, "0")):
+                raise ValueError("E2 qualification JUnit suite reports " + status)
     for testcase in tree.iter("testcase"):
         name = testcase.get("name")
-        if not name:
-            raise ValueError("JUnit contains unnamed test result")
+        classname = testcase.get("classname")
+        if not name or not classname:
+            raise ValueError("JUnit contains unnamed or unowned test result")
         if any(testcase.find(tag) is not None for tag in ("failure", "error", "skipped")):
             raise ValueError("E2 capability qualification has failed/skipped test: " + name)
-        items.append({"name": name, "classname": testcase.get("classname", "")})
+        identity = (classname, name)
+        if identity in seen:
+            raise ValueError("Duplicate JUnit execution identity: " + name)
+        seen.add(identity)
+        items.append({"name": name, "classname": classname})
     if not items:
         raise ValueError("JUnit has no actual executed tests")
+    if sum(int(suite.get("tests", len(items))) for suite in suites) < len(items):
+        raise ValueError("JUnit test totals do not match actual testcases")
     return items
 
 
@@ -67,41 +83,62 @@ def qualify(root: Path, xml: Path) -> dict:
             "installed_provider_qualified": False,
         }
     for required in MANDATORY:
-        if not any(name.startswith(required) for name in names):
+        if not any(case["name"].split("[", 1)[0] == required
+                   and "test_" in case["classname"] for case in observed):
             raise ValueError("Missing mandatory native qualification execution: " + required)
+    # Independently prove every typed operation across ALL nine native
+    # source/target platform directions. A substring match is not evidence.
+    fault_cases = {
+        "test_mismatched_data_method_is_held_before_native_submission": {
+            "operation", "platform", "same_environment", "mechanism",
+            "dataset", "predecessor", "reverse", "parameters",
+        },
+    }
+    for test, expected_faults in fault_cases.items():
+        actual = {
+            case["name"].removeprefix(test + "[").removesuffix("]")
+            for case in observed
+            if case["name"].startswith(test + "[")
+            and "test_method_protocol" in case["classname"]
+        }
+        if actual != expected_faults:
+            raise ValueError("Incomplete native negative cases: " + test)
+    readback = [
+        case for case in observed
+        if case["name"].startswith("test_independent_dataset_readback_enforces_every_limit[")
+        and "test_method_protocol" in case["classname"]
+    ]
+    if len(readback) != 12:
+        raise ValueError("Incomplete independent readback denial matrix")
     for method, record in methods.items():
+        handler_path = record["implementation"]["handler"]
+        if not handler_path.endswith("/migration_method.py"):
+            continue
+        module = ast.parse((root / handler_path).read_text())
+        node = next((n.value for n in module.body
+                     if isinstance(n, ast.Assign)
+                     and any(isinstance(t, ast.Name) and t.id == "OPERATIONS"
+                             for t in n.targets)), None)
+        if node is None:
+            raise ValueError("Missing typed native dispatch table: " + method)
+        implementations = ast.literal_eval(node)
         alias = record["v1_alias"]
-        # The typed data-operation implementations are covered by their own
-        # parameterized execution test, not merely the registry's file paths.
-        if record["implementation"]["handler"].endswith("/migration_method.py"):
-            for stage in {
-                stage for stages in record["stages"].values() for stage in stages
-            }:
-                from_stage = [n for n in names if
-                              n.startswith("test_protected_runtime_dispatches_exact_data_mechanism_in_every_direction[")
-                              and alias in n and stage in n]
-                # Only stages with an actual native data-operation handler
-                # are checked by this dispatch test. Remaining stages are
-                # checked by the stage matrix and native ownership controls.
-                if stage in {
-                    "capture", "restart_baseline_source", "export_copy",
-                    "import_target", "final_sync", "reverse_sync",
-                } and not from_stage:
-                    # Verify against the canonical operation map, never a
-                    # guessed stage applicability.
-                    import ast
-                    code = (root / record["implementation"]["handler"]).read_text()
-                    module = ast.parse(code)
-                    table = next((node.value for node in module.body
-                                  if isinstance(node, ast.Assign)
-                                  and any(isinstance(target, ast.Name)
-                                          and target.id == "OPERATIONS"
-                                          for target in node.targets)), None)
-                    if table is None:
-                        raise ValueError("Missing actual typed native dispatch table: " + method)
-                    operations = ast.literal_eval(table)
-                    if stage in operations.get(alias, {}):
-                        raise ValueError("Native stage dispatch lacks executed evidence: " + method + "/" + stage)
+        for stage in implementations.get(alias, {}):
+            if not any(stage in rows for rows in record["stages"].values()):
+                raise ValueError("Unreachable native stage implementation: " + method + "/" + stage)
+            for source_platform in data["platforms"]:
+                for target_platform in data["platforms"]:
+                    case_name = (
+                        "test_protected_runtime_dispatches_exact_data_mechanism_in_every_direction"
+                        f"[{alias}-{stage}-{source_platform}-{target_platform}]"
+                    )
+                    hits = [case for case in observed
+                            if case["name"] == case_name
+                            and "test_method_protocol" in case["classname"]]
+                    if len(hits) != 1:
+                        raise ValueError("Native stage dispatch lacks executed evidence: "
+                                         + method + "/" + stage + "/"
+                                         + source_platform + "/" + target_platform)
     revision = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root,
                                         text=True, timeout=15).strip()
     if not re.fullmatch(r"[a-f0-9]{40}", revision):

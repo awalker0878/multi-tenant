@@ -33,9 +33,23 @@ class ExecutedCapabilityEvidenceTests(unittest.TestCase):
                             f"[MATRIX_{method}__{mode}]",
                 })
         for name in MANDATORY:
-            ET.SubElement(suite, "testcase", {
-                "classname": "test_method_protocol", "name": name,
-            })
+            if name == "test_mismatched_data_method_is_held_before_native_submission":
+                for fault in ("operation", "platform", "same_environment", "mechanism",
+                              "dataset", "predecessor", "reverse", "parameters"):
+                    ET.SubElement(suite, "testcase", {
+                        "classname": "test_method_protocol", "name": name + "[" + fault + "]",
+                    })
+            elif name == "test_independent_dataset_readback_enforces_every_limit":
+                for fault in ("fault0", "partial", "stale", "identity", "lag", "loss",
+                              "integrity", "metadata", "source_writer", "target_writer",
+                              "deadline", "boundary"):
+                    ET.SubElement(suite, "testcase", {
+                        "classname": "test_method_protocol", "name": name + "[" + fault + "]",
+                    })
+            else:
+                ET.SubElement(suite, "testcase", {
+                    "classname": "test_method_protocol", "name": name,
+                })
         # Include every truly implemented native operation, not a list of
         # strings that merely happen to occur in a handler's source.
         source = (ROOT / "workers/lifecycle/src/lifecycle_worker/infrastructure/migration_method.py")
@@ -49,11 +63,13 @@ class ExecutedCapabilityEvidenceTests(unittest.TestCase):
                 continue
             alias = entry["v1_alias"]
             for stage in table[alias]:
-                ET.SubElement(suite, "testcase", {
-                    "classname": "test_method_protocol",
-                    "name": "test_protected_runtime_dispatches_exact_data_mechanism_in_every_direction"
-                            f"[{alias}-{stage}-vmware-ahv]",
-                })
+                for source in self.declaration["platforms"]:
+                    for target in self.declaration["platforms"]:
+                        ET.SubElement(suite, "testcase", {
+                            "classname": "test_method_protocol",
+                            "name": "test_protected_runtime_dispatches_exact_data_mechanism_in_every_direction"
+                                    f"[{alias}-{stage}-{source}-{target}]",
+                        })
         return suite
 
     def write(self, suite: ET.Element) -> None:
@@ -85,6 +101,37 @@ class ExecutedCapabilityEvidenceTests(unittest.TestCase):
                 break
         self.write(suite)
         with self.assertRaisesRegex(ValueError, "dispatch lacks executed evidence"):
+            qualify(ROOT, self.xml)
+
+    def test_missing_single_platform_direction_fails_closed(self):
+        suite = self.valid_suite()
+        cases = suite.findall("testcase")
+        missing = next(item for item in cases
+                       if "vmware-openstack" in item.get("name", "")
+                       and "test_protected_runtime_dispatches_" in item.get("name", ""))
+        suite.remove(missing)
+        self.write(suite)
+        with self.assertRaisesRegex(ValueError, "dispatch lacks executed evidence"):
+            qualify(ROOT, self.xml)
+
+    def test_missing_native_fault_case_fails_closed(self):
+        suite = self.valid_suite()
+        missing = next(item for item in suite.findall("testcase")
+                       if item.get("name", "").endswith("[mechanism]")
+                       and "test_mismatched_data_method" in item.get("name", ""))
+        suite.remove(missing)
+        self.write(suite)
+        with self.assertRaisesRegex(ValueError, "Incomplete native negative cases"):
+            qualify(ROOT, self.xml)
+
+    def test_missing_readback_denial_fails_closed(self):
+        suite = self.valid_suite()
+        missing = next(item for item in suite.findall("testcase")
+                       if item.get("name", "").endswith("[stale]")
+                       and "test_independent_dataset_readback" in item.get("name", ""))
+        suite.remove(missing)
+        self.write(suite)
+        with self.assertRaisesRegex(ValueError, "Incomplete independent readback"):
             qualify(ROOT, self.xml)
 
     def test_skipped_native_denial_fails_closed(self):
