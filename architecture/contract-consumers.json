@@ -1095,9 +1095,7 @@
       "consumers": [
         "planning"
       ],
-      "copies": [
-        "services/planning/src/planning/infrastructure/inputs/inventory-input-v1.json"
-      ],
+      "copies": [],
       "source_manifest": null,
       "depends_on": []
     },

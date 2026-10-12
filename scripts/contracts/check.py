@@ -635,13 +635,12 @@ def check_implemented_api_contracts():
 
     inv_api = load("contracts/openapi/inventory-native-input-v1.3.json")
     for embedded, source, installed in (
-        ("PlanningInput", "contracts/schemas/planning/inventory-input-v1.json",
-         "services/planning/src/planning/infrastructure/inputs/inventory-input-v1.json"),
+        ("PlanningInput", "contracts/schemas/planning/inventory-input-v1.json", None),
         ("CapabilityInput", "contracts/schemas/planning/inventory-input-v2.json",
          "services/planning/src/planning/infrastructure/inputs/inventory-input-v2.json"),
     ):
         reference = normalize_uuids(load(source))
-        if inv_api["components"]["schemas"][embedded] != reference or load(source) != load(installed):
+        if inv_api["components"]["schemas"][embedded] != reference or (installed is not None and load(source) != load(installed)):
             raise ValueError(f"Inventory native {embedded} producer/consumer schema drift")
     assurance_api = load("contracts/openapi/assurance-qualification-v1.json")
     for embedded, source in (

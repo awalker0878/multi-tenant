@@ -183,3 +183,5 @@ Superseded versioned canonical releases and historical-only consumer bundles do 
 ### 2026-10-11 canonical cleanup closeout
 
 Canonical native-boundary, worker-effect, adapter-package, inventory-fact and planning-fact qualification contracts are registered as active. Historical-only Inventory collection-page v1.4, commissioning-evidence v1 and proposed E4 provenance v1 files have been retired from the current tree; their designs remain available in Git history. The Governance support OpenAPI test now reads its current canonical contract rather than shipping a test-only service copy. The Console feature-policy copy is retained because the Vue migration page imports it at build time. Retirement manifest reviews record the limit of repository-only evidence: they do not attest independently verified external-consumer absence.
+
+The active Inventory v1.3 HTTP `PlanningInput` embeds the canonical inventory-input-v1 schema, but Planning no longer loads its former v1-installed copy. That packaged duplicate was removed; the current v2 capability-input and v4 migration-input installed schemas remain.
