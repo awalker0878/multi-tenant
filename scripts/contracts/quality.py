@@ -386,6 +386,13 @@ def check_new_releases(root: Path, revision: str) -> dict:
     registry = load(root / "architecture/contract-consumers.json")
     current = {entry["path"] for entry in registry["active_releases"]}
     before = git_base_paths(root, revision)
+    try:
+        prior_registry = json.loads(subprocess.run(
+            ["git", "show", revision + ":architecture/contract-consumers.json"],
+            cwd=root, check=True, capture_output=True, text=True, timeout=30
+        ).stdout)
+    except subprocess.CalledProcessError:
+        prior_registry = {"active_releases": []}
     new = sorted(current - before)
     old_versions = {}
     for filename in sorted(before):
@@ -418,7 +425,8 @@ def check_new_releases(root: Path, revision: str) -> dict:
         predecessor = old_versions.get(family)
         affected = sorted({
             consumer
-            for release in registry["active_releases"]
+            for snapshot in (prior_registry, registry)
+            for release in snapshot["active_releases"]
             if release["path"] == path or (predecessor is not None and release["path"] == predecessor[1])
             for consumer in release.get("consumers", [])
         })
