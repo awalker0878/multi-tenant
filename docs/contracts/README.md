@@ -65,3 +65,16 @@ Assurance check current contracts only.
 
 See [the service error/idempotency ADR](adr-service-authority-errors-idempotency-2026-10-11.md)
 and the [implementation records](../implementation/) for operational details.
+
+## Retirement clearance after the active-only cleanup
+
+The native API duplicates were eliminated: only Lifecycle migration boundary v2
+and worker migration effect v2.1 claim their current native operations. Security
+negative tests still reject obsolete provision-only grants. The retirement checker
+also rejects newly retired canonical paths when their external-consumer status is
+unverified. Fifty-three older owner-directed removals remain explicitly
+unverified and frozen as a historical review backlog; this is not external
+clearance. See `architecture/retirement-unverified-baseline.txt` and the
+retirement manifest before approving further deletions. Installed consumer-copy
+checks now recognize actual JSON loader/import expressions and typed Planning
+owner-operation mapping instead of filename mentions in comments.

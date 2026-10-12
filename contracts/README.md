@@ -54,8 +54,9 @@ Planning v1.6 OpenAPI wire projection from that active profile.
 Readiness is an assessment only; neither workload admission nor native provider
 writes are authorized by a positive readiness result.
 
-Current native provision/migration boundaries and their negative grant tests
-remain part of the active registry. The Inventory collection-manifest source
+The v2 Lifecycle migration boundary and v2.1 worker migration-effect API
+are the only active owners of their respective native operations. P07 tests
+validate these current APIs and reject the old provision-stage fixture. The Inventory collection-manifest source
 partitions maintain their order, including interleaved source/target/owner
 attributes, and must reproduce the exact canonical bundle. Independent E3/E4
 evidence and field-level transformation qualification must be commissioned
@@ -84,6 +85,15 @@ No installed JSON copy may exist merely because it is listed in the registry.
 The runtime inventory independently requires a real loader, including Planning's
 typed dynamic owner-operation binding, and checks byte parity for all packages.
 No retired path may be reintroduced or referenced from executable source, tests,
-build scripts or CI. Deletion of published interfaces still requires an explicit
-consumer/commitment decision; repository scans do not prove absence of external
-consumers. Git history retains the old bytes without inflating the checkout.
+build scripts or CI. Prospective retirements must include explicit independent
+external-consumer review evidence and a recorded disposition of compatibility
+commitments. `not-independently-verified` is not accepted for any **new**
+retirement.
+
+The 53 already-removed canonical versions remain a **frozen, unresolved
+review backlog**, not certified external clearances. The exact roster is pinned
+by `architecture/retirement-unverified-baseline.txt` and the digest in
+`scripts/contracts/retirement_integrity.py`. Clearing an outstanding version
+requires genuine external evidence; no repository-only scan can establish the
+absence of external consumers. Previous bytes remain in Git history rather than
+being copied into the working tree.
