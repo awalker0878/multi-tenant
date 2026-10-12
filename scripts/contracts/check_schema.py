@@ -4,6 +4,7 @@ import json
 import re
 from pathlib import Path
 from jsonschema import Draft202012Validator, FormatChecker
+from openapi_spec_validator import validate_spec
 ROOT = Path(__file__).resolve().parents[2]
 
 def load(name: str):
