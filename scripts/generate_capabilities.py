@@ -75,7 +75,7 @@ def projections(data):
     php += '/** Generated definition metadata; Assurance decisions remain independent. */\nfinal class CapabilityDefinitions\n{\n'
     php += f"    public const string SHA256 = '{checksum}';\n\n"
     php += f"    public const string VERSION = '{data['definition_version']}';\n\n"
-    for name, value in [('PLATFORMS', data['platforms']), ('METHODS', list(methods)), ('WIRE_METHODS', list(aliases))]:
+    for name, value in [('PLATFORMS', data['platforms']), ('METHODS', list(methods)), ('WIRE_METHODS', list(aliases)), ('MODES', data['modes'])]:
         php += f"    public const array {name} = [" + ', '.join(repr(v) for v in value) + '];\n\n'
     php = php.rstrip() + '\n}\n'
     output[ROOT / 'services/assurance/app/Domain/Qualification/CapabilityDefinitions.php'] = php

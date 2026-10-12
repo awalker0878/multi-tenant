@@ -37,6 +37,7 @@ final class NativeQualification
             $receipt = $this->verify($proof, $keys, 'observer', $scope, $now);
             $this->native($receipt, $scope);
             $this->require(($receipt['adapter_conformant'] ?? null) === true, 'adapter_runtime_mismatch');
+            $this->require(($receipt['method_modes'] ?? null) === ($record['method_modes'] ?? null), 'installed_method_mode_evidence_drift');
             $evidence[] = $proof['sha256'];
             $observers[] = $receipt['subject_id'];
             $observerKeys[] = $receipt['_key_sha256'];
@@ -61,6 +62,7 @@ final class NativeQualification
         $this->require($now - $runtime['observed_at'] <= 60
             && $runtime['expires_at'] <= $runtime['observed_at'] + 120, 'runtime_observation_stale');
         $this->require(($runtime['adapter_conformant'] ?? null) === true, 'adapter_runtime_mismatch');
+        $this->require(($runtime['method_modes'] ?? null) === ($record['method_modes'] ?? null), 'installed_method_mode_review_drift');
         $this->require(($runtime['decision_sha256'] ?? null) === $bundle['decision']['sha256'], 'runtime_decision_unbound');
         $expiry = min($expiry, $runtime['expires_at']);
         $this->require(($record['dimensions'] ?? []) === ($runtime['dimensions'] ?? null), 'runtime_dimensions_changed');
@@ -140,6 +142,21 @@ final class NativeQualification
             && ($receipt['cases']['adapter_behavior'] ?? null) === 'passed'
             && ($receipt['cases']['installed_identity'] ?? null) === 'passed'
             && ($receipt['cases']['runtime_artifacts'] ?? null) === 'passed', 'native_evidence_required');
+        $matrix = $receipt['method_modes'] ?? null;
+        $this->require(is_array($matrix), 'installed_method_mode_matrix_required');
+        $expected = [];
+        foreach (CapabilityDefinitions::WIRE_METHODS as $method) {
+            foreach (CapabilityDefinitions::MODES as $mode) {
+                $key = 'method:'.$method.':'.$mode;
+                $state = $matrix[$key] ?? null;
+                $this->require(in_array($state, ['passed', 'unsupported'], true)
+                    && ($receipt['cases'][$key] ?? null) === $state,
+                    'installed_method_mode_unverified');
+                $expected[$key] = true;
+            }
+        }
+        $this->require(array_keys($expected) !== []
+            && count($matrix) === count($expected), 'installed_method_mode_matrix_incomplete');
     }
 
     public static function digest(mixed $value): string

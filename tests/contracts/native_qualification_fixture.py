@@ -40,16 +40,24 @@ def signed_fixture(record, directory, now=None, inventory=None, snapshot=None, r
         return {'key_id': role, 'content_base64': base64.b64encode(raw).decode(),
                 'sha256': hashlib.sha256(raw).hexdigest(), 'signature_base64': base64.b64encode(signature).decode()}
 
+    method_modes = {
+        'method:' + method['v1_alias'] + ':' + mode: 'unsupported'
+        for method in json.loads(source.read_text())['methods'].values()
+        for mode in json.loads(source.read_text())['modes']
+    }
     record = copy.deepcopy(record)
     record.pop('verification', None)
-    record.update(version=2, evidence_level='E4' if receiving else 'E3')
+    record.update(version=2, evidence_level='E4' if receiving else 'E3',
+                  method_modes=method_modes)
     proof = {'kind': 'native_conformance', 'simulation': False, 'finalized': True,
              'scope_sha256': digest(scope), 'definition_sha256': definition,
              'runtime_artifacts': scope['artifacts'], 'adapter_conformant': True,
              'dimensions': record['dimensions'], 'capabilities': record['capabilities'],
+             'method_modes': method_modes,
              'cases': ({'capability:' + k: 'passed' for k in record['capabilities']}
                        | {'dimension:' + k: 'passed' for k in record['dimensions']}
-                       | {'adapter_behavior':'passed','installed_identity':'passed','runtime_artifacts':'passed'}),
+                       | {'adapter_behavior':'passed','installed_identity':'passed','runtime_artifacts':'passed'}
+                       | method_modes),
              'observed_at': now, 'expires_at': now + 3600, 'subject_id': keys['observer']['subject_id']}
     if inventory is not None:
         proof['inventory']=copy.deepcopy(inventory)
