@@ -208,20 +208,10 @@ def check_implemented_api_contracts():
     # A schema embedded into OpenAPI must have its local definitions rebased.
     # Only the reference anchor changes; the active Catalogue v2 payload is
     # otherwise an exact projection of the canonical producer schema.
+    from generate_authority_releases import assemble as authority_projection
     embedded = load("contracts/openapi/catalogue-internal-v1.json")["components"]["schemas"]["CurrentPlanningIntent"]
-    current = load("contracts/schemas/planning/catalogue-current-v2.json")
-    def relocate_current(node):
-        if isinstance(node, list):
-            for item in node:
-                relocate_current(item)
-        elif isinstance(node, dict):
-            ref = node.get("$ref")
-            if isinstance(ref, str) and ref.startswith("#/$defs/"):
-                node["$ref"] = ref.replace("#/$defs/", "#/components/schemas/CurrentPlanningIntent/$defs/", 1)
-            for item in node.values():
-                relocate_current(item)
-    relocate_current(current)
-    if embedded != current:
+    projected = authority_projection("catalogue-internal-v1.json")["components"]["schemas"]["CurrentPlanningIntent"]
+    if embedded != projected:
         raise ValueError("Catalogue current-v2 OpenAPI projection drift")
 
     # Canonical producer -> active OpenAPI -> installed consumer parity.
