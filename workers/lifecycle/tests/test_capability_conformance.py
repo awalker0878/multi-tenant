@@ -9,7 +9,7 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 
 from lifecycle_worker.application.native import NativeHeld, digest
-from lifecycle_worker.domain.capability_definitions import DEFINITION_SHA256, DIMENSIONS
+from lifecycle_worker.domain.capability_definitions import DEFINITION_SHA256, DIMENSIONS, MODES, WIRE_METHODS
 from lifecycle_worker.infrastructure.capability_conformance import ConformancePublisher
 
 
@@ -44,12 +44,27 @@ def test_failure_suspends_review_until_a_new_decision(tmp_path: Path) -> None:
             *("dimension:" + d for d in DIMENSIONS),
         )
     }
+    method_modes = {
+        "method:" + method + ":" + mode: "unsupported"
+        for method in WIRE_METHODS for mode in MODES
+    }
+    cases.update({
+        key: {
+            "outcome": "unsupported",
+            "reason": "not_qualified_on_synthetic_installation",
+            "scope_sha256": digest(scope),
+            "artifacts": artifacts,
+            "observed_at": 1000,
+        }
+        for key in method_modes
+    })
     observed: dict[str, Any] = {
         "scope_sha256": digest(scope),
         "definition_sha256": DEFINITION_SHA256,
         "installed_tuple": scope["installed_tuple"],
         "observed_at": 1000,
         "cases": cases,
+        "method_modes": method_modes,
         "capabilities": {},
         "inventory": {},
         "snapshot": {},
@@ -82,6 +97,15 @@ def test_failure_suspends_review_until_a_new_decision(tmp_path: Path) -> None:
     state = json.loads(output.read_text())
     receipt = json.loads(base64.b64decode(state["records"]["b" * 64]["content_base64"]))
     assert receipt["adapter_conformant"] is True
+    # A signed observation with one missing method/mode must never
+    # masquerade as a qualified installed provider release.
+    missing = next(iter(method_modes))
+    observed["cases"].pop(missing)
+    publisher.publish(assignment | {"decision_sha256": "c" * 64})
+    state = json.loads(output.read_text())
+    denied = json.loads(base64.b64decode(state["records"]["c" * 64]["content_base64"]))
+    assert denied["adapter_conformant"] is False
+    observed["cases"][missing] = cases[missing]
     artifact.write_text("drift")
     publisher.publish(assignment | {"decision_sha256": "b" * 64})
     assert "b" * 64 in json.loads(output.read_text())["suspended"]

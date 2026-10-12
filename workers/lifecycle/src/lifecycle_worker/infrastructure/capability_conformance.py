@@ -14,7 +14,7 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
 
 from lifecycle_worker.application.native import NativeHeld, decode, digest
-from lifecycle_worker.domain.capability_definitions import DEFINITION_SHA256, DIMENSIONS
+from lifecycle_worker.domain.capability_definitions import DEFINITION_SHA256, DIMENSIONS, MODES, WIRE_METHODS
 from lifecycle_worker.infrastructure.evidence_probes import ProbeJson, fresh_measurement, matches
 from lifecycle_worker.infrastructure.native_files import protected_read
 
@@ -82,6 +82,17 @@ class ConformancePublisher:
             required = {"adapter_behavior", "installed_identity", "runtime_artifacts"}
             required.update("dimension:" + d for d in DIMENSIONS)
             required.update("capability:" + c for c in observed["capabilities"])
+            # Every active wire method and recovery mode is assessed for the
+            # EXACT installed tuple. Unsupported is an explicit negative
+            # outcome, never a qualified capability or inherited E2 result.
+            method_keys = {
+                "method:" + method + ":" + mode
+                for method in WIRE_METHODS for mode in MODES
+            }
+            declared_method_modes = observed["method_modes"]
+            if (not isinstance(declared_method_modes, dict)
+                    or set(declared_method_modes) != method_keys):
+                raise NativeHeld("installed_method_mode_matrix_incomplete")
             cases = observed["cases"]
             for name in required:
                 case = cases.get(name, {})
@@ -97,6 +108,23 @@ class ConformancePublisher:
                     observed["capabilities"][name[11:]]["values"]
                 ):
                     raise NativeHeld("conformance_native_values_changed")
+            method_modes: dict[str, str] = {}
+            for name in sorted(method_keys):
+                case = cases.get(name, {})
+                outcome = case.get("outcome") if isinstance(case, dict) else None
+                if (outcome not in {"passed", "unsupported"}
+                        or declared_method_modes[name] != outcome
+                        or case.get("scope_sha256") != digest(scope)
+                        or case.get("artifacts") != artifacts
+                        or type(case.get("observed_at")) is not int
+                        or not 0 <= now - case["observed_at"] <= 30):
+                    raise NativeHeld("installed_method_mode_not_observed")
+                if outcome == "unsupported" and (
+                    not isinstance(case.get("reason"), str)
+                    or not 1 <= len(case["reason"]) <= 160
+                ):
+                    raise NativeHeld("installed_method_mode_unsupported_reason_required")
+                method_modes[name] = outcome
             latest_restores: dict[str, dict[str, Any]] = {}
             for sample in observed["snapshot"].get("recovery_measurements", []):
                 prior = latest_restores.get(sample["dataset_id"])
@@ -113,7 +141,8 @@ class ConformancePublisher:
                 capabilities=observed["capabilities"],
                 inventory=observed["inventory"],
                 snapshot=observed["snapshot"],
-                cases={name: "passed" for name in required},
+                method_modes=method_modes,
+                cases={**{name: "passed" for name in required}, **method_modes},
                 observed_at=observed["observed_at"],
                 expires_at=observed["observed_at"] + 30,
             )
