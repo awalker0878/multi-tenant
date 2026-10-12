@@ -11,6 +11,7 @@ from openapi_spec_validator import validate_spec
 
 from build import verify
 from runtime_inventory import verify_runtime_inventory
+from installed_usage import verify_installed_usage
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -417,6 +418,7 @@ def check_consumer_registry():
     verify_retirement_decisions(ROOT, retired, reviews)
     verify_retired_references(ROOT, retired)
     verify_runtime_inventory(registry, ROOT)
+    verify_installed_usage(ROOT, registry)
 
 
 

@@ -356,6 +356,27 @@ components:
             with self.assertRaisesRegex(ValueError, "Shipped contract copies missing"):
                 verify_runtime_inventory({"active_releases": []}, root)
 
+    def test_installed_copy_ledger_requires_real_loader_and_packaging(self):
+        from installed_usage import verify_installed_usage
+        reg = load("architecture/contract-consumers.json")
+        self.assertEqual(verify_installed_usage(ROOT, reg), 24)
+        source = load("architecture/installed-contract-usage.json")
+        changed = json.loads(json.dumps(source))
+        changed["copies"][0]["loader"] = "apps/console/app/Nonexistent.php"
+        with patch("installed_usage.json.loads", return_value=changed):
+            with self.assertRaisesRegex(ValueError, "loader outside bounded component"):
+                verify_installed_usage(ROOT, reg)
+        changed = json.loads(json.dumps(source))
+        changed["copies"][0]["packaging_marker"] = "COPY nothing-and-never-check-it"
+        with patch("installed_usage.json.loads", return_value=changed):
+            with self.assertRaisesRegex(ValueError, "not included in runtime image"):
+                verify_installed_usage(ROOT, reg)
+        changed = json.loads(json.dumps(source))
+        changed["copies"] = changed["copies"][:-1]
+        with patch("installed_usage.json.loads", return_value=changed):
+            with self.assertRaisesRegex(ValueError, "does not cover active installed copies"):
+                verify_installed_usage(ROOT, reg)
+
     def test_registered_but_unused_package_fails(self):
         from runtime_inventory import verify_runtime_inventory
         with tempfile.TemporaryDirectory() as directory:
