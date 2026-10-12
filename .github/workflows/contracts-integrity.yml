@@ -11,6 +11,7 @@ on:
       - 'architecture/retirement-unverified-baseline.txt'
       - 'architecture/retirement-clearances.json'
       - 'architecture/installed-contract-usage.json'
+      - 'architecture/contract-quality-policy.json'
       - 'scripts/contracts/**'
       - 'scripts/p01/contracts/**'
       - 'scripts/p03/**'
@@ -64,6 +65,15 @@ jobs:
             CONTRACT_BASE=$(git rev-parse HEAD^)
           fi
           python scripts/p01/contracts/compatibility.py --base "$CONTRACT_BASE"
+          python scripts/contracts/quality.py --base "$CONTRACT_BASE" --output "$RUNNER_TEMP/contract-quality.json"
+      - name: Preserve independently checked new-release quality report
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: contract-quality-${{ github.sha }}
+          path: ${{ runner.temp }}/contract-quality.json
+          if-no-files-found: warn
+          retention-days: 30
       - name: Check canonical embedded readiness projection
         run: python scripts/contracts/generate_readiness.py
       - name: Reject stale executable dependencies on retired canonical contracts
@@ -90,6 +100,7 @@ jobs:
           python -m unittest discover -s tests/contracts -p 'test_assurance.py' -v
           python -m unittest discover -s tests/contracts -p 'test_active_contracts.py' -v
           python -m unittest discover -s tests/contracts -p 'test_phase2_artifacts.py' -v
+          python -m unittest discover -s tests/contracts -p 'test_quality.py' -v
           python -m unittest discover -s tests/contracts -p 'test_dependency_impact.py' -v
       - name: Install bounded owner contract test dependencies
         run: python -m pip install --disable-pip-version-check -e services/planning -e services/lifecycle -e services/inventory pytest==9.1.1
