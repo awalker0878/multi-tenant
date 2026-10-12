@@ -1,24 +1,30 @@
-"""Negative tests for current active-release immutability, without history replay."""
+"""Git-backed negative tests for active contract immutability and staged retirement."""
+import hashlib
 import json
 import subprocess
 import tempfile
 import unittest
 from pathlib import Path
 
-from compatibility import check, compare
+from compatibility import approved_clearance, check, compare
+
+PATH = "contracts/openapi/current-v1.json"
+NEW = "contracts/openapi/current-v2.json"
 
 
 class ActiveContractTests(unittest.TestCase):
     def setUp(self):
-        self.temp = tempfile.TemporaryDirectory()
-        self.addCleanup(self.temp.cleanup)
-        self.root = Path(self.temp.name)
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
         self.git("init", "-b", "main")
-        self.git("config", "user.name", "Contract test")
-        self.git("config", "user.email", "contracts@example.invalid")
-        self.write("contracts/openapi/current-v1.json", "{}\n")
-        self.registry(["contracts/openapi/current-v1.json"])
+        self.git("config", "user.name", "Contract fixture")
+        self.git("config", "user.email", "fixture@example.invalid")
+        self.write(PATH, "{}\n")
+        self.registry([PATH])
         self.retirement([])
+        self.write("architecture/retirement-clearances.json",
+                   json.dumps({"schema_version": 1, "clearances": {}}))
         self.base = self.commit()
 
     def git(self, *args):
@@ -26,52 +32,115 @@ class ActiveContractTests(unittest.TestCase):
                               capture_output=True, text=True).stdout.strip()
 
     def write(self, path, value):
-        file = self.root / path
-        file.parent.mkdir(parents=True, exist_ok=True)
-        file.write_text(value)
+        target = self.root / path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(value)
 
     def registry(self, paths):
         self.write("architecture/contract-consumers.json",
                    json.dumps({"active_releases": [{"path": p} for p in paths]}))
 
-    def retirement(self, paths):
-        self.write("architecture/retired-contract-releases.json",
-                   json.dumps({"retired": paths}))
+    def retirement(self, paths, reviewed=False):
+        self.write("architecture/retired-contract-releases.json", json.dumps({
+            "retired": paths,
+            "reviews": {p: {
+                "external_consumer_review": ("verified_no_external_consumers" if reviewed
+                                             else "not-independently-verified"),
+                "compatibility_commitments": "none",
+                "external_review_evidence": "https://example.invalid/consumer-inventory",
+            } for p in paths}
+        }))
+
+    def approval(self, reviewer="independent-reviewer", digest=None):
+        return {
+            "status": "approved",
+            "owner": "service-owner",
+            "reviewed_by": reviewer,
+            "review_url": "https://github.com/awalker0878/multi-tenant/pull/123",
+            "reviewed_at": "2026-10-11T12:00:00Z",
+            "consumer_inventory_evidence": "https://example.invalid/consumer-inventory",
+            "compatibility_evidence": "https://example.invalid/compatibility-disposition",
+            "compatibility_commitments": "none",
+            "contract_sha256": digest or hashlib.sha256(b"{}\n").hexdigest(),
+            "assessed_consumers": [],
+            "decision": "retire",
+        }
+
+    def clearances(self, approval):
+        self.write("architecture/retirement-clearances.json", json.dumps({
+            "schema_version": 1,
+            "clearances": {PATH: approval},
+        }))
 
     def commit(self):
-        self.git("add", ".")
-        self.git("commit", "-m", "Snapshot active release")
+        self.git("add", "-A")
+        self.git("commit", "-m", "Reviewed snapshot")
         return self.git("rev-parse", "HEAD")
 
-    def test_exact_active_bytes_are_immutable(self):
+    def remove_current(self, reviewed=False, record=True):
+        self.registry([])
+        (self.root / PATH).unlink()
+        self.retirement([PATH] if record else [], reviewed=reviewed)
+
+    def test_existing_version_immutable_and_new_version_permitted(self):
         self.assertEqual(compare({"a": b"one"}, {"a": b"one"}), [])
-        self.write("contracts/openapi/current-v1.json", '{"added":true}\n')
+        self.write(PATH, '{"added":true}\n')
         with self.assertRaisesRegex(ValueError, "Active published contract removed or changed"):
             check(self.root, self.base)
+        self.write(PATH, "{}\n")
+        self.write(NEW, "{}\n")
+        self.registry([PATH, NEW])
+        self.assertEqual(check(self.root, self.base)["added"], [NEW])
 
-    def test_new_current_version_can_be_added(self):
-        other = "contracts/openapi/current-v2.json"
-        self.write(other, "{}\n")
-        self.registry(["contracts/openapi/current-v1.json", other])
-        result = check(self.root, self.base)
-        self.assertEqual(result["added"], [other])
-        self.assertEqual(result["checked_active_releases"], 2)
-
-    def test_missing_current_release_is_rejected(self):
-        (self.root / "contracts/openapi/current-v1.json").unlink()
-        with self.assertRaisesRegex(ValueError, "Active canonical missing"):
+    def test_missing_current_file_fails_even_if_registry_claims_active(self):
+        (self.root / PATH).unlink()
+        with self.assertRaisesRegex(ValueError, "Canonical inventory does not match"):
             check(self.root, self.base)
 
-    def test_retirement_requires_active_registry_removal(self):
-        path = "contracts/openapi/current-v1.json"
-        self.retirement([path])
-        with self.assertRaisesRegex(ValueError, "Active contract cannot be retired"):
+    def test_removed_from_both_registry_and_tree_without_retirement_is_rejected(self):
+        self.remove_current(record=False)
+        with self.assertRaisesRegex(ValueError, "Canonical deleted without retirement record"):
             check(self.root, self.base)
-        self.registry([])
-        (self.root / path).unlink()
-        self.assertEqual(check(self.root, self.base)["retired"], [path])
 
-    def test_invalid_base_is_rejected(self):
+    def test_retirement_cannot_be_self_declared_in_same_change(self):
+        self.remove_current(reviewed=True)
+        self.clearances(self.approval())
+        with self.assertRaisesRegex(ValueError, "must be approved in an earlier reviewed base"):
+            check(self.root, self.base)
+
+    def test_unreviewed_retirement_fails_even_with_manifest_entry(self):
+        self.remove_current(reviewed=False)
+        with self.assertRaisesRegex(ValueError, "Reviewed retirement clearance missing"):
+            check(self.root, self.base)
+
+    def test_valid_staged_clearance_must_be_committed_before_removal(self):
+        self.clearances(self.approval())
+        stage = self.commit()
+        self.remove_current(reviewed=True)
+        result = check(self.root, stage)
+        self.assertEqual(result["removed_from_review_base"], [PATH])
+        self.assertEqual(result["staged_new_retirements"], [PATH])
+
+    def test_approved_clearance_checks_hash_and_independent_review(self):
+        approval = self.approval()
+        with self.assertRaisesRegex(ValueError, "independent reviewer"):
+            approved_clearance(PATH, self.approval(reviewer="service-owner"),
+                               hashlib.sha256(b"{}\n").hexdigest())
+        with self.assertRaisesRegex(ValueError, "reviewed contract bytes"):
+            approved_clearance(PATH, approval, "f" * 64)
+        with self.assertRaisesRegex(ValueError, "review timestamp"):
+            approved_clearance(PATH, {**approval, "reviewed_at": "today"},
+                               hashlib.sha256(b"{}\n").hexdigest())
+
+    def test_reviewed_clearance_cannot_be_changed_in_removal_commit(self):
+        self.clearances(self.approval())
+        stage = self.commit()
+        self.clearances(self.approval(reviewer="another-reviewer"))
+        self.remove_current(reviewed=True)
+        with self.assertRaisesRegex(ValueError, "earlier reviewed base"):
+            check(self.root, stage)
+
+    def test_base_revision_must_exist(self):
         with self.assertRaisesRegex(ValueError, "explicit existing base"):
             check(self.root, "0" * 40)
 
