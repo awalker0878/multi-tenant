@@ -189,6 +189,13 @@ def check(root: Path, base_revision: str) -> dict:
         frozen = set(raw.decode("utf-8").splitlines())
         if not frozen <= retired:
             raise ValueError("Historical retirement record missing")
+        # Once the roster is committed in main, it is immutable relative to
+        # the independent review base as well as to its original fingerprint.
+        base_frozen = git("ls-tree", "-r", "--name-only", base_revision, "--",
+                          "architecture/retirement-unverified-baseline.txt").decode().strip()
+        if (base_frozen == "architecture/retirement-unverified-baseline.txt"
+                and git("show", base_revision + ":" + base_frozen) != raw):
+            raise ValueError("Frozen historical retirement roster changed relative to review base")
     new_retirements = retired - prior_retired - frozen
     clearance_file = root / CLEARANCES
     current_clearances = (json.loads(clearance_file.read_text()) if clearance_file.is_file()
@@ -199,18 +206,30 @@ def check(root: Path, base_revision: str) -> dict:
     if base_clearances.get("schema_version") != 1 or not isinstance(base_clearances.get("clearances"), dict):
         raise ValueError("Invalid review-base retirement clearance registry")
 
-    for path in sorted(new_retirements | (missing - frozen)):
-        # Pre-existing historical removals are tracked but do not masquerade as cleared.
-        if path in prior_retired:
-            continue
+    reviews = retirement.get("reviews", {})
+    # Frozen debt can be closed only by the SAME independently reviewed approval
+    # process; changing an old status string is not retroactive proof.
+    cleared_frozen = {
+        path for path in frozen
+        if reviews.get(path, {}).get("external_consumer_review") != "not-independently-verified"
+    }
+    for path in sorted(new_retirements | (missing - frozen) | cleared_frozen):
         approval = base_clearances["clearances"].get(path)
         if approval != current_clearances["clearances"].get(path):
             raise ValueError("Retirement clearance must be approved in an earlier reviewed base: " + path)
-        if path not in base_paths:
-            raise ValueError("Retirement must identify canonical in Git review base: " + path)
-        approved_clearance(path, approval, hashlib.sha256(git("show", base_revision + ":" + path)).hexdigest())
+        if path in base_paths:
+            canonical_bytes = git("show", base_revision + ":" + path)
+        else:
+            # A retired historical file is absent from the review base. Bind
+            # clearance to its actual bytes in an explicit prior Git revision.
+            origin = approval.get("source_revision") if isinstance(approval, dict) else None
+            if not isinstance(origin, str) or not re.fullmatch(r"[a-f0-9]{40}", origin):
+                raise ValueError("Historical retirement clearance lacks source_revision: " + path)
+            git("cat-file", "-e", origin + "^{commit}")
+            canonical_bytes = git("show", origin + ":" + path)
+        approved_clearance(path, approval, hashlib.sha256(canonical_bytes).hexdigest())
         verify_github_approval(approval, base_revision, git)
-        review = retirement.get("reviews", {}).get(path, {})
+        review = reviews.get(path, {})
         if (review.get("external_consumer_review") not in
                 {"verified_no_external_consumers", "verified_compatibility_commitments_satisfied"}
                 or review.get("compatibility_commitments") != approval["compatibility_commitments"]
