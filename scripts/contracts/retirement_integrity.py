@@ -19,7 +19,7 @@ SOURCE_FOLDERS = ("scripts", "tests", "apps", "services", "workers", ".github/wo
 def verify_retirement_decisions(root: Path, retired: set[str], reviews: dict) -> None:
     """Preserve unresolved historical debt; fail closed for new retirements."""
     baseline = (root / BASELINE).read_bytes()
-    header = b"blob " + str(len(baseline)).encode() + b"\\x00"
+    header = b"blob " + str(len(baseline)).encode() + bytes([0])
     if hashlib.sha1(header + baseline).hexdigest() != PRE_ENFORCEMENT_BLOB_SHA1:
         raise ValueError("Previously unverified retirement roster was modified")
     frozen = set(baseline.decode("utf-8").splitlines())

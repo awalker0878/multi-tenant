@@ -401,6 +401,38 @@ components:
             with self.assertRaisesRegex(ValueError, "Overlapping native wire operation"):
                 check_consumer_registry()
 
+    def test_new_unverified_retirement_is_denied(self):
+        from retirement_integrity import verify_retirement_decisions
+        record = load("architecture/retired-contract-releases.json")
+        retired = set(record["retired"])
+        reviews = dict(record["reviews"])
+        candidate = "contracts/openapi/example-future-v99.json"
+        retired.add(candidate)
+        reviews[candidate] = {
+            "reason": "test", "internal_consumer_review": "test",
+            "external_consumer_review": "not-independently-verified",
+            "decision": "test",
+        }
+        with self.assertRaisesRegex(ValueError, "lacks external consumer clearance"):
+            verify_retirement_decisions(ROOT, retired, reviews)
+        reviews[candidate]["external_consumer_review"] = "verified_no_external_consumers"
+        with self.assertRaisesRegex(ValueError, "review evidence missing"):
+            verify_retirement_decisions(ROOT, retired, reviews)
+        reviews[candidate]["external_review_evidence"] = "review://example-no-clients"
+        reviews[candidate]["compatibility_commitments"] = "none"
+        verify_retirement_decisions(ROOT, retired, reviews)
+
+    def test_unverified_backlog_cannot_expand_silently(self):
+        from retirement_integrity import verify_retirement_decisions
+        record = load("architecture/retired-contract-releases.json")
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            file = root / "architecture/retirement-unverified-baseline.txt"
+            file.parent.mkdir(parents=True)
+            file.write_text("contracts/openapi/new-backlog.json\\n")
+            with self.assertRaisesRegex(ValueError, "roster was modified"):
+                verify_retirement_decisions(root, set(record["retired"]), record["reviews"])
+
     def test_retired_canonical_file_cannot_reappear(self):
         from check import check_consumer_registry
         from check import load as real_load
