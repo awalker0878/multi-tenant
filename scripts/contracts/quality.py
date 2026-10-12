@@ -149,6 +149,8 @@ def parameters(op: dict, item: dict) -> list[dict]:
 
 def api_breakages(old: dict, new: dict) -> list[str]:
     failures = []
+    if old.get("components", {}).get("securitySchemes", {}) != new.get("components", {}).get("securitySchemes", {}):
+        failures.append("Underlying authentication/security-scheme definition changed")
     for path, item in old.get("paths", {}).items():
         target = new.get("paths", {}).get(path, {})
         for verb, prior in item.items():
@@ -408,6 +410,12 @@ def check_new_releases(root: Path, revision: str) -> dict:
         else:
             raise ValueError("Unsupported canonical publication: " + path)
         predecessor = old_versions.get(family)
+        affected = sorted({
+            consumer
+            for release in registry["active_releases"]
+            if release["path"] == path or (predecessor is not None and release["path"] == predecessor[1])
+            for consumer in release.get("consumers", [])
+        })
         breaking = []
         if predecessor is not None:
             older_version, old_path = predecessor
@@ -430,6 +438,7 @@ def check_new_releases(root: Path, revision: str) -> dict:
         results.append({
             "path": path, "version": list(ver),
             "predecessor": predecessor[1] if predecessor else None,
+            "impacted_consumers": affected,
             "breaking_changes": breaking,
         })
     return {"schema_version": 1, "review_base": revision, "new_releases": results,
