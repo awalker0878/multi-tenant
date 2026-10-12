@@ -71,6 +71,11 @@ def main():
             report['suites'].append({'name': suite, **totals})
             if totals['tests'] == 0 or any(totals[k] for k in ('failures', 'errors', 'skipped')):
                 raise RuntimeError(suite + ' not fully passing')
+        command('.', ['python', 'scripts/contracts/qualify_capabilities.py',
+                      '--worker-junit', str(output / 'worker.xml'),
+                      '--output', str(output / 'capability-qualification.json')])
+        if report['commands'][-1]['exit_code'] != 0:
+            raise RuntimeError('Phase 4 executable capability qualification incomplete')
         command('services/planning', ['uv', 'run', '--frozen', 'python', str(ROOT / 'scripts/p08/check_composition.py')])
         command('.', ['python', 'scripts/p04/generate_clients.py', '--check'])
         command('scripts/p01/contracts', ['uv', 'sync', '--locked'])

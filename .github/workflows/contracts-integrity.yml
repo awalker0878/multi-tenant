@@ -22,6 +22,7 @@ on:
       - 'scripts/p08/**'
       - 'scripts/p09/**'
       - 'tests/contracts/**'
+      - 'scripts/generate_capabilities.py'
       - '.github/workflows/contracts-integrity.yml'
   push:
     branches: [main]
@@ -195,6 +196,40 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
+
+  capability-qualification:
+    name: Phase 4 executable method/mode qualification
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12.14'
+      - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78
+        with:
+          version: '0.12.19'
+          enable-cache: false
+      - name: Install frozen native worker and test dependencies
+        run: uv sync --directory workers/lifecycle --locked --group build
+      - name: Execute all 30 current method/mode and independent native tests
+        run: |
+          cd workers/lifecycle
+          uv run --frozen pytest -q tests/test_capability_qualification.py tests/test_method_protocol.py tests/test_openstack_source.py tests/test_migration_bootstrap.py --junitxml="$RUNNER_TEMP/worker-capabilities.xml"
+      - name: Verify no missing method, native dispatch, cold capture or denied-effect cases
+        run: python scripts/contracts/qualify_capabilities.py --worker-junit "$RUNNER_TEMP/worker-capabilities.xml" --output "$RUNNER_TEMP/capability-qualification.json"
+      - name: Preserve Phase 4 executable E2 results
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: capability-qualification-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/worker-capabilities.xml
+            ${{ runner.temp }}/capability-qualification.json
+          if-no-files-found: warn
+          retention-days: 30
 
   assurance-report:
     name: Operation-level contract assurance report
