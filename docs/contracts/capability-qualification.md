@@ -41,6 +41,19 @@ It **does not** prove a specific installed source or destination version, a
 production tenant, qualified endpoint methods, commissioning, live writer
 fencing, or receiving application acceptance.
 
+Production E3/E4 qualification now also requires **30 explicitly enumerated,
+independently observed method/mode outcomes**: each current wire method and
+mode is either `passed` or `unsupported`. An unsupported combination is
+not eligible for selection. Passing combinations must have an independent,
+fresh, scope-bound native case receipt. Missing results, contradictory states,
+stale observations and partial matrices fail closed in the worker signer,
+Inventory reader and Assurance reviewer.
+
+Signed records and runtime observations are compared canonically: JSON
+object property ordering is not authority. E3/E4 approval remains tied to
+the exact installed tuple, reviewed inventory and provider evidence; no
+synthetic test or metadata declaration can promote an unsupported combination.
+
 Production E3/E4 qualification requires real, independently enrolled
 observer evidence through the existing
 `workers/lifecycle/.../capability_conformance.py`,
