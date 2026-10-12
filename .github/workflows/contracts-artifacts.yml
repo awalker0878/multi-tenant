@@ -38,6 +38,10 @@ jobs:
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
         with:
           python-version: '3.12.14'
+      - name: Assert wheel and dependency negative canaries
+        run: |
+          python -m pip install --disable-pip-version-check -r scripts/contracts/requirements.txt
+          python -m unittest discover -s tests/contracts -p 'test_phase2_artifacts.py' -v
       - name: Install pinned registry validators
         run: python -m pip install --disable-pip-version-check -r scripts/contracts/requirements.txt
       - name: Build the actual runtime image with exact source provenance
