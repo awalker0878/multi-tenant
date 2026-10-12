@@ -193,6 +193,9 @@ class GitPublicationTests(unittest.TestCase):
             prior = good_api()
             path = "contracts/openapi/things-v2.json"
             (root / path).write_text(json.dumps(prior))
+            (root / "architecture/contract-consumers.json").write_text(json.dumps({
+                "active_releases": [{"path": path, "consumers": ["former-client"]}]
+            }))
             subprocess.run(["git", "init", "-q"], cwd=root, check=True)
             subprocess.run(["git", "config", "user.email", "quality@example.invalid"], cwd=root, check=True)
             subprocess.run(["git", "config", "user.name", "Quality fixture"], cwd=root, check=True)
@@ -205,7 +208,9 @@ class GitPublicationTests(unittest.TestCase):
             replacement = "contracts/openapi/things-v2.1.json"
             (root / replacement).write_text(json.dumps(new))
             (root / "architecture/contract-consumers.json").write_text(json.dumps({
-                "active_releases": [{"path": path}, {"path": replacement}]
+                "active_releases": [{"path": path}, {
+                    "path": replacement, "consumers": ["new-client"]
+                }]
             }))
             with self.assertRaisesRegex(ValueError, "Breaking change requires a NEW MAJOR"):
                 check_new_releases(root, base)
@@ -214,11 +219,15 @@ class GitPublicationTests(unittest.TestCase):
             replacement = "contracts/openapi/things-v3.json"
             (root / replacement).write_text(json.dumps(new))
             (root / "architecture/contract-consumers.json").write_text(json.dumps({
-                "active_releases": [{"path": path}, {"path": replacement}]
+                "active_releases": [{"path": path}, {
+                    "path": replacement, "consumers": ["new-client"]
+                }]
             }))
             result = check_new_releases(root, base)
             self.assertEqual(result["validated"], 1)
             self.assertTrue(result["new_releases"][0]["breaking_changes"])
+            self.assertEqual(result["new_releases"][0]["impacted_consumers"],
+                             ["former-client", "new-client"])
 
 
 if __name__ == "__main__":
