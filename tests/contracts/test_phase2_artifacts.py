@@ -14,7 +14,7 @@ from unittest.mock import patch
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts/contracts"))
 from dependency_graph import derive
-from artifact_attestation import check_image, check_wheel
+from artifact_attestation import check_image, check_wheel, check_console_frontend
 from aggregate_artifacts import aggregate
 
 
@@ -121,6 +121,27 @@ class ArtifactTests(unittest.TestCase):
         self.assertIn("  push:" + chr(10) + "    branches: [main]", workflow)
         self.assertIn("docker build", workflow)
         self.assertIn("aggregate_artifacts.py", workflow)
+
+    def test_compiled_console_bundle_requires_all_manifest_assets(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            manifest = root / "manifest.json"
+            target = root / "assets/app.js"
+            target.parent.mkdir()
+            target.write_text("console")
+            manifest.write_text(json.dumps({"resources/js/app.ts": {
+                "file": "assets/app.js", "css": []}}))
+            self.assertEqual(check_console_frontend(root), 1)
+            target.unlink()
+            with self.assertRaisesRegex(ValueError, "not present"):
+                check_console_frontend(root)
+            manifest.write_text(json.dumps({"resources/js/app.ts": {
+                "file": "../escaped.js"}}))
+            with self.assertRaisesRegex(ValueError, "not present"):
+                check_console_frontend(root)
+            manifest.unlink()
+            with self.assertRaisesRegex(ValueError, "lacks compiled Vite manifest"):
+                check_console_frontend(root)
 
     def test_oci_image_requires_exact_source_sha_label(self):
         fake = [{
