@@ -77,6 +77,7 @@ jobs:
         run: |
           python -m unittest discover -s tests/contracts -p 'test_integrity.py' -v
           python -m unittest discover -s tests/contracts -p 'test_route_conformance.py' -v
+          python -m unittest discover -s tests/contracts -p 'test_assurance.py' -v
       - name: Install bounded owner contract test dependencies
         run: python -m pip install --disable-pip-version-check -e services/planning -e services/lifecycle -e services/inventory pytest==9.1.1
       - name: Probe Inventory and Planning migration operations against real ASGI routers
@@ -93,6 +94,9 @@ jobs:
           python scripts/contracts/assurance_routes.py --app inventory --output "$RUNNER_TEMP/contract-assurance/python-inventory.json"
           python scripts/contracts/assurance_routes.py --app python-composed --output "$RUNNER_TEMP/contract-assurance/python-composed.json"
           python scripts/contracts/assurance_routes.py --app lifecycle-native --output "$RUNNER_TEMP/contract-assurance/python-native.json"
+          python scripts/contracts/python_denials.py --owner inventory --output "$RUNNER_TEMP/contract-assurance/python-inventory-denials.json"
+          python scripts/contracts/python_denials.py --owner planning --output "$RUNNER_TEMP/contract-assurance/python-planning-denials.json"
+          python scripts/contracts/python_denials.py --owner lifecycle --output "$RUNNER_TEMP/contract-assurance/python-lifecycle-denials.json"
       - name: Retain SHA-bound Python route evidence
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
