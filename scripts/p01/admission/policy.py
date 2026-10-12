@@ -45,11 +45,27 @@ def affected(paths, base_components, head_components, base_graph, head_graph):
             unknown.append(path); selected.update(ids)
         if path.startswith('tests/contracts/'):
             selected.update(ids)
+    # Derive impacted dependent components from each versioned release, not
+    # the removed, manually maintained architectural dependency map.
+    # Use BOTH base and head; removing an edge must not hide its former clients.
     edges = {}
     for graph in (base_graph, head_graph):
-        for consumer, producers in graph.get('dependencies', {}).items():
-            need(consumer in ids and set(producers) <= ids, 'unregistered_consumer')
-            edges.setdefault(consumer, set()).update(producers)
+        releases = graph.get('active_releases', [])
+        need(isinstance(releases, list), 'invalid_contract_release_inventory')
+        for release in releases:
+            need(isinstance(release, dict), 'invalid_contract_release_record')
+            owner = release.get('owner')
+            consumers = release.get('consumers', [])
+            need(isinstance(consumers, list) and all(isinstance(c, str) for c in consumers),
+                 'invalid_contract_consumer_record')
+            # Contract-platform is a shared specification, not a runnable
+            # service. Its change impact is directly captured by the
+            # contracts[path] owner/consumer listing above.
+            if owner not in ids:
+                continue
+            for consumer in consumers:
+                if consumer in ids and consumer != owner:
+                    edges.setdefault(consumer, set()).add(owner)
     for _ in range(len(ids) + 1):
         expanded = selected | {consumer for consumer, deps in edges.items() if deps & selected}
         if expanded == selected:
