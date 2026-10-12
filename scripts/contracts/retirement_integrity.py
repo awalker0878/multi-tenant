@@ -29,9 +29,6 @@ def verify_retired_references(root: Path, retired: set[str]) -> None:
                 continue
             text = source.read_text(encoding="utf-8")
             for number, line in enumerate(text.splitlines(), 1):
-                if (source.relative_to(root).as_posix() == "tests/contracts/test_integrity.py"
-                        and 'retired_path = "contracts/openapi/governance-native-approval-v1.json"' in line):
-                    continue  # Deliberate negative canary: assert retired files cannot reappear.
                 for path, pattern in patterns.items():
                     if path in line or pattern.search(line):
                         failures.append(f"{source.relative_to(root)}:{number}: {path}")

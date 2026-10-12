@@ -383,11 +383,16 @@ components:
             with self.assertRaisesRegex(ValueError, "Retired contracts still referenced"):
                 verify_retired_references(root, {"contracts/openapi/demo-v1.json"})
 
+    def test_real_retirement_scan_has_no_self_references(self):
+        from retirement_integrity import verify_retired_references
+        retired = set(load("architecture/retired-contract-releases.json")["retired"])
+        verify_retired_references(ROOT, retired)
+
     def test_retired_canonical_file_cannot_reappear(self):
         from check import check_consumer_registry
         from check import load as real_load
         registry = real_load("architecture/contract-consumers.json")
-        retired_path = "contracts/openapi/governance-native-approval-v1.json"
+        retired_path = load("architecture/retired-contract-releases.json")["retired"][0]
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             reintroduced = root / retired_path
