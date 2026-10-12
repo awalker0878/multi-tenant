@@ -388,6 +388,19 @@ components:
         retired = set(load("architecture/retired-contract-releases.json")["retired"])
         verify_retired_references(ROOT, retired)
 
+    def test_native_api_cannot_double_claim_endpoint_across_owner_names(self):
+        from check import check_consumer_registry
+        from check import load as original
+        path = "contracts/openapi/worker-migration-method-v2.json"
+        altered = json.loads(json.dumps(original(path)))
+        altered["paths"]["/internal/native-effects"] = {
+            "post": {"responses": {"200": {"description": "duplicate"}}}
+        }
+        with patch("check.load", side_effect=lambda name:
+                   altered if name == path else original(name)):
+            with self.assertRaisesRegex(ValueError, "Overlapping native wire operation"):
+                check_consumer_registry()
+
     def test_retired_canonical_file_cannot_reappear(self):
         from check import check_consumer_registry
         from check import load as real_load

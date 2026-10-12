@@ -345,6 +345,9 @@ def check_consumer_registry():
     # Each live service operation belongs to exactly one active versioned owner
     # release; obsolete canonical bundles are removed from the working tree.
     seen_operations = {}
+    # Native authority/effect endpoints are single deployed boundaries even
+    # if duplicate specs incorrectly declare different owner strings.
+    native_operations = {}
     for entry in releases:
         if not entry["path"].startswith("contracts/openapi/"):
             continue
@@ -357,6 +360,14 @@ def check_consumer_registry():
                 if operation in seen_operations:
                     raise ValueError(f"Overlapping active owner operation: {operation} in {seen_operations[operation]} and {entry['path']}")
                 seen_operations[operation] = entry["path"]
+                if endpoint.startswith("/internal/native-"):
+                    native_key = (method.upper(), endpoint)
+                    if native_key in native_operations:
+                        raise ValueError(
+                            f"Overlapping native wire operation: {native_key} in "
+                            f"{native_operations[native_key]} and {entry['path']}"
+                        )
+                    native_operations[native_key] = entry["path"]
     # The deployed broker definitions are all implemented products, not optional
     # self-declared inventory entries. Their schema dependencies must be active.
     # This detects removal of an event spec from both editable registry maps.
