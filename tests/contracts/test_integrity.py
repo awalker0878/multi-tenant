@@ -9,11 +9,13 @@ from unittest.mock import patch
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts/contracts"))
 from build import assemble, verify
-from check import (
-    check_consumer_registry, check_copies, check_events, check_readiness_projection,
-    check_routes, check_schema_dialects, current_api, load, local_refs,
-    unique_schema_ids, check_error_policy,
+from check_schema import (
+    check_copies, check_readiness_projection, check_routes,
+    check_schema_dialects, current_api, load, local_refs, unique_schema_ids,
 )
+from check_events import check_events
+from check_registry import check_consumer_registry
+from check_http import check_error_policy
 
 class ContractIntegrityTests(unittest.TestCase):
     def test_catalogue_embedded_schema_references_rebase_to_active_release(self):
@@ -26,17 +28,17 @@ class ContractIntegrityTests(unittest.TestCase):
 
     def test_new_authority_releases_use_common_error(self):
         check_error_policy()
-        from check import check_error_policy as check
-        from check import load as real_load
+        from check_http import check_error_policy as check
+        from check_schema import load as real_load
         original = real_load("contracts/openapi/assurance-qualification-v1.json")
         altered = json.loads(json.dumps(original))
         altered["paths"]["/internal/tenants/{tenant}/qualification-publications"]["post"]["responses"]["409"].pop("content")
-        with patch("check.load", side_effect=lambda path: altered if path == "contracts/openapi/assurance-qualification-v1.json" else real_load(path)):
+        with patch("check_http.load", side_effect=lambda path: altered if path == "contracts/openapi/assurance-qualification-v1.json" else real_load(path)):
             with self.assertRaisesRegex(ValueError, "Owner error body not contracted"):
                 check()
 
     def test_delegate_headers_and_native_digest_conflict_are_part_of_owner_contracts(self):
-        from check import check_implemented_api_contracts
+        from check_http import check_implemented_api_contracts
         check_implemented_api_contracts()
         source = load("contracts/openapi/governance-service-checks-v1.json")
         source["paths"]["/v1/tenants/{tenant}/planning-input-checks"]["post"]["parameters"] = [
@@ -44,7 +46,7 @@ class ContractIntegrityTests(unittest.TestCase):
             if p["in"] != "header"
         ]
         original = load
-        with patch("check.load", side_effect=lambda name:
+        with patch("check_http.load", side_effect=lambda name:
                    source if name == "contracts/openapi/governance-service-checks-v1.json"
                    else original(name)):
             with self.assertRaisesRegex(ValueError, "Missing delegated authority header"):
@@ -59,7 +61,7 @@ class ContractIntegrityTests(unittest.TestCase):
         self.assertNotEqual(generated, modified)
 
     def test_current_uuid_policy_rejects_noncanonical_new_routes_without_legacy_allowlist(self):
-        from check import check_uuid_policy
+        from check_http import check_uuid_policy
         self.assertEqual(check_uuid_policy(), 0)
         self.assertFalse((ROOT / "scripts/contracts/uuid-legacy-v1.json").exists())
         original = load
@@ -67,7 +69,7 @@ class ContractIntegrityTests(unittest.TestCase):
         api["paths"]["/internal/collections/receipts"]["post"]["requestBody"][
             "content"]["application/json"]["schema"]["properties"]["tenant_id"][
                 "pattern"] = r"^[0-9a-f-]{36}$"
-        with patch("check.load", side_effect=lambda path:
+        with patch("check_http.load", side_effect=lambda path:
                    api if path == "contracts/openapi/inventory-collection-worker-v1.json"
                    else original(path)):
             with self.assertRaisesRegex(ValueError, "Noncanonical UUID"):
@@ -122,7 +124,7 @@ class ContractIntegrityTests(unittest.TestCase):
         self.assertGreater(unique_schema_ids(), 10)
 
     def test_all_declared_active_openapi_versions(self):
-        from check import current_api
+        from check_schema import current_api
         releases = load("architecture/contract-consumers.json")["active_releases"]
         for entry in releases:
             if entry["path"].startswith("contracts/openapi/"):
@@ -149,7 +151,7 @@ class ContractIntegrityTests(unittest.TestCase):
             parameter for parameter in operation["parameters"]
             if parameter.get("name") != "tenant"
         ]
-        with patch("check.load", return_value=spec):
+        with patch("check_schema.load", return_value=spec):
             with self.assertRaisesRegex(ValueError, "operation parameters/responses"):
                 current_api(name)
 
@@ -170,7 +172,7 @@ class ContractIntegrityTests(unittest.TestCase):
                 "$schema": "https://json-schema.org/draft/2020-12/schema",
                 "type": "object",
             }))
-            with patch("check.ROOT", root):
+            with patch("check_schema.ROOT", root):
                 with self.assertRaisesRegex(ValueError, "Schema identity required"):
                     check_schema_dialects()
 
@@ -178,14 +180,14 @@ class ContractIntegrityTests(unittest.TestCase):
         registry = load("architecture/contract-consumers.json")
         registry["active_releases"].pop()
         original = load
-        with patch("check.load", side_effect=lambda name:
+        with patch("check_registry.load", side_effect=lambda name:
                    registry if name == "architecture/contract-consumers.json"
                    else original(name)):
             with self.assertRaisesRegex(ValueError, "does not cover every declared"):
                 check_consumer_registry()
 
     def test_asyncapi_operation_without_a_declared_channel_is_rejected(self):
-        from check import check_events
+        from check_events import check_events
 
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -216,7 +218,7 @@ components:
         schema:
           $ref: ../schemas/events/recorded.json
 """)
-            with patch("check.ROOT", root):
+            with patch("check_events.ROOT", root):
                 with self.assertRaisesRegex(ValueError, "Invalid"):
                     check_events()
 
@@ -232,14 +234,14 @@ components:
             entry for entry in registry["active_releases"] if entry["path"] != missing
         ]
         original = load
-        with patch("check.load", side_effect=lambda name:
+        with patch("check_registry.load", side_effect=lambda name:
                    registry if name == "architecture/contract-consumers.json"
                    else original(name)):
             with self.assertRaisesRegex(ValueError, "Deployed AsyncAPI missing"):
                 check_consumer_registry()
 
     def test_planning_lifecycle_contract_is_required_and_derived_from_producer(self):
-        from check import check_implemented_api_contracts
+        from check_http import check_implemented_api_contracts
         check_implemented_api_contracts()
         registry = load("architecture/contract-consumers.json")
         path = "contracts/openapi/planning-lifecycle-reads-v1.json"
@@ -248,18 +250,18 @@ components:
             row for row in registry["active_releases"] if row["path"] != path
         ]
         original = load
-        with patch("check.load", side_effect=lambda name:
+        with patch("check_http.load", side_effect=lambda name:
                    registry if name == "architecture/contract-consumers.json"
                    else original(name)):
             with self.assertRaisesRegex(ValueError, "Implemented OpenAPI release not registered"):
                 check_implemented_api_contracts()
 
     def test_implemented_openapi_release_and_v4_response_parity(self):
-        from check import check_implemented_api_contracts
+        from check_http import check_implemented_api_contracts
         check_implemented_api_contracts()
 
     def test_implemented_api_cannot_be_removed_from_both_registry_maps(self):
-        from check import check_implemented_api_contracts
+        from check_http import check_implemented_api_contracts
         registry = load("architecture/contract-consumers.json")
         missing = "contracts/openapi/assurance-evidence-v1.json"
         registry["contracts"].pop(missing)
@@ -267,42 +269,42 @@ components:
             row for row in registry["active_releases"] if row["path"] != missing
         ]
         original = load
-        with patch("check.load", side_effect=lambda name:
+        with patch("check_http.load", side_effect=lambda name:
                    registry if name == "architecture/contract-consumers.json"
                    else original(name)):
             with self.assertRaisesRegex(ValueError, "Implemented OpenAPI release not registered"):
                 check_implemented_api_contracts()
 
     def test_native_input_api_response_drift_is_detected(self):
-        from check import check_implemented_api_contracts
+        from check_http import check_implemented_api_contracts
         original = load
         path = "contracts/openapi/inventory-native-input-v1.3.json"
         broken = original(path)
         endpoint = next(iter(broken["paths"].values()))["get"]
         envelope = broken["components"]["schemas"]["MigrationInput"]
         envelope["properties"].pop("collection_coverages")
-        with patch("check.load", side_effect=lambda name:
+        with patch("check_http.load", side_effect=lambda name:
                    broken if name == path else original(name)):
             with self.assertRaisesRegex(ValueError, "producer/consumer v4 schema mismatch"):
                 check_implemented_api_contracts()
 
     def test_embedded_owner_schema_must_match_canonical_and_installed(self):
-        from check import check_implemented_api_contracts
+        from check_http import check_implemented_api_contracts
         original = load
         path = "contracts/openapi/inventory-native-input-v1.3.json"
         changed = load(path)
         changed["components"]["schemas"]["CapabilityInput"]["properties"].pop("capability_snapshot")
-        with patch("check.load", side_effect=lambda name:
+        with patch("check_http.load", side_effect=lambda name:
                    changed if name == path else original(name)):
             with self.assertRaisesRegex(ValueError, "Inventory native CapabilityInput"):
                 check_implemented_api_contracts()
 
     def test_all_dynamic_owner_operations_resolve_to_active_copies(self):
-        from check import check_owner_operation_bindings
+        from check_registry import check_owner_operation_bindings
         check_owner_operation_bindings()
 
     def test_removing_dynamic_owner_contract_from_both_maps_fails(self):
-        from check import check_owner_operation_bindings
+        from check_registry import check_owner_operation_bindings
         registry = load("architecture/contract-consumers.json")
         source = "contracts/schemas/planning/catalogue-current-v2.json"
         registry["contracts"].pop(source)
@@ -310,18 +312,18 @@ components:
             entry for entry in registry["active_releases"] if entry["path"] != source
         ]
         original = load
-        with patch("check.load", side_effect=lambda name:
+        with patch("check_registry.load", side_effect=lambda name:
                    registry if name == "architecture/contract-consumers.json"
                    else original(name)):
             with self.assertRaisesRegex(ValueError, "owner-operation contract missing"):
                 check_owner_operation_bindings()
 
     def test_catalogue_current_projection_cannot_diverge_from_source_intent(self):
-        from check import check_owner_operation_bindings
+        from check_registry import check_owner_operation_bindings
         original = load
         bad = load("contracts/schemas/planning/catalogue-current-v2.json")
         bad["$defs"]["Intent"]["properties"]["workloads"] = {"type": "string"}
-        with patch("check.load", side_effect=lambda name:
+        with patch("check_registry.load", side_effect=lambda name:
                    bad if name == "contracts/schemas/planning/catalogue-current-v2.json"
                    else original(name)):
             with self.assertRaisesRegex(ValueError, "intent projection differs"):
@@ -429,14 +431,14 @@ components:
         verify_retired_references(ROOT, retired)
 
     def test_native_api_cannot_double_claim_endpoint_across_owner_names(self):
-        from check import check_consumer_registry
-        from check import load as original
+        from check_registry import check_consumer_registry
+        from check_schema import load as original
         path = "contracts/openapi/worker-migration-method-v2.json"
         altered = json.loads(json.dumps(original(path)))
         altered["paths"]["/internal/native-effects"] = {
             "post": {"responses": {"200": {"description": "duplicate"}}}
         }
-        with patch("check.load", side_effect=lambda name:
+        with patch("check_registry.load", side_effect=lambda name:
                    altered if name == path else original(name)):
             with self.assertRaisesRegex(ValueError, "Overlapping native wire operation"):
                 check_consumer_registry()
@@ -475,8 +477,8 @@ components:
                 verify_retirement_decisions(root, set(record["retired"]), record["reviews"])
 
     def test_retired_canonical_file_cannot_reappear(self):
-        from check import check_consumer_registry
-        from check import load as real_load
+        from check_registry import check_consumer_registry
+        from check_schema import load as real_load
         registry = real_load("architecture/contract-consumers.json")
         retired_path = load("architecture/retired-contract-releases.json")["retired"][0]
         with tempfile.TemporaryDirectory() as directory:
@@ -484,7 +486,7 @@ components:
             reintroduced = root / retired_path
             reintroduced.parent.mkdir(parents=True)
             reintroduced.write_text("{}")
-            with patch("check.ROOT", root), patch("check.load", side_effect=lambda path:
+            with patch("check_registry.ROOT", root), patch("check_registry.load", side_effect=lambda path:
                        registry if path == "architecture/contract-consumers.json"
                        else {"retired": [retired_path], "reviews": {retired_path: {"reason": "negative test", "internal_consumer_review": "fixture", "external_consumer_review": "fixture", "decision": "fixture"}}} if path == "architecture/retired-contract-releases.json"
                        else real_load(path)):
@@ -528,7 +530,7 @@ components:
                 verify_runtime_inventory(registry, root)
 
     def test_channel_specific_discriminator_rejects_other_valid_event_type(self):
-        from check import event_discriminator
+        from check_events import event_discriminator
         from jsonschema import Draft202012Validator
         schema = {
             "type": "object",
