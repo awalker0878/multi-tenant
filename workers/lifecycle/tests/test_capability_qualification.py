@@ -15,17 +15,13 @@ import pytest
 
 from lifecycle_worker.application.migration_runtime import MIGRATION_STAGES
 from lifecycle_worker.application.native import NativeHeld
-from lifecycle_worker.domain.capability_definitions import BEFORE, AFTER, STAGES
+from lifecycle_worker.domain.capability_definitions import AFTER, BEFORE, STAGES
 from lifecycle_worker.infrastructure.migration_method import OPERATIONS, contract, measured
 from test_method_protocol import method_plan, measurement
 
 ROOT = Path(__file__).resolve().parents[3]
 DEFINITIONS = json.loads((ROOT / "contracts/capabilities/definitions-v1.json").read_text())
-MATRIX = [
-    (method, mode)
-    for method in DEFINITIONS["methods"]
-    for mode in DEFINITIONS["modes"]
-]
+MATRIX = [(method, mode) for method in DEFINITIONS["methods"] for mode in DEFINITIONS["modes"]]
 
 
 @pytest.mark.parametrize(
@@ -33,9 +29,7 @@ MATRIX = [
     MATRIX,
     ids=[f"MATRIX_{method}__{mode}" for method, mode in MATRIX],
 )
-def test_current_capability_method_mode_execution_and_denial(
-    method: str, mode: str
-) -> None:
+def test_current_capability_method_mode_execution_and_denial(method: str, mode: str) -> None:
     entry = DEFINITIONS["methods"][method]
     wire_method = entry["v1_alias"]
     declared = tuple(entry["stages"][mode])
@@ -70,10 +64,18 @@ def test_current_capability_method_mode_execution_and_denial(
 def test_current_definition_has_no_unqualified_method_mode_and_no_unknown_stage() -> None:
     assert len(MATRIX) == len(DEFINITIONS["methods"]) * len(DEFINITIONS["modes"])
     assert DEFINITIONS["methods"] and DEFINITIONS["modes"]
-    assert all(entry["implementation_required"] is True
-               for entry in DEFINITIONS["methods"].values())
-    assert all(set(entry["stages"]) == set(DEFINITIONS["modes"])
-               for entry in DEFINITIONS["methods"].values())
-    current = {stage for entry in DEFINITIONS["methods"].values()
-               for ordered in entry["stages"].values() for stage in ordered}
+    assert all(
+        entry["implementation_required"] is True
+        for entry in DEFINITIONS["methods"].values()
+    )
+    assert all(
+        set(entry["stages"]) == set(DEFINITIONS["modes"])
+        for entry in DEFINITIONS["methods"].values()
+    )
+    current = {
+        stage
+        for entry in DEFINITIONS["methods"].values()
+        for ordered in entry["stages"].values()
+        for stage in ordered
+    }
     assert current == MIGRATION_STAGES
