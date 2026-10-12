@@ -4,8 +4,11 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 import subprocess
+import urllib.request
+import urllib.error
 from datetime import datetime
 from pathlib import Path
 from urllib.parse import urlparse
@@ -59,6 +62,69 @@ def approved_clearance(path: str, approval: dict, baseline_sha256: str) -> None:
             raise ValueError("naive")
     except ValueError as error:
         raise ValueError(f"Retirement review timestamp invalid: {path}") from error
+
+
+
+def verify_github_approval(approval: dict, base_revision: str, git) -> None:
+    """Require a real, merged, independently reviewed PR already in the base."""
+    url = urlparse(approval["review_url"])
+    owner_repo = "/".join(url.path.split("/")[1:3])
+    if owner_repo != os.environ.get("GITHUB_REPOSITORY", "awalker0878/multi-tenant"):
+        raise ValueError("Retirement review must belong to the owning GitHub repository")
+    token = os.environ.get("GITHUB_TOKEN")
+    if not token:
+        raise ValueError("GITHUB_TOKEN is required to independently check retirement approval")
+    number = url.path.split("/")[-1]
+    api = f"https://api.github.com/repos/{owner_repo}/pulls/{number}"
+
+    def read_json(endpoint: str):
+        request = urllib.request.Request(endpoint, headers={
+            "Authorization": "Bearer " + token,
+            "Accept": "application/vnd.github+json",
+            "User-Agent": "contract-retirement-verifier",
+            "X-GitHub-Api-Version": "2022-11-28",
+        })
+        try:
+            with urllib.request.urlopen(request, timeout=12) as response:
+                return json.load(response)
+        except (OSError, ValueError) as error:
+            raise ValueError("Cannot verify independently approved retirement PR") from error
+
+    pull = read_json(api)
+    merge_commit = pull.get("merge_commit_sha")
+    if (not pull.get("merged_at") or not isinstance(merge_commit, str)
+            or not re.fullmatch(r"[a-f0-9]{40}", merge_commit)):
+        raise ValueError("Retirement PR was not merged before deletion")
+    if (pull.get("user") or {}).get("login", "").casefold() == approval["reviewed_by"].casefold():
+        raise ValueError("Retirement PR author cannot approve their own deletion")
+    try:
+        git("merge-base", "--is-ancestor", merge_commit, base_revision)
+    except ValueError as error:
+        raise ValueError("Independent retirement approval is not in Git review base") from error
+    description = pull.get("body") or ""
+    if (approval["consumer_inventory_evidence"] not in description
+            or approval["compatibility_evidence"] not in description):
+        raise ValueError("Retirement PR omits the referenced consumer and compatibility evidence")
+    latest = {}
+    for page in range(1, 11):
+        batch = read_json(api + f"/reviews?per_page=100&page={page}")
+        if not isinstance(batch, list):
+            raise ValueError("Invalid independent review response")
+        for review in batch:
+            user = (review.get("user") or {}).get("login", "").casefold()
+            if user and review.get("state") in {"APPROVED", "CHANGES_REQUESTED", "DISMISSED"}:
+                latest[user] = review
+        if len(batch) < 100:
+            break
+    reviewer = latest.get(approval["reviewed_by"].casefold())
+    if not reviewer or reviewer.get("state") != "APPROVED":
+        raise ValueError("Retirement PR lacks a current independent approving review")
+    submitted = reviewer.get("submitted_at")
+    if submitted != approval["reviewed_at"]:
+        raise ValueError("Recorded retirement approval timestamp does not match GitHub")
+    if datetime.fromisoformat(submitted.replace("Z", "+00:00")) > datetime.fromisoformat(
+            pull["merged_at"].replace("Z", "+00:00")):
+        raise ValueError("Retirement approval was submitted after merge")
 
 
 def check(root: Path, base_revision: str) -> dict:
@@ -143,6 +209,7 @@ def check(root: Path, base_revision: str) -> dict:
         if path not in base_paths:
             raise ValueError("Retirement must identify canonical in Git review base: " + path)
         approved_clearance(path, approval, hashlib.sha256(git("show", base_revision + ":" + path)).hexdigest())
+        verify_github_approval(approval, base_revision, git)
         review = retirement.get("reviews", {}).get(path, {})
         if (review.get("external_consumer_review") not in
                 {"verified_no_external_consumers", "verified_compatibility_commitments_satisfied"}
