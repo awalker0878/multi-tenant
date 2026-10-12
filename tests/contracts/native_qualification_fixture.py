@@ -54,7 +54,7 @@ def signed_fixture(record, directory, now=None, inventory=None, snapshot=None, r
              'scope_sha256': digest(scope), 'definition_sha256': definition,
              'runtime_artifacts': scope['artifacts'], 'adapter_conformant': True,
              'dimensions': record['dimensions'], 'capabilities': record['capabilities'],
-             'method_modes': method_modes,
+             'method_modes': dict(sorted(method_modes.items(), reverse=True)),
              'cases': ({'capability:' + k: 'passed' for k in record['capabilities']}
                        | {'dimension:' + k: 'passed' for k in record['dimensions']}
                        | {'adapter_behavior':'passed','installed_identity':'passed','runtime_artifacts':'passed'}
