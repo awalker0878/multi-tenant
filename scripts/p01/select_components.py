@@ -35,6 +35,17 @@ def select(changed: list[str], components: dict) -> tuple[list[str], str]:
     return sorted(selected), "changed components plus registered owner-dependent workers"
 
 
+
+def reconcile_impacted_components(selected: list[str], impacted: list[str], components: dict) -> list[str]:
+    """Exclude specification-only nodes; unknown runnable owners force complete selection."""
+    known = set(components)
+    impacted_ids = set(impacted)
+    unregistered = impacted_ids - known - {"contract-platform"}
+    if unregistered:
+        return sorted(known)
+    return sorted(set(selected) | (impacted_ids & known))
+
+
 def changed_paths(event: dict, event_name: str, workspace: Path) -> tuple[list[str] | None, str]:
     if event_name == "workflow_dispatch":
         return None, "manual workflow request selects every candidate"
@@ -94,7 +105,7 @@ def main() -> int:
         impact = affected(paths, base_components, components, base_graph, head_graph)
         if impact["removed_components"]:
             raise ValueError("Removing a required deployable requires an explicit foundation inventory decision")
-        selected = sorted(set(selected) | set(impact["components"]))
+        selected = reconcile_impacted_components(selected, impact["components"], components)
         explanation += "; union of base/head ownership and transitive contract consumers"
     result = {"components": selected, "reason": explanation, "changed_paths": paths, "impact": impact}
     for language in ("python", "php"):

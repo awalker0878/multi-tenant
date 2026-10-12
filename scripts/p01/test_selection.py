@@ -30,7 +30,7 @@ class SelectionTest(unittest.TestCase):
         self.assertEqual(MODULE.select(["workers/lifecycle/uv.lock"], COMPONENTS)[0], ["lifecycle-workers"])
 
     def test_global_inputs_never_skip_registered_components(self):
-        for path in ["scripts/p01/candidates.json", "deploy/build/inputs.lock.json", "architecture/context-map.yaml", ".github/workflows/p01-foundations.yml", "scripts/validate_architecture.py"]:
+        for path in ["scripts/p01/candidates.json", "deploy/build/inputs.lock.json", "architecture/context-map.yaml", ".github/workflows/ci.yml", "scripts/validate_architecture.py"]:
             with self.subTest(path=path):
                 self.assertEqual(MODULE.select([path], COMPONENTS)[0], sorted(COMPONENTS))
 
@@ -51,6 +51,15 @@ class SelectionTest(unittest.TestCase):
 
     def test_contract_changes_conservatively_select_every_consumer_candidate(self):
         self.assertEqual(MODULE.select(["contracts/http/v1/planning.openapi.yaml"], COMPONENTS)[0], sorted(COMPONENTS))
+
+    def test_specification_only_contract_owner_is_not_a_build(self):
+        # Contract-platform appears in active dependency graphs, but is not a deployable.
+        got = MODULE.reconcile_impacted_components(["planning"], ["planning", "contract-platform"], COMPONENTS)
+        self.assertEqual(got, ["planning"])
+
+    def test_unknown_runnable_owner_fails_closed_to_full_selection(self):
+        got = MODULE.reconcile_impacted_components([], ["unregistered-component"], COMPONENTS)
+        self.assertEqual(got, sorted(COMPONENTS))
 
     def test_traversal_and_absolute_inputs_rejected(self):
         for path in ["/services/planning/x.py", "../services/planning/x.py", "services\\planning\\x.py"]:
