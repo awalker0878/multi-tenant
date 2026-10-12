@@ -93,14 +93,17 @@ def inventory(root: Path = ROOT) -> dict:
                     if not isinstance(security, list):
                         raise ValueError(f"Invalid operation security: {identity}")
                     cases = sorted(spec["responses"])
-                    if not any(code.startswith("2") for code in cases):
-                        raise ValueError(f"No success case contracted: {identity}")
+                    if not cases:
+                        raise ValueError(f"No HTTP responses contracted: {identity}")
                     operations.append({
                         "key": identity, "release": path,
                         "release_sha256": releases[-1]["sha256"],
                         "owner": release["owner"], "consumers": releases[-1]["consumers"],
                         "method": method.upper(), "path": uri, "operation_id": spec["operationId"],
-                        "security_required": bool(security),
+                        # An explicit empty security alternative makes an
+                        # operation publicly callable even if other alternatives
+                        # require credentials.
+                        "security_required": bool(security) and all(bool(x) for x in security),
                         "response_statuses": cases,
                         "has_request_body": bool(spec.get("requestBody")),
                     })

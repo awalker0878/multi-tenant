@@ -140,6 +140,22 @@ class AssuranceCoverageTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Stale operation evidence"):
             assess(self.root, all_claims)
 
+    def test_not_ready_only_status_is_still_an_active_wire_operation(self):
+        doc = json.loads((self.root / self.api).read_text())
+        doc["paths"][self.op]["get"]["responses"] = {
+            "503": {"description": "not yet commissioned"}
+        }
+        self.write(self.api, doc)
+        op = inventory(self.root)["operations"][0]
+        self.assertEqual(op["response_statuses"], ["503"])
+        self.assertFalse(assess(self.root)["coverage"][0]["qualified"])
+
+    def test_anonymous_security_alternative_does_not_demand_auth_denials(self):
+        doc = json.loads((self.root / self.api).read_text())
+        doc["security"] = [{"Caller": []}, {}]
+        self.write(self.api, doc)
+        self.assertFalse(inventory(self.root)["operations"][0]["security_required"])
+
     def test_missing_declared_canonical_cannot_be_qualified(self):
         (self.root / self.api).unlink()
         with self.assertRaisesRegex(ValueError, "Missing canonical contract"):
