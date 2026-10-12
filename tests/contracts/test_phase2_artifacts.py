@@ -55,6 +55,15 @@ class DependencyTests(unittest.TestCase):
         other = next(x for x in graph["edges"] if x["consumer"] == "planning")
         self.assertEqual(other["evidence"], "registry-declaration")
 
+    def test_producer_owned_copy_is_local_validation_not_dependency(self):
+        self.registry["active_releases"][0]["owner"] = "console"
+        self.registry["active_releases"][0]["consumers"] = ["planning"]
+        self._save()
+        graph = derive(self.root)
+        self.assertEqual(len(graph["edges"]), 1)
+        self.assertEqual(graph["summary"]["producer_local_copies"], 1)
+        self.assertEqual(graph["producer_local_copies"][0]["copy"], self.copy)
+
     def test_no_unknown_or_orphaned_installed_copy(self):
         self.registry["active_releases"][0]["consumers"] = ["planning"]
         self._save()

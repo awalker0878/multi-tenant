@@ -25,6 +25,7 @@ def derive(root: Path = ROOT) -> dict:
     usage = json.loads((root / "architecture/installed-contract-usage.json").read_text())
     copies = {item["copy"]: item for item in usage["copies"]}
     edges = []
+    producer_local = []
     installed_seen = set()
     for entry in registry["active_releases"]:
         canonical, owner = entry["path"], entry["owner"]
@@ -43,9 +44,17 @@ def derive(root: Path = ROOT) -> dict:
             component = "/".join(Path(copy).parts[:2])
             consumer = ("console" if component == "apps/console"
                         else component.split("/")[1])
-            if consumer not in declared_consumers:
+            if consumer == owner:
+                # Producer-installed schema is an internal encoding/validation
+                # boundary, not a cross-service dependency.
+                producer_local.append({
+                    "provider": owner, "release": canonical, "copy": copy,
+                    "kind": TYPE[kind],
+                })
+            elif consumer in declared_consumers:
+                bindings.setdefault(consumer, []).append(copy)
+            else:
                 raise ValueError(f"Installed consumer omitted from release: {canonical} {consumer}")
-            bindings.setdefault(consumer, []).append(copy)
             installed_seen.add(copy)
         for consumer in declared_consumers:
             if consumer == owner:
@@ -59,12 +68,15 @@ def derive(root: Path = ROOT) -> dict:
     if set(copies) != installed_seen:
         raise ValueError("Orphaned installed contract not represented in dependency graph")
     edges.sort(key=lambda e: (e["consumer"], e["provider"], e["release"]))
+    producer_local.sort(key=lambda e: (e["provider"], e["release"], e["copy"]))
     modules = sorted({e["consumer"] for e in edges} | {e["provider"] for e in edges})
     return {
         "schema_version": 1,
         "nodes": modules,
         "edges": edges,
+        "producer_local_copies": producer_local,
         "summary": {
+            "producer_local_copies": len(producer_local),
             "declared_relationships": len(edges),
             "with_installed_loader": sum(e["evidence"] == "installed-loader" for e in edges),
             "without_installed_loader": sum(e["evidence"] != "installed-loader" for e in edges),
