@@ -1,191 +1,89 @@
-# Contract ownership and versioning
+# Active contract catalogue
 
-The contract root owns **wire contracts**, not provider eligibility or native execution authority.
+This directory is the **current wire/data contract surface**, not an archive or an
+execution-authority engine. Older releases are available in Git history, not as
+working-tree compatibility artifacts.
 
-- `contracts/source/` contains small, named, editable partitions for large source contracts.
-- `contracts/openapi/`, `contracts/schemas/`, and `contracts/capabilities/` contain versioned, deployment-ready **bundles**. They remain self-contained because PHP, Python and generated clients load these artifacts directly.
-- `scripts/contracts/build.py --check` reconstructs every split bundle and verifies its canonical and installed copies. Use `--write` only when intentionally assembling a reviewed unpublished version.
-- Consumers must load exact versioned artifact names. Do not give a new version an old filename or schema `$id`.
-- Only current active releases and the explicitly retained native-boundary qualification contracts remain in the working tree. The product owner approved retiring obsolete canonical releases, historical-only tests and installed copies on 2026-10-11. The exact removed paths are recorded in `architecture/retired-contract-releases.json`. Current registered contracts are protected by `scripts/p01/contracts/compatibility.py` and active-route/schema validation.
-- Readiness uses the active `v2.2` validation profile in Planning and Lifecycle; its external wire `schema_version` remains 2. `scripts/contracts/generate_readiness.py` derives the stable v2 OpenAPI projection from the active v2.2 schema, excluding only its additional admission gates. The retired standalone `migration-readiness-v2.json` file is not a dependency.
-- `migration-workload-readiness` is a **read-only eligibility assessment**. It never grants native writes or workload admission. Runtime still independently verifies signed custody, exact scope, freshness and E3/E4 evidence.
+## Canonical ownership
 
-## Current active packages
+- `architecture/contract-consumers.json` lists every current canonical release,
+  owner, consumer, installed package copy, source manifest and dependency.
+- `architecture/retired-contract-releases.json` records removed paths and per-path
+  decisions. The external-consumer statuses distinguish repository evidence from
+  independently established external compatibility commitments.
+- `contracts/openapi/`, `contracts/asyncapi/`, `contracts/schemas/`,
+  `contracts/capabilities/` and `contracts/platforms/` contain active bundles.
+- `contracts/source/` is the editable split authoring representation for larger
+  assembled contracts; `contracts/fixtures/` contains only test cases.
+- A new breaking wire contract receives a new version. Current existing releases
+  are byte-frozen relative to the review base. Historical-only aliases, shims,
+  replay fixtures and packaged consumer copies are not preserved.
 
-| Capability | Canonical bundle | Installed consumer |
+## Installed consumers
+
+| Interface | Active canonical artifact | Installed runtime |
 | --- | --- | --- |
-| Planning migration | `openapi/planning-migration-v1.6.json` | `apps/console/resources/contracts/planning-migration-v1.6.json` |
-| Inventory | `openapi/inventory-v1.9.json` | `apps/console/resources/contracts/inventory-v1.9.json` |
-| Catalogue | `openapi/catalogue-v1.0.1.json` | `apps/console/resources/contracts/catalogue-v1.0.1.json` |
-| Native migration input | `schemas/planning/migration-input-v4.json` | `services/planning/src/planning/infrastructure/inputs/migration-input-v4.json` |
-| Migration support | `schemas/planning/migration-support-v2.json` | `services/planning/src/planning/infrastructure/inputs/migration-support-v2.json` |
-| Workload-readiness validation (wire v2) | `schemas/planning/migration-readiness-v2.2.json` | Planning and Lifecycle exact packaged copies |
+| Catalogue HTTP | `openapi/catalogue-v1.0.1.json` | Console |
+| Inventory HTTP | `openapi/inventory-v1.9.json` | Console |
+| Planning HTTP | `openapi/planning-v1.2.json` | Console |
+| Planning migration | `openapi/planning-migration-v1.6.json` | Console |
+| Lifecycle native jobs | `openapi/lifecycle-native-jobs-v1.1.json` | Console |
+| Inventory planning input | `schemas/planning/inventory-input-v2.json` | Planning |
+| Inventory migration input | `schemas/planning/migration-input-v4.json` | Planning |
+| Qualification | `schemas/planning/qualification-v2.1.json` | Planning |
+| Migration support | `schemas/planning/migration-support-v2.json` | Planning |
+| Readiness validation | `schemas/planning/migration-readiness-v2.2.json` | Planning and Lifecycle |
 
-The source manifests are an editing representation, not independently hosted service contracts. Do not create separate, unverifiable drift between source fragments and the immutable deployed bundles.
+All other installed event/HTTP consumer files are enumerated by the active
+registry. The two `foundation-event.json` installed names share the single
+versioned `schemas/events/catalogue-foundation-recorded-v1.json` canonical
+artifact. `apps/console/resources/contracts/migration-feature-policy-v1.json`
+is required: the Migration Vue page imports that policy at build time.
 
-## Duplicate cleanup
+Inventory native-input v1.3 embeds `schemas/planning/inventory-input-v1.json`
+as an **active API response component**, but Planning no longer installs a
+redundant v1 copy. The current Planning runtime operation mapping selects the
+v2 capability input and v4 migration input.
 
-The byte-identical `contracts/fixtures/planning/synthetic-plan-v1.json` was removed. All fixture generation and live service test copies source `synthetic-plan-v1.1.json`. Fixture examples and partition source files are editable authoring inputs, not historically frozen published wire artifacts. Published API, event, schema and capability releases remain subject to the immutable-version gate.
+## Current authority and qualification constraints
 
-The `planning/qualification-v2.1.json` validation profile tightens the externally delivered v2 qualification payload; its wire `version` remains `2` and Assurance keeps the existing v2 endpoint. This is a schema contract revision, **not** a native evidence upgrade.
+The Planning migration-readiness external wire `schema_version` remains 2.
+The active v2.2 schema adds stricter acceptance gates while
+`scripts/contracts/generate_readiness.py` reproduces the stable embedded
+Planning v1.6 OpenAPI wire projection from that active profile.
+Readiness is an assessment only; neither workload admission nor native provider
+writes are authorized by a positive readiness result.
 
-## Retired duplicate schema identities
+Current native provision/migration boundaries and their negative grant tests
+remain part of the active registry. The Inventory collection-manifest source
+partitions maintain their order, including interleaved source/target/owner
+attributes, and must reproduce the exact canonical bundle. Independent E3/E4
+evidence and field-level transformation qualification must be commissioned
+separately; a proposed E4 schema is not an authority grant or active release.
 
-The retired Inventory collection-page v1.1–v1.3 documents historically reused one schema ID. Their files and SHA-based compatibility exceptions are now removed. Current schemas must have unique IDs, enforced directly in `scripts/contracts/check.py`. The current `collection-page-v1.4.json` remains available.
+## Checks and cleanup policy
 
-## Collection-manifest source partitions
+Run from the repository root:
 
-The Inventory collection manifest is authored in platform headers and ordered scope-specific arrays under `contracts/source/capabilities/migration-collection-manifest-v1/platforms/<provider>/`. Numeric prefixes preserve the published attribute sequence, including interleaved source/target/owner groups. Do not reorder these files or aggregate by scope: the resulting contract must continue matching the canonical bundle via `scripts/contracts/build.py --check`.
+```sh
+python scripts/contracts/retirement_integrity.py
+python scripts/contracts/generate_readiness.py
+python scripts/contracts/generate_authority_releases.py --check
+python scripts/contracts/build.py --check
+python scripts/contracts/check.py
+python -m unittest discover -s tests/contracts -p 'test_integrity.py' -v
+```
 
-Superseded Inventory and Planning releases and historical-only replay fixtures have been deleted under the explicit retirement manifest. Current Console consumers use Inventory v1.9 and Planning Migration v1.6. Native grant conformance tests required by P10 are retained until equivalent current safety-negative coverage is available.
+CI additionally checks current producer responses against the exact installed
+consumer, live Laravel and Python routes, JSON Schema dialects, AsyncAPI
+channel/event bindings, version identities and negative denial cases. The P01
+compatibility gate protects **current** canonical releases relative to the
+review base and no longer replays first-publication history.
 
-## Active producer and consumer ownership
-
-`architecture/contract-consumers.json` owns the **editable** active-release catalogue with per-contract producers, downstream consumers, installed artifact paths, source manifests, and explicit dependencies. `scripts/contracts/check.py` checks every declaration against real files and byte-identical installed copies. Replacing an active release updates the registry and creates a new version; a retirement is authorized explicitly rather than silently removing an active API.
-
-All contracts with a declared implemented consumer are now represented by an active-release record. The registry validates source manifests, installed byte parity and the active OpenAPI specifications, including OpenAPI 3.0 foundation health. Asynchronous events are checked for channel/address uniqueness, valid operation bindings and referenced JSON Schema payloads; this is not a substitute for measured broker-event conformance.
-
-## Migration admission owner commissioning
-
-Lifecycle migration admission now requires an independently credentialed `catalogue` read owner in the protected native-owner configuration, alongside Planning, Governance, Inventory, Custody and Observer. The Catalogue owner must expose the current scoped `/internal/tenants/{tenant}/applications/{application}/environments/{environment}/current-planning-intent` read. At each admission/current-authority check Lifecycle compares the current Catalogue revision, immutable intent SHA and **complete unique workload-ID set** to Planning's reconciliation; a missing owner, stale revision, extra or missing VM holds the operation. Non-migration native workflows retain the existing owner set. Configure the dedicated scoped Catalogue credential and TLS trust before enabling migration, and include it in environment commissioning/rotation controls.
-
-## E4 qualified-transformation provenance
-
-The proposed E4 field-provenance model formerly represented by a non-commissioned schema defines an independently attestable E4 field proof: Catalogue revision/digest, workload and field, exact source profile and desired/observed field hashes, proof/plan/acceptance digests, level, decision, revocation and validity interval. **It is a prerequisite for a future versioned migration-readiness wire release, not a currently commissioned execution grant.** The active wire v2/v2.2 admission validator intentionally **holds required qualified transformations**, because v2 field dispositions do not carry an independently verifiable E4 reference. Do not relax that invariant by accepting `evidence_source=independent_e4` alone; activate these transformations only after an authenticated Assurance proof lookup and a complete versioned producer/consumer rollout with negative tests.
-
-## Executable consumer inventory and conformance
-
-The editable active-release registry is checked against a **separate observation
-of deployed code** in `scripts/contracts/runtime_inventory.py`. Executable
-PHP/Python/TypeScript/Vue references to packaged JSON inside each bounded
-product must resolve to exactly one registered byte-identical canonical
-release. Retired or test-only copies do not remain in deployed packages. Tests read their canonical contract directly, and every shipped copy must have an active declared consumer. The checker also requires every shipped AsyncAPI release and
-its event payload schemas to appear in the active inventory; removing records
-from both editable registry maps is not sufficient to bypass this check.
-
-`scripts/contracts/check.py` validates broker-address uniqueness across event
-documents, all operation/channel/message bindings, complete event-type routing,
-and channel-specific event discriminators. Existing immutable v1 event payloads
-are **not** overwritten: channel-specific discriminator schemas are validation
-profiles. Catalogue intentionally multiplexes its four intent fact types over
-the single `catalogue.intent.changed.v1` exchange binding. Event delivery
-consumers must still verify publisher identity, routing key, event ID and the
-current authorization boundary independently.
-
-The dedicated CI job compares `php artisan route:list --json` for Governance
-and Catalogue with **every active OpenAPI operation owned by that service**,
-including verbs and full paths. This proves published operations have concrete
-runtime routes; it does not establish that all endpoints are documented or that
-response bodies match. Producer fixture/live HTTP tests and installed-consumer
-validation remain additional requirements, particularly for Planning, Inventory,
-Console and Lifecycle.
-
-All split-source file names and deployment destinations are confined to approved
-repository subtrees, with resolved-path traversal checks. CI calls the source
-assembler in `--check` mode, not `--write`. A changed published contract
-requires a new release; no previous wire version is silently rewritten.
-
-Do not equate these source-bound and synthetic conformance checks with live
-provider qualification, independent E3/E4 evidence or authority for native
-execution. Those gates remain separate and fail closed.
-
-## 2026-10-09 owner-operation contract remediation
-
-The Planning owner client no longer selects JSON Schema by a caller-defined
-filename allowlist. `planning.infrastructure.owner_contracts` binds each
-authenticated upstream owner, HTTP method and exact route pattern to one
-installed response contract; unknown/mismatched operations fail closed before
-the network call. `scripts/contracts/check.py` independently verifies that
-**all six owner-response schema types** are registered and byte-identical to
-their installed copies, even though `importlib.resources` constructs the
-schema file path dynamically.
-
-Inventory migration-input requests use **v4**, including reconciliation and
-collection-coverage evidence. Assurance migration qualification requests use
-**v2**, including API and application-flow E4 evidence. Superseded v3 and v1 migration-input schemas have been retired from the working tree; the active owner operations reject those versions. The Inventory producer fixture is additionally passed through the
-real Planning HTTPS owner-client validator, with an obsolete-version canary.
-
-`schemas/planning/catalogue-current-v2.json` is a new immutable internal
-Catalogue-current response contract. Its complete `$defs.Intent` is projected
-from `schemas/planning/catalogue-input-v1.json`, and CI prevents divergence.
-Planning consumes the installed v2 copy instead of the earlier shallow v1
-envelope. Older installed Catalogue-current consumer copies are removed rather than preserved as historical artifacts.
-
-Planning's installed Catalogue foundation-event payload and Python package
-copies are included in consumer parity checks. Live route conformance also
-probes Inventory's separate authenticated Planning-input ASGI router.
-These checks do not by themselves establish successful live deployments,
-independent provider E4 qualification, or authorization for native execution.
-
-## 2026-10-09 registered API and producer-conformance closeout
-
-Inventory's native-read API is now published at
-`openapi/inventory-native-input-v1.2.json`, embedding the exact canonical
-`schemas/planning/migration-input-v4.json` success response. CI checks that
-published response, canonical v4 schema and Planning's installed v4 schema
-are identical. Inventory's real producer response is exercised through its
-authenticated ASGI route and compared with both the API and Planning consumer.
-Previous native-input releases are available only through Git history.
-
-Assurance evidence v1, Lifecycle migration boundary v2 and Planning's immutable
-plan v1.1 are registered as active implemented OpenAPI releases. The required
-owner/operation set is hard-coded independently of editable registry entries:
-removing a contract from both registry maps does not disable validation.
-
-Assurance evidence-review requests must contain exactly a JSON `decision`
-with no additional fields; extra fields and non-JSON requests fail before
-custody access. Route CI includes Assurance and fails on newly implemented
-`/v1/` or `/internal/` operations unless covered by an active API contract
-or explicitly listed as a pre-existing qualification-operation exception.
-The exceptions are intentionally finite and must be reduced through
-separately versioned specifications, never expanded automatically.
-
-Synthetic, successfully authenticated ASGI contract probes are included for
-Lifecycle's native-grant boundary and Planning's immutable plan. These are
-in addition to Inventory's concrete producer fixture and negative authority
-tests. They validate **transport and wire compatibility**, not independent
-production commissioning or a live provider migration.
-
-## 2026-10-11 Planning-to-Lifecycle read contracts
-
-`contracts/openapi/planning-lifecycle-reads-v1.json` is the active
-Lifecycle-only transport specification for current execution-plan reads and
-unreserved placement-proposal reads. Both enforce response envelopes and
-explicit immutable bindings; no native write permission is implied by a
-positive placement projection. Base content and immutable bindings derive from
-the published Planning v1.2 specification; the embedded readiness projection
-derives from canonical migration-readiness v2.2. Optional native/migration
-content extensions have explicit names, not an unbounded root envelope.
-
-The executable route probe checks both successful Lifecycle-authenticated reads,
-their wire shapes, and denied requests. Independent operation inventory makes
-removal from both registry maps a CI failure.
-
-## 2026-10-11 authority-boundary OpenAPI additions (implemented, unverified)
-
-New active versioned releases are `catalogue-internal-v1`, `inventory-native-input-v1.3`, `governance-service-checks-v1`, and `assurance-qualification-v1`. These explicitly cover source owner reads, execution/Planning authority checks, and qualification operations. The unversioned Assurance `planning-qualification` alias has been removed; `planning-qualification-v2` is the supported route. The older `planning-inputs-v1/v2` aggregates and `inventory-native-input-v1.2` are removed from the working tree; historical content is recoverable in Git.
-
-The Laravel conformance job now checks both directions for **all** `/v1/` and `/internal/` operations, with no legacy exception set. Inventory native source operations are compared against their registered release and probed through the real ASGI object. Shared errors use `schemas/common/error-v1.json` and canonical lowercase UUIDs are enforced on new releases, with historical bytes frozen by the per-file allowlist. See `docs/contracts/adr-service-authority-errors-idempotency-2026-10-11.md` for implemented body and idempotency semantics. These controls do not establish live E3/E4 qualification, native write authority or an exact-head successful CI run.
-
-The two installed files `services/catalogue/resources/contracts/foundation-event.json` and `services/planning/src/planning/infrastructure/messaging/foundation-event.json` are **installed consumer names** of `contracts/schemas/events/catalogue-foundation-recorded-v1.json`; the active registry pins their byte parity. They are not separate unversioned wire publications and should only be renamed alongside a coordinated producer/consumer deployment.
-
-The separately versioned Governance collection and native approval status contracts `governance-inventory-collection-v1.1` and `governance-native-approval-v1.1` supersede their v1 active releases. The superseded v1 artifacts have been retired from the working tree. New responses document explicit 401/403/404/422/503 as applicable, with the shared `common/error-v1` envelope; these are not native effect grants. Exact producer-status matrix verification remains outstanding until independently exercised and recorded.
-
-
-### Authority-contract audit remediation (2026-10-11)
-
-Current owner-boundary releases additionally include `inventory-collection-worker-v1` (four worker operations), `planning-qualification-events-v1` (independently authenticated Planning invalidations), `lifecycle-internal-authority-v1` (placement and E2-only simulation evidence), and an activated existing `planning-native-v1`. The broken unqualified Inventory internal Planning-input alias and P00 synthetic compatibility runtime/CI tooling were retired rather than shimmed. `inventory-native-input-v1.3` deduplicates its canonical v4 response schema. Owner schema projections must pass `python scripts/contracts/generate_authority_releases.py --check`, with candidate regenerated releases emitted outside published `contracts/` for explicit review. Modern authority releases use one shared error schema and strict UUID policy without historical compatibility allowlists. All new operations have reverse-route/authority checks; end-to-end producer status completeness and exact-head CI remain acceptance gates. No native-write authority is conferred.
-
-## Active-only contract cleanup
-
-Superseded versioned canonical releases and historical-only consumer bundles do not remain in the checkout. Retirement decisions are recorded in `architecture/retired-contract-releases.json`; Git history holds the old bytes. `inventory-input-v1.json` remains an **active current API component** because `inventory-native-input-v1.3` embeds its PlanningInput response and Planning installs it. The release registry enumerates that installed copy. Current native provisioning boundaries (`lifecycle-native-boundary-v1`, `worker-native-effect-v1`) remain until current independent safety coverage can replace them. The P07 generator that wrote the superseded `lifecycle-native-jobs-v1` contract was removed; the active job release is v1.1.
-
-### 2026-10-11 canonical cleanup closeout
-
-Canonical native-boundary, worker-effect, adapter-package, inventory-fact and planning-fact qualification contracts are registered as active. Historical-only Inventory collection-page v1.4, commissioning-evidence v1 and proposed E4 provenance v1 files have been retired from the current tree; their designs remain available in Git history. The Governance support OpenAPI test now reads its current canonical contract rather than shipping a test-only service copy. The Console feature-policy copy is retained because the Vue migration page imports it at build time. Retirement manifest reviews record the limit of repository-only evidence: they do not attest independently verified external-consumer absence.
-
-The active Inventory v1.3 HTTP `PlanningInput` embeds the canonical inventory-input-v1 schema, but Planning no longer loads its former v1-installed copy. That packaged duplicate was removed; the current v2 capability-input and v4 migration-input installed schemas remain.
-
-### CI gates for active-only contracts
-
-The retirement manifest records one reason and review status per removed path, without asserting independently verified external adoption. `scripts/contracts/retirement_integrity.py` scans active executable source, generators and CI for old filenames. `scripts/contracts/check.py` rejects unregistered canonical artifacts; `scripts/contracts/runtime_inventory.py` rejects shipped copies with no corresponding loader, including Planning's typed runtime-only resolution. Keep active wire versions unchanged while deleting only unused packaged copies. P05, P08 and Capability Assurance validate current APIs rather than importing retired files.
+No installed JSON copy may exist merely because it is listed in the registry.
+The runtime inventory independently requires a real loader, including Planning's
+typed dynamic owner-operation binding, and checks byte parity for all packages.
+No retired path may be reintroduced or referenced from executable source, tests,
+build scripts or CI. Deletion of published interfaces still requires an explicit
+consumer/commitment decision; repository scans do not prove absence of external
+consumers. Git history retains the old bytes without inflating the checkout.

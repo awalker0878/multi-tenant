@@ -1,124 +1,67 @@
 # Contract conventions and ownership
 
-Status: implemented versioned contract registry and consumer validation, with historical P00/P01 design discussion below. The active release catalogue is `architecture/contract-consumers.json`; executable contract checks are `scripts/contracts/check.py` and `scripts/contracts/route_conformance.py`. See [ADR: service authority errors and retries](adr-service-authority-errors-idempotency-2026-10-11.md) for decisions superseding earlier proposals.
+The current source of truth is [the active contract catalogue](../../contracts/README.md).
+All deployed interfaces are registered in
+`architecture/contract-consumers.json`; retired paths and review status are
+recorded in `architecture/retired-contract-releases.json`.
+Do not use historical contract paths or unpublished proposals as live interfaces.
 
-## Where contracts will live
+## Design rules
 
-| Artifact | Planned authoritative location | Owner / purpose |
-| --- | --- | --- |
-| HTTP definitions | `contracts/openapi/<service>.yaml` | Owning service; request/response, scope, errors and concurrency semantics. |
-| Event envelopes and payloads | `contracts/asyncapi/<service>.yaml` and `contracts/schemas/events/` | Producer; versioned envelope and event schemas, ordering/replay expectations. |
-| Shared scalar/problem schemas | `contracts/schemas/common/` | Architecture; narrow interoperable formats, not shared business data models. |
-| Valid/invalid fixtures | `contracts/fixtures/{service}/` | Producer and consumer jointly; deterministic examples and rejection cases. |
-| PHP / TypeScript / Python clients | `packages/generated/{language}/` | Generated from locked schemas; regeneration checked in CI, no manual semantic forks. |
-| Compatibility tests | `tests/contracts/` | Quality and service owners; validate PHP/Python interpretation and producer/consumer versions. |
+- The owning bounded context defines each request, response, event payload,
+  error code and eligibility decision. Consumers must not infer authorization
+  from a returned identifier or a claimed qualification level.
+- HTTP contracts specify authentication, exact tenant/resource scope, methods,
+  status/error envelopes, freshness, idempotency where implemented, rate/retry
+  bounds and immutable request or digest bindings.
+- JSON Schema 2020-12 and versioned OpenAPI/AsyncAPI artifacts define wire
+  shapes. Check validated producer responses against consumers' installed
+  contracts before converting them into domain values.
+- Use stable opaque IDs, explicit units, bounded pagination and truthful
+  unknown/partial results. Reject unsupported versions or incomplete evidence.
+- Native write eligibility is never inferred from simulated E2 validation.
+  Independent E3/E4 qualification, signed custody and current authority remain
+  separate requirements.
 
-These paths are destinations to implement in P01.03, not evidence that the files are present. [Service specifications](../services/README.md) own business semantics. [Examples](examples.md) show proposed interactions without duplicating an authoritative future schema.
+## Active ownership examples
 
-## HTTP conventions
+- Catalogue: `contracts/openapi/catalogue-v1.0.1.json` plus current internal
+  planning-intent reads.
+- Inventory: `contracts/openapi/inventory-v1.9.json` and
+  `contracts/openapi/inventory-native-input-v1.3.json`.
+- Planning: `contracts/openapi/planning-v1.2.json`,
+  `contracts/openapi/planning-migration-v1.6.json` and
+  `contracts/openapi/planning-immutable-plan-v1.1.json`.
+- Lifecycle: `contracts/openapi/lifecycle-v1.json`, active native job,
+  migration boundary and internal authority releases.
+- Governance and Assurance: versioned approval, support, evidence custody
+  and qualification owner interfaces.
+- Foundation event: `contracts/schemas/events/catalogue-foundation-recorded-v1.json`
+  with two installed consumer names pinned to that source.
 
-- Each service has its own authenticated origin; `/v1/tenants/{tenant_id}` is the proposed tenant-scoped prefix. Any gateway mapping is deployment configuration, not a new domain owner.
-- Use opaque stable IDs, explicit schema versions, UTC timestamps with timezone and typed units. Public sample IDs are synthetic; consumers must not parse business meaning out of real IDs.
-- A tenant path/header is a selector. Validate the authenticated service, effective actor, delegation, audience and current action/resource scope independently. Never trust an `actor_id` supplied as an ordinary JSON field.
-- Return `Location` for created/accepted resources and an authorized status link for asynchronous work. Catalogue revision creation is synchronous; discovery/assessment tasks and lifecycle execution jobs have distinct typed IDs.
-- A completed assessment task yields an assessment; an execution job coordinates native operations. Only lifecycle owns native execution jobs. A `202` means accepted for processing, not successfully executed.
-- **Design objective, not a blanket current requirement:** require `Idempotency-Key` for commands whose safe retry matters only where the owning service contract actually implements it. Native-effect commands are explicitly excluded because their signed grant and effect journal provide the exactly-once admission boundary. See the per-operation decisions in the ADR. Scope it by tenant, effective principal, command and relevant parent resource. Persist its canonical payload binding and result with the command's domain mutation.
-- Historical proposal (not implemented across all services): Scope it by tenant, effective principal, command and relevant parent resource. Persist its canonical payload binding and result with the command's domain mutation.
-- After checking current caller access, an identical accepted retry returns the original command receipt/IDs without dispatching work again. Different canonical payload under the same key returns `409`. Record whether a request was accepted; transient pre-admission errors must not masquerade as an accepted receipt.
-- A duplicate still in acceptance processing returns a defined in-progress response and status reference when known. Do not start a second transaction path merely because the first response was lost. Exact response/header choices lock in P01.03.
-- For catalogue appends, `If-Match` explicitly names the current parent application ETag, even though the target is the revision collection. An accepted retry is recognized before comparing its now-stale ETag. A new command missing the precondition returns `428`; a mismatched precondition returns `412`.
-- Canonical command hashes include the semantic payload, command/parent identity and expected revision; exclude transport retry count and correlation metadata. Plan canonicalization has its own explicit version and executable-content boundary; P01.03 must publish cross-language golden vectors before relying on digests.
-- Use bounded cursor pagination over a stated snapshot/order. Results include freshness/provenance where observations or projections are involved. Readers cannot infer a complete set from a partial page or scan.
+See the active registry for the complete authoritative inventory and installed
+artifact locations. Console and Planning must validate bounded service-owner
+responses, not accept untyped or guessed schema compatibility.
 
-Command-receipt retention must exceed the allowed retry window and preserve job/operation deduplication for retained effects. P00.05/P01.03 define bounds and tombstones; pruning a receipt must not make an old native effect eligible for blind replay. Error and retry policies document which failed commands can safely be retried with the same key.
+## Versioning, retirement and verification
 
-## Error contract
+Current published canonical files are immutable against the review base.
+Changing the wire contract requires a new version; old canonical paths are
+removed from the working tree once retirement is authorized, rather than copied
+into historical folders. Source fragments and test fixtures are not separately
+published releases. No legacy adapters or historical replay tests are needed
+for an unused version.
 
-**Implemented service authority contract:** `contracts/schemas/common/error-v1.json` is the shared, versioned wire schema for newly published authority operations. Current Python owners emit `application/json` with `{"error":"snake_case_code"}`; custom Laravel denials often use the same shape, while framework errors can emit `{"message":"...","errors":{...}}`. These two implemented envelopes are documented; no `application/problem+json` endpoint migration is asserted. The earlier problem+json description was a **proposed future version**, not the current release. Clients branch on a stable snake_case `error` when present and on the documented HTTP status otherwise, never English prose. Do not expose secrets, SQL, internal stack traces or cross-tenant identifiers.
+Each retirement records the removed exact path, reason, internal review and
+external-consumer verification status. A repository-only scan is not evidence
+that independently deployed clients have been migrated.
 
-| Response | Meaning / client action |
-| --- | --- |
-| `401` | Missing/invalid/expired authentication; use the approved session flow, never broaden credentials. |
-| `403` / `404` | Forbidden or deliberately non-disclosing resource lookup; use one documented existence-protection policy across services. |
-| `409` | Idempotency payload mismatch, incompatible current state or resource ownership conflict; inspect the code before taking any action. |
-| `412` / `428` | Stale or missing revision precondition; reload/compare and submit a deliberate new command. |
-| `422` | Semantic/schema invalidity, unmet required plan conditions or invalid scope binding; change the request or satisfy blockers. |
-| `429` | Budget exceeded; honor retry guidance with the same command identity. |
-| `503` | Required authority/dependency unavailable; preserve known request/job identity and check status before retrying. |
+`scripts/contracts/check.py`, `scripts/contracts/retirement_integrity.py`,
+`scripts/contracts/runtime_inventory.py` and the
+[contract-integrity workflow](../../.github/workflows/contracts-integrity.yml)
+check active canonical coverage, executable references, runtime consumers,
+wire/schema projections and safety-negative cases. P05/P08 and Capability
+Assurance check current contracts only.
 
-An HTTP timeout is absence of a response, not a native operation result. An accepted job with `outcome_unknown` is normally a successful authorized status read (`200`) showing a hold; it is not a `500` instructing a client to create another job.
-
-## Events and consistency
-
-Use dotted names such as `catalogue.intent-revision.created` with a separate integer `schema_version`. The producer owns the schema. The envelope includes event ID, occurred time, producer/artifact version, tenant scope, aggregate type/ID/version and causation/correlation IDs. Payloads carry essential references/digests; consumers fetch additional authorized data when needed.
-
-Mutation and outbox commit locally together; inbox deduplication and local consumer effects commit together. Delivery is at least once. Ordering is per documented aggregate/version, not global. Consumers detect gaps/out-of-order versions and refresh through the source API when required; timestamps alone do not establish causal order. Dead-letter/replay rules require redaction, restricted access and an owner.
-
-Events carry facts, never reusable credentials or independent permission to run a native operation. Replayed approval/plan events may rebuild a projection but cannot bypass lifecycle admission or repeat a journaled side effect. Revocation events accelerate response; direct authority checks remain necessary.
-
-## Compatibility and review
-
-Framework adapters follow [Laravel conventions](../engineering/laravel-conventions.md), [data and messaging](../engineering/data-and-messaging.md) and [frontend rules](../engineering/frontend.md). Explicit resource serialization must match the owning schema rather than expose an Eloquent graph. Form validation never grants authority over referenced objects. Inertia browser forms use their redirect/error-bag protocol; the console maps safe service errors without changing this JSON API contract.
-
-Each integration defines connect/total timeouts, permitted endpoints, payload and pagination bounds, rate-limit behavior and one coordinated retry budget. Record which operations are safe to retry and how accepted-but-unanswered commands are reconciled. Client, queue and workflow retries cannot multiply into unbounded attempts. Contract fixtures include old/new enum and nullable-field handling, precision boundaries, unknown fields, denied resource fields and sanitized dependency failures.
-
-P01.03 locks initial contracts with both provider and consumer owners. Document additive-field handling, enum expansion, nullability, date/number precision and unknown-version behavior; do not assume every additive change is safe. HTTP breaking changes require a new supported major route or a reviewed compatibility bridge; event breaking changes require a new schema/version and migration/replay plan.
-
-CI should regenerate clients, validate valid/invalid fixtures, compare schema compatibility and run both PHP and Python against digest/error/idempotency golden cases. New behavior links requirements, packages and evidence through the [status model](../implementation/status-model.md); passing these checks proves contract behavior, not native qualification.
-
-
-## Measured tool candidate
-
-[ADR-012](../decisions/adr-012-contracts-and-event-evolution.md) records the tested OpenAPI 3.0.4 subset, JSON Schema 2020-12 event envelope and OpenAPI Generator 7.25.0 candidate. That former synthetic prototype has been retired: current contract integrity is enforced by the independently versioned owner releases and [the contract-integrity workflow](../../.github/workflows/contracts-integrity.yml), including live Laravel routes, Python ASGI route conformance, canonical producer/consumer projections and rejection tests. Generator outputs remain private Infrastructure adapters; wire-schema validation must precede domain translation because generated models and decoders do not enforce every constraint.
-
-P01.03 must still publish the reviewed product schemas in this contract tree, choose AsyncAPI channels/bindings, implement the selected compatibility checker and golden digest/error/idempotency vectors, and execute real provider/consumer and outbox/inbox tests. Deterministic generation and synthetic fixture rejection do not complete those gates.
-
-## Initial P01 owner contract
-
-[Catalogue foundation facts](../../contracts/asyncapi/catalogue.yaml) and the
-[versioned event schema](../../contracts/schemas/events/catalogue-foundation-recorded-v1.json)
-are implemented for the [P01 messaging reference](../implementation/p01-messaging.md).
-Private generated DTOs follow schema validation; `generate.py --check` rejects
-drift. The 16 shared fixtures compare PHP/Python acceptance and canonical digests.
-The preceding business APIs remain proposed; this reference does not publish them.
-
-The [foundation HTTP contract](../../contracts/openapi/foundation-health-v1.json)
-now describes the existing diagnostic routes. Its [implementation record](../implementation/p01-http-contracts.md)
-documents locked client generation, PHP/Python fixture interpretation and the
-conservative base/head rule that rejects mutation or deletion of published
-contract artifacts. The rule requires a new artifact for a new version; it does
-not turn proposed business APIs into implemented endpoints.
-
-## P05 Planning owner and review contracts
-
-The implemented [review API](../../contracts/openapi/planning-v1.json) and
-[independent source-owner reads](../../contracts/openapi/planning-inputs-v1.json)
-are bounded synchronous interfaces. The [v1.1 immutable binding](../../contracts/openapi/planning-immutable-plan-v1.1.json)
-adds semantic content digest, canonicalization and authority lane to the exact
-Governance approval binding. Historical v1 artifacts remain unchanged; the
-corrected synthetic plan is explicitly [version 1.1](../../contracts/fixtures/planning/synthetic-plan-v1.1.json).
-
-[Content](../../contracts/schemas/planning/content-v1.json),
-[admission](../../contracts/schemas/planning/admission-record-v1.json),
-[reservation receipt](../../contracts/schemas/planning/reservation-receipt-v1.json),
-[qualification](../../contracts/schemas/planning/qualification-v1.json) and
-[fact](../../contracts/schemas/planning/fact-v1.json) schemas keep observations,
-qualification and authority separate. `scripts/p05/generate_contracts.py --check`
-verifies exact consumer snapshots and component-owned test fixtures. See the
-[implementation record](../implementation/p05-planning.md) for immutable semantic
-versus approval identity and the separate P06 atomic admission obligation.
-
-## P06 execution and custody contracts
-
-The implemented [Lifecycle API](../../contracts/openapi/lifecycle-v1.json) binds
-admission, current job projections and idempotent operator requests. Its exact
-Console snapshot validates owner responses before rendering. The
-[Assurance custody API](../../contracts/openapi/assurance-evidence-v1.json)
-separates workload upload/finalization from delegated reads and independent review.
-All receipts remain explicitly E2 simulation with no native support authority.
-`scripts/p06/generate_contracts.py --check` checks owner artifacts and consumer
-drift; the live campaign validates actual successful wire responses against them.
-Use the [implementation record](../implementation/p06-execution.md) for effect
-certainty, current authority and recovery behavior.
-
-The foundation event `foundation-event.json` service copies are exact installed aliases of the canonical versioned `contracts/schemas/events/catalogue-foundation-recorded-v1.json` event. A filename alias is not an independent wire publication.
+See [the service error/idempotency ADR](adr-service-authority-errors-idempotency-2026-10-11.md)
+and the [implementation records](../implementation/) for operational details.
