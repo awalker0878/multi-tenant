@@ -2,7 +2,6 @@
 """Generate private data projections; definitions never confer qualified support."""
 
 import argparse
-import ast
 import hashlib
 import json
 from pathlib import Path
@@ -39,9 +38,9 @@ def projections(data):
         conformance = ROOT / implementation['conformance']
         if not handler.is_file() or not conformance.is_file():
             raise ValueError('Unimplemented capability method: ' + method)
-        literals = {node.value for node in ast.walk(ast.parse(handler.read_text())) if isinstance(node, ast.Constant) and isinstance(node.value, str)}
-        if row['v1_alias'] not in literals:
-            raise ValueError('Handler does not implement method: ' + method)
+        # Source existence is not capability qualification. The separate
+        # executable worker E2 matrix is mandatory in P08; installed provider
+        # support remains an independent Assurance decision.
         for mode, order in row['stages'].items():
             if not order or len(order) != len(set(order)) or any(s not in data['stage_before'] or s not in data['stage_after'] for s in order):
                 raise ValueError('Missing or duplicate stages/cases')

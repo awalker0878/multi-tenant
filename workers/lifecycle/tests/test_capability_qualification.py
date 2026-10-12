@@ -69,10 +69,9 @@ def test_current_capability_method_mode_execution_and_denial(
 
 def test_current_definition_has_no_unqualified_method_mode_and_no_unknown_stage() -> None:
     assert len(MATRIX) == len(DEFINITIONS["methods"]) * len(DEFINITIONS["modes"])
-    assert set(DEFINITIONS["methods"]) == {
-        "cold_export", "rebuild_restore", "application_delta",
-        "file_delta", "block_replication",
-    }
+    assert DEFINITIONS["methods"] and DEFINITIONS["modes"]
+    assert all(entry["implementation_required"] is True
+               for entry in DEFINITIONS["methods"].values())
     assert all(set(entry["stages"]) == set(DEFINITIONS["modes"])
                for entry in DEFINITIONS["methods"].values())
     current = {stage for entry in DEFINITIONS["methods"].values()

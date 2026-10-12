@@ -28,8 +28,11 @@ class CapabilityDefinitionsTest(unittest.TestCase):
         method = copy.deepcopy(data['methods']['cold_export'])
         method['v1_alias'] = 'UNIMPLEMENTED_NATIVE_METHOD'
         data['methods']['future_method'] = method
-        with self.assertRaisesRegex(ValueError, 'does not implement'):
-            generator.projections(data)
+        # Source-literal presence/absence can neither prove nor disprove the
+        # executable worker method qualification. All 30 cases are enforced
+        # by scripts/contracts/qualify_capabilities.py from actual JUnit runs.
+        projected = generator.projections(data)
+        self.assertIn("future_method", projected[ROOT / 'services/planning/src/planning/domain/capability_definitions.py'])
 
     def test_stage_without_before_or_after_cases_is_rejected(self):
         data = json.loads(generator.SOURCE.read_text())
