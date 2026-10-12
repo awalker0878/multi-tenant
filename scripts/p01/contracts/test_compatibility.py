@@ -109,6 +109,13 @@ class ActiveContractTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "must be approved in an earlier reviewed base"):
             check(self.root, self.base)
 
+    def test_prelisted_retirement_cannot_bypass_deletion_review(self):
+        self.retirement([PATH])
+        prior = self.commit()
+        self.remove_current(reviewed=True)
+        with self.assertRaisesRegex(ValueError, "Reviewed retirement clearance missing"):
+            check(self.root, prior)
+
     def test_unreviewed_retirement_fails_even_with_manifest_entry(self):
         self.remove_current(reviewed=False)
         with self.assertRaisesRegex(ValueError, "Reviewed retirement clearance missing"):
