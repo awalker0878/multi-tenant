@@ -108,3 +108,6 @@ Operation-by-operation producer, consumer, authorization and isolation qualifica
 is now fail-closed. See [contract assurance](../docs/contracts/assurance.md)
 for the current evidence generators, CI report and the remaining unqualified
 interfaces. Byte parity and route matching alone do not grant qualification.
+
+Current operation assurance and built-artifact verification are documented in
+[Contract assurance phases](../docs/contracts/assurance-phases.md).
