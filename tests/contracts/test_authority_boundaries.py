@@ -48,11 +48,11 @@ class Service:
         return self.receipt
 
 
-def invoke(service, tenant=TENANT, operation="checks", bearer="fixture"):
+def invoke(service, tenant=TENANT, operation="checks", bearer="fixture", command=None):
     messages = []
 
     async def receive():
-        return {"type": "http.request", "body": json.dumps({"plan_digest": HEX}).encode(),
+        return {"type": "http.request", "body": json.dumps({"plan_digest": HEX} if command is None else command).encode(),
                 "more_body": False}
 
     async def send(message):
@@ -94,6 +94,14 @@ class OwnerBoundaryContracts(unittest.TestCase):
         status, body = invoke(Service(), bearer="invalid")
         self.assertNotEqual(status, 200)
         self.assertEqual(body, {"error": "placement_caller_denied"})
+
+    def test_actual_owner_denies_invalid_and_unbounded_commands(self):
+        for request_body in ({"plan_digest": "not-a-digest"},
+                             {"plan_digest": HEX, "unexpected": "scope_override"},
+                             {"plan_digest": HEX, "tenant_id": OTHER}):
+            status, body = invoke(Service(), command=request_body)
+            self.assertEqual(status, 423)
+            self.assertEqual(body, {"error": "placement_request_invalid"})
 
     def test_governance_and_lifecycle_operations_have_no_untyped_bypass(self):
         self.assertEqual(contract_for_operation("GOVERNANCE", "POST",

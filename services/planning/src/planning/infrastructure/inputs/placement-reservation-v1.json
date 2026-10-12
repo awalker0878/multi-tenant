@@ -159,5 +159,166 @@
     "native_write_authorized": {
       "const": false
     }
+  },
+  "$defs": {
+    "ReserveCommand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scope",
+        "plan_digest",
+        "generation_id",
+        "policy_sha256",
+        "placement_sha256",
+        "allocations"
+      ],
+      "properties": {
+        "scope": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "tenant_id"
+          ],
+          "properties": {
+            "tenant_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "resource_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "application_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "environment": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "site_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "endpoint_id": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "plan_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "generation_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "policy_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "placement_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "allocations": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 50,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "workload_id",
+              "pool_id",
+              "native_ref",
+              "vector"
+            ],
+            "properties": {
+              "workload_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "pool_id": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "native_ref": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "failure_domain": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256
+              },
+              "failure_group": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256
+              },
+              "ledger_revision": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "vector": {
+                "type": "object",
+                "required": [
+                  "vcpus",
+                  "memory_mib",
+                  "storage_gib",
+                  "addresses"
+                ],
+                "properties": {
+                  "vcpus": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "memory_mib": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "storage_gib": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "addresses": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "patternProperties": {
+                  "^(storage_gib:[^:]{1,64}|addresses:[^:]{1,64}:(ipv4|ipv6))$": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "DigestCommand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "plan_digest"
+      ],
+      "properties": {
+        "plan_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    }
   }
 }

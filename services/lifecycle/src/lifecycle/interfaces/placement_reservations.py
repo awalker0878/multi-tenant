@@ -49,6 +49,15 @@ class PlacementReservationApp:
                 if not message.get("more_body"):
                     break
             body = json.loads(raw)
+            # The same canonical installed contract validates commands and receipts.
+            schema = json.loads(
+                files("lifecycle.infrastructure.contracts")
+                .joinpath("placement-reservation-v1.json").read_text()
+            )
+            command = "ReserveCommand" if operation == "reserve" else "DigestCommand"
+            if not Draft202012Validator(schema["$defs"][command],
+                                        format_checker=FormatChecker()).is_valid(body):
+                raise Held("placement_request_invalid")
             if operation == "reserve":
                 payload = await asyncio.to_thread(self.service.reserve, tenant, body)
             elif operation == "checks":
