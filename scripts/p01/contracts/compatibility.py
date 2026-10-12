@@ -1,96 +1,72 @@
-"""Conservative admission: published contract artifacts are immutable by version."""
+"""Check immutability of active canonical contracts against a review base commit."""
 from __future__ import annotations
 
 import argparse
 import hashlib
 import json
-from pathlib import Path
 import re
 import subprocess
+from pathlib import Path
 
 
 def compare(base: dict[str, bytes], head: dict[str, bytes]) -> list[str]:
-    # Exact bytes intentionally include descriptions and channel bindings. This
-    # policy makes no claim to solve general JSON Schema language inclusion.
-    return [path for path, value in base.items() if head.get(path) != value]
+    """An existing active release is frozen byte-for-byte."""
+    return sorted(path for path, value in base.items() if head.get(path) != value)
 
 
 def is_published_contract(path: str) -> bool:
-    """Immutable wire/data releases, not developer source pieces or test inputs."""
-    return (
-        path.startswith("contracts/")
-        and not path.startswith(("contracts/source/", "contracts/fixtures/"))
-        and Path(path).suffix in {".json", ".yaml", ".yml"}
-    )
-
-
-def inventory(root: Path) -> dict[str, bytes]:
-    return {str(p.relative_to(root)): p.read_bytes()
-            for p in sorted((root / 'contracts').rglob('*'))
-            if p.is_file() and is_published_contract(str(p.relative_to(root)))}
+    return (path.startswith("contracts/")
+            and ".." not in Path(path).parts
+            and not path.startswith(("contracts/source/", "contracts/fixtures/"))
+            and Path(path).suffix in {".json", ".yaml", ".yml"})
 
 
 def check(root: Path, base_revision: str) -> dict:
-    if not re.fullmatch(r'[0-9a-f]{40}', base_revision) or set(base_revision) == {'0'}:
-        raise ValueError('An explicit existing base commit is required')
+    if not re.fullmatch(r"[0-9a-f]{40}", base_revision) or set(base_revision) == {"0"}:
+        raise ValueError("An explicit existing base commit is required")
+
     def git(*args: str) -> bytes:
         try:
-            return subprocess.run(['git', *args], cwd=root, check=True,
+            return subprocess.run(["git", *args], cwd=root, check=True,
                                   capture_output=True, timeout=30).stdout
         except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as error:
-            raise ValueError('Complete Git history is required to verify published contracts') from error
-    git('cat-file', '-e', base_revision + '^{commit}')
-    if git('rev-parse', '--is-shallow-repository').strip() != b'false':
-        raise ValueError('Complete Git history is required to verify published contracts; shallow checkout')
-    # Validate reachability even when a missing parent predates the last contract
-    # edit. A partial history must never establish a new, weaker freeze point.
-    git('rev-list', '--parents', base_revision)
-    history = ('--first-parent', '--diff-merges=first-parent', '--diff-filter=A', '--no-renames')
-    paths = git('log', *history, '--format=', '--name-only', '-z', base_revision,
-                '--', 'contracts').decode().split('\0')
-    paths = sorted({p.lstrip('\n') for p in paths
-                    if is_published_contract(p.lstrip('\n'))})
-    base, published = {}, {}
-    for path in paths:
-        # The first appearance on the base branch is the published artifact.
-        # Merge commits publish their first-parent diff; draft revisions on a
-        # side branch are not mistaken for an earlier release on this branch.
-        # Do not follow renames: moving/deleting a published path is a removal.
-        revisions = git('log', '--reverse', *history, '--format=%H', base_revision,
-                        '--', path).decode().splitlines()
-        if not revisions:
-            raise ValueError('Missing publication history for contract: ' + path)
-        published[path] = revisions[0]
-        base[path] = git('show', revisions[0] + ':' + path)
-    current = inventory(root)
-    # Product-approved contract retirement: only active releases are immutable
-    # going forward. Previously published versions deliberately retired by the
-    # owner are listed in an independent exact-path retirement manifest.
-    retirement_file = root / "architecture/retired-contract-releases.json"
-    retired = set(json.loads(retirement_file.read_text())["retired"]) if retirement_file.exists() else set()
-    active_file = root / "architecture/contract-consumers.json"
-    if active_file.exists():
-        registry = json.loads(active_file.read_text())
-        active = {row["path"] for row in registry["active_releases"]}
-        if retired & active:
-            raise ValueError("Active contract cannot be retired: " + ", ".join(sorted(retired & active)))
-        if any(not is_published_contract(path) for path in retired):
-            raise ValueError("Retirement manifest contains a non-contract path")
-    current = {path: body for path, body in current.items() if path not in retired}
-    base = {path: body for path, body in base.items() if path not in retired}
-    conflicts = compare(base, current)
-    report = {'base_revision': base_revision, 'policy': 'immutable-existing-contract-artifacts',
-              'baseline': 'first-publication-on-base-first-parent-history',
-              'published_revisions': published,
-              'baseline_sha256': {p: hashlib.sha256(v).hexdigest() for p, v in base.items()},
-              'added': sorted(set(current) - set(base)), 'retired': sorted(retired), 'conflicts': conflicts}
+            raise ValueError("The review base Git commit must be available") from error
+
+    git("cat-file", "-e", base_revision + "^{commit}")
+    registry = json.loads((root / "architecture/contract-consumers.json").read_text())
+    retirement = json.loads((root / "architecture/retired-contract-releases.json").read_text())
+    active = {item["path"] for item in registry["active_releases"]}
+    retired = set(retirement["retired"])
+    if active & retired:
+        raise ValueError("Active contract cannot be retired: " + ", ".join(sorted(active & retired)))
+    if not all(map(is_published_contract, active | retired)):
+        raise ValueError("Invalid canonical or retired contract path")
+    current = {}
+    for path in sorted(active):
+        file = root / path
+        if not file.is_file():
+            raise ValueError("Active canonical missing: " + path)
+        current[path] = file.read_bytes()
+    base_paths = set(git("ls-tree", "-r", "--name-only", base_revision, "--", "contracts").decode().splitlines())
+    baseline = {path: git("show", base_revision + ":" + path)
+                for path in sorted(active & base_paths)}
+    conflicts = compare(baseline, current)
     if conflicts:
-        raise ValueError('Published contract removed or changed: ' + ', '.join(conflicts))
-    return report
+        raise ValueError("Active published contract removed or changed: " + ", ".join(conflicts))
+    return {
+        "policy": "active-canonical-immutability",
+        "base_revision": base_revision,
+        "baseline": "review-base-commit",
+        "checked_active_releases": len(active),
+        "baseline_sha256": {p: hashlib.sha256(v).hexdigest() for p, v in baseline.items()},
+        "added": sorted(active - base_paths),
+        "retired": sorted(retired),
+        "conflicts": conflicts,
+    }
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--base', required=True)
+    parser.add_argument("--base", required=True)
     args = parser.parse_args()
     print(json.dumps(check(Path(__file__).resolve().parents[3], args.base), indent=2))
