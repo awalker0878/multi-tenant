@@ -135,7 +135,7 @@ class HttpQualityTests(unittest.TestCase):
         old_api = good_api()
         replacement = copy.deepcopy(old_api)
         route = replacement["paths"]["/v2/things"]["post"]
-        route["parameters"][0]["schema"]["minLength"] = 22
+        route["parameters"][0]["schema"]["minLength"] = 32
         self.assertIn("parameter", repr(api_breakages(old_api, replacement)))
         replacement = copy.deepcopy(old_api)
         response = replacement["paths"]["/v2/things"]["post"]["responses"]["201"]
