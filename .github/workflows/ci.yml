@@ -371,3 +371,11 @@ jobs:
       - env:
           CI_NEEDS_JSON: ${{ toJSON(needs) }}
         run: python3 scripts/ci/check.py
+      - name: Bind required outcome to the exact checkout for trusted-base admission
+        run: python3 scripts/p01/record_check_source.py --name "CI / Required"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: check-source-required-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/p01-check-source/report.json
+          if-no-files-found: error
+          retention-days: 7

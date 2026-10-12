@@ -4,23 +4,7 @@
     "contexts": [],
     "checks": [
       {
-        "context": "Architecture registry and documentation",
-        "app_id": 15368
-      },
-      {
-        "context": "Foundation checks",
-        "app_id": 15368
-      },
-      {
-        "context": "Foundation images",
-        "app_id": 15368
-      },
-      {
-        "context": "Foundation contracts",
-        "app_id": 15368
-      },
-      {
-        "context": "Foundation policy controls",
+        "context": "CI / Required",
         "app_id": 15368
       }
     ]

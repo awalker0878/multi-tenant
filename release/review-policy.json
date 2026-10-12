@@ -4,11 +4,7 @@
   "repository": "awalker0878/multi-tenant",
   "allowed_check_app_id": 15368,
   "required_checks": [
-    "Architecture registry and documentation",
-    "Foundation checks",
-    "Foundation images",
-    "Foundation contracts",
-    "Foundation policy controls"
+    "CI / Required"
   ],
   "accounts": {},
   "roles": {
@@ -24,27 +20,11 @@
     "security": [],
     "sre": []
   },
-  "note": "Account IDs and current repository write access must be verified before activation. Role names are not GitHub identities. G00 reviewer approval remains unchanged.",
+  "note": "UNCONFIGURED: do not activate until actual branch protection, repository permissions, reviewer identities, source artifacts and check application ID have been verified. This candidate replaces old P01 check names; prior reports are historical evidence only.",
   "check_sources": {
-    "Architecture registry and documentation": {
-      "workflow": "architecture-policy.yml",
-      "job": "architecture-and-docs"
-    },
-    "Foundation checks": {
-      "workflow": "p01-foundations.yml",
-      "job": "foundation-checks"
-    },
-    "Foundation images": {
-      "workflow": "p01-images.yml",
-      "job": "image-outcome"
-    },
-    "Foundation contracts": {
-      "workflow": "p01-contracts.yml",
-      "job": "contracts"
-    },
-    "Foundation policy controls": {
-      "workflow": "p01-policy-controls.yml",
-      "job": "controls"
+    "CI / Required": {
+      "workflow": "ci.yml",
+      "job": "required"
     }
   }
 }
