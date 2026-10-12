@@ -15,6 +15,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts/contracts"))
 from dependency_graph import derive
 from artifact_attestation import check_image, check_wheel
+from aggregate_artifacts import aggregate
 
 
 class DependencyTests(unittest.TestCase):
@@ -127,6 +128,87 @@ class ArtifactTests(unittest.TestCase):
                 with patch.dict(os.environ, {"GITHUB_SHA": "b" * 40}):
                     with self.assertRaisesRegex(ValueError, "revision does not match"):
                         check_image("services/inventory", "test-image", self.root)
+
+
+
+
+class ReleaseAggregateTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        self.out = self.root / "artifacts"
+        self.out.mkdir()
+        self.sha = "a" * 40
+        folder = self.root / "architecture"
+        folder.mkdir()
+        (folder / "contract-consumers.json").write_text(json.dumps({
+            "active_releases": [{
+                "path": "contracts/openapi/foundation-health-v1.json",
+                "owner": "contract-platform", "consumers": ["a", "b"],
+            }],
+        }))
+        self.owned = {
+            "key": '["a","GET","/v1/owned"]',
+            "release": "contracts/openapi/owned.json",
+            "release_sha256": "a" * 64, "operation_id": "owned",
+        }
+        self.foundation = {
+            "key": '["contract-platform","GET","/health/live"]',
+            "release": "contracts/openapi/foundation-health-v1.json",
+            "release_sha256": "b" * 64, "operation_id": "health",
+        }
+        self.components = {
+            "services/a": ("a", "python"),
+            "services/b": ("b", "php"),
+        }
+        self.emit("a-image.json", "services/a", "a", "oci", [self.owned])
+        self.emit("a-wheel.json", "services/a", "a", "wheel", [self.owned])
+        self.emit("b-image.json", "services/b", "b", "oci", [])
+
+    def emit(self, name, component, owner, kind, operations):
+        (self.out / name).write_text(json.dumps({
+            "component": component,
+            "owner": owner,
+            "kind": kind,
+            "source_revision": self.sha,
+            "artifact_sha256": "c" * 64,
+            "installed_copies": [],
+            "owner_operations": operations,
+            "consumed_releases": [],
+        }))
+
+    def call(self):
+        rows = [dict(self.owned, owner="a"), dict(self.foundation, owner="contract-platform")]
+        def owned(component, root):
+            return ([], [self.owned] if component == "services/a" else [])
+        with patch("aggregate_artifacts.COMPONENTS", self.components):
+            with patch("aggregate_artifacts.expected", side_effect=owned):
+                with patch("aggregate_artifacts.consumed_bindings", return_value=[]):
+                    with patch("aggregate_artifacts.inventory", return_value={"operations": rows}):
+                        return aggregate(self.out, self.root, self.sha)
+
+    def test_all_images_and_wheels_are_required_and_release_bound(self):
+        report = self.call()
+        self.assertEqual(report["summary"]["runtime_images"], 2)
+        self.assertEqual(report["summary"]["contracted_http_operations"], 2)
+        self.assertEqual(report["summary"]["shared_foundation_operations"], 1)
+        (self.out / "a-wheel.json").unlink()
+        with self.assertRaisesRegex(ValueError, "Missing/extra release runtime"):
+            self.call()
+
+    def test_wrong_digest_or_revision_cannot_be_admitted(self):
+        file = self.out / "a-image.json"
+        changed = json.loads(file.read_text())
+        changed["owner_operations"][0]["release_sha256"] = "d" * 64
+        file.write_text(json.dumps(changed))
+        with self.assertRaisesRegex(ValueError, "does not match active source"):
+            self.call()
+        changed["owner_operations"][0]["release_sha256"] = "a" * 64
+        changed["source_revision"] = "e" * 40
+        file.write_text(json.dumps(changed))
+        with self.assertRaisesRegex(ValueError, "does not match active source"):
+            self.call()
 
 
 if __name__ == "__main__":
