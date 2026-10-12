@@ -83,10 +83,27 @@ def verify_runtime_inventory(registry: dict, root: Path = ROOT) -> dict[str, lis
     if missing:
         raise ValueError("Runtime contract copies missing from active releases: " + repr(missing))
 
-    # Prevent a self-consistent but false registry entry from mapping a file
-    # to an unrelated canonical release or silently dropping its producer.
-    for artifact in observed:
-        canonical = indexed[artifact]
+    # Installed copies must have executable consumers. Planning resolves schema
+    # names through its typed operation map, rather than literal filenames.
+    owner_map = root / "services/planning/src/planning/infrastructure/owner_contracts.py"
+    owner_loader = root / "services/planning/src/planning/infrastructure/owners.py"
+    dynamic_map = owner_map.read_text(encoding="utf-8") if owner_map.is_file() else ""
+    dynamic_loader = owner_loader.read_text(encoding="utf-8") if owner_loader.is_file() else ""
+    dynamic_ready = 'joinpath(name + ".json")' in dynamic_loader and "contract_for_operation" in dynamic_loader
+    unconsumed = []
+    for artifact in indexed:
+        if artifact in observed:
+            continue
+        prefix = "services/planning/src/planning/infrastructure/inputs/"
+        if (artifact.startswith(prefix) and dynamic_ready
+                and ('"' + Path(artifact).stem + '"') in dynamic_map):
+            continue
+        unconsumed.append(artifact)
+    if unconsumed:
+        raise ValueError("Registered installed contracts have no executable consumer: " + repr(sorted(unconsumed)))
+
+    # Check every registered copy, including dynamically loaded input schemas.
+    for artifact, canonical in indexed.items():
         if not (root / canonical).is_file():
             raise ValueError(f"Runtime contract canonical missing: {canonical}")
         if (root / artifact).read_bytes() != (root / canonical).read_bytes():
