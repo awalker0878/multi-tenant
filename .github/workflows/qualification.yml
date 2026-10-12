@@ -1,0 +1,247 @@
+name: On-demand platform qualification
+on:
+  workflow_dispatch:
+    inputs:
+      suite:
+        description: Explicit high-cost suite; never launched automatically by PR updates
+        required: true
+        type: choice
+        options: [infrastructure, native, browser, images, contract-artifacts, all]
+        default: infrastructure
+permissions:
+  contents: read
+concurrency:
+  group: qualification-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  infrastructure:
+    name: Qualified local platform, stateful and Kubernetes exercises
+    if: inputs.suite == 'infrastructure' || inputs.suite == 'all'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12.14'
+      - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78
+        with:
+          version: '0.12.19'
+      - run: |
+          python3 scripts/p01/run_local.py --output "$RUNNER_TEMP/local" --source-revision "$GITHUB_SHA"
+          python3 scripts/p01/run_stateful.py --output "$RUNNER_TEMP/stateful" --source-revision "$GITHUB_SHA"
+          python3 scripts/p01/run_kubernetes.py --output "$RUNNER_TEMP/kubernetes" --source-revision "$GITHUB_SHA"
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: infrastructure-evidence-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/local/
+            ${{ runner.temp }}/stateful/
+            ${{ runner.temp }}/kubernetes/
+          if-no-files-found: warn
+          retention-days: 14
+
+  native:
+    name: Qualification of provider adapters and operating envelope
+    if: inputs.suite == 'native' || inputs.suite == 'all'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      P05_POSTGRES_BIN: /usr/lib/postgresql/16/bin
+      P07_POSTGRES_BIN: /usr/lib/postgresql/16/bin
+      P08_POSTGRES_BIN: /usr/lib/postgresql/16/bin
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12.14'
+      - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78
+        with:
+          version: '0.12.19'
+      - run: python -m pip install -r requirements-docs.txt
+      - run: |
+          python scripts/p07/qualify.py --output "$RUNNER_TEMP/p07-preparation"
+          python scripts/p07/qualify_native.py --output "$RUNNER_TEMP/p07-adapters"
+          python scripts/p07/qualify_dispatch.py --output "$RUNNER_TEMP/p07-dispatch"
+          python scripts/p10/qualify.py --output "$RUNNER_TEMP/p10-qualification"
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: native-qualification-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/p07-*/
+            ${{ runner.temp }}/p10-qualification/
+          if-no-files-found: warn
+          retention-days: 14
+
+  browser:
+    name: End-to-end native migration browser exercises
+    if: inputs.suite == 'browser' || inputs.suite == 'all'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12.14'
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '24.19.0'
+          cache: npm
+          cache-dependency-path: apps/console/package-lock.json
+      - run: |
+          npm ci --prefix apps/console --ignore-scripts --no-audit --no-fund
+          cd apps/console
+          npx playwright install --with-deps --only-shell chromium
+      - run: python scripts/p08/qualify_browser.py --output "$RUNNER_TEMP/browser"
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: browser-qualification-${{ github.sha }}
+          path: ${{ runner.temp }}/browser/
+          if-no-files-found: warn
+          retention-days: 14
+
+  images:
+    name: Source-pinned images (${{ matrix.component }})
+    if: inputs.suite == 'images' || inputs.suite == 'all'
+    strategy:
+      fail-fast: false
+      matrix:
+        component: [governance, catalogue, assurance, inventory, planning, lifecycle, inventory-workers, lifecycle-workers, console]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - env:
+          P01_COMPONENT: ${{ matrix.component }}
+        run: |
+          python3 scripts/p01/run_images.py --component "$P01_COMPONENT" --output "$RUNNER_TEMP/image" --source-revision "$GITHUB_SHA"
+          python3 scripts/p01/artifacts/campaign.py --build-report "$RUNNER_TEMP/image/report.json" --output "$RUNNER_TEMP/artifact"
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: image-${{ matrix.component }}-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/image/
+            ${{ runner.temp }}/artifact/
+          if-no-files-found: warn
+          retention-days: 14
+
+  artifact-bindings:
+    if: inputs.suite == 'contract-artifacts' || inputs.suite == 'all'
+    name: Built contract bindings (${{ matrix.name }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {component: 'apps/console', name: console, python: false}
+          - {component: 'services/catalogue', name: catalogue, python: false}
+          - {component: 'services/governance', name: governance, python: false}
+          - {component: 'services/assurance', name: assurance, python: false}
+          - {component: 'services/inventory', name: inventory, python: true}
+          - {component: 'services/planning', name: planning, python: true}
+          - {component: 'services/lifecycle', name: lifecycle, python: true}
+          - {component: 'workers/inventory', name: inventory-worker, python: true}
+          - {component: 'workers/lifecycle', name: lifecycle-worker, python: true}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12.14'
+      - name: Install pinned contract validation dependencies
+        run: python -m pip install --disable-pip-version-check -r scripts/contracts/requirements.txt
+      - name: Verify complete deployable component matrix
+        run: python scripts/contracts/runtime_binding_coverage.py
+      - name: Assert wheel and dependency negative canaries
+        run: |
+          python -m unittest discover -s tests/contracts -p 'test_phase2_artifacts.py' -v
+      - name: Install pinned registry validators
+        run: python -m pip install --disable-pip-version-check -r scripts/contracts/requirements.txt
+      - name: Build the actual runtime image with exact source provenance
+        env:
+          COMPONENT: ${{ matrix.component }}
+          TAG: contract-assurance/${{ matrix.name }}:${{ github.sha }}
+        run: |
+          set -euo pipefail
+          docker build --build-arg SOURCE_REVISION="$GITHUB_SHA" -t "$TAG" "$COMPONENT"
+      - name: Verify packaged JSON and bind owned operations to image digest
+        env:
+          COMPONENT: ${{ matrix.component }}
+          TAG: contract-assurance/${{ matrix.name }}:${{ github.sha }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/contract-attestations"
+          python scripts/contracts/artifact_attestation.py --component "$COMPONENT" --image-tag "$TAG" --output "$RUNNER_TEMP/contract-attestations/image-${{ matrix.name }}.json"
+      - name: Build the Python wheel supplying the image
+        if: matrix.python
+        env:
+          COMPONENT: ${{ matrix.component }}
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check setuptools==84.0.0 wheel==0.48.0
+          mkdir -p "$RUNNER_TEMP/wheels"
+          python -m pip wheel --no-deps --no-build-isolation -w "$RUNNER_TEMP/wheels" "$COMPONENT"
+      - name: Verify actual wheel contents against canonical installed versions
+        if: matrix.python
+        env:
+          COMPONENT: ${{ matrix.component }}
+        run: |
+          set -euo pipefail
+          WHEEL=$(find "$RUNNER_TEMP/wheels" -maxdepth 1 -name '*.whl' -type f)
+          [ "$(printf '%s\n' "$WHEEL" | wc -l)" -eq 1 ]
+          python scripts/contracts/artifact_attestation.py --component "$COMPONENT" --wheel "$WHEEL" --output "$RUNNER_TEMP/contract-attestations/wheel-${{ matrix.name }}.json"
+      - name: Retain measured image/wheel contract attestations
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: contract-artifacts-${{ matrix.name }}-${{ github.sha }}
+          path: ${{ runner.temp }}/contract-attestations/*.json
+          if-no-files-found: warn
+          retention-days: 30
+
+  aggregate-bindings:
+    name: Complete source-pinned contract to runtime image binding
+    if: (inputs.suite == 'contract-artifacts' || inputs.suite == 'all') && always()
+    needs: [artifact-bindings]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12.14'
+      - name: Install pinned validators
+        run: python -m pip install --disable-pip-version-check -r scripts/contracts/requirements.txt
+      - name: Download image/wheel evidence created in this run
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          pattern: contract-artifacts-*-${{ github.sha }}
+          path: ${{ runner.temp }}/runtime-attestations
+          merge-multiple: true
+      - name: Validate every owned and shared canonical operation is bound to the exact image
+        run: |
+          python scripts/contracts/aggregate_artifacts.py --input-directory "$RUNNER_TEMP/runtime-attestations" --output "$RUNNER_TEMP/runtime-release-bindings.json"
+      - name: Publish complete immutable runtime contract release bindings
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: runtime-contract-release-bindings-${{ github.sha }}
+          path: ${{ runner.temp }}/runtime-release-bindings.json
+          if-no-files-found: warn
+          retention-days: 30
