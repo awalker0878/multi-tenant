@@ -1,0 +1,717 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "P06 Assurance simulation custody",
+    "version": "1.0.0",
+    "description": "E2 only. Upload/finalize require the distinct Lifecycle producer identity. Read/review require current tenant and resource-scoped Governance delegation; review cannot elevate native support."
+  },
+  "security": [
+    {
+      "Workload": []
+    }
+  ],
+  "paths": {
+    "/v1/tenants/{tenant}/evidence-uploads": {
+      "post": {
+        "operationId": "uploadSimulationEvidence",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tenant",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Digest-bound E2 custody; no-store, private",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadReceipt"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access, digest, binding or owner dependency denied"
+          },
+          "403": {
+            "description": "Access, digest, binding or owner dependency denied"
+          },
+          "404": {
+            "description": "Access, digest, binding or owner dependency denied"
+          },
+          "409": {
+            "description": "Access, digest, binding or owner dependency denied"
+          },
+          "422": {
+            "description": "Access, digest, binding or owner dependency denied"
+          },
+          "503": {
+            "description": "Access, digest, binding or owner dependency denied"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "job_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "plan_digest": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "source_revision": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{40}$"
+                  },
+                  "digest": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "evidence_level": {
+                    "const": "E2"
+                  },
+                  "content_base64": {
+                    "type": "string",
+                    "maxLength": 90000
+                  }
+                },
+                "required": [
+                  "job_id",
+                  "plan_digest",
+                  "source_revision",
+                  "digest",
+                  "evidence_level",
+                  "content_base64"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/evidence-uploads/{evidence}/finalization": {
+      "post": {
+        "operationId": "finalizeSimulationEvidence",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tenant",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "evidence",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Digest-bound E2 custody; no-store, private",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Evidence"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access, digest, binding or owner dependency denied"
+          },
+          "403": {
+            "description": "Access, digest, binding or owner dependency denied"
+          },
+          "404": {
+            "description": "Access, digest, binding or owner dependency denied"
+          },
+          "409": {
+            "description": "Access, digest, binding or owner dependency denied"
+          },
+          "422": {
+            "description": "Access, digest, binding or owner dependency denied"
+          },
+          "503": {
+            "description": "Access, digest, binding or owner dependency denied"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/evidence/{evidence}": {
+      "get": {
+        "operationId": "readSimulationEvidence",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tenant",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "evidence",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Actor-Delegation",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Digest-bound E2 custody; no-store, private",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvidenceRecord"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access, digest, binding or owner dependency denied"
+          },
+          "403": {
+            "description": "Access, digest, binding or owner dependency denied"
+          },
+          "404": {
+            "description": "Access, digest, binding or owner dependency denied"
+          },
+          "409": {
+            "description": "Access, digest, binding or owner dependency denied"
+          },
+          "422": {
+            "description": "Access, digest, binding or owner dependency denied"
+          },
+          "503": {
+            "description": "Access, digest, binding or owner dependency denied"
+          }
+        }
+      }
+    },
+    "/v1/tenants/{tenant}/evidence/{evidence}/reviews": {
+      "post": {
+        "operationId": "reviewSimulationEvidence",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tenant",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "evidence",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Actor-Delegation",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Digest-bound E2 custody; no-store, private",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewReceipt"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access, digest, binding or owner dependency denied"
+          },
+          "403": {
+            "description": "Access, digest, binding or owner dependency denied"
+          },
+          "404": {
+            "description": "Access, digest, binding or owner dependency denied"
+          },
+          "409": {
+            "description": "Access, digest, binding or owner dependency denied"
+          },
+          "422": {
+            "description": "Access, digest, binding or owner dependency denied"
+          },
+          "503": {
+            "description": "Access, digest, binding or owner dependency denied"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "decision": {
+                    "enum": [
+                      "accepted_simulation",
+                      "rejected"
+                    ]
+                  }
+                },
+                "required": [
+                  "decision"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "Workload": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "UploadReceipt": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "state": {
+            "const": "uploaded"
+          }
+        },
+        "required": [
+          "id",
+          "state"
+        ]
+      },
+      "Evidence": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "job_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "producer_actor_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "requested_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "plan_digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "source_revision": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{40}$"
+          },
+          "evidence_level": {
+            "const": "E2"
+          },
+          "state": {
+            "const": "finalized"
+          },
+          "native_support": {
+            "const": false
+          },
+          "scope": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "site_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "environment": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "resource_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "endpoint_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "native_scope": {
+                "type": "string",
+                "maxLength": 4096
+              }
+            },
+            "required": [
+              "tenant_id",
+              "site_id",
+              "environment",
+              "resource_id",
+              "endpoint_id",
+              "native_scope"
+            ]
+          },
+          "retention_until": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "finalized_at": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "job_id",
+          "producer_actor_id",
+          "requested_by",
+          "plan_digest",
+          "digest",
+          "source_revision",
+          "evidence_level",
+          "state",
+          "native_support",
+          "scope",
+          "retention_until",
+          "finalized_at"
+        ]
+      },
+      "EvidenceRecord": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "job_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "producer_actor_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "requested_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "plan_digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "source_revision": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{40}$"
+          },
+          "evidence_level": {
+            "const": "E2"
+          },
+          "state": {
+            "const": "finalized"
+          },
+          "native_support": {
+            "const": false
+          },
+          "scope": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "site_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "environment": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "resource_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "endpoint_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "native_scope": {
+                "type": "string",
+                "maxLength": 4096
+              }
+            },
+            "required": [
+              "tenant_id",
+              "site_id",
+              "environment",
+              "resource_id",
+              "endpoint_id",
+              "native_scope"
+            ]
+          },
+          "retention_until": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "finalized_at": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "observations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "tenant_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "job_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "operation_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "attempt_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "epoch": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "plan_digest": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "simulation": {
+                  "const": true
+                },
+                "sealed": {
+                  "const": true
+                },
+                "effect_count": {
+                  "enum": [
+                    0,
+                    1
+                  ]
+                },
+                "observed_at": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "outcome": {
+                  "enum": [
+                    "confirmed_succeeded",
+                    "confirmed_failed"
+                  ]
+                }
+              },
+              "required": [
+                "tenant_id",
+                "job_id",
+                "operation_id",
+                "attempt_id",
+                "epoch",
+                "plan_digest",
+                "simulation",
+                "sealed",
+                "effect_count",
+                "observed_at",
+                "outcome"
+              ]
+            },
+            "maxItems": 32
+          },
+          "reviews": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "evidence": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "reviewer": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "decision": {
+                  "enum": [
+                    "accepted_simulation",
+                    "rejected"
+                  ]
+                },
+                "recorded_at": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "id",
+                "evidence",
+                "reviewer",
+                "decision",
+                "recorded_at"
+              ]
+            },
+            "maxItems": 1000
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "job_id",
+          "producer_actor_id",
+          "requested_by",
+          "plan_digest",
+          "digest",
+          "source_revision",
+          "evidence_level",
+          "state",
+          "native_support",
+          "scope",
+          "retention_until",
+          "finalized_at",
+          "observations",
+          "reviews"
+        ]
+      },
+      "ReviewReceipt": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "evidence": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reviewer": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "decision": {
+            "enum": [
+              "accepted_simulation",
+              "rejected"
+            ]
+          },
+          "recorded_at": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "native_support": {
+            "const": false
+          }
+        },
+        "required": [
+          "id",
+          "evidence",
+          "reviewer",
+          "decision",
+          "recorded_at",
+          "native_support"
+        ]
+      }
+    }
+  }
+}

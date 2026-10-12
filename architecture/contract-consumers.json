@@ -46,6 +46,7 @@
     ],
     "contracts/openapi/assurance-evidence-v1.json": [
       "assurance",
+      "lifecycle",
       "lifecycle-workers"
     ],
     "contracts/openapi/assurance-qualification-v1.json": [
@@ -83,6 +84,7 @@
     "contracts/openapi/governance-delegation-v1.1.json": [
       "console",
       "governance",
+      "lifecycle",
       "planning"
     ],
     "contracts/openapi/governance-directory-v1.json": [
@@ -106,10 +108,10 @@
       "lifecycle"
     ],
     "contracts/openapi/governance-service-checks-v1.json": [
-      "governance",
-      "catalogue",
-      "inventory",
       "assurance",
+      "catalogue",
+      "governance",
+      "inventory",
       "lifecycle",
       "planning"
     ],
@@ -151,8 +153,8 @@
       "governance"
     ],
     "contracts/openapi/planning-lifecycle-reads-v1.json": [
-      "planning",
-      "lifecycle"
+      "lifecycle",
+      "planning"
     ],
     "contracts/openapi/planning-migration-v1.6.json": [
       "planning",
@@ -430,9 +432,12 @@
       "path": "contracts/openapi/assurance-evidence-v1.json",
       "owner": "assurance",
       "consumers": [
+        "lifecycle",
         "lifecycle-workers"
       ],
-      "copies": [],
+      "copies": [
+        "services/lifecycle/src/lifecycle/infrastructure/contracts/assurance-evidence-v1.json"
+      ],
       "source_manifest": null,
       "depends_on": []
     },
@@ -519,9 +524,12 @@
       "owner": "governance",
       "consumers": [
         "console",
+        "lifecycle",
         "planning"
       ],
-      "copies": [],
+      "copies": [
+        "services/lifecycle/src/lifecycle/infrastructure/contracts/governance-delegation-v1.1.json"
+      ],
       "source_manifest": null,
       "depends_on": []
     },
@@ -583,13 +591,15 @@
       "path": "contracts/openapi/governance-service-checks-v1.json",
       "owner": "governance",
       "consumers": [
+        "assurance",
         "catalogue",
         "inventory",
-        "assurance",
         "lifecycle",
         "planning"
       ],
-      "copies": [],
+      "copies": [
+        "services/lifecycle/src/lifecycle/infrastructure/contracts/governance-service-checks-v1.json"
+      ],
       "source_manifest": null,
       "depends_on": [
         "contracts/schemas/common/error-v1.json"
@@ -727,7 +737,9 @@
       "consumers": [
         "lifecycle"
       ],
-      "copies": [],
+      "copies": [
+        "services/lifecycle/src/lifecycle/infrastructure/contracts/planning-lifecycle-reads-v1.json"
+      ],
       "source_manifest": null,
       "depends_on": [
         "contracts/schemas/planning/migration-readiness-v2.2.json"

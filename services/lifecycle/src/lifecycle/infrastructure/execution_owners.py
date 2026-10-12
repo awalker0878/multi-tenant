@@ -8,13 +8,39 @@ import re
 import ssl
 import time
 from datetime import datetime
+from importlib.resources import files
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlsplit
 
+from jsonschema import Draft202012Validator, FormatChecker
+
 from lifecycle.domain.admission import digest
 from lifecycle.domain.execution import Rejected, decode, identity
 from lifecycle.infrastructure.foundation import mounted_secret
+
+
+# Actual owner operations, each resolved to one immutable installed OpenAPI response.
+OWNER_OPERATIONS = (
+    ("GOVERNANCE", "POST", r"/v1/tenants/[^/]+/delegated-authorizations",
+     "governance-delegation-v1.1.json", "CurrentDelegation", 200),
+    ("GOVERNANCE", "POST", r"/v1/tenants/[^/]+/execution-approval-checks",
+     "governance-service-checks-v1.json", "SimulationConsent", 200),
+    ("PLANNING", "GET", r"/v1/tenants/[^/]+/execution-plans/[^/]+/revisions/[1-9][0-9]*",
+     "planning-lifecycle-reads-v1.json", "ExecutionPlan", 200),
+    ("ASSURANCE", "POST", r"/v1/tenants/[^/]+/evidence-uploads",
+     "assurance-evidence-v1.json", "UploadReceipt", 201),
+    ("ASSURANCE", "POST", r"/v1/tenants/[^/]+/evidence-uploads/[^/]+/finalization",
+     "assurance-evidence-v1.json", "Evidence", 200),
+)
+
+# Named immutable snapshots are packaged in the Lifecycle wheel/image.
+OWNER_APIS = {
+    "governance-delegation-v1.1.json": json.loads(files("lifecycle.infrastructure.contracts").joinpath("governance-delegation-v1.1.json").read_text()),
+    "governance-service-checks-v1.json": json.loads(files("lifecycle.infrastructure.contracts").joinpath("governance-service-checks-v1.json").read_text()),
+    "planning-lifecycle-reads-v1.json": json.loads(files("lifecycle.infrastructure.contracts").joinpath("planning-lifecycle-reads-v1.json").read_text()),
+    "assurance-evidence-v1.json": json.loads(files("lifecycle.infrastructure.contracts").joinpath("assurance-evidence-v1.json").read_text()),
+}
 
 
 def request(
@@ -25,6 +51,10 @@ def request(
     delegation: str | None = None,
 ) -> dict[str, Any]:
     try:
+        selected = [item for item in OWNER_OPERATIONS
+                    if item[0] == owner and item[1] == method and re.fullmatch(item[2], path)]
+        if owner in {"GOVERNANCE", "PLANNING", "ASSURANCE"} and len(selected) != 1:
+            raise ValueError("owner_operation_uncontracted")
         url = urlsplit(os.environ[owner + "_URL"])
         ca = os.environ[owner + "_CA_FILE"]
         if (
@@ -62,7 +92,16 @@ def request(
                 or response.getheader("Content-Encoding", "identity") != "identity"
             ):
                 raise ValueError
-            return decode(raw)
+            result = decode(raw)
+            if selected:
+                _, _, _, document_name, response_name, expected_status = selected[0]
+                api = OWNER_APIS[document_name]
+                wire = {"$ref": "#/components/schemas/" + response_name,
+                        "components": api["components"]}
+                if (response.status != expected_status
+                        or not Draft202012Validator(wire, format_checker=FormatChecker()).is_valid(result)):
+                    raise ValueError("owner_response_contract_invalid")
+            return result
         finally:
             connection.close()
     except Rejected:
