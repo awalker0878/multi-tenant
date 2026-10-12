@@ -87,3 +87,36 @@ jobs:
           path: ${{ runner.temp }}/contract-attestations/*.json
           if-no-files-found: warn
           retention-days: 30
+
+  aggregate-bindings:
+    name: Complete source-pinned contract to runtime image binding
+    if: always()
+    needs: [artifact-bindings]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12.14'
+      - name: Install pinned validators
+        run: python -m pip install --disable-pip-version-check -r scripts/contracts/requirements.txt
+      - name: Download image/wheel evidence created in this run
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          pattern: contract-artifacts-*-${{ github.sha }}
+          path: ${{ runner.temp }}/runtime-attestations
+          merge-multiple: true
+      - name: Validate every owned and shared canonical operation is bound to the exact image
+        run: |
+          python scripts/contracts/aggregate_artifacts.py --input-directory "$RUNNER_TEMP/runtime-attestations" --output "$RUNNER_TEMP/runtime-release-bindings.json"
+      - name: Publish complete immutable runtime contract release bindings
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: runtime-contract-release-bindings-${{ github.sha }}
+          path: ${{ runner.temp }}/runtime-release-bindings.json
+          if-no-files-found: warn
+          retention-days: 30
