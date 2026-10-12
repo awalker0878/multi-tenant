@@ -137,8 +137,9 @@ def check_image(component: str, tag: str, root: Path = ROOT) -> dict:
             # Verify actual application code exists for every mapped owner,
             # including components with zero installed JSON copies.
             if COMPONENTS[component][1] == "php":
-                executable = "/app/routes/api.php"
-                source = root / component / "routes/api.php"
+                route_file = "web.php" if component == "apps/console" else "api.php"
+                executable = "/app/routes/" + route_file
+                source = root / component / "routes" / route_file
             else:
                 source = (root / component / "src" / pkg / "bootstrap"
                           / ("native.py" if component == "workers/lifecycle"
