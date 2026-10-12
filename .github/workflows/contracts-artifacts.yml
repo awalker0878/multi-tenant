@@ -1,0 +1,83 @@
+name: Contract artifact and runtime binding assurance
+on:
+  pull_request:
+    paths:
+      - 'contracts/**'
+      - 'architecture/contract-consumers.json'
+      - 'architecture/installed-contract-usage.json'
+      - 'services/**'
+      - 'workers/**'
+      - 'apps/console/**'
+      - 'scripts/contracts/**'
+      - '.github/workflows/contracts-artifacts.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  artifact-bindings:
+    name: Built contract bindings (${{ matrix.name }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {component: 'apps/console', name: console, python: false}
+          - {component: 'services/catalogue', name: catalogue, python: false}
+          - {component: 'services/governance', name: governance, python: false}
+          - {component: 'services/assurance', name: assurance, python: false}
+          - {component: 'services/inventory', name: inventory, python: true}
+          - {component: 'services/planning', name: planning, python: true}
+          - {component: 'services/lifecycle', name: lifecycle, python: true}
+          - {component: 'workers/inventory', name: inventory-worker, python: true}
+          - {component: 'workers/lifecycle', name: lifecycle-worker, python: true}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12.14'
+      - name: Install pinned registry validators
+        run: python -m pip install --disable-pip-version-check -r scripts/contracts/requirements.txt
+      - name: Build the actual runtime image with exact source provenance
+        env:
+          COMPONENT: ${{ matrix.component }}
+          TAG: contract-assurance/${{ matrix.name }}:${{ github.sha }}
+        run: |
+          set -euo pipefail
+          docker build --build-arg SOURCE_REVISION="$GITHUB_SHA" -t "$TAG" "$COMPONENT"
+      - name: Verify packaged JSON and bind owned operations to image digest
+        env:
+          COMPONENT: ${{ matrix.component }}
+          TAG: contract-assurance/${{ matrix.name }}:${{ github.sha }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/contract-attestations"
+          python scripts/contracts/artifact_attestation.py --component "$COMPONENT" --image-tag "$TAG" --output "$RUNNER_TEMP/contract-attestations/image-${{ matrix.name }}.json"
+      - name: Build the Python wheel supplying the image
+        if: matrix.python
+        env:
+          COMPONENT: ${{ matrix.component }}
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check setuptools==84.0.0 wheel==0.48.0
+          mkdir -p "$RUNNER_TEMP/wheels"
+          python -m pip wheel --no-deps --no-build-isolation -w "$RUNNER_TEMP/wheels" "$COMPONENT"
+      - name: Verify actual wheel contents against canonical installed versions
+        if: matrix.python
+        env:
+          COMPONENT: ${{ matrix.component }}
+        run: |
+          set -euo pipefail
+          WHEEL=$(find "$RUNNER_TEMP/wheels" -maxdepth 1 -name '*.whl' -type f)
+          [ "$(printf '%s\n' "$WHEEL" | wc -l)" -eq 1 ]
+          python scripts/contracts/artifact_attestation.py --component "$COMPONENT" --wheel "$WHEEL" --output "$RUNNER_TEMP/contract-attestations/wheel-${{ matrix.name }}.json"
+      - name: Retain measured image/wheel contract attestations
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: contract-artifacts-${{ matrix.name }}-${{ github.sha }}
+          path: ${{ runner.temp }}/contract-attestations/*.json
+          if-no-files-found: warn
+          retention-days: 30
