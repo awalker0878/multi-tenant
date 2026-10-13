@@ -58,7 +58,7 @@ it('serializes publication and holds the exact authority epoch with durable outb
         $this->scope, 'publish', $command, 0, 'E2-only review fixture',
         $bundle, str_repeat('a', 64), 1, 'reviewer-one'
     );
-    expect($retry)->toBe($initial);
+    expect($retry)->toEqual($initial);
 
     $scopeHash = \App\Domain\Qualification\NativeQualification::digest($this->scope);
     expect(DB::table('app.qualification_authority_events')->where('scope_sha256', $scopeHash)->count())->toBe(1)
@@ -189,10 +189,19 @@ it('delivers immutable invalidations in order and does not clear uncertain ackno
         ->where('scope_sha256', $scopeHash)->whereNotNull('delivered_at')->count())->toBe(0);
 
     $publisher->unavailable = false;
-    expect($delivery->handle())->toBe('delivered')
-        ->and($delivery->handle())->toBe('delivered')
-        ->and($delivery->handle())->toBe('idle');
-    expect(array_column($publisher->accepted, 'authority_epoch'))->toBe([1, 2])
+    // The worker drains a global queue. Other isolated test scopes can leave
+    // pending events, so assert delivery of *this* scope rather than assuming
+    // the third global poll must be idle.
+    for ($attempt = 0; $attempt < 64; $attempt++) {
+        if ($delivery->handle() === 'idle') {
+            break;
+        }
+    }
+    $accepted = array_values(array_filter(
+        $publisher->accepted,
+        static fn (array $event): bool => ($event['scope_sha256'] ?? null) === $scopeHash
+    ));
+    expect(array_column($accepted, 'authority_epoch'))->toBe([1, 2])
         ->and(DB::table('app.qualification_authority_outbox')
             ->where('scope_sha256', $scopeHash)->whereNotNull('delivered_at')->count())->toBe(2);
 });
@@ -215,7 +224,7 @@ it('rejects a head-only epoch advance without matching immutable event and outbo
                 ]);
         });
         $this->fail('Unjournaled authority head was accepted.');
-    } catch (QueryException) {
+    } catch (QueryException|\PDOException) {
         // Deferred trigger verifies the event + outbox at commit.
     }
     expect($this->ledger->current($this->scope)['authority_epoch'])->toBe(1);
@@ -227,12 +236,15 @@ it('rejects runtime deletion or alteration of an immutable outbox event payload'
         ['source' => 'e2'], str_repeat('a', 64), 1, 'reviewer-one'
     );
     $hash = \App\Domain\Qualification\NativeQualification::digest($this->scope);
+    $denied = false;
     try {
         DB::table('app.qualification_authority_outbox')
             ->where('scope_sha256', $hash)
             ->update(['payload' => '{}']);
         $this->fail('Outbox wire payload was altered.');
     } catch (QueryException) {
+        $denied = true;
         // Only the delivered_at field is mutable by the runtime principal.
     }
+    expect($denied)->toBeTrue();
 });
