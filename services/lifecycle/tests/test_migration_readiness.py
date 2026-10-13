@@ -6,7 +6,7 @@ import pytest
 
 from lifecycle.domain.admission import digest
 from lifecycle.domain.execution import Rejected
-from lifecycle.domain.migration_readiness import verify
+from lifecycle.infrastructure.migration_readiness_contract import verify
 
 
 def specimen() -> tuple[dict, dict]:

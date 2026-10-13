@@ -2,7 +2,7 @@
 
 import pytest
 
-from planning.application.migration_support import validate_workload_contract
+from planning.infrastructure.migration_readiness_contract import validate_workload_contract
 from planning.domain.migration_readiness import resolve, resolve_workload
 from planning.domain.model import Rejected, digest
 

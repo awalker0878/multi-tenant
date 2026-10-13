@@ -1,12 +1,8 @@
 """Directional eligibility from commissioned scope and authenticated Assurance reads."""
 
-import json
 from collections.abc import Callable
-from functools import lru_cache
-from importlib.resources import files
 from typing import Any
 
-from jsonschema import Draft202012Validator, FormatChecker
 
 from planning.domain.api_compatibility import evaluate as evaluate_api
 from planning.domain.capability_definitions import METHOD_ALIASES as METHODS
@@ -14,26 +10,6 @@ from planning.domain.expansion import matrix, tranche
 from planning.domain.migration_readiness import resolve as resolve_readiness
 from planning.domain.migration_readiness import resolve_workload
 from planning.domain.model import Actor, Rejected, digest
-
-
-@lru_cache(maxsize=1)
-def _workload_validator() -> Draft202012Validator:
-    schema = json.loads(
-        files("planning.infrastructure.inputs")
-        .joinpath("migration-readiness-v2.2.json")
-        .read_text(encoding="utf-8")
-    )
-    Draft202012Validator.check_schema(schema)
-    return Draft202012Validator(schema, format_checker=FormatChecker())
-
-
-def validate_workload_contract(result: dict[str, Any]) -> None:
-    """Fail closed on invalid or partially produced migration readiness.
-
-    This is a transport contract check, not independent E3/E4 qualification.
-    """
-    if not _workload_validator().is_valid(result):
-        raise Rejected("migration_workload_contract_invalid", 423)
 
 
 class MigrationSupport:
@@ -44,9 +20,11 @@ class MigrationSupport:
         clock: Callable[[], int],
         api_observations: Callable[[Actor, str, dict[str, Any]], dict[str, Any] | None]
         | None = None,
+        validate_readiness: Callable[[dict[str, Any]], None] | None = None,
     ) -> None:
         self.scope, self.observations, self.clock = scope, observations, clock
         self.api_observations = api_observations
+        self.validate_readiness = validate_readiness
         self.flow_require: Callable[[Actor, str, dict[str, Any]], dict[str, Any]] | None = None
         self.workload_current: Callable[[Actor, str, dict[str, Any], dict[str, Any] | None], dict[str, Any]] | None = None
         self.workload_review: Callable[[Actor, str, dict[str, Any]], dict[str, Any]] | None = None
@@ -161,7 +139,9 @@ class MigrationSupport:
             if self.collection_manifest is not None else None,
             selected_review=binding,
         )
-        validate_workload_contract(result)
+        if self.validate_readiness is None:
+            raise Rejected("migration_contract_validator_unavailable", 503)
+        self.validate_readiness(result)
         return {"schema_version": 1, "review": revision, "readiness": result,
                 "native_write_authorized": False, "workload_admission_authorized": False}
 
@@ -275,5 +255,7 @@ class MigrationSupport:
         )
         if readiness["status"] != "eligible":
             raise Rejected("migration_workload_readiness_held", 423)
-        validate_workload_contract(readiness)
+        if self.validate_readiness is None:
+            raise Rejected("migration_contract_validator_unavailable", 503)
+        self.validate_readiness(readiness)
         return readiness

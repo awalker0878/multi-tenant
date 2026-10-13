@@ -16,6 +16,7 @@ from planning.application.planning import Planning
 from planning.application.qualification_invalidations import QualificationInvalidations
 from planning.application.validation import MigrationValidation, NativeValidation, PlanValidation
 from planning.infrastructure.foundation import database_ready, mounted_secret
+from planning.infrastructure.migration_readiness_contract import validate_workload_contract
 from planning.infrastructure.migration import prepare_migration
 from planning.infrastructure.migration_collection_manifest import binding as collection_manifest_binding
 from planning.infrastructure.workload_reconciliation import (
@@ -97,7 +98,8 @@ class PlanningRouter:
             return int(time.time())
 
         self.support = MigrationSupport(
-            selected_tranche, qualification_records, clock, api_capability_records
+            selected_tranche, qualification_records, clock, api_capability_records,
+            validate_readiness=validate_workload_contract,
         )
         validation = PlanValidation(
             NativeValidation(

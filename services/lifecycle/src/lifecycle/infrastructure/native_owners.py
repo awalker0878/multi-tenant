@@ -16,10 +16,8 @@ from lifecycle.domain.admission import digest
 from lifecycle.domain.campaign_plan import native_plan_record, plan_requirements
 from lifecycle.domain.execution import Rejected, decode, identity
 from lifecycle.domain.migration import current_profiles
-from lifecycle.domain.migration_readiness import (
-    verify as verify_migration_readiness,
-    verify_catalogue_membership,
-)
+from lifecycle.domain.migration_readiness import verify_catalogue_membership
+from lifecycle.infrastructure.migration_readiness_contract import verify as verify_migration_readiness
 from lifecycle.domain.native_workflow import (
     checksum,
     current_authority,
