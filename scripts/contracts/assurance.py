@@ -177,7 +177,7 @@ def assess(root: Path = ROOT, observations: list[dict] | None = None,
         if claim == "tenant_isolation" and (
             observation.get("denial_kind") != "cross-tenant"
             or observation.get("authenticated") is not True
-            or observation.get("status_code") not in (403, 404, 423)
+            or observation.get("status_code") not in (403, 404)
             or not isinstance(observation.get("credential_tenant"), str)
             or not observation["credential_tenant"]
             or not isinstance(observation.get("requested_tenant"), str)
