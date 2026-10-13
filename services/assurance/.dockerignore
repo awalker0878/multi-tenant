@@ -17,6 +17,8 @@
 !public/index.php
 !routes/
 !routes/**
+!database/
+!database/**
 !resources/
 !resources/**
 !build/
