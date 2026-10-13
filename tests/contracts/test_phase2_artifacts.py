@@ -160,6 +160,14 @@ class ArtifactTests(unittest.TestCase):
                 archive.writestr("../other.py", "pass")
             with self.assertRaisesRegex(ValueError, "unsafe archive"):
                 check_wheel("services/planning", self.wheel, self.root)
+            self.wheel_contents()
+            with zipfile.ZipFile(self.wheel, "a") as archive:
+                link = zipfile.ZipInfo("planning/bootstrap/redirect.py")
+                link.create_system = 3
+                link.external_attr = 0o120777 << 16
+                archive.writestr(link, "server.py")
+            with self.assertRaisesRegex(ValueError, "unsafe archive"):
+                check_wheel("services/planning", self.wheel, self.root)
 
     def test_wheel_attestation_requires_a_pinned_commit(self):
         self.wheel_contents()
@@ -209,6 +217,17 @@ class ArtifactTests(unittest.TestCase):
         (image / "app.php").write_text("<?php return true;")
         (image / "unreviewed.sql").write_text("select 1")
         with self.assertRaisesRegex(ValueError, "differs from reviewed runtime source"):
+            compare_runtime_tree(source, image, "php-service")
+
+    def test_runtime_extra_symlink_cannot_hide_unreviewed_code(self):
+        source = self.root / "source"
+        image = self.root / "image"
+        source.mkdir()
+        image.mkdir()
+        (source / "app.php").write_text("<?php return true;")
+        (image / "app.php").write_text("<?php return true;")
+        (image / "runtime.php").symlink_to("app.php")
+        with self.assertRaisesRegex(ValueError, "unreviewed symlink"):
             compare_runtime_tree(source, image, "php-service")
 
     def test_runtime_bootstrap_cache_is_not_counted_as_authored_source(self):

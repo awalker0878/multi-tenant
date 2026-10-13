@@ -108,6 +108,7 @@ def check_wheel(component: str, wheel: Path, root: Path = ROOT) -> dict:
         for info in archive.infolist():
             member = PurePosixPath(info.filename)
             if (member.is_absolute() or ".." in member.parts
+                    or member.as_posix() != info.filename.rstrip("/")
                     or "\\" in info.filename
                     or ((info.external_attr >> 16) & 0o170000) == 0o120000):
                 raise ValueError("Wheel contains unsafe archive path or symlink")
@@ -122,6 +123,8 @@ def check_wheel(component: str, wheel: Path, root: Path = ROOT) -> dict:
             if sha(archive.read(packaged)) != item["sha256"]:
                 raise ValueError(f"Wheel has stale contract bytes: {packaged}")
         source_root = root / component / "src" / package
+        if any(item.is_symlink() for item in source_root.rglob("*")):
+            raise ValueError("Reviewed Python package contains an unsafe source symlink")
         expected_sources = {
             str(file.relative_to(source_root)): sha(file.read_bytes())
             for file in source_root.rglob("*") if file.is_file()
@@ -168,13 +171,15 @@ def compare_runtime_tree(source_root: Path, image_root: Path, component: str,
     """Require exact bytes for every shipped product file, not just route modules."""
     if not source_root.is_dir() or not image_root.is_dir():
         raise ValueError(f"Runtime source directory is missing: {component}")
+    if any(file.is_symlink() for folder in (source_root, image_root)
+           for file in folder.rglob("*")):
+        raise ValueError(f"Runtime source contains an unreviewed symlink: {component}")
 
     def files(folder: Path) -> dict[str, str]:
         return {
             str(file.relative_to(folder)): sha(file.read_bytes())
             for file in folder.rglob("*")
             if file.is_file()
-            and not file.is_symlink()
             and not (skip_cache and file.relative_to(folder).parts[0] == "cache")
         }
 
