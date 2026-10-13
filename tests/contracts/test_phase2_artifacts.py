@@ -100,7 +100,10 @@ class ArtifactTests(unittest.TestCase):
         self.wheel = self.root / "product_planning-0.1.0-py3-none-any.whl"
         self.source = self.root / "services/planning/src/planning/bootstrap/server.py"
         self.source.parent.mkdir(parents=True)
-        self.source.write_text("def serve(): pass\\n")
+        self.source.write_text("def serve(): pass\n")
+        current = self.root / "services/planning/src/planning/infrastructure/inputs/current.json"
+        current.parent.mkdir(parents=True)
+        current.write_bytes(self.contract)
 
     def wheel_contents(self, schema=None, extra=None, code=None):
         with zipfile.ZipFile(self.wheel, "w") as archive:

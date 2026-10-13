@@ -115,13 +115,15 @@ def check_wheel(component: str, wheel: Path, root: Path = ROOT) -> dict:
         source_root = root / component / "src" / package
         expected_sources = {
             str(file.relative_to(source_root)): sha(file.read_bytes())
-            for file in source_root.rglob("*.py")
+            for file in source_root.rglob("*") if file.is_file()
         }
         packaged_sources = {
             name[len(package) + 1:]: sha(archive.read(name))
             for name in members
-            if name.startswith(package + "/") and name.endswith(".py")
+            if name.startswith(package + "/") and not name.endswith("/")
         }
+        if set(packaged_sources) - set(expected_sources):
+            raise ValueError("Wheel contains unregistered contracts or unreviewed package files")
         if not expected_sources or expected_sources != packaged_sources:
             raise ValueError("Wheel differs from reviewed Python runtime sources")
         for item in copies:
@@ -288,11 +290,11 @@ def check_image(component: str, tag: str, root: Path = ROOT) -> dict:
                 source_root = root / component / "src" / pkg
                 source_files = {
                     str(file.relative_to(source_root)): sha(file.read_bytes())
-                    for file in source_root.rglob("*.py")
+                    for file in source_root.rglob("*") if file.is_file()
                 }
                 packaged_files = {
                     str(file.relative_to(local_root)): sha(file.read_bytes())
-                    for file in local_root.rglob("*.py")
+                    for file in local_root.rglob("*") if file.is_file()
                 }
                 if not source_files or source_files != packaged_files:
                     raise ValueError(f"Image differs from reviewed Python runtime sources: {component}")
