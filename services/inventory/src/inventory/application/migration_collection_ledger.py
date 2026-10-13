@@ -4,19 +4,20 @@ Ingesting an envelope proves its signature, tenant/site, exact current native
 generations and installed namespace tuple. It never grants E3/E4, equivalence,
 or an executable instruction. Current reads never fall back to older receipts.
 """
+from collections.abc import Callable
 from typing import Any
 from uuid import uuid4
 
 from inventory.application.discovery import Discovery
 from inventory.application.workload import WorkloadProfiles
 from inventory.domain.discovery import Actor, Rejected, Worker, canonical, digest, identifier, shape
-from inventory.infrastructure.migration_collection_evidence import read_collection_coverages
 
 
 class MigrationCollectionLedger:
-    def __init__(self, discovery: Discovery) -> None:
+    def __init__(self, discovery: Discovery, coverage_reader: Callable[..., list[dict[str, Any]]]) -> None:
         self.d = discovery
         self.profiles = WorkloadProfiles(discovery)
+        self.coverage_reader = coverage_reader
 
     @staticmethod
     def require_unrevoked_generation(
@@ -57,7 +58,7 @@ class MigrationCollectionLedger:
                 raise Rejected("migration_collection_unenrolled_publisher", 403)
             self.require_unrevoked_generation(tx, tenant, site, source, target)
             left, right = self.profiles.binding(source), self.profiles.binding(target)
-            coverage = read_collection_coverages(
+            coverage = self.coverage_reader(
                 tenant, site, source, target, left, right, int(self.d.clock()),
                 signed_envelope=envelope,
             )
@@ -221,7 +222,7 @@ class MigrationCollectionLedger:
         if (record["source_sha256"] != source_binding["profile_sha256"]
                 or record["target_sha256"] != target_binding["profile_sha256"]):
             return []
-        return read_collection_coverages(
+        return self.coverage_reader(
             tenant, site, source, target, source_binding, target_binding, int(now),
             signed_envelope=record["envelope"],
         )

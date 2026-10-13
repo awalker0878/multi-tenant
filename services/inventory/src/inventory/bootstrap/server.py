@@ -36,6 +36,7 @@ class InventoryRouter:
             ),
             authority,
             read_evidence,
+            read_collection_coverages,
         )
         self.planning = PlanningInputApp(
             self.inventory.discovery,

@@ -220,7 +220,8 @@ class InventoryApp:
         self,
         discovery: Discovery,
         authority: Authority,
-        evidence: Callable[..., dict[str, Any]] | None = None,
+        evidence: Callable[..., dict[str, Any]] | None,
+        collection_reader: Callable[..., list[dict[str, Any]]],
     ) -> None:
         self.discovery = discovery
         self.authority = authority
@@ -228,7 +229,7 @@ class InventoryApp:
         self.configuration = PortingConfiguration(discovery)
         self.operator_inputs = OperatorInputs(discovery, evidence)
         self.workloads = WorkloadProfiles(discovery)
-        self.collection_ledger = MigrationCollectionLedger(discovery)
+        self.collection_ledger = MigrationCollectionLedger(discovery, collection_reader)
         self.fleet = MigrationFleet(discovery)
 
     async def __call__(

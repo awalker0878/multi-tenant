@@ -75,7 +75,9 @@ def test_readiness_route_saves_context_rejects_authority_and_rechecks_access(
 ) -> None:
     c = campaign
     authority = Authority(c.actor)
-    app = InventoryApp(c.service, authority)
+    from inventory.infrastructure.migration_collection_evidence import read_collection_coverages
+
+    app = InventoryApp(c.service, authority, None, read_collection_coverages)
     path = f"/v1/tenants/{c.actor.tenant}/sites/{c.actor.site}/operator-readiness"
     body = {
         "values": {"max_outage_seconds": 0},
