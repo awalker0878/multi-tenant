@@ -13,7 +13,15 @@ ROOT = Path(__file__).resolve().parents[2]
 def check_consumer_registry():
     registry = load("architecture/contract-consumers.json")
     inventory = registry["contracts"]
-    active = {entry["path"] for entry in registry["active_releases"]}
+    releases = registry.get("active_releases")
+    if not isinstance(releases, list) or not releases:
+        raise ValueError("Missing machine-readable active contract release catalogue")
+    names = [entry["path"] for entry in releases]
+    if len(names) != len(set(names)):
+        raise ValueError("Duplicate active canonical contract release")
+    if set(names) != set(inventory):
+        raise ValueError("Active contract registry does not cover every declared consumer")
+    active = set(names)
     # Only current canonical releases are shipped. Every installed consumer
     # and generated loader must target the active release set directly.
     # Each live service operation belongs to exactly one active versioned owner
