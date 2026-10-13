@@ -106,7 +106,7 @@ def consumed_bindings(component: str, root: Path = ROOT) -> list[dict]:
 
 
 def verify_wheel_record(archive: zipfile.ZipFile, component: str, package: str,
-                        root: Path) -> None:
+                        root: Path, wheel_name: str) -> None:
     """Verify wheel identity and every installed byte, not merely package JSON.
 
     RECORD is unsigned, so this is integrity/structure checking; separate
@@ -137,6 +137,9 @@ def verify_wheel_record(archive: zipfile.ZipFile, component: str, package: str,
     expected_directory = re.sub(r"[-_.]+", "_", project["name"]) + "-" + project["version"] + ".dist-info"
     if directory != expected_directory:
         raise ValueError("Wheel distribution metadata path differs from reviewed identity")
+    if (not wheel_name.startswith(expected_directory.removesuffix(".dist-info") + "-")
+            or not wheel_name.endswith(".whl")):
+        raise ValueError("Wheel filename identity differs from reviewed distribution")
     scripts = project.get("scripts", {})
     entry_points = directory + "/entry_points.txt"
     if scripts or entry_points in names:
@@ -193,7 +196,7 @@ def check_wheel(component: str, wheel: Path, root: Path = ROOT) -> dict:
                     or "\\" in info.filename
                     or ((info.external_attr >> 16) & 0o170000) == 0o120000):
                 raise ValueError("Wheel contains unsafe archive path or symlink")
-        verify_wheel_record(archive, component, package, root)
+        verify_wheel_record(archive, component, package, root, wheel.name)
         members = set(names)
         for item in copies:
             prefix = component + "/src/"
