@@ -53,6 +53,11 @@ RELEASES = {
         "CapabilityInput": "contracts/schemas/planning/inventory-input-v2.json",
         "MigrationInput": "contracts/schemas/planning/migration-input-v4.json",
     },
+    "lifecycle-internal-authority-v1.json": {
+        "PlacementReceipt": "contracts/schemas/planning/placement-reservation-v1.json",
+        "PlacementReserveCommand": "contracts/schemas/planning/placement-reservation-v1.json",
+        "PlacementDigestCommand": "contracts/schemas/planning/placement-reservation-v1.json",
+    },
     "assurance-qualification-v1.json": {
         "Qualification": "contracts/schemas/planning/qualification-v2.1.json",
         "MigrationSupport": "contracts/schemas/planning/migration-support-v2.json",
@@ -66,6 +71,13 @@ def assemble(name: str, root: Path = ROOT) -> dict:
     output = copy.deepcopy(read("contracts/openapi/" + name, root))
     for component, source in RELEASES[name].items():
         value = read(source, root)
+        if name == "lifecycle-internal-authority-v1.json":
+            if component == "PlacementReserveCommand":
+                value = value["$defs"]["ReserveCommand"]
+            elif component == "PlacementDigestCommand":
+                value = value["$defs"]["DigestCommand"]
+            output["components"]["schemas"][component] = value
+            continue
         if name == "catalogue-internal-v1.json" and component == "PlanningInput":
             value.pop("components", None)
             value = normalized(value)
