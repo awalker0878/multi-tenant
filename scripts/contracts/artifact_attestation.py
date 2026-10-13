@@ -300,7 +300,9 @@ def check_image(component: str, tag: str, root: Path = ROOT) -> dict:
             # ALL bounded runtime source code, not only a startup module, is
             # byte-for-byte identical to the reviewed checkout.
             if COMPONENTS[component][1] == "php":
-                folders = ["app", "routes", "bootstrap", "config", "database"]
+                folders = ["app", "routes", "bootstrap", "config"]
+                if component in {"apps/console", "services/governance"}:
+                    folders.append("database")
                 if component == "apps/console":
                     folders += ["resources/views", "resources/js/pages"]
                 for folder in folders:

@@ -49,7 +49,7 @@ attestation job.
 filesystems and wheel ZIPs; it verifies all registered packaged JSON bytes,
 detects unregistered contract JSON and malicious wheel entries, compares
 entire Python package bytes and shipped PHP runtime configuration, bootstrap,
-migrations and application resources against the reviewed checkout, and pins the built artifact content ID
+the migrations actually shipped, and application resources against the reviewed checkout, and pins the built artifact content ID
 to the exact 40-character Git release SHA. It records owned operation IDs,
 canonical file digests, and consumed release identities with an explicit
 distinction between installed-copy proof and registry-only declarations.
