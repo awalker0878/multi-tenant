@@ -173,7 +173,7 @@ it('issues lifecycle-scoped authority and rejects an authenticated foreign tenan
         '$ref' => '#/components/schemas/CurrentDelegation',
         'components' => $canonical->components,
     ];
-    expect((new \\Opis\\JsonSchema\\Validator)->validate((object) $result, $schema)->isValid())->toBeTrue();
+    expect((new \Opis\JsonSchema\Validator)->validate((object) $result, $schema)->isValid())->toBeTrue();
     $foreignTenant = '550e8400-e29b-41d4-a716-446655440222';
     $this->postJson('/v1/tenants/'.$foreignTenant.'/delegated-authorizations', $payload)->assertUnauthorized();
     $this->postJson($this->inspectPath, ['action' => 'operation.read',
