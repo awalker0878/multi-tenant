@@ -132,9 +132,9 @@ class ArtifactTests(unittest.TestCase):
                 self.contract if schema is None else schema
             ),
             dist + "/METADATA": (
-                "Metadata-Version: 2.3\\nName: product-planning\\nVersion: 0.1.0.dev0\\n"
+                "Metadata-Version: 2.3\nName: product-planning\nVersion: 0.1.0.dev0\n"
             ),
-            dist + "/WHEEL": "Wheel-Version: 1.0\\nRoot-Is-Purelib: true\\nTag: py3-none-any\\n",
+            dist + "/WHEEL": "Wheel-Version: 1.0\nRoot-Is-Purelib: true\nTag: py3-none-any\n",
         }
         if extra is not None:
             payloads["planning/infrastructure/inputs/orphan.json"] = extra
@@ -173,20 +173,20 @@ class ArtifactTests(unittest.TestCase):
                 check_wheel("services/planning", self.wheel, self.root)
 
     def test_wheel_record_and_distribution_identity_are_verified(self):
-        with patch.dict(os.environ, {"GITHUB_SHA": "a" * 40}), \\
-                patch("artifact_attestation.expected", return_value=([self.copy], [])), \\
+        with patch.dict(os.environ, {"GITHUB_SHA": "a" * 40}), \
+                patch("artifact_attestation.expected", return_value=([self.copy], [])), \
                 patch("artifact_attestation.consumed_bindings", return_value=[]):
             self.wheel_contents(tamper_record=True)
             with self.assertRaisesRegex(ValueError, "RECORD digest/size"):
                 check_wheel("services/planning", self.wheel, self.root)
             self.wheel_contents()
             with zipfile.ZipFile(self.wheel, "a") as archive:
-                archive.writestr("other_module.py", "def run(): pass\\n")
+                archive.writestr("other_module.py", "def run(): pass\n")
             with self.assertRaisesRegex(ValueError, "unreviewed distribution payload"):
                 check_wheel("services/planning", self.wheel, self.root)
             self.wheel_contents()
             project = self.root / "services/planning/pyproject.toml"
-            project.write_text('[project]\\nname = "product-other"\\nversion = "0.1.0.dev0"\\n')
+            project.write_text('[project]\nname = "product-other"\nversion = "0.1.0.dev0"\n')
             with self.assertRaisesRegex(ValueError, "identity differs"):
                 check_wheel("services/planning", self.wheel, self.root)
 
