@@ -17,7 +17,7 @@ from unittest.mock import patch
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts/contracts"))
 from dependency_graph import derive
-from artifact_attestation import check_image, check_wheel, check_console_frontend, compare_runtime_tree
+from artifact_attestation import check_image, check_wheel, check_console_frontend, compare_runtime_tree, verify_image_process
 from aggregate_artifacts import aggregate
 from runtime_binding_coverage import verify as verify_runtime_bindings
 
@@ -313,6 +313,38 @@ class ArtifactTests(unittest.TestCase):
         self.assertEqual(compare_runtime_tree(source, image, "bootstrap", skip_cache=True), 1)
         with self.assertRaisesRegex(ValueError, "differs from reviewed runtime source"):
             compare_runtime_tree(source, image, "bootstrap")
+
+    def test_image_process_identity_is_independently_attested(self):
+        runtime = {
+            "Config": {
+                "User": "10001:10001",
+                "Entrypoint": ["/usr/local/bin/service-entrypoint"],
+                "Cmd": ["php-fpm", "-F"],
+            }
+        }
+        verify_image_process("apps/console", runtime, self.root)
+        forged = json.loads(json.dumps(runtime))
+        forged["Config"]["Entrypoint"] = ["/tmp/unreviewed"]
+        with self.assertRaisesRegex(ValueError, "runtime entrypoint/command"):
+            verify_image_process("apps/console", forged, self.root)
+        forged = json.loads(json.dumps(runtime))
+        forged["Config"]["User"] = "0:0"
+        with self.assertRaisesRegex(ValueError, "runtime user"):
+            verify_image_process("apps/console", forged, self.root)
+        python_runtime = {
+            "Config": {
+                "User": "10001:10001",
+                "Entrypoint": ["/opt/venv/bin/planning-health"],
+                "Cmd": ["liveness"],
+            }
+        }
+        project = self.root / "services/planning/pyproject.toml"
+        project.write_text(project.read_text() +
+                           'planning-health = "planning.bootstrap.health:main"\n')
+        verify_image_process("services/planning", python_runtime, self.root)
+        python_runtime["Config"]["Cmd"] = ["serve"]
+        with self.assertRaisesRegex(ValueError, "runtime entrypoint/command"):
+            verify_image_process("services/planning", python_runtime, self.root)
 
     def test_oci_image_requires_exact_source_sha_label(self):
         fake = [{
