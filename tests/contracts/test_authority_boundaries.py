@@ -113,6 +113,87 @@ class OwnerBoundaryContracts(unittest.TestCase):
                 f"/v1/tenants/{TENANT}/undocumented-authority")
 
 
+    def test_all_placement_owner_operations_use_strict_openapi(self):
+        document = json.loads((ROOT / "contracts/openapi/lifecycle-internal-authority-v1.json").read_text())
+        canonical = json.loads((ROOT / "contracts/schemas/planning/placement-reservation-v1.json").read_text())
+        self.assertEqual(document["components"]["schemas"]["PlacementReceipt"], canonical)
+        for operation in ("reserve", "checks", "confirm", "renew", "release"):
+            uri = f"/internal/tenants/{{tenant}}/placement-reservations/{operation}"
+            published = document["paths"][uri]["post"]
+            body_ref = published["requestBody"]["content"]["application/json"]["schema"]["$ref"]
+            expected = "PlacementReserveCommand" if operation == "reserve" else "PlacementDigestCommand"
+            self.assertEqual(body_ref, "#/components/schemas/" + expected)
+            self.assertEqual(
+                published["responses"]["200"]["content"]["application/json"]["schema"],
+                {"$ref": "#/components/schemas/PlacementReceipt"},
+            )
+            command = (
+                {"scope": {"tenant_id": TENANT}, "plan_digest": HEX, "generation_id": OTHER,
+                 "policy_sha256": HEX, "placement_sha256": HEX,
+                 "allocations": RECEIPT["allocations"]}
+                if operation == "reserve" else {"plan_digest": HEX}
+            )
+            status, receipt = invoke(Service(), operation=operation, command=command)
+            self.assertEqual(status, 200)
+            self.assertEqual(receipt, RECEIPT)
+            Draft202012Validator(canonical, format_checker=FormatChecker()).validate(receipt)
+            status, denial = invoke(Service(), operation=operation,
+                                    command={**command, "uncontracted": True})
+            self.assertEqual(status, 423)
+            self.assertEqual(denial["error"], "placement_request_invalid")
+
+    def test_real_asgi_owner_and_planning_consumer_roundtrip(self):
+        import os
+        from unittest.mock import patch
+        from planning.domain.model import Rejected
+        from planning.infrastructure import owners
+
+        status, produced = invoke(Service())
+        self.assertEqual(status, 200)
+        wire = [produced]
+
+        class Response:
+            status = 200
+
+            def read(self, size):
+                return json.dumps(wire[0]).encode()
+
+            def getheader(self, name, default=None):
+                return "identity"
+
+        class Connection:
+            def __init__(self, *args, **kwargs):
+                pass
+
+            def request(self, method, path, data, headers):
+                assert method == "POST" and path.endswith("/placement-reservations/checks")
+
+            def getresponse(self):
+                return Response()
+
+            def close(self):
+                pass
+
+        path = f"/internal/tenants/{TENANT}/placement-reservations/checks"
+        with (
+            patch.dict(os.environ, {"CAPACITY_URL": "https://capacity.example",
+                                    "CAPACITY_CA_FILE": "/tmp/synthetic-ca"}),
+            patch.object(owners, "mounted_secret", return_value="synthetic-token"),
+            patch.object(owners.ssl, "create_default_context", return_value=object()),
+            patch.object(owners.http.client, "HTTPSConnection", Connection),
+        ):
+            self.assertEqual(owners.request("CAPACITY", "POST", path, {"plan_digest": HEX}), produced)
+            for poisoned in (
+                {**produced, "tenant_id": OTHER},
+                {**produced, "plan_digest": "b" * 64},
+                {**produced, "unexpected_authority": True},
+            ):
+                wire[0] = poisoned
+                with self.assertRaises(Rejected) as caught:
+                    owners.request("CAPACITY", "POST", path, {"plan_digest": HEX})
+                self.assertEqual(caught.exception.status, 503)
+
+
 class LifecycleOwnerTransportContracts(unittest.TestCase):
     def test_real_lifecycle_consumer_validates_current_assurance_receipt(self):
         import os
@@ -147,11 +228,13 @@ class LifecycleOwnerTransportContracts(unittest.TestCase):
             def close(self):
                 pass
 
-        with patch.dict(os.environ, {"ASSURANCE_URL": "https://assurance.example",
-                                  "ASSURANCE_CA_FILE": "/tmp/synthetic-ca"}), \\
-                patch.object(execution_owners, "mounted_secret", return_value="synthetic-token"), \\
-                patch.object(execution_owners.ssl, "create_default_context", return_value=object()), \\
-                patch.object(execution_owners.http.client, "HTTPSConnection", Connection):
+        with (
+            patch.dict(os.environ, {"ASSURANCE_URL": "https://assurance.example",
+                                    "ASSURANCE_CA_FILE": "/tmp/synthetic-ca"}),
+            patch.object(execution_owners, "mounted_secret", return_value="synthetic-token"),
+            patch.object(execution_owners.ssl, "create_default_context", return_value=object()),
+            patch.object(execution_owners.http.client, "HTTPSConnection", Connection),
+        ):
             path = f"/v1/tenants/{TENANT}/evidence-uploads"
             self.assertEqual(execution_owners.request("ASSURANCE", "POST", path, {}), wire[0])
             for invalid in ({"id": TENANT, "state": "uploaded", "unexpected": True},

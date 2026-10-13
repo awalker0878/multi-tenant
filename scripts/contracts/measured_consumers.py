@@ -34,12 +34,39 @@ TESTS = {
          "/internal/tenants/{tenant}/applications/{application}/"
          "environments/{environment}/current-planning-intent", ("consumer",)),
     ),
+    "services/planning/tests/test_owner_operation_contracts.py::"
+    "test_capacity_and_governance_owner_responses_are_schema_and_scope_validated": (
+        ("governance", "POST", "/v1/tenants/{tenant}/delegated-authorizations", ("consumer",)),
+    ),
+    "tests/contracts/test_authority_boundaries.py::"
+    "OwnerBoundaryContracts::test_real_asgi_owner_and_planning_consumer_roundtrip": (
+        ("lifecycle", "POST",
+         "/internal/tenants/{tenant}/placement-reservations/checks", ("producer", "consumer")),
+    ),
+    "tests/contracts/test_authority_boundaries.py::"
+    "OwnerBoundaryContracts::test_all_placement_owner_operations_use_strict_openapi": (
+        ("lifecycle", "POST",
+         "/internal/tenants/{tenant}/placement-reservations/reserve", ("producer",)),
+    ),
+    "tests/contracts/test_authority_boundaries.py::"
+    "LifecycleOwnerTransportContracts::test_real_lifecycle_consumer_validates_current_assurance_receipt": (
+        ("assurance", "POST", "/v1/tenants/{tenant}/evidence-uploads", ("consumer",)),
+    ),
+}
+
+
+# Non-HTTP proof is earned only by a single test exercising both live sides.
+RELEASE_TESTS = {
+    "tests/contracts/test_authority_boundaries.py::"
+    "OwnerBoundaryContracts::test_real_asgi_owner_and_planning_consumer_roundtrip": (
+        "contracts/schemas/planning/placement-reservation-v1.json", ("producer", "consumer")
+    ),
 }
 
 
 def verified_consumers(root: Path = ROOT) -> list[dict]:
     current = {operation["key"]: operation for operation in inventory(root)["operations"]}
-    cases = list(TESTS)
+    cases = sorted(set(TESTS) | set(RELEASE_TESTS))
     # The executed test includes independently exercised producer logic,
     # installed consumer validation, and changed-version/malformed rejections.
     result = subprocess.run(
@@ -63,6 +90,16 @@ def verified_consumers(root: Path = ROOT) -> list[dict]:
                 "result": "PASS", "release_sha256": current[key]["release_sha256"],
                 "test": test,
             })
+    releases = {release["path"]: release for release in inventory(root)["releases"]}
+    for test, (path, claims) in RELEASE_TESTS.items():
+        if path not in releases:
+            raise ValueError("Non-HTTP test targets an inactive release: " + path)
+        for claim in claims:
+            evidence.append({
+                "key": path, "claim": claim,
+                "source": "live-producer" if claim == "producer" else "live-consumer",
+                "result": "PASS", "release_sha256": releases[path]["sha256"], "test": test,
+            })
     for observation in evidence:
         observation["run_id"] = os.environ.get("GITHUB_RUN_ID")
         observation["revision"] = os.environ.get("GITHUB_SHA")
@@ -76,7 +113,7 @@ def main() -> None:
     evidence = verified_consumers()
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(evidence, indent=2) + "\n")
-    print(f"Validated {len(TESTS)} executable producer/consumer tests, "
+    print(f"Validated {len(cases)} executable producer/consumer tests, "
           f"{len(evidence)} operation proofs")
 
 
