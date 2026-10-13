@@ -153,6 +153,57 @@ class MeasuredProofTests(unittest.TestCase):
             for proof in proofs
         ))
 
+    def test_actual_pytest_junit_module_and_class_abbreviations_are_unambiguous(self):
+        from xml.etree import ElementTree
+
+        def abbreviated(argv, **kwargs):
+            result = self.fake_passed_test_run(argv, **kwargs)
+            receipt = next(Path(arg.split("=", 1)[1]) for arg in argv
+                           if arg.startswith("--junitxml="))
+            tree = ElementTree.parse(receipt)
+            for node in tree.iter("testcase"):
+                classname = node.attrib["classname"]
+                if "test_owner_operation_contracts" in classname:
+                    node.set("classname", "tests.test_owner_operation_contracts")
+                elif "test_alert_owner." in classname:
+                    node.set("classname", ".AlertOwnerContracts")
+                elif "test_authority_boundaries." in classname:
+                    node.set("classname", "." + classname.rsplit(".", 1)[-1])
+                elif "test_simulation_owner." in classname:
+                    node.set("classname", ".SimulationOwnerContracts")
+            tree.write(receipt, encoding="unicode")
+            return result
+
+        with patch.object(measured.subprocess, "run", side_effect=abbreviated):
+            proofs = measured.verified_consumers()
+        self.assertTrue(any(
+            proof["key"] == "contracts/schemas/lifecycle/alert-delivery-v1.json"
+            and proof["claim"] == "consumer" for proof in proofs
+        ))
+        self.assertTrue(any(
+            proof["key"] == '["lifecycle-workers","POST","/v1/effects"]'
+            and proof["claim"] == "consumer" for proof in proofs
+        ))
+
+    def test_class_receipt_from_unselected_class_is_not_credited(self):
+        from xml.etree import ElementTree
+
+        def fake_wrong_class(argv, **kwargs):
+            result = self.fake_passed_test_run(argv, **kwargs)
+            receipt = next(Path(arg.split("=", 1)[1]) for arg in argv
+                           if arg.startswith("--junitxml="))
+            tree = ElementTree.parse(receipt)
+            node = next(node for node in tree.iter("testcase")
+                        if node.attrib["name"] ==
+                        "test_installed_alert_contract_fences_external_receipts")
+            node.set("classname", ".WrongAlertOwnerContracts")
+            tree.write(receipt, encoding="unicode")
+            return result
+
+        with patch.object(measured.subprocess, "run", side_effect=fake_wrong_class):
+            with self.assertRaisesRegex(RuntimeError, "selector did not execute"):
+                measured.verified_consumers()
+
     def test_same_short_name_from_wrong_module_cannot_mint_proof(self):
         from xml.etree import ElementTree
 
