@@ -108,6 +108,28 @@ class MeasuredProofTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "did not execute"):
                 measured.verified_consumers()
 
+    def test_importlib_top_level_function_without_classname_has_unique_identity(self):
+        # Pytest 9 may write an empty classname for an explicitly selected
+        # module-level function. The exact selector plus unique test name
+        # provides independently attributable evidence in that case.
+        from xml.etree import ElementTree
+
+        def empty_top_level_classname(argv, **kwargs):
+            result = self.fake_passed_test_run(argv, **kwargs)
+            receipt = next(Path(arg.split("=", 1)[1]) for arg in argv
+                           if arg.startswith("--junitxml="))
+            tree = ElementTree.parse(receipt)
+            node = next(node for node in tree.iter("testcase")
+                        if node.attrib["name"] ==
+                        "test_real_inventory_planning_response_validates_installed_strict_schema")
+            node.set("classname", "")
+            tree.write(receipt, encoding="unicode")
+            return result
+
+        with patch.object(measured.subprocess, "run",
+                          side_effect=empty_top_level_classname):
+            self.assertTrue(measured.verified_consumers())
+
     def test_same_short_name_from_wrong_module_cannot_mint_proof(self):
         from xml.etree import ElementTree
 

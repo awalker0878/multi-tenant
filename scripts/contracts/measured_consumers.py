@@ -135,9 +135,18 @@ def verified_consumers(root: Path = ROOT) -> list[dict]:
         for node in observations:
             classname = node.attrib.get("classname", "")
             name = node.attrib.get("name", "")
-            if not classname or not name:
-                raise RuntimeError("Producer/consumer receipt has no full executable identity: "
+            if not name:
+                raise RuntimeError("Producer/consumer receipt has no test name: "
                                    + repr(node.attrib))
+            # pytest --import-mode=importlib can emit classname="" for a
+            # top-level test function. The subprocess received explicit test
+            # selectors; such a receipt may count only when its *exact* test
+            # name is unique among those selected. A nonempty classname must
+            # still match the real module/class below.
+            if not classname and sum(
+                selector.rsplit("::", 1)[-1] == name for selector in cases
+            ) != 1:
+                raise RuntimeError("Ambiguous unqualified pytest test identity: " + name)
             identity = (classname, name)
             if identity in executed:
                 raise RuntimeError("Duplicated producer/consumer execution receipt: " + repr(identity))
@@ -151,8 +160,12 @@ def verified_consumers(root: Path = ROOT) -> list[dict]:
                 classname += "." + ".".join(parts[:-1])
             test_name = parts[-1]
             if not any(
-                name == test_name or name.startswith(test_name + "[")
-                for candidate, name in executed if candidate == classname
+                (name == test_name or name.startswith(test_name + "["))
+                and (candidate == classname or (
+                    not candidate and name == test_name and
+                    sum(x.rsplit("::", 1)[-1] == test_name for x in cases) == 1
+                ))
+                for candidate, name in executed
             ):
                 raise RuntimeError("Producer/consumer selector did not execute: " + selector)
     evidence = []
