@@ -19,7 +19,7 @@ afterEach(function (): void {
 });
 
 it('requires the service caller and returns no invented native evidence', function (): void {
-    $this->postJson($this->path, $this->body)->assertForbidden();
+    $this->postJson($this->path, $this->body)->assertUnauthorized();
     $this->withToken(str_repeat('a', 64))->postJson($this->path, $this->body)
         ->assertOk()->assertJsonPath('records', [])
         ->assertJsonPath('api_evidence', [])
