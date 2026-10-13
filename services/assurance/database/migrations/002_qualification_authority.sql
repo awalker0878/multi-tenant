@@ -59,7 +59,7 @@ CREATE TRIGGER qualification_head_monotonic
     FOR EACH ROW EXECUTE FUNCTION app.guard_qualification_head_epoch();
 
 CREATE FUNCTION app.verify_qualification_head_event()
-RETURNS trigger LANGUAGE plpgsql AS $
+RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE
     prior_event text;
 BEGIN
