@@ -7,13 +7,18 @@ the actual immutable image filesystem or wheel ZIP and fails closed.
 from __future__ import annotations
 
 import argparse
+import base64
+import csv
 import hashlib
+import io
 import json
 import os
 import re
 import subprocess
 import tempfile
+import tomllib
 import zipfile
+from email.parser import Parser
 from pathlib import Path, PurePosixPath
 
 from assurance import inventory
@@ -99,6 +104,61 @@ def consumed_bindings(component: str, root: Path = ROOT) -> list[dict]:
 
 
 
+def verify_wheel_record(archive: zipfile.ZipFile, component: str, package: str,
+                        root: Path) -> None:
+    """Verify wheel identity and every installed byte, not merely package JSON.
+
+    RECORD is unsigned, so this is integrity/structure checking; separate
+    source-byte comparison and exact CI provenance establish trust.
+    """
+    names = {info.filename for info in archive.infolist() if not info.is_dir()}
+    dist_info = {
+        name.split("/", 1)[0] for name in names
+        if name.split("/", 1)[0].endswith(".dist-info")
+    }
+    if len(dist_info) != 1:
+        raise ValueError("Wheel must declare exactly one distribution metadata directory")
+    directory = next(iter(dist_info))
+    required = {directory + "/" + name for name in ("METADATA", "WHEEL", "RECORD")}
+    if not required <= names:
+        raise ValueError("Wheel lacks required distribution metadata/RECORD")
+    if any(not (name.startswith(package + "/") or name.startswith(directory + "/"))
+           for name in names):
+        raise ValueError("Wheel contains unreviewed distribution payload")
+    project = tomllib.loads((root / component / "pyproject.toml").read_text())["project"]
+    metadata = Parser().parsestr(archive.read(directory + "/METADATA").decode("utf-8"))
+    wheel_metadata = Parser().parsestr(archive.read(directory + "/WHEEL").decode("utf-8"))
+    canonical_name = lambda name: re.sub(r"[-_.]+", "-", name).lower()
+    if (canonical_name(metadata.get("Name", "")) != canonical_name(project["name"])
+            or metadata.get("Version") != project["version"]
+            or wheel_metadata.get("Wheel-Version") != "1.0"):
+        raise ValueError("Wheel distribution identity differs from reviewed pyproject")
+    expected_directory = re.sub(r"[-_.]+", "_", project["name"]) + "-" + project["version"] + ".dist-info"
+    if directory != expected_directory:
+        raise ValueError("Wheel distribution metadata path differs from reviewed identity")
+
+    rows = list(csv.reader(io.StringIO(archive.read(directory + "/RECORD").decode("utf-8"))))
+    if any(len(row) != 3 or not row[0] for row in rows):
+        raise ValueError("Malformed wheel RECORD entry")
+    indexed = {row[0]: row for row in rows}
+    if len(indexed) != len(rows) or set(indexed) != names:
+        raise ValueError("Wheel RECORD does not cover exact installed members")
+    record_path = directory + "/RECORD"
+    for name, recorded_hash, recorded_size in rows:
+        if name == record_path:
+            if recorded_hash or recorded_size:
+                raise ValueError("Wheel RECORD must not attest itself")
+            continue
+        if not recorded_hash.startswith("sha256="):
+            raise ValueError("Wheel RECORD has missing or unsupported hash")
+        content = archive.read(name)
+        expected_hash = base64.urlsafe_b64encode(
+            hashlib.sha256(content).digest()
+        ).rstrip(b"=").decode("ascii")
+        if recorded_hash != "sha256=" + expected_hash or recorded_size != str(len(content)):
+            raise ValueError("Wheel RECORD digest/size differs from packaged bytes")
+
+
 def check_wheel(component: str, wheel: Path, root: Path = ROOT) -> dict:
     if COMPONENTS[component][1] != "python":
         raise ValueError("Only a Python component may be bound to a wheel")
@@ -120,6 +180,7 @@ def check_wheel(component: str, wheel: Path, root: Path = ROOT) -> dict:
                     or "\\" in info.filename
                     or ((info.external_attr >> 16) & 0o170000) == 0o120000):
                 raise ValueError("Wheel contains unsafe archive path or symlink")
+        verify_wheel_record(archive, component, package, root)
         members = set(names)
         for item in copies:
             prefix = component + "/src/"
