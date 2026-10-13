@@ -79,10 +79,13 @@ python scripts/contracts/runtime_binding_coverage.py
 python -m unittest discover -s tests/contracts -p 'test_phase2_artifacts.py' -v
 ```
 
-Built-artifact attestation is an intentionally explicit high-cost GitHub Actions
-suite (`qualification.yml`, `suite=contract-artifacts`), not a simulated
-source-only pass. The strict `CI / Contract assurance` gate remains red until
-every active operation earns its independently measured evidence.
+Built-artifact attestation is an actual high-cost GitHub Actions suite
+(`qualification.yml`, `suite=contract-artifacts`). The consolidated pull-request
+CI invokes it for affected contract changes, and it may also be dispatched
+explicitly for release requalification. Its nine image/five wheel attestations
+must aggregate successfully; an image matrix pass alone is not sufficient.
+The separate strict `CI / Contract assurance` gate remains red until
+every active operation earns independently measured behavioral evidence.
 
 See [contract assurance](../docs/contracts/assurance.md),
 [assurance phases](../docs/contracts/assurance-phases.md), and
