@@ -360,9 +360,9 @@ class RuntimeWorkflowTests(unittest.TestCase):
             target = root / ".github/workflows/qualification.yml"
             target.parent.mkdir(parents=True)
             target.write_text(yaml.safe_dump(workflow))
-            with patch("runtime_binding_coverage.inventory", return_value={"operations": []}), \\
-                    patch("runtime_binding_coverage.verify_installed_usage"), \\
-                    patch("runtime_binding_coverage.COMPONENTS", {}):
+            with (patch("runtime_binding_coverage.inventory", return_value={"operations": []}),
+                  patch("runtime_binding_coverage.verify_installed_usage"),
+                  patch("runtime_binding_coverage.COMPONENTS", {})):
                 registry = root / "architecture/contract-consumers.json"
                 registry.parent.mkdir(parents=True)
                 registry.write_text('{"active_releases": []}')
