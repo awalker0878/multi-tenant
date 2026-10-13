@@ -51,7 +51,7 @@ final class QualificationAuthorityLedger
         ]);
 
         return DB::transaction(function () use (
-            $scope, $scopeSha, $operation, $commandId, $expectedEpoch, $reason,
+            $scope, $scopeSha, $operation, $commandId, $expectedEpoch,
             $bundle, $decisionSha, $decisionRevision, $reviewerId, $requestSha
         ): array {
             // Collision only introduces unnecessary serialization, never mixed authority.
@@ -160,13 +160,22 @@ final class QualificationAuthorityLedger
     /** @return array<string, mixed> */
     private function projection(object $row): array
     {
+        $values = get_object_vars($row);
+        foreach (['state', 'authority_epoch', 'decision_sha256',
+            'decision_revision', 'reviewer_id', 'bundle'] as $field) {
+            abort_unless(array_key_exists($field, $values), 503, 'qualification_head_invalid');
+        }
+        abort_unless(is_string($values['state']) && is_string($values['decision_sha256'])
+            && is_string($values['reviewer_id']) && is_string($values['bundle']),
+            503, 'qualification_head_invalid');
+
         return [
-            'state' => $row->state,
-            'authority_epoch' => (int) $row->authority_epoch,
-            'decision_sha256' => $row->decision_sha256,
-            'decision_revision' => (int) $row->decision_revision,
-            'reviewer_id' => $row->reviewer_id,
-            'bundle' => json_decode($row->bundle, true, 64, JSON_THROW_ON_ERROR),
+            'state' => $values['state'],
+            'authority_epoch' => (int) $values['authority_epoch'],
+            'decision_sha256' => $values['decision_sha256'],
+            'decision_revision' => (int) $values['decision_revision'],
+            'reviewer_id' => $values['reviewer_id'],
+            'bundle' => json_decode($values['bundle'], true, 64, JSON_THROW_ON_ERROR),
         ];
     }
 }

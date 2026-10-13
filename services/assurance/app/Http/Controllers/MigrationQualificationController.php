@@ -250,12 +250,14 @@ final class MigrationQualificationController
                                     && ($case['disposition'] ?? null) === 'verified_observation';
                                 $requiredFields = $verifiedObserved
                                     ? [...$semanticFields, 'observed_value'] : $semanticFields;
+                                $observedValue = is_array($case) ? ($case['observed_value'] ?? null) : null;
+                                $observedValid = ! $verifiedObserved
+                                    || ($observedValue !== null
+                                        && strlen((string) json_encode($observedValue)) <= 2048);
                                 if (! is_array($case) || count($case) !== count($requiredFields)
                                     || array_diff($requiredFields, array_keys($case)) !== []
                                     || array_diff(array_keys($case), $requiredFields) !== []
-                                    || ($verifiedObserved
-                                        && ($case['observed_value'] === null
-                                            || strlen((string) json_encode($case['observed_value'])) > 2048))
+                                    || ! $observedValid
                                     || ! is_string($case['workload_id'] ?? null)
                                     || ! is_string($case['field'] ?? null)
                                     || strlen($case['field']) > 240

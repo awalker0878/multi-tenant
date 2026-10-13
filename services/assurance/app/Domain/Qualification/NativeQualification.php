@@ -155,8 +155,7 @@ final class NativeQualification
                 $expected[$key] = true;
             }
         }
-        $this->require(array_keys($expected) !== []
-            && count($matrix) === count($expected), 'installed_method_mode_matrix_incomplete');
+        $this->require(count($matrix) === count($expected), 'installed_method_mode_matrix_incomplete');
     }
 
     public static function digest(mixed $value): string
