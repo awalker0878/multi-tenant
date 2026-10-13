@@ -62,7 +62,7 @@ class DependencyTests(unittest.TestCase):
         self.assertEqual(other["evidence"], "registry-declaration")
 
     def test_loader_claim_rejected_without_actual_installed_usage(self):
-        with self.assertRaisesRegex(ValueError, "does not cover active installed copies"):
+        with self.assertRaisesRegex(ValueError, "Installed contract usage ledger is invalid"):
             derive(self.root)
 
     def test_producer_owned_copy_is_local_validation_not_dependency(self):
