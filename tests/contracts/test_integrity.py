@@ -360,7 +360,9 @@ components:
     def test_installed_copy_ledger_requires_real_loader_and_packaging(self):
         from installed_usage import verify_installed_usage
         reg = load("architecture/contract-consumers.json")
-        self.assertEqual(verify_installed_usage(ROOT, reg), 31)
+        active_installed = sum(len(release.get("copies", []))
+                               for release in reg["active_releases"])
+        self.assertEqual(verify_installed_usage(ROOT, reg), active_installed)
         source = load("architecture/installed-contract-usage.json")
         changed = json.loads(json.dumps(source))
         changed["copies"][0]["loader"] = "apps/console/app/Nonexistent.php"
