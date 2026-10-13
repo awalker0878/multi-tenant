@@ -434,6 +434,20 @@ class ReleaseAggregateTests(unittest.TestCase):
 
 
 
+class PhpMigrationArtifactTests(unittest.TestCase):
+    def test_all_deployed_php_owners_copy_database_into_images(self):
+        from artifact_attestation import COMPONENTS
+        php = [path for path, (_owner, kind) in COMPONENTS.items()
+               if kind == "php"]
+        self.assertEqual(set(php), {"apps/console", "services/governance",
+                                    "services/catalogue", "services/assurance"})
+        for component in php:
+            with self.subTest(component=component):
+                self.assertTrue((ROOT / component / "database/migrations").is_dir())
+                dockerfile = (ROOT / component / "Dockerfile").read_text()
+                self.assertIn("COPY --from=dependencies /app/database/ ./database/", dockerfile)
+
+
 class RuntimeWorkflowTests(unittest.TestCase):
     def test_real_workflow_runs_builds_attestation_and_aggregation(self):
         result = verify_runtime_bindings(ROOT)

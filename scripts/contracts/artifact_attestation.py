@@ -310,8 +310,9 @@ def check_image(component: str, tag: str, root: Path = ROOT) -> dict:
             # byte-for-byte identical to the reviewed checkout.
             if COMPONENTS[component][1] == "php":
                 folders = ["app", "routes", "bootstrap", "config"]
-                if component in {"apps/console", "services/governance"}:
-                    folders.append("database")
+                # SQL migrations are executable service behavior and must be
+                # present and byte-identical in every deployed PHP image.
+                folders.append("database")
                 if component == "apps/console":
                     folders += ["resources/views", "resources/js/pages"]
                 for folder in folders:

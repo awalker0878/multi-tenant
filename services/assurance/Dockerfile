@@ -40,6 +40,7 @@ COPY --from=dependencies /app/bootstrap/ ./bootstrap/
 COPY --from=dependencies /app/config/ ./config/
 COPY --from=dependencies /app/public/ ./public/
 COPY --from=dependencies /app/routes/ ./routes/
+COPY --from=dependencies /app/database/ ./database/
 COPY --from=dependencies /app/artisan /app/composer.json /app/composer.lock ./
 COPY --from=dependencies /app/resources/ ./resources/
 # These directories are the only application paths that require writable mounts.
