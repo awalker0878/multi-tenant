@@ -45,8 +45,8 @@ are not an operated trust root. Later admission needs fresh scans and independen
 full-artifact verification.
 
 EV-P01-029/030 retain complete current runtime archives and exact report copies:
-[Compose](../../../verification/p01/local/run-37278731868/report.json) and
-[Kubernetes](../../../verification/p01/kubernetes/run-37278731990/report.json).
+Compose and
+Kubernetes.
 Retrieval verified 324/310 source bindings and 610/1,052 command logs respectively.
 Each archive includes 22 telemetry snapshots and three signal exports, and both
 campaigns cleaned up completely. The [telemetry record](../../implementation/p01-telemetry.md)
