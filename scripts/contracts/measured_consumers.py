@@ -76,6 +76,10 @@ RELEASE_TESTS = {
     "OwnerBoundaryContracts::test_real_asgi_owner_and_planning_consumer_roundtrip": (
         "contracts/schemas/planning/placement-reservation-v1.json", ("producer", "consumer")
     ),
+    "tests/contracts/test_alert_owner.py::"
+    "AlertOwnerContracts::test_installed_alert_contract_fences_external_receipts": (
+        "contracts/schemas/lifecycle/alert-delivery-v1.json", ("consumer",)
+    ),
     "tests/contracts/test_inventory_planning_contract.py::"
     "test_real_inventory_planning_response_validates_installed_strict_schema": (
         "contracts/schemas/planning/migration-input-v4.json", ("producer", "consumer")
