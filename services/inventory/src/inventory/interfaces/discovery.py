@@ -275,7 +275,7 @@ class InventoryApp:
                 raise Rejected("not_found", 404)
             body: dict[str, Any] = {}
             if scope["method"] == "POST":
-                if single(headers, b"content-type").split(";")[0] != "application/json" or single(
+                if single(headers, b"content-type", True).split(";")[0] != "application/json" or single(
                     headers, b"content-encoding", True
                 ):
                     raise Rejected("unsupported_content_type", 415)

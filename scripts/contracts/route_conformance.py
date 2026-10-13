@@ -219,7 +219,11 @@ def verify_inventory(root: Path = ROOT) -> int:
         claim=lambda *args: {"job": None, "retry_after": 1},
         submit=lambda *args: {"accepted": True, "discovery_id": SAMPLE_UUID, "status": "running"},
     )
-    worker_app = InventoryApp(discovery=fake_discovery, authority=workers)
+    from inventory.infrastructure.migration_collection_evidence import read_collection_coverages
+    worker_app = InventoryApp(
+        discovery=fake_discovery, authority=workers, evidence=None,
+        collection_reader=read_collection_coverages,
+    )
     good_headers = [(b"authorization", b"Bearer " + b"a" * 64),
                     (b"content-type", b"application/json")]
     bodies = {
