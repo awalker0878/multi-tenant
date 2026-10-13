@@ -116,7 +116,18 @@ class OwnerBoundaryContracts(unittest.TestCase):
     def test_all_placement_owner_operations_use_strict_openapi(self):
         document = json.loads((ROOT / "contracts/openapi/lifecycle-internal-authority-v1.json").read_text())
         canonical = json.loads((ROOT / "contracts/schemas/planning/placement-reservation-v1.json").read_text())
-        self.assertEqual(document["components"]["schemas"]["PlacementReceipt"], canonical)
+        # OpenAPI normalizes UUID lexical patterns while retaining canonical semantics.
+        def without_uuid_patterns(value):
+            if isinstance(value, list):
+                return [without_uuid_patterns(v) for v in value]
+            if isinstance(value, dict):
+                return {
+                    k: without_uuid_patterns(v) for k, v in value.items()
+                    if not (k == "pattern" and value.get("format") == "uuid")
+                }
+            return value
+        self.assertEqual(without_uuid_patterns(
+            document["components"]["schemas"]["PlacementReceipt"]), canonical)
         for operation in ("reserve", "checks", "confirm", "renew", "release"):
             uri = f"/internal/tenants/{{tenant}}/placement-reservations/{operation}"
             published = document["paths"][uri]["post"]

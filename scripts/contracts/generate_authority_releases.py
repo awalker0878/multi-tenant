@@ -76,7 +76,7 @@ def assemble(name: str, root: Path = ROOT) -> dict:
                 value = value["$defs"]["ReserveCommand"]
             elif component == "PlacementDigestCommand":
                 value = value["$defs"]["DigestCommand"]
-            output["components"]["schemas"][component] = value
+            output["components"]["schemas"][component] = normalized(value)
             continue
         if name == "catalogue-internal-v1.json" and component == "PlanningInput":
             value.pop("components", None)
