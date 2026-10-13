@@ -304,6 +304,26 @@ def check_console_frontend(browser: Path) -> int:
     return len(assets)
 
 
+def verify_image_process(component: str, image: dict, root: Path = ROOT) -> None:
+    """An image with copied code but an unrelated configured process is not bound."""
+    config = image.get("Config") or {}
+    if config.get("User") != "10001:10001":
+        raise ValueError("OCI runtime user differs from reviewed service identity")
+    if COMPONENTS[component][1] == "php":
+        expected_entry = ["/usr/local/bin/service-entrypoint"]
+        expected_command = ["php-fpm", "-F"]
+    else:
+        metadata = tomllib.loads((root / component / "pyproject.toml").read_text())
+        scripts = metadata["project"].get("scripts", {})
+        health_scripts = [name for name in scripts if name.endswith("-health")]
+        if len(health_scripts) != 1:
+            raise ValueError("Python runtime has no unique reviewed health entrypoint")
+        expected_entry = ["/opt/venv/bin/" + health_scripts[0]]
+        expected_command = ["liveness"]
+    if config.get("Entrypoint") != expected_entry or config.get("Cmd") != expected_command:
+        raise ValueError("OCI runtime entrypoint/command differs from reviewed product process")
+
+
 def check_image(component: str, tag: str, root: Path = ROOT) -> dict:
     copies, operations = expected(component, root)
     result = json.loads(run("docker", "image", "inspect", tag))
@@ -319,6 +339,7 @@ def check_image(component: str, tag: str, root: Path = ROOT) -> dict:
     image_id = image.get("Id", "")
     if not re.fullmatch(r"sha256:[0-9a-f]{64}", image_id):
         raise ValueError("OCI image has no immutable content ID")
+    verify_image_process(component, image, root)
     cid = run("docker", "create", "--entrypoint", "/bin/true", tag)
     try:
         with tempfile.TemporaryDirectory() as directory:
