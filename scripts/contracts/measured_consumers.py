@@ -10,6 +10,8 @@ import json
 import os
 import subprocess
 import sys
+import tempfile
+from xml.etree import ElementTree
 from pathlib import Path
 
 from assurance import inventory, operation_key
@@ -96,14 +98,33 @@ def verified_consumers(root: Path = ROOT) -> list[dict]:
     cases = sorted(set(TESTS) | set(RELEASE_TESTS))
     # The executed test includes independently exercised producer logic,
     # installed consumer validation, and changed-version/malformed rejections.
-    result = subprocess.run(
-        [sys.executable, "-m", "pytest", "--import-mode=importlib",
-         "--strict-config", "-q", *cases],
-        cwd=root, capture_output=True, text=True, timeout=180,
-    )
-    if result.returncode:
-        raise RuntimeError("Exact producer/consumer qualification failed:\n"
-                           + (result.stdout + result.stderr)[-9000:])
+    with tempfile.TemporaryDirectory(prefix="contract-consumer-") as temporary:
+        receipt = Path(temporary) / "measured-junit.xml"
+        result = subprocess.run(
+            [sys.executable, "-m", "pytest", "--import-mode=importlib",
+             "--strict-config", "-q", f"--junitxml={receipt}", *cases],
+            cwd=root, capture_output=True, text=True, timeout=180,
+        )
+        if result.returncode:
+            raise RuntimeError("Exact producer/consumer qualification failed:\n"
+                               + (result.stdout + result.stderr)[-9000:])
+        # pytest exits zero for skipped/xfail cases. Such cases did not prove
+        # their contract; every selector must have a passing JUnit testcase.
+        try:
+            suites = ElementTree.parse(receipt)
+            observations = list(suites.iter("testcase"))
+        except (OSError, ElementTree.ParseError) as exc:
+            raise RuntimeError("Missing valid producer/consumer execution receipts") from exc
+        names = [node.attrib.get("name", "") for node in observations]
+        if (not observations or any(node.find(tag) is not None
+                                    for node in observations
+                                    for tag in ("skipped", "failure", "error"))):
+            raise RuntimeError("Producer/consumer receipt includes skipped or failed tests")
+        for selector in cases:
+            test_name = selector.rsplit("::", 1)[-1]
+            if not any(name == test_name or name.startswith(test_name + "[")
+                       for name in names):
+                raise RuntimeError("Producer/consumer selector did not execute: " + selector)
     evidence = []
     for test, bindings in TESTS.items():
         for owner, method, path, claims in bindings:
