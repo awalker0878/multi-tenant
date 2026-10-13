@@ -112,6 +112,15 @@ def check_wheel(component: str, wheel: Path, root: Path = ROOT) -> dict:
                     or ((info.external_attr >> 16) & 0o170000) == 0o120000):
                 raise ValueError("Wheel contains unsafe archive path or symlink")
         members = set(names)
+        for item in copies:
+            prefix = component + "/src/"
+            if not item["path"].startswith(prefix):
+                raise ValueError(f"Unexpected Python copy root: {item['path']}")
+            packaged = item["path"][len(prefix):]
+            if packaged not in members:
+                raise ValueError(f"Wheel omits registered copy: {packaged}")
+            if sha(archive.read(packaged)) != item["sha256"]:
+                raise ValueError(f"Wheel has stale contract bytes: {packaged}")
         source_root = root / component / "src" / package
         expected_sources = {
             str(file.relative_to(source_root)): sha(file.read_bytes())
@@ -122,19 +131,13 @@ def check_wheel(component: str, wheel: Path, root: Path = ROOT) -> dict:
             for name in members
             if name.startswith(package + "/") and not name.endswith("/")
         }
-        if set(packaged_sources) - set(expected_sources):
+        unreviewed = set(packaged_sources) - set(expected_sources)
+        if any(name.endswith(".py") for name in unreviewed):
+            raise ValueError("Wheel differs from reviewed Python runtime sources")
+        if unreviewed:
             raise ValueError("Wheel contains unregistered contracts or unreviewed package files")
         if not expected_sources or expected_sources != packaged_sources:
             raise ValueError("Wheel differs from reviewed Python runtime sources")
-        for item in copies:
-            prefix = component + "/src/"
-            if not item["path"].startswith(prefix):
-                raise ValueError(f"Unexpected Python copy root: {item['path']}")
-            packaged = item["path"][len(prefix):]
-            if packaged not in members:
-                raise ValueError(f"Wheel omits registered copy: {packaged}")
-            if sha(archive.read(packaged)) != item["sha256"]:
-                raise ValueError(f"Wheel has stale contract bytes: {packaged}")
         # A wheel must contain its actual code package, not just a contract JSON.
         if not any(name.startswith(package + "/") and name.endswith(".py")
                    for name in members):
