@@ -87,6 +87,15 @@ class DependencyTests(unittest.TestCase):
             self.verified()
 
 
+class ActualConsumerBindingTests(unittest.TestCase):
+    def test_active_installed_consumption_uses_release_path_not_alias(self):
+        from artifact_attestation import consumed_bindings
+        bindings = consumed_bindings("services/planning", ROOT)
+        self.assertTrue(bindings)
+        self.assertTrue(any(row["evidence"] == "verified-installed-copy" for row in bindings))
+        self.assertTrue(all(row["canonical"].startswith("contracts/") for row in bindings))
+
+
 class ArtifactTests(unittest.TestCase):
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()

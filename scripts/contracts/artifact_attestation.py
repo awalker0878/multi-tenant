@@ -79,7 +79,7 @@ def consumed_bindings(component: str, root: Path = ROOT) -> list[dict]:
     verify_installed_usage(root, ledger)
     operation_map = inventory(root)["operations"]
     installed = {
-        row["canonical"] for row in ledger["active_releases"]
+        row["path"] for row in ledger["active_releases"]
         for copy in row.get("copies", [])
         if "/".join(Path(copy).parts[:2]) == component
     }
