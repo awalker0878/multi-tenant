@@ -130,6 +130,29 @@ class MeasuredProofTests(unittest.TestCase):
                           side_effect=empty_top_level_classname):
             self.assertTrue(measured.verified_consumers())
 
+    def test_importlib_shorthand_requires_unique_selected_module(self):
+        from xml.etree import ElementTree
+
+        def abbreviated_module(argv, **kwargs):
+            result = self.fake_passed_test_run(argv, **kwargs)
+            receipt = next(Path(arg.split("=", 1)[1]) for arg in argv
+                           if arg.startswith("--junitxml="))
+            tree = ElementTree.parse(receipt)
+            node = next(node for node in tree.iter("testcase")
+                        if node.attrib["name"] ==
+                        "test_capacity_and_governance_owner_responses_are_schema_and_scope_validated")
+            node.set("classname", "test_owner_operation_contracts")
+            tree.write(receipt, encoding="unicode")
+            return result
+
+        with patch.object(measured.subprocess, "run", side_effect=abbreviated_module):
+            proofs = measured.verified_consumers()
+        self.assertTrue(any(
+            proof["key"] == '["governance","POST","/v1/tenants/{tenant}/delegated-authorizations"]'
+            and proof["claim"] == "consumer"
+            for proof in proofs
+        ))
+
     def test_same_short_name_from_wrong_module_cannot_mint_proof(self):
         from xml.etree import ElementTree
 
