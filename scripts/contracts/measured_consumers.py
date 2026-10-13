@@ -171,6 +171,15 @@ def verified_consumers(root: Path = ROOT) -> list[dict]:
             name_unique = sum(
                 candidate.rsplit("::", 1)[-1] == test_name for candidate in cases
             ) == 1
+            selected_class = ".".join(parts[:-1])
+            class_unique = bool(selected_class) and sum(
+                "::".join(candidate.split("::")[1:-1]) == "::".join(parts[:-1])
+                for candidate in cases
+            ) == sum(
+                candidate.split("::", 1)[0] == path
+                and "::".join(candidate.split("::")[1:-1]) == "::".join(parts[:-1])
+                for candidate in cases
+            )
             def matches(candidate: str, name: str) -> bool:
                 if not (name == test_name or name.startswith(test_name + "[")):
                     return False
@@ -179,6 +188,13 @@ def verified_consumers(root: Path = ROOT) -> list[dict]:
                 if not name_unique or name != test_name:
                     return False
                 if not candidate:
+                    return True
+                # Pytest may omit the module but preserve an explicitly
+                # selected unittest.TestCase class. A unique class/test
+                # selector is the only admissible abbreviated class identity.
+                if (class_unique and candidate in {
+                    "." + selected_class, selected_class
+                }):
                     return True
                 return (stem_unique and classname.endswith("." + candidate)
                         and candidate.split(".")[-1] == module_stem)
