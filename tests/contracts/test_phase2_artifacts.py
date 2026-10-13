@@ -16,6 +16,7 @@ sys.path.insert(0, str(ROOT / "scripts/contracts"))
 from dependency_graph import derive
 from artifact_attestation import check_image, check_wheel, check_console_frontend, compare_runtime_tree
 from aggregate_artifacts import aggregate
+from runtime_binding_coverage import verify as verify_runtime_bindings
 
 
 class DependencyTests(unittest.TestCase):
@@ -338,6 +339,35 @@ class ReleaseAggregateTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "does not match active source"):
             self.call()
 
+
+
+
+class RuntimeWorkflowTests(unittest.TestCase):
+    def test_real_workflow_runs_builds_attestation_and_aggregation(self):
+        result = verify_runtime_bindings(ROOT)
+        self.assertGreater(result["bound_http_operations"], 0)
+        self.assertEqual(result["unmapped_owner_operations"], [])
+
+    def test_missing_aggregate_execution_is_rejected(self):
+        import yaml
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            workflow = yaml.safe_load((ROOT / ".github/workflows/qualification.yml").read_text())
+            workflow["jobs"]["aggregate-bindings"]["steps"] = [
+                step for step in workflow["jobs"]["aggregate-bindings"]["steps"]
+                if "aggregate_artifacts.py" not in str(step.get("run", ""))
+            ]
+            target = root / ".github/workflows/qualification.yml"
+            target.parent.mkdir(parents=True)
+            target.write_text(yaml.safe_dump(workflow))
+            with patch("runtime_binding_coverage.inventory", return_value={"operations": []}), \\
+                    patch("runtime_binding_coverage.verify_installed_usage"), \\
+                    patch("runtime_binding_coverage.COMPONENTS", {}):
+                registry = root / "architecture/contract-consumers.json"
+                registry.parent.mkdir(parents=True)
+                registry.write_text('{"active_releases": []}')
+                with self.assertRaisesRegex(ValueError, "does not aggregate measured"):
+                    verify_runtime_bindings(root)
 
 if __name__ == "__main__":
     unittest.main()

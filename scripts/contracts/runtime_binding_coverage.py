@@ -32,7 +32,26 @@ def verify(root: Path = ROOT) -> dict:
         raise ValueError(f"Shipped contract component not mapped to built image: {sorted(unmapped)}")
     file = root / ".github/workflows/qualification.yml"
     workflow = yaml.safe_load(file.read_text(encoding="utf-8"))
-    matrix = workflow["jobs"]["artifact-bindings"]["strategy"]["matrix"]["include"]
+    # A declared matrix is not a built-artifact guarantee. Fail closed if the
+    # workflow stops building images, verifying wheel contents, or aggregating
+    # the actual attestation artifacts.
+    jobs = workflow["jobs"]
+    artifact = jobs["artifact-bindings"]
+    aggregate = jobs["aggregate-bindings"]
+    if "artifact-bindings" not in aggregate.get("needs", []):
+        raise ValueError("Runtime release aggregation must depend on built artifacts")
+    def has_command(job: dict, fragment: str) -> bool:
+        return any(fragment in str(step.get("run", "")) for step in job.get("steps", []))
+    for command in ("docker build ", "artifact_attestation.py --component",
+                    "pip wheel ", "runtime_binding_coverage.py"):
+        if not has_command(artifact, command):
+            raise ValueError("Artifact CI does not execute required build/verification: " + command)
+    if not has_command(aggregate, "aggregate_artifacts.py --input-directory"):
+        raise ValueError("Artifact CI does not aggregate measured built releases")
+    if not any("actions/download-artifact@" in str(step.get("uses", ""))
+               for step in aggregate.get("steps", [])):
+        raise ValueError("Artifact aggregation does not download the actual built evidence")
+    matrix = artifact["strategy"]["matrix"]["include"]
     declared = [entry["component"] for entry in matrix]
     if len(declared) != len(set(declared)) or set(declared) != set(COMPONENTS):
         raise ValueError("Artifact CI omits/adds or duplicates a deployable contract owner")
