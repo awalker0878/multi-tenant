@@ -123,6 +123,14 @@ jobs:
         env:
           P01_COMPONENT: ${{ matrix.component }}
         run: python3 scripts/p01/run_quality.py --workspace "$GITHUB_WORKSPACE" --output "$RUNNER_TEMP/quality" --component "$P01_COMPONENT"
+      - name: Retain bounded quality evidence on failure
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: php-quality-${{ matrix.component }}-${{ github.sha }}
+          path: ${{ runner.temp }}/quality/evidence/
+          if-no-files-found: warn
+          retention-days: 1
 
   contracts:
     name: CI / Contracts
