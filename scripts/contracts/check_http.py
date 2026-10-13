@@ -294,8 +294,8 @@ UUID_V4_PATTERN = r"^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9
 
 def check_owner_response_projections():
     """Current bounded response profiles must reflect their owner-authored API and producer."""
-    delegation = load("contracts/openapi/governance-delegation-v1.1.json")
-    projected = load("contracts/schemas/planning/governance-delegation-response-v1.json")
+    delegation = load("contracts/openapi/governance-delegation-v2.json")
+    projected = load("contracts/schemas/planning/governance-delegation-response-v2.json")
     embedded = json.loads(json.dumps(delegation["components"]["schemas"]["CurrentDelegation"]))
     embedded["properties"]["scope"] = {"$ref": "#/$defs/Scope"}
     projected_scope = projected.pop("$defs", None)
