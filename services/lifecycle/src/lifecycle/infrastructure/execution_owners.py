@@ -34,6 +34,7 @@ OWNER_OPERATIONS = (
      "assurance-evidence-v1.json", "Evidence", 200),
     ("SIMULATOR", "POST", r"/v1/effects", "worker-simulation-v1.json", "EffectReceipt", 200),
     ("SIMULATOR", "POST", r"/v1/reconciliations", "worker-simulation-v1.json", "ObservationReceipt", 200),
+    ("ALERTS", "POST", r"/v1/lifecycle-alerts", "alert-delivery-v1.json", "Receipt", 200),
 )
 
 # Named immutable snapshots are packaged in the Lifecycle wheel/image.
@@ -43,6 +44,7 @@ OWNER_APIS = {
     "planning-lifecycle-reads-v1.json": json.loads(files("lifecycle.infrastructure.contracts").joinpath("planning-lifecycle-reads-v1.json").read_text()),
     "assurance-evidence-v1.json": json.loads(files("lifecycle.infrastructure.contracts").joinpath("assurance-evidence-v1.json").read_text()),
     "worker-simulation-v1.json": json.loads(files("lifecycle.infrastructure.contracts").joinpath("worker-simulation-v1.json").read_text()),
+    "alert-delivery-v1.json": json.loads(files("lifecycle.infrastructure.contracts").joinpath("alert-delivery-v1.json").read_text()),
 }
 
 
@@ -78,6 +80,12 @@ def request(
             "Content-Type": "application/json",
             "Accept-Encoding": "identity",
         }
+        if owner == "ALERTS":
+            schema = OWNER_APIS["alert-delivery-v1.json"]
+            if (body is None or not Draft202012Validator(
+                    {"$ref": "#/$defs/Command", "$defs": schema["$defs"]},
+                    format_checker=FormatChecker()).is_valid(body)):
+                raise ValueError("alert_command_contract_invalid")
         if owner == "SIMULATOR":
             import hashlib
             raw_key = json.dumps({"path": path, "body": body},
@@ -104,8 +112,12 @@ def request(
             if selected:
                 _, _, _, document_name, response_name, expected_status = selected[0]
                 api = OWNER_APIS[document_name]
-                wire = {"$ref": "#/components/schemas/" + response_name,
-                        "components": api["components"]}
+                wire = (
+                    {"$ref": "#/$defs/" + response_name, "$defs": api["$defs"]}
+                    if owner == "ALERTS" else
+                    {"$ref": "#/components/schemas/" + response_name,
+                     "components": api["components"]}
+                )
                 if (response.status != expected_status
                         or not Draft202012Validator(wire, format_checker=FormatChecker()).is_valid(result)):
                     raise ValueError("owner_response_contract_invalid")
@@ -120,6 +132,9 @@ def request(
                                                          "attempt_id", "plan_digest", "epoch",
                                                          "simulation")):
                         raise ValueError("simulation_receipt_scope_mismatch")
+                if owner == "ALERTS" and (
+                        body is None or result.get("event_id") != body["id"]):
+                    raise ValueError("alert_receipt_scope_mismatch")
             return result
         finally:
             connection.close()

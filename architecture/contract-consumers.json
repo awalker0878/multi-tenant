@@ -325,6 +325,9 @@
       "lifecycle-workers",
       "lifecycle",
       "assurance"
+    ],
+    "contracts/schemas/lifecycle/alert-delivery-v1.json": [
+      "lifecycle"
     ]
   },
   "scope": "Implemented consumers: Planning consumes Catalogue reference facts; Console uses Governance identity APIs and five tenant-administration notifications as refresh hints. Diagnostics are owned by all seven applications. No shared SQL authority is implied.",
@@ -1169,6 +1172,16 @@
       ],
       "copies": [
         "services/lifecycle/src/lifecycle/infrastructure/contracts/worker-simulation-v1.json"
+      ],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/schemas/lifecycle/alert-delivery-v1.json",
+      "owner": "lifecycle",
+      "consumers": [],
+      "copies": [
+        "services/lifecycle/src/lifecycle/infrastructure/contracts/alert-delivery-v1.json"
       ],
       "source_manifest": null,
       "depends_on": []

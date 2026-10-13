@@ -417,6 +417,19 @@
       "generator": null,
       "generation_mode": "canonical_snapshot",
       "ci": ".github/workflows/ci.yml"
+    },
+    {
+      "copy": "services/lifecycle/src/lifecycle/infrastructure/contracts/alert-delivery-v1.json",
+      "canonical": "contracts/schemas/lifecycle/alert-delivery-v1.json",
+      "loader": "services/lifecycle/src/lifecycle/infrastructure/execution_owners.py",
+      "load_kind": "literal",
+      "packaging": "services/lifecycle/Dockerfile",
+      "packaging_marker": "COPY src/ ./src/",
+      "package_data": "services/lifecycle/pyproject.toml",
+      "package_data_marker": "\"lifecycle.infrastructure.contracts\" = [\"*.json\"]",
+      "generator": null,
+      "generation_mode": "canonical_snapshot",
+      "ci": ".github/workflows/ci.yml"
     }
   ]
 }
