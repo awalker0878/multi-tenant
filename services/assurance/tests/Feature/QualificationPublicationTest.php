@@ -3,6 +3,10 @@
 declare(strict_types=1);
 
 beforeEach(function (): void {
+    // Exercise controller-level commissioning and tenant validation with a
+    // syntactically valid but uncommissioned workload bearer. The transport
+    // middleware correctly rejects absent credentials before the controller.
+    $this->withHeaders(['Authorization' => 'Bearer '.str_repeat('z', 64)]);
     $this->tenant = '10000000-0000-4000-8000-000000000001';
     $this->url = '/internal/tenants/'.$this->tenant.'/qualification-publications';
     $this->payload = [
