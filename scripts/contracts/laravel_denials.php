@@ -74,6 +74,8 @@ foreach ($registry['active_releases'] as $entry) {
                 'run_id' => getenv('GITHUB_RUN_ID') ?: null,
                 'revision' => getenv('GITHUB_SHA') ?: null,
                 'test' => 'laravel_denials.php:unauthenticated_'.$code,
+                'denial_kind' => 'missing-credential',
+                'status_code' => $code,
             ];
         }
     }

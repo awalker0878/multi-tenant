@@ -161,6 +161,22 @@ def assess(root: Path = ROOT, observations: list[dict] | None = None,
             raise ValueError(f"Wrong evidence source or verdict: {key} {claim}")
         if not isinstance(observation.get("test"), str) or not observation["test"].strip():
             raise ValueError(f"Missing executable test identity: {key} {claim}")
+        # Missing or invalid credentials cannot prove authenticated tenant isolation.
+        if claim == "authorization" and (
+            observation.get("denial_kind") not in {"missing-credential", "invalid-credential"}
+            or observation.get("status_code") not in (401, 403)
+        ):
+            raise ValueError(f"Authorization evidence lacks a real credential denial: {key}")
+        if claim == "tenant_isolation" and (
+            observation.get("denial_kind") != "cross-tenant"
+            or observation.get("authenticated") is not True
+            or observation.get("status_code") not in (403, 404, 423)
+            or not isinstance(observation.get("credential_tenant"), str)
+            or not observation["credential_tenant"]
+            or not isinstance(observation.get("requested_tenant"), str)
+            or observation["credential_tenant"] == observation["requested_tenant"]
+        ):
+            raise ValueError(f"Tenant isolation evidence requires an authenticated cross-tenant denial: {key}")
         if key in releases and claim not in {"producer", "consumer"}:
             raise ValueError(f"Release assurance cannot claim HTTP-only evidence: {key} {claim}")
         if claim in proofs[key]:

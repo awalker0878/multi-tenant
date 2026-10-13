@@ -72,6 +72,14 @@ class AssuranceCoverageTests(unittest.TestCase):
             "result": "PASS",
             "release_sha256": release_hash or row["release_sha256"],
             "test": "service-owned-executable-test",
+            **({
+                "denial_kind": "missing-credential", "status_code": 401,
+            } if claim == "authorization" else {
+                "denial_kind": "cross-tenant", "authenticated": True,
+                "credential_tenant": "10000000-0000-4000-8000-000000000001",
+                "requested_tenant": "10000000-0000-4000-8000-000000000002",
+                "status_code": 403,
+            } if claim == "tenant_isolation" else {}),
         }
 
     def test_contracts_and_operations_are_independently_derived(self):
@@ -123,6 +131,24 @@ class AssuranceCoverageTests(unittest.TestCase):
         wrong["key"] = operation_key("sample", "POST", self.op)
         with self.assertRaisesRegex(ValueError, "Unregistered operation"):
             assess(self.root, [wrong])
+
+    def test_unauthenticated_denials_cannot_substitute_for_tenant_isolation(self):
+        spoofed = self.evidence("tenant_isolation")
+        spoofed.update({"denial_kind": "missing-credential", "authenticated": False})
+        with self.assertRaisesRegex(ValueError, "authenticated cross-tenant denial"):
+            assess(self.root, [spoofed])
+        spoofed = self.evidence("tenant_isolation")
+        spoofed["requested_tenant"] = spoofed["credential_tenant"]
+        with self.assertRaisesRegex(ValueError, "authenticated cross-tenant denial"):
+            assess(self.root, [spoofed])
+        spoofed = self.evidence("tenant_isolation")
+        spoofed["status_code"] = 503
+        with self.assertRaisesRegex(ValueError, "authenticated cross-tenant denial"):
+            assess(self.root, [spoofed])
+        spoofed = self.evidence("authorization")
+        spoofed["status_code"] = 404
+        with self.assertRaisesRegex(ValueError, "real credential denial"):
+            assess(self.root, [spoofed])
 
     def test_new_owner_operation_is_not_silently_qualified(self):
         all_claims = [self.evidence(x) for x in (

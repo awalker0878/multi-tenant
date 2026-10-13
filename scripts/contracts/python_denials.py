@@ -109,6 +109,7 @@ async def probe(owner: str) -> tuple[list[dict], list[str]]:
             "source": "live-denial", "result": "PASS",
             "release_sha256": op["release_sha256"],
             "test": "python_denials.py:unauthenticated_" + str(code),
+            "denial_kind": "missing-credential", "status_code": code,
         })
     for observation in measured:
         observation["run_id"] = os.environ.get("GITHUB_RUN_ID")
