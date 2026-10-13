@@ -110,7 +110,7 @@ class ArtifactTests(unittest.TestCase):
             "canonical": "contracts/schemas/current.json",
             "sha256": hashlib.sha256(self.contract).hexdigest(),
         }
-        self.wheel = self.root / "product_planning-0.1.0-py3-none-any.whl"
+        self.wheel = self.root / "product_planning-0.1.0.dev0-py3-none-any.whl"
         self.source = self.root / "services/planning/src/planning/bootstrap/server.py"
         self.source.parent.mkdir(parents=True)
         self.source.write_text("def serve(): pass\n")
@@ -181,6 +181,12 @@ class ArtifactTests(unittest.TestCase):
         with patch.dict(os.environ, {"GITHUB_SHA": "a" * 40}), \
                 patch("artifact_attestation.expected", return_value=([self.copy], [])), \
                 patch("artifact_attestation.consumed_bindings", return_value=[]):
+            wrong_name = self.wheel.with_name("wrong_name-0.1.0.dev0-py3-none-any.whl")
+            self.wheel_contents()
+            self.wheel.rename(wrong_name)
+            with self.assertRaisesRegex(ValueError, "Wheel filename identity"):
+                check_wheel("services/planning", wrong_name, self.root)
+            wrong_name.rename(self.wheel)
             self.wheel_contents(tamper_scripts=True)
             with self.assertRaisesRegex(ValueError, "console scripts differ"):
                 check_wheel("services/planning", self.wheel, self.root)
