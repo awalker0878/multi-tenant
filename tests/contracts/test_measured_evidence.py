@@ -35,6 +35,15 @@ class MeasuredProofTests(unittest.TestCase):
             self.assertTrue((ROOT / selector.split("::", 1)[0]).is_file(), selector)
             self.assertTrue(path and claims, selector)
 
+    def test_external_alert_receiver_is_not_claimed_as_executed_producer(self):
+        # A synthetic acknowledgement injected into Lifecycle's HTTP client
+        # cannot establish producer behavior for the external alert sink.
+        selector = ("tests/contracts/test_alert_owner.py::"
+                    "AlertOwnerContracts::test_installed_alert_contract_fences_external_receipts")
+        path, claims = measured.RELEASE_TESTS[selector]
+        self.assertEqual(path, "contracts/schemas/lifecycle/alert-delivery-v1.json")
+        self.assertEqual(claims, ("consumer",))
+
     @staticmethod
     def fake_passed_test_run(argv, **_kwargs):
         receipt = next(Path(arg.split("=", 1)[1]) for arg in argv

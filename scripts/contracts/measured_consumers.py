@@ -86,7 +86,10 @@ RELEASE_TESTS = {
     ),
     "tests/contracts/test_alert_owner.py::"
     "AlertOwnerContracts::test_installed_alert_contract_fences_external_receipts": (
-        "contracts/schemas/lifecycle/alert-delivery-v1.json", ("producer", "consumer")
+        # The locally exercised Lifecycle sender and installed receipt decoder
+        # do not execute the external alert receiver. They prove only the
+        # consumer boundary; never qualify an unavailable external producer.
+        "contracts/schemas/lifecycle/alert-delivery-v1.json", ("consumer",)
     ),
     "tests/contracts/test_inventory_planning_contract.py::"
     "test_real_inventory_planning_response_validates_installed_strict_schema": (
