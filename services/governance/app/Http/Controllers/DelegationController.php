@@ -17,11 +17,12 @@ final class DelegationController
     {
         $input = $this->input($request, true);
 
-        return response()->json($issue->handle((string) $request->header('X-Console-Session'), $tenant, $input['audience'], $input['action'], $input['scope']), 201);
+        return response()->json($issue->handle((string) $request->header('X-Console-Session'), $tenant, $input['audience'], $input['action'], $input['scope'], $this->commandKey($request)), 201);
     }
 
     public function inspect(Request $request, string $tenant, InspectActorDelegation $inspect): JsonResponse
     {
+        $this->commandKey($request);
         $input = $this->input($request, false);
         $tokens = $request->headers->all('x-actor-delegation');
         if (count($tokens) !== 1 || ! is_string($tokens[0])) {
@@ -33,12 +34,24 @@ final class DelegationController
 
     public function revoke(Request $request, string $tenant, string $delegation, RevokeActorDelegation $revoke): JsonResponse
     {
+        $this->commandKey($request);
         if ($request->all() !== []) {
             throw ValidationException::withMessages(['request' => 'Unexpected fields.']);
         }
         $revoke->handle((string) $request->header('X-Console-Session'), $tenant, $delegation);
 
         return response()->json(['revoked' => true]);
+    }
+
+    private function commandKey(Request $request): string
+    {
+        $keys = $request->headers->all('idempotency-key');
+        if (count($keys) !== 1 || ! is_string($keys[0])
+            || ! preg_match('/\\A[0-9a-f]{32,64}\\z/', $keys[0])) {
+            throw ValidationException::withMessages(['idempotency_key' => 'A strong command key is required.']);
+        }
+
+        return $keys[0];
     }
 
     /** @return array<string, mixed> */
