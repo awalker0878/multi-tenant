@@ -430,6 +430,10 @@ jobs:
         run: python -m pip install --disable-pip-version-check -r scripts/contracts/requirements.txt
       - name: Download measured receipts from this exact run
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        # Upstream jobs may fail before they upload a receipt. Keep going so
+        # the strict aggregator writes an explicit red gap report instead of
+        # ending here with no diagnostic. No missing receipt earns a pass.
+        continue-on-error: true
         with:
           pattern: contract-assurance-*-${{ github.sha }}
           path: ${{ runner.temp }}/contract-measurements

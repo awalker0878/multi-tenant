@@ -218,5 +218,19 @@ class AssuranceCoverageTests(unittest.TestCase):
             inventory(self.root)
 
 
+
+class MissingArtifactFailClosedTests(unittest.TestCase):
+    def test_missing_upstream_artifacts_produce_no_proof(self):
+        from combine_assurance import combine
+
+        with tempfile.TemporaryDirectory() as directory:
+            absent = Path(directory) / "never-uploaded"
+            self.assertEqual(combine(absent), [])
+            result = assess(observations=combine(absent))
+            self.assertEqual(result["summary"]["qualified_http_operations"], 0)
+            self.assertEqual(result["summary"]["qualified_canonical_releases"], 0)
+            self.assertGreater(result["summary"]["unqualified_canonical_releases"], 0)
+
+
 if __name__ == "__main__":
     unittest.main()
