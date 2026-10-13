@@ -93,6 +93,9 @@ class SimulationOwnerContracts(unittest.TestCase):
             ("/v1/effects", GRANT, "EffectReceipt"),
             ("/v1/reconciliations", BINDING, "ObservationReceipt"),
         ):
+            status, denied = request_worker(route, body, bearer="wrong-audience")
+            self.assertEqual(status, 403)
+            self.assertEqual(denied["code"], "simulation_denied")
             status, payload = request_worker(route, body)
             self.assertEqual(status, 200)
             Draft202012Validator(
