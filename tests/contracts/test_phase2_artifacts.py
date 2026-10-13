@@ -305,6 +305,8 @@ class ReleaseAggregateTests(unittest.TestCase):
             "installed_copies": [],
             "owner_operations": operations,
             "consumed_releases": [],
+            "github_run_id": os.environ.get("GITHUB_RUN_ID"),
+            "github_run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT"),
         }))
 
     def call(self):
