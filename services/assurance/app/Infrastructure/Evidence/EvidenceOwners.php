@@ -82,7 +82,14 @@ final class EvidenceOwners implements EvidenceAuthority
             && ! isset($url['user']) && ! isset($url['pass']) && ! isset($url['query']) && ! isset($url['fragment'])
             && ($url['path'] ?? '') === '' && is_string($ca) && str_starts_with($ca, '/') && is_readable($ca) && $credential !== null, 503);
         try {
-            $response = Http::acceptJson()->asJson()->withToken($credential)->withHeaders($delegation === null ? [] : ['X-Actor-Delegation' => $delegation])
+            $headers = $delegation === null ? [] : ['X-Actor-Delegation' => $delegation];
+            if ($owner === 'simulator') {
+                abort_unless($body !== null && $path === '/v1/observations', 503);
+                $encoded = json_encode(self::canonicalize(['path' => $path, 'body' => $body]),
+                    JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
+                $headers['Idempotency-Key'] = hash('sha256', $encoded);
+            }
+            $response = Http::acceptJson()->asJson()->withToken($credential)->withHeaders($headers)
                 ->connectTimeout(2)->timeout(5)->withOptions(['allow_redirects' => false, 'verify' => $ca, 'stream' => true])
                 ->send($method, $base.$path, $body === null ? [] : ['json' => $body]);
             $stream = $response->toPsrResponse()->getBody();
@@ -97,6 +104,27 @@ final class EvidenceOwners implements EvidenceAuthority
             abort_unless($response->status() === 200 && strlen($raw) <= 262144, 503);
             $result = json_decode($raw, true, 64, JSON_THROW_ON_ERROR);
             abort_unless(is_array($result) && ! array_is_list($result), 503);
+            if ($owner === 'simulator') {
+                $required = ['tenant_id', 'job_id', 'operation_id', 'attempt_id',
+                    'plan_digest', 'epoch', 'simulation', 'sealed', 'effect_count',
+                    'observed_at', 'outcome'];
+                $present = array_keys($result);
+                sort($required, SORT_STRING);
+                sort($present, SORT_STRING);
+                abort_unless($present === $required, 503, 'simulation_receipt_contract_invalid');
+                foreach (['tenant_id', 'job_id', 'operation_id', 'attempt_id',
+                    'plan_digest', 'epoch', 'simulation'] as $field) {
+                    abort_unless(($result[$field] ?? null) === ($body[$field] ?? null),
+                        503, 'simulation_receipt_scope_mismatch');
+                }
+                abort_unless(($result['sealed'] ?? null) === true
+                    && is_int($result['effect_count'] ?? null)
+                    && $result['effect_count'] >= 0
+                    && is_int($result['observed_at'] ?? null)
+                    && in_array($result['outcome'] ?? null,
+                        ['confirmed_succeeded', 'confirmed_failed'], true),
+                    503, 'simulation_receipt_contract_invalid');
+            }
 
             return $result;
         } catch (HttpException $e) {
@@ -105,4 +133,21 @@ final class EvidenceOwners implements EvidenceAuthority
             abort(503, 'evidence_owner_unavailable');
         }
     }
+    /** @return mixed */
+    private static function canonicalize(mixed $value): mixed
+    {
+        if (! is_array($value)) {
+            return $value;
+        }
+        if (array_is_list($value)) {
+            return array_map(self::canonicalize(...), $value);
+        }
+        ksort($value, SORT_STRING);
+        foreach ($value as $key => $child) {
+            $value[$key] = self::canonicalize($child);
+        }
+
+        return $value;
+    }
+
 }
