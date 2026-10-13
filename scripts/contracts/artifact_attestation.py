@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import base64
 import csv
+import configparser
 import hashlib
 import io
 import json
@@ -136,6 +137,18 @@ def verify_wheel_record(archive: zipfile.ZipFile, component: str, package: str,
     expected_directory = re.sub(r"[-_.]+", "_", project["name"]) + "-" + project["version"] + ".dist-info"
     if directory != expected_directory:
         raise ValueError("Wheel distribution metadata path differs from reviewed identity")
+    scripts = project.get("scripts", {})
+    entry_points = directory + "/entry_points.txt"
+    if scripts or entry_points in names:
+        if not isinstance(scripts, dict) or entry_points not in names:
+            raise ValueError("Wheel omits reviewed console script entrypoints")
+        parser = configparser.ConfigParser(interpolation=None, strict=True)
+        parser.optionxform = str
+        parser.read_string(archive.read(entry_points).decode("utf-8"))
+        if parser.sections() != ["console_scripts"] or (
+            dict(parser.items("console_scripts")) != scripts
+        ):
+            raise ValueError("Wheel console scripts differ from reviewed pyproject")
 
     rows = list(csv.reader(io.StringIO(archive.read(directory + "/RECORD").decode("utf-8"))))
     if any(len(row) != 3 or not row[0] for row in rows):
