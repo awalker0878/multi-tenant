@@ -94,6 +94,17 @@ final class EvidenceOwners implements EvidenceAuthority
      * @return array<string, mixed> */
     private function request(string $owner, string $method, string $path, ?array $body = null, ?string $delegation = null): array
     {
+        // Only the three commissioned owner operations are admissible. An
+        // arbitrary caller-supplied path can never bypass a published boundary.
+        $operations = [
+            'lifecycle' => ['GET', '#\\A/internal/evidence-bindings/[0-9a-f-]{36}/[0-9a-f-]{36}\\z#D'],
+            'governance' => ['POST', '#\\A/v1/tenants/[0-9a-f-]{36}/delegated-authorizations\\z#D'],
+            'simulator' => ['POST', '#\\A/v1/observations\\z#D'],
+        ];
+        abort_unless(isset($operations[$owner])
+            && $operations[$owner][0] === $method
+            && preg_match($operations[$owner][1], $path) === 1,
+            503, 'owner_operation_uncontracted');
         $base = config('evidence.'.$owner.'_url');
         $url = is_string($base) ? parse_url($base) : false;
         $ca = config('evidence.'.$owner.'_ca');
