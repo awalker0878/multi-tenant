@@ -50,17 +50,23 @@ it('rejects merely successful HTTP replies and accepts only the exact durable in
             'event_sha256' => str_repeat('b', 64),
         ];
         $publisher = new ConfirmedHttpInvalidationPublisher(new MountedSecret);
-        Http::fake(['https://receiving.test/*' => Http::response(['persisted' => true], 200)]);
+        // Register exactly one fake transport. Re-registering matching Http::fake
+        // patterns appends earlier callbacks, which can shadow later receipt
+        // assertions and produce false negative outcomes.
+        $responseBody = ['persisted' => true];
+        Http::fake(function () use (&$responseBody) {
+            return Http::response($responseBody, 200);
+        });
         expect(fn () => $publisher->publish($event))
             ->toThrow(RuntimeException::class, 'qualification_invalidation_unconfirmed');
 
-        Http::fake(['https://receiving.test/*' => Http::response([
+        $responseBody = [
             'persisted' => true,
             'event_id' => $event['event_id'],
             'scope_sha256' => $event['scope_sha256'],
             'authority_epoch' => 6,
             'event_sha256' => $event['event_sha256'],
-        ], 200)]);
+        ];
         expect(fn () => $publisher->publish($event))
             ->toThrow(RuntimeException::class, 'qualification_invalidation_unconfirmed');
 
@@ -72,11 +78,11 @@ it('rejects merely successful HTTP replies and accepts only the exact durable in
             'authority_epoch' => $event['authority_epoch'],
             'event_sha256' => $event['event_sha256'],
         ];
-        Http::fake(['https://receiving.test/*' => Http::response(['persisted' => true] + $event, 200)]);
+        $responseBody = ['persisted' => true] + $event;
         expect(fn () => $publisher->publish($event))
             ->toThrow(RuntimeException::class, 'qualification_invalidation_unconfirmed');
 
-        Http::fake(['https://receiving.test/*' => Http::response($receipt, 200)]);
+        $responseBody = $receipt;
         $publisher->publish($event);
         // The exact persisted acknowledgement above is required for success.
     } finally {
