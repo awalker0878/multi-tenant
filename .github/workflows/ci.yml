@@ -92,6 +92,14 @@ jobs:
           P07_POSTGRES_BIN: /usr/lib/postgresql/16/bin
           P08_POSTGRES_BIN: /usr/lib/postgresql/16/bin
         run: python3 scripts/p01/run_quality.py --workspace "$GITHUB_WORKSPACE" --output "$RUNNER_TEMP/quality" --component "$P01_COMPONENT"
+      - name: Retain Python quality and test logs on failure
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: python-quality-${{ matrix.component }}-${{ github.sha }}
+          path: ${{ runner.temp }}/quality/evidence/
+          if-no-files-found: warn
+          retention-days: 7
 
   php:
     name: CI / Laravel (${{ matrix.component }})
@@ -258,6 +266,16 @@ jobs:
           python scripts/generate_capabilities.py --check
           python scripts/p08/qualify.py --output "$RUNNER_TEMP/native-p08"
           python scripts/p09/qualify.py --output "$RUNNER_TEMP/native-p09"
+      - name: Retain exact native qualification failures
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: native-qualification-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/native-p08/
+            ${{ runner.temp }}/native-p09/
+          if-no-files-found: warn
+          retention-days: 7
 
   authority:
     needs: scope
