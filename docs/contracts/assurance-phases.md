@@ -61,7 +61,9 @@ against the current canonical registry. It emits one complete
 event, schema, capability, and platform) and canonical HTTP operations to built
 image digests. Each release-to-image relationship distinguishes an exact
 installed-copy byte match from a registry-only declaration. A declaration is
-never promoted to runtime usage evidence. Shared foundation operations are labelled as shared declarations
+never promoted to runtime usage evidence.
+A contract-platform convention with no registered consumers is explicitly
+listed as `source_only` without inventing a deployable runtime image. Shared foundation operations are labelled as shared declarations
 on the participating service images, not independent HTTP execution results.
 
 The **Contract artifact and runtime binding assurance** workflow must pass

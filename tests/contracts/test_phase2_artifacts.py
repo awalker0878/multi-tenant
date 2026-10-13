@@ -382,6 +382,38 @@ class ReleaseAggregateTests(unittest.TestCase):
         self.assertTrue(all(len(row["runtime_image_sha256"]) == 64
                             for row in release["relationships"]))
 
+    def test_source_only_shared_release_is_recorded_without_fake_runtime(self):
+        schema = "contracts/schemas/common/error-v2.json"
+        target = self.root / schema
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text('{"type":"object"}')
+        registry = self.root / "architecture/contract-consumers.json"
+        document = json.loads(registry.read_text())
+        document["active_releases"].append({
+            "path": schema, "owner": "contract-platform", "consumers": []
+        })
+        registry.write_text(json.dumps(document))
+        result = self.call()
+        release = next(item for item in result["release_bindings"]
+                       if item["canonical"] == schema)
+        self.assertTrue(release["source_only"])
+        self.assertEqual(release["relationships"], [])
+        self.assertEqual(result["summary"]["source_only_releases"], 1)
+
+    def test_non_shared_unbound_release_is_rejected(self):
+        schema = "contracts/schemas/no-runtime-v1.json"
+        target = self.root / schema
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text("{}")
+        registry = self.root / "architecture/contract-consumers.json"
+        document = json.loads(registry.read_text())
+        document["active_releases"].append({
+            "path": schema, "owner": "unknown-owner", "consumers": []
+        })
+        registry.write_text(json.dumps(document))
+        with self.assertRaisesRegex(ValueError, "no attested runtime"):
+            self.call()
+
     def test_non_http_binding_refuses_unmapped_owner(self):
         schema = "contracts/schemas/orphan-v1.json"
         file = self.root / schema

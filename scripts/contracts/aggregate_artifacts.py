@@ -89,12 +89,18 @@ def bind_all_releases(documents: dict[tuple[str, str], dict], root: Path = ROOT)
                     "verified-installed-bytes" if copies else "registry-declaration-only"
                 ),
             })
-        if not relationships:
+        # A shared convention with no enrolled consumers is a legitimate
+        # source-only contract, not an imaginary runtime artifact. Keep it in
+        # the release inventory, explicitly unbound, until a real consumer is
+        # registered and attested.
+        source_only = release["owner"] == "contract-platform" and not release["consumers"]
+        if not relationships and not source_only:
             raise ValueError("Canonical release has no runtime image binding: " + path)
         releases.append({
             "canonical": path,
             "kind": path.split("/")[1],
             "canonical_sha256": digest,
+            "source_only": source_only,
             "relationships": relationships,
         })
     return sorted(releases, key=lambda row: row["canonical"])
@@ -206,6 +212,7 @@ def aggregate(folder: Path, root: Path = ROOT, revision: str | None = None) -> d
         "summary": {
             "runtime_images": len(COMPONENTS),
             "active_releases": len(release_bindings),
+            "source_only_releases": sum(row["source_only"] for row in release_bindings),
             "non_http_releases": sum(row["kind"] != "openapi" for row in release_bindings),
             "release_image_bindings": sum(len(row["relationships"]) for row in release_bindings),
             "verified_installed_release_bindings": sum(
