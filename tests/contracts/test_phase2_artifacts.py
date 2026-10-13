@@ -89,10 +89,14 @@ class ArtifactTests(unittest.TestCase):
             "sha256": hashlib.sha256(self.contract).hexdigest(),
         }
         self.wheel = self.root / "product_planning-0.1.0-py3-none-any.whl"
+        self.source = self.root / "services/planning/src/planning/bootstrap/server.py"
+        self.source.parent.mkdir(parents=True)
+        self.source.write_text("def serve(): pass\\n")
 
-    def wheel_contents(self, schema=None, extra=None):
+    def wheel_contents(self, schema=None, extra=None, code=None):
         with zipfile.ZipFile(self.wheel, "w") as archive:
-            archive.writestr("planning/bootstrap/server.py", "def serve(): pass\n")
+            archive.writestr("planning/bootstrap/server.py",
+                             self.source.read_text() if code is None else code)
             archive.writestr("planning/infrastructure/inputs/current.json",
                              self.contract if schema is None else schema)
             if extra is not None:
@@ -100,14 +104,16 @@ class ArtifactTests(unittest.TestCase):
 
     def test_wheel_contains_exact_installed_schema_bytes(self):
         self.wheel_contents()
-        with patch("artifact_attestation.expected", return_value=([self.copy], [])), \
+        with patch.dict(os.environ, {"GITHUB_SHA": "a" * 40}), \
+                patch("artifact_attestation.expected", return_value=([self.copy], [])), \
                 patch("artifact_attestation.consumed_bindings", return_value=[]):
             report = check_wheel("services/planning", self.wheel, self.root)
         self.assertEqual(report["installed_copies"], [self.copy])
         self.assertEqual(len(report["artifact_sha256"]), 64)
 
     def test_missing_drifting_and_unregistered_wheel_contracts_fail(self):
-        with patch("artifact_attestation.expected", return_value=([self.copy], [])), \
+        with patch.dict(os.environ, {"GITHUB_SHA": "a" * 40}), \
+                patch("artifact_attestation.expected", return_value=([self.copy], [])), \
                 patch("artifact_attestation.consumed_bindings", return_value=[]):
             self.wheel_contents(schema=b'{"kind":"old"}')
             with self.assertRaisesRegex(ValueError, "stale contract bytes"):
@@ -115,6 +121,39 @@ class ArtifactTests(unittest.TestCase):
             self.wheel_contents(extra=b"{}")
             with self.assertRaisesRegex(ValueError, "unregistered contract"):
                 check_wheel("services/planning", self.wheel, self.root)
+
+    def test_wheel_code_is_identical_to_reviewed_python_source(self):
+        with patch.dict(os.environ, {"GITHUB_SHA": "a" * 40}), \
+                patch("artifact_attestation.expected", return_value=([self.copy], [])), \
+                patch("artifact_attestation.consumed_bindings", return_value=[]):
+            self.wheel_contents(code="def serve(): return 'stale'\n")
+            with self.assertRaisesRegex(ValueError, "differs from reviewed Python runtime"):
+                check_wheel("services/planning", self.wheel, self.root)
+            self.wheel_contents()
+            self.source.unlink()
+            with self.assertRaisesRegex(ValueError, "differs from reviewed Python runtime"):
+                check_wheel("services/planning", self.wheel, self.root)
+
+    def test_wheel_rejects_ambiguous_and_unsafe_zip_entries(self):
+        with patch.dict(os.environ, {"GITHUB_SHA": "a" * 40}), \
+                patch("artifact_attestation.expected", return_value=([self.copy], [])), \
+                patch("artifact_attestation.consumed_bindings", return_value=[]):
+            self.wheel_contents()
+            with zipfile.ZipFile(self.wheel, "a") as archive:
+                archive.writestr("planning/bootstrap/server.py", "def serve(): pass\n")
+            with self.assertRaisesRegex(ValueError, "duplicate archive"):
+                check_wheel("services/planning", self.wheel, self.root)
+            self.wheel_contents()
+            with zipfile.ZipFile(self.wheel, "a") as archive:
+                archive.writestr("../other.py", "pass")
+            with self.assertRaisesRegex(ValueError, "unsafe archive"):
+                check_wheel("services/planning", self.wheel, self.root)
+
+    def test_wheel_attestation_requires_a_pinned_commit(self):
+        self.wheel_contents()
+        with patch.dict(os.environ, {"GITHUB_SHA": "unrecorded"}), \
+                self.assertRaisesRegex(ValueError, "exact Git revision"):
+            check_wheel("services/planning", self.wheel, self.root)
 
     def test_artifact_qualification_is_explicit_and_checks_built_image_bindings(self):
         workflow = (ROOT / ".github/workflows/qualification.yml").read_text()

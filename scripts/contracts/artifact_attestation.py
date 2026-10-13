@@ -14,7 +14,7 @@ import re
 import subprocess
 import tempfile
 import zipfile
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 from assurance import inventory
 
@@ -92,12 +92,36 @@ def consumed_bindings(component: str, root: Path = ROOT) -> list[dict]:
 def check_wheel(component: str, wheel: Path, root: Path = ROOT) -> dict:
     if COMPONENTS[component][1] != "python":
         raise ValueError("Only a Python component may be bound to a wheel")
+    revision = os.environ.get("GITHUB_SHA")
+    if not revision or not re.fullmatch(r"[0-9a-f]{40}", revision):
+        raise ValueError("Python wheel attestation requires an exact Git revision")
     copies, operations = expected(component, root)
     package = component.split("/")[-1].replace("-", "_")
     if component.startswith("workers/"):
         package = package + "_worker"
     with zipfile.ZipFile(wheel) as archive:
-        members = set(archive.namelist())
+        names = archive.namelist()
+        if len(names) != len(set(names)):
+            raise ValueError("Wheel has ambiguous duplicate archive members")
+        for info in archive.infolist():
+            member = PurePosixPath(info.filename)
+            if (member.is_absolute() or ".." in member.parts
+                    or "\\" in info.filename
+                    or ((info.external_attr >> 16) & 0o170000) == 0o120000):
+                raise ValueError("Wheel contains unsafe archive path or symlink")
+        members = set(names)
+        source_root = root / component / "src" / package
+        expected_sources = {
+            str(file.relative_to(source_root)): sha(file.read_bytes())
+            for file in source_root.rglob("*.py")
+        }
+        packaged_sources = {
+            name[len(package) + 1:]: sha(archive.read(name))
+            for name in members
+            if name.startswith(package + "/") and name.endswith(".py")
+        }
+        if not expected_sources or expected_sources != packaged_sources:
+            raise ValueError("Wheel differs from reviewed Python runtime sources")
         for item in copies:
             prefix = component + "/src/"
             if not item["path"].startswith(prefix):
@@ -126,7 +150,7 @@ def check_wheel(component: str, wheel: Path, root: Path = ROOT) -> dict:
     return {
         "component": component, "owner": COMPONENTS[component][0],
         "kind": "wheel", "artifact_sha256": sha(wheel.read_bytes()),
-        "source_revision": os.environ.get("GITHUB_SHA"),
+        "source_revision": revision,
         "installed_copies": copies, "owner_operations": operations,
         "consumed_releases": consumed_bindings(component, root),
     }
