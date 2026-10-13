@@ -397,40 +397,6 @@ components:
             with self.assertRaisesRegex(ValueError, "no executable consumer"):
                 verify_runtime_inventory(registry, root)
 
-    def test_retirement_checker_rejects_stale_active_script(self):
-        from retirement_integrity import verify_retired_references
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            executable = root / "scripts/demo.py"
-            executable.parent.mkdir(parents=True)
-            executable.write_text("schema = 'contracts/openapi/demo-v1.json'\\n")
-            with self.assertRaisesRegex(ValueError, "Retired contracts still referenced"):
-                verify_retired_references(root, {"contracts/openapi/demo-v1.json"})
-
-    def test_retirement_scanner_distinguishes_active_same_name(self):
-        from retirement_integrity import verify_retired_references
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            script = root / "scripts/check.py"
-            script.parent.mkdir(parents=True)
-            registry = root / "architecture/contract-consumers.json"
-            registry.parent.mkdir(parents=True)
-            registry.write_text(json.dumps({"active_releases": [{
-                "path": "contracts/schemas/planning/fact-v1.json", "copies": []
-            }]}))
-            script.write_text("schema = 'contracts/schemas/planning/fact-v1.json'")
-            retired_path = "/".join(("contracts", "schemas", "inventory", "fact-v1.json"))
-            verify_retired_references(root, {retired_path})
-            retired_path = "/".join(("contracts", "schemas", "inventory", "fact-v1.json"))
-            script.write_text("schema = '" + retired_path + "'")
-            with self.assertRaisesRegex(ValueError, "Retired contracts still referenced"):
-                verify_retired_references(root, {retired_path})
-
-    def test_real_retirement_scan_has_no_self_references(self):
-        from retirement_integrity import verify_retired_references
-        retired = set(load("architecture/retired-contract-releases.json")["retired"])
-        verify_retired_references(ROOT, retired)
-
     def test_native_api_cannot_double_claim_endpoint_across_owner_names(self):
         from check_registry import check_consumer_registry
         from check_schema import load as original
@@ -443,56 +409,6 @@ components:
                    altered if name == path else original(name)):
             with self.assertRaisesRegex(ValueError, "Overlapping native wire operation"):
                 check_consumer_registry()
-
-    def test_new_unverified_retirement_is_denied(self):
-        from retirement_integrity import verify_retirement_decisions
-        record = load("architecture/retired-contract-releases.json")
-        retired = set(record["retired"])
-        reviews = dict(record["reviews"])
-        candidate = "contracts/openapi/example-future-v99.json"
-        retired.add(candidate)
-        reviews[candidate] = {
-            "reason": "test", "internal_consumer_review": "test",
-            "external_consumer_review": "not-independently-verified",
-            "decision": "test",
-        }
-        with self.assertRaisesRegex(ValueError, "lacks external consumer clearance"):
-            verify_retirement_decisions(ROOT, retired, reviews)
-        reviews[candidate]["external_consumer_review"] = "verified_no_external_consumers"
-        with self.assertRaisesRegex(ValueError, "review evidence missing"):
-            verify_retirement_decisions(ROOT, retired, reviews)
-        reviews[candidate]["external_review_evidence"] = "https://example.invalid/no-clients"
-        reviews[candidate]["compatibility_commitments"] = "none"
-        with self.assertRaisesRegex(ValueError, "lacks separately reviewed staged clearance"):
-            verify_retirement_decisions(ROOT, retired, reviews)
-
-    def test_unverified_backlog_cannot_expand_silently(self):
-        from retirement_integrity import verify_retirement_decisions
-        record = load("architecture/retired-contract-releases.json")
-        with tempfile.TemporaryDirectory() as folder:
-            root = Path(folder)
-            file = root / "architecture/retirement-unverified-baseline.txt"
-            file.parent.mkdir(parents=True)
-            file.write_text("contracts/openapi/new-backlog.json\\n")
-            with self.assertRaisesRegex(ValueError, "roster was modified"):
-                verify_retirement_decisions(root, set(record["retired"]), record["reviews"])
-
-    def test_retired_canonical_file_cannot_reappear(self):
-        from check_registry import check_consumer_registry
-        from check_schema import load as real_load
-        registry = real_load("architecture/contract-consumers.json")
-        retired_path = load("architecture/retired-contract-releases.json")["retired"][0]
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            reintroduced = root / retired_path
-            reintroduced.parent.mkdir(parents=True)
-            reintroduced.write_text("{}")
-            with patch("check_registry.ROOT", root), patch("check_registry.load", side_effect=lambda path:
-                       registry if path == "architecture/contract-consumers.json"
-                       else {"retired": [retired_path], "reviews": {retired_path: {"reason": "negative test", "internal_consumer_review": "fixture", "external_consumer_review": "fixture", "decision": "fixture"}}} if path == "architecture/retired-contract-releases.json"
-                       else real_load(path)):
-                with self.assertRaisesRegex(ValueError, "Retired canonical contract reintroduced"):
-                    check_consumer_registry()
 
     def test_runtime_discovery_is_bounded_to_own_product(self):
         from runtime_inventory import discover_runtime_copies

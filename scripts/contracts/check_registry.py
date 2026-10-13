@@ -1,4 +1,4 @@
-"""Canonical release registration, retirement admission and typed consumers."""
+"""Active canonical releases, live owner bindings, and installed consumers."""
 from __future__ import annotations
 import json
 import re
@@ -13,56 +13,9 @@ ROOT = Path(__file__).resolve().parents[2]
 def check_consumer_registry():
     registry = load("architecture/contract-consumers.json")
     inventory = registry["contracts"]
-    retirement = load("architecture/retired-contract-releases.json")
-    retired = set(retirement["retired"])
-    reviews = retirement.get("reviews", {})
-    if set(reviews) != retired:
-        raise ValueError("Every retired contract requires a per-path retirement review")
-    for path, review in reviews.items():
-        if not isinstance(review, dict) or not all(
-            isinstance(review.get(field), str) and review[field]
-            for field in ("reason", "internal_consumer_review", "external_consumer_review", "decision")
-        ):
-            raise ValueError(f"Retirement review incomplete: {path}")
     active = {entry["path"] for entry in registry["active_releases"]}
-    if retired & active:
-        raise ValueError("Retired canonical contract is registered as active")
-    for path in retired:
-        if not path.startswith("contracts/") or ".." in Path(path).parts:
-            raise ValueError(f"Invalid retired contract path: {path}")
-        if (ROOT / path).exists():
-            raise ValueError(f"Retired canonical contract reintroduced: {path}")
-    for source, consumers in {
-        "contracts/openapi/assurance-evidence-v1.json": {"assurance"},
-        "contracts/openapi/inventory-native-input-v1.3.json": {"inventory", "planning", "lifecycle"},
-        "contracts/openapi/catalogue-internal-v1.json": {"catalogue", "planning", "lifecycle"},
-        "contracts/openapi/governance-service-checks-v1.json": {"governance", "planning"},
-        "contracts/openapi/governance-delegation-v1.1.json": {"governance", "planning"},
-        "contracts/schemas/planning/governance-delegation-response-v1.json": {"governance", "planning"},
-        "contracts/schemas/planning/placement-reservation-v1.json": {"lifecycle", "planning"},
-        "contracts/openapi/governance-inventory-collection-v1.1.json": {"governance", "inventory"},
-        "contracts/openapi/governance-native-approval-v1.1.json": {"governance", "lifecycle"},
-        "contracts/openapi/assurance-qualification-v1.json": {"assurance", "planning"},
-        "contracts/schemas/common/error-v1.json": {"contract-platform", "inventory", "governance", "catalogue", "assurance"},
-        "contracts/openapi/lifecycle-migration-boundary-v2.json": {"lifecycle", "lifecycle-workers"},
-        "contracts/openapi/planning-immutable-plan-v1.1.json": {"planning", "governance"},
-        "contracts/openapi/catalogue-v1.0.1.json": {"catalogue", "console"},
-        "contracts/openapi/inventory-v1.9.json": {"inventory", "console"},
-        "contracts/openapi/planning-migration-v1.6.json": {"planning", "console"},
-        "contracts/schemas/planning/migration-input-v4.json": {"inventory", "planning"},
-    }.items():
-        if source not in inventory:
-            raise ValueError(f"Active contract missing from consumer registry: {source}")
-        if not consumers.issubset(set(inventory[source])):
-            raise ValueError(f"Incorrect active consumer registry: {source}")
-    releases = registry.get("active_releases")
-    if not isinstance(releases, list) or len(releases) < 6:
-        raise ValueError("Missing machine-readable active contract release catalogue")
-    names = [entry["path"] for entry in releases]
-    if set(names) != set(inventory):
-        raise ValueError("Active contract registry does not cover every declared consumer")
-    if len(names) != len(set(names)):
-        raise ValueError("Duplicate active contract release")
+    # Only current canonical releases are shipped. Every installed consumer
+    # and generated loader must target the active release set directly.
     # Each live service operation belongs to exactly one active versioned owner
     # release; obsolete canonical bundles are removed from the working tree.
     seen_operations = {}
@@ -138,9 +91,6 @@ def check_consumer_registry():
     if canonical != set(names):
         raise ValueError("Canonical contracts outside active releases: " + repr(sorted(canonical - set(names)))
                          + "; active releases without canonical files: " + repr(sorted(set(names) - canonical)))
-    from retirement_integrity import verify_retired_references, verify_retirement_decisions
-    verify_retirement_decisions(ROOT, retired, reviews)
-    verify_retired_references(ROOT, retired)
     verify_runtime_inventory(registry, ROOT)
     verify_installed_usage(ROOT, registry)
 

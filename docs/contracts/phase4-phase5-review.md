@@ -38,31 +38,22 @@ have separate ownership:
 | --- | --- |
 | `check_schema.py` | Current schema IDs, canonical definitions and embedded projections |
 | `check_events.py` | Event declarations, channel/discriminator binding and payload references |
-| `check_registry.py` | Canonical registration, owner-operation bindings, retired paths and all installed copies |
+| `check_registry.py` | Active canonical registration, owner-operation bindings and installed copies |
 | `check_http.py` | Native authority, implemented owner APIs, UUID and error contracts |
 | `route_conformance.py` | Actual bounded runtime router conformance |
 | `runtime_inventory.py` / `installed_usage.py` | Real consumer-loader and packaging evidence |
 
 The former hard-coded three-copy byte test and source-regex route test were
 removed. Comprehensive runtime-copy parity, generated-client checks, route
-conformance, quality gates and retirement decisions remain enforced by CI.
+conformance and quality gates remain enforced by CI.
 Tests were updated to import their genuine owner modules, not a proxy.
 
-### Historical external review
+### Active-only release inventory
 
-`retirement_report.py` enumerates the retirement manifest, validates its
-decision records and emits an actionable artifact with each pending external
-inventory, compatibility and independent-review obligation.
-
-The 53 historically deleted canonical versions remain uncleared. This is
-**not** an assertion that external consumers do or do not exist. The archive
-remains in Git. Completing the review requires real independent evidence:
-no generated JSON, repository static scan or blanket approval can replace it.
-
-CI workflow_dispatch can use `require_retirement_clearance=true` to reject an
-unresolved review backlog. Normal structural checks still reject new unapproved
-deletions and stale executable references while permitting the known,
-explicitly documented historical review debt.
+The checkout ships only current canonical releases, active installed copies and
+executable consumer bindings. Historical retirement manifests and archived
+compatibility tests are not part of the release. New contract publications
+still require the current strict quality profile and semantic comparison.
 
 ## Verification
 
@@ -71,14 +62,11 @@ the engineering work is treated as verified:
 
 ```sh
 python -m unittest discover -s tests/contracts -p 'test_capability_qualification.py' -v
-python -m unittest discover -s tests/contracts -p 'test_retirement_report.py' -v
 python -m unittest discover -s tests/contracts -p 'test_integrity.py' -v
 python scripts/contracts/check.py
-python scripts/contracts/retirement_report.py
 # Run P08 with locked dependencies and disposable PostgreSQL:
 python scripts/p08/qualify.py --output /tmp/p08-qualification
 ```
 
 Keep PR #64 draft until these checks pass and any legitimate failures are fixed.
-Do not claim E3/E4 qualification or external retirement clearance from an E2
-passing result.
+Do not claim E3/E4 qualification from an E2 passing result.

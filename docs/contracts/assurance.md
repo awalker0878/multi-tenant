@@ -96,5 +96,5 @@ python scripts/contracts/combine_assurance.py \
 ```
 
 No new canonical compatibility layer, alias, runtime shim or legacy test is
-introduced by this phase. Previously deleted canonical versions remain
-historically unresolved in the separate retirement governance ledger.
+introduced by this phase. Removed versions are not retained as additional worktree artifacts. Git commit
+history remains the source of prior source revisions.

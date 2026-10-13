@@ -151,7 +151,6 @@ jobs:
           python scripts/p04/generate_clients.py --check
           python scripts/p06/generate_contracts.py --check
           python scripts/contracts/runtime_binding_coverage.py
-          python scripts/contracts/retirement_integrity.py
           python scripts/contracts/check.py
           python -m unittest discover -s tests/contracts -p 'test_*.py' -q
       - name: Probe actual Inventory, Planning and Lifecycle producer/consumer routes

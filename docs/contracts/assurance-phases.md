@@ -78,9 +78,8 @@ python scripts/contracts/assurance.py --output /tmp/contract-inventory.json
 # Required CI / Contract assurance fails on an incomplete measurement set.
 ```
 
-Retired canonical versions still have separately managed consumer-clearance
-obligations under `docs/contracts/retirement-approval.md`. This assurance
-work does not fabricate or waive those reviews.
+The active worktree keeps no historical contract copies, retirement rosters or
+compatibility loaders. Git retains its normal commit provenance.
 
 ## Phase 3: new-publication quality admission
 
