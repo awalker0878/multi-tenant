@@ -121,15 +121,35 @@ def verified_consumers(root: Path = ROOT) -> list[dict]:
             observations = list(suites.iter("testcase"))
         except (OSError, ElementTree.ParseError) as exc:
             raise RuntimeError("Missing valid producer/consumer execution receipts") from exc
-        names = [node.attrib.get("name", "") for node in observations]
         if (not observations or any(node.find(tag) is not None
                                     for node in observations
                                     for tag in ("skipped", "failure", "error"))):
             raise RuntimeError("Producer/consumer receipt includes skipped or failed tests")
+        # Pytest JUnit identifies the actual executing module/class independently
+        # of the test's short name. Another module with the same test name must
+        # never be credited as a registered producer or consumer.
+        executed = set()
+        for node in observations:
+            classname = node.attrib.get("classname", "")
+            name = node.attrib.get("name", "")
+            if not classname or not name:
+                raise RuntimeError("Producer/consumer receipt has no full executable identity")
+            identity = (classname, name)
+            if identity in executed:
+                raise RuntimeError("Duplicated producer/consumer execution receipt: " + repr(identity))
+            executed.add(identity)
         for selector in cases:
-            test_name = selector.rsplit("::", 1)[-1]
-            if not any(name == test_name or name.startswith(test_name + "[")
-                       for name in names):
+            path, *parts = selector.split("::")
+            if not parts:
+                raise RuntimeError("Producer/consumer selector must name one executable test")
+            classname = ".".join(Path(path).with_suffix("").parts)
+            if len(parts) > 1:
+                classname += "." + ".".join(parts[:-1])
+            test_name = parts[-1]
+            if not any(
+                name == test_name or name.startswith(test_name + "[")
+                for candidate, name in executed if candidate == classname
+            ):
                 raise RuntimeError("Producer/consumer selector did not execute: " + selector)
     evidence = []
     for test, bindings in TESTS.items():

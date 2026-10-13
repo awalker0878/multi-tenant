@@ -40,8 +40,13 @@ class MeasuredProofTests(unittest.TestCase):
         receipt = next(Path(arg.split("=", 1)[1]) for arg in argv
                        if arg.startswith("--junitxml="))
         cases = sorted(set(measured.TESTS) | set(measured.RELEASE_TESTS))
-        elements = "".join('<testcase name="' + selector.rsplit("::", 1)[-1] + '"/>'
-                           for selector in cases)
+        def testcase(selector):
+            path, *parts = selector.split("::")
+            classname = ".".join(Path(path).with_suffix("").parts)
+            if len(parts) > 1:
+                classname += "." + ".".join(parts[:-1])
+            return '<testcase classname="' + classname + '" name="' + parts[-1] + '"/>'
+        elements = "".join(testcase(selector) for selector in cases)
         receipt.write_text("<testsuites><testsuite>" + elements + "</testsuite></testsuites>")
         return SimpleNamespace(returncode=0, stdout="", stderr="")
 
@@ -84,11 +89,49 @@ class MeasuredProofTests(unittest.TestCase):
             filename = next(Path(arg.split("=", 1)[1]) for arg in argv
                             if arg.startswith("--junitxml="))
             content = filename.read_text()
-            selector = sorted(measured.TESTS)[0].rsplit("::", 1)[-1]
-            filename.write_text(content.replace('<testcase name="' + selector + '"/>', ''))
+            from xml.etree import ElementTree
+            root = ElementTree.fromstring(content)
+            suite = root.find("testsuite")
+            suite.remove(list(suite)[0])
+            filename.write_text(ElementTree.tostring(root, encoding="unicode"))
             return response
         with patch.object(measured.subprocess, "run", side_effect=omit_case):
             with self.assertRaisesRegex(RuntimeError, "did not execute"):
+                measured.verified_consumers()
+
+    def test_same_short_name_from_wrong_module_cannot_mint_proof(self):
+        from xml.etree import ElementTree
+
+        def replace_module(argv, **kwargs):
+            response = self.fake_passed_test_run(argv, **kwargs)
+            receipt = next(Path(arg.split("=", 1)[1]) for arg in argv
+                           if arg.startswith("--junitxml="))
+            root = ElementTree.parse(receipt)
+            one = next(root.iter("testcase"))
+            one.set("classname", "a.different.module")
+            root.write(receipt, encoding="unicode")
+            return response
+
+        with patch.object(measured.subprocess, "run", side_effect=replace_module):
+            with self.assertRaisesRegex(RuntimeError, "selector did not execute"):
+                measured.verified_consumers()
+
+    def test_duplicate_execution_record_cannot_mint_proof(self):
+        from xml.etree import ElementTree
+
+        def duplicate(argv, **kwargs):
+            response = self.fake_passed_test_run(argv, **kwargs)
+            receipt = next(Path(arg.split("=", 1)[1]) for arg in argv
+                           if arg.startswith("--junitxml="))
+            root = ElementTree.parse(receipt)
+            suite = root.find("testsuite")
+            source = list(suite)[0]
+            suite.append(ElementTree.fromstring(ElementTree.tostring(source)))
+            root.write(receipt, encoding="unicode")
+            return response
+
+        with patch.object(measured.subprocess, "run", side_effect=duplicate):
+            with self.assertRaisesRegex(RuntimeError, "Duplicated producer/consumer"):
                 measured.verified_consumers()
 
     def test_failed_executable_test_never_mints_a_pass_receipt(self):
