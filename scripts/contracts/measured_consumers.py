@@ -133,7 +133,8 @@ def verified_consumers(root: Path = ROOT) -> list[dict]:
             classname = node.attrib.get("classname", "")
             name = node.attrib.get("name", "")
             if not classname or not name:
-                raise RuntimeError("Producer/consumer receipt has no full executable identity")
+                raise RuntimeError("Producer/consumer receipt has no full executable identity: "
+                                   + repr(node.attrib))
             identity = (classname, name)
             if identity in executed:
                 raise RuntimeError("Duplicated producer/consumer execution receipt: " + repr(identity))
