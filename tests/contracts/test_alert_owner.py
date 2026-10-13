@@ -13,6 +13,8 @@ from pathlib import Path
 from unittest.mock import patch
 
 from lifecycle.domain.execution import Rejected
+from lifecycle.application.execution import Execution
+from jsonschema import Draft202012Validator, FormatChecker
 from lifecycle.infrastructure.execution_owners import AlertReceiver
 from lifecycle.infrastructure import execution_owners as transport
 
@@ -26,7 +28,33 @@ RECEIPT = {"event_id": A, "acknowledged": True, "receipt_id": C}
 
 class AlertOwnerContracts(unittest.TestCase):
     def test_installed_alert_contract_fences_external_receipts(self):
-        wire = [RECEIPT]
+        # Exercise the actual Lifecycle alert producer, not an assembled
+        # example or a static JSON fixture.
+        captured = []
+
+        class Tx:
+            def one(self, sql, parameters):
+                if "SELECT state,reason" in sql:
+                    return {"state": "running", "reason": None}
+                if "SELECT revision" in sql:
+                    return {"revision": 2}
+                raise AssertionError("unexpected SQL read")
+
+            def execute(self, sql, parameters):
+                if "INSERT INTO app.execution_alerts" in sql:
+                    captured.append(json.loads(parameters[-1]))
+
+        Execution(None, None, None, None, lambda: 123).project(
+            Tx(), B, "held", "simulation_held"
+        )
+        self.assertEqual(len(captured), 1)
+        event = captured[0]
+        self.assertEqual(event["job_id"], B)
+        published = json.loads((ROOT / "contracts/schemas/lifecycle/alert-delivery-v1.json").read_text())
+        command = {"$ref": "#/$defs/Command", "$defs": published["$defs"]}
+        Draft202012Validator(command, format_checker=FormatChecker()).validate(event)
+        receipt = {**RECEIPT, "event_id": event["id"]}
+        wire = [receipt]
         paths = []
         class Response:
             status = 200
@@ -59,27 +87,27 @@ class AlertOwnerContracts(unittest.TestCase):
             patch.object(transport.ssl, "create_default_context", return_value=object()),
             patch.object(transport.http.client, "HTTPSConnection", Connection),
         ):
-            self.assertEqual(AlertReceiver().deliver(ALERT), C)
-            self.assertEqual(paths[0][0:3], ("POST", "/v1/lifecycle-alerts", ALERT))
+            self.assertEqual(AlertReceiver().deliver(event), C)
+            self.assertEqual(paths[0][0:3], ("POST", "/v1/lifecycle-alerts", event))
             self.assertIn("Authorization", paths[0][3])
             for poisoned in (
-                {**RECEIPT, "event_id": B},
-                {**RECEIPT, "acknowledged": False},
-                {**RECEIPT, "extra": "uncontracted"},
-                {**RECEIPT, "receipt_id": "not-an-id"},
+                {**receipt, "event_id": B},
+                {**receipt, "acknowledged": False},
+                {**receipt, "extra": "uncontracted"},
+                {**receipt, "receipt_id": "not-an-id"},
             ):
                 wire[0] = poisoned
                 with self.subTest(poisoned=poisoned), self.assertRaises(Rejected):
-                    AlertReceiver().deliver(ALERT)
+                    AlertReceiver().deliver(event)
             for poisoned in (
-                {**ALERT, "unexpected": True},
-                {**ALERT, "simulation": False},
-                {**ALERT, "job_id": "not-an-id"},
+                {**event, "unexpected": True},
+                {**event, "simulation": False},
+                {**event, "job_id": "not-an-id"},
             ):
                 with self.subTest(poisoned=poisoned), self.assertRaises(Rejected):
                     AlertReceiver().deliver(poisoned)
             with self.assertRaises(Rejected):
-                transport.request("ALERTS", "POST", "/v1/uncontracted", ALERT)
+                transport.request("ALERTS", "POST", "/v1/uncontracted", event)
 
     def test_outbound_schema_matches_immutable_installed_copy(self):
         original = ROOT / "contracts/schemas/lifecycle/alert-delivery-v1.json"
