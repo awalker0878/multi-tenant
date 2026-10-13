@@ -211,8 +211,8 @@
       "ci": ".github/workflows/ci.yml"
     },
     {
-      "copy": "services/lifecycle/src/lifecycle/infrastructure/contracts/governance-delegation-v1.1.json",
-      "canonical": "contracts/openapi/governance-delegation-v1.1.json",
+      "copy": "services/lifecycle/src/lifecycle/infrastructure/contracts/governance-delegation-v2.json",
+      "canonical": "contracts/openapi/governance-delegation-v2.json",
       "loader": "services/lifecycle/src/lifecycle/infrastructure/execution_owners.py",
       "load_kind": "literal",
       "packaging": "services/lifecycle/Dockerfile",
@@ -302,8 +302,8 @@
       "ci": ".github/workflows/ci.yml"
     },
     {
-      "copy": "services/planning/src/planning/infrastructure/inputs/governance-delegation-response-v1.json",
-      "canonical": "contracts/schemas/planning/governance-delegation-response-v1.json",
+      "copy": "services/planning/src/planning/infrastructure/inputs/governance-delegation-response-v2.json",
+      "canonical": "contracts/schemas/planning/governance-delegation-response-v2.json",
       "loader": "services/planning/src/planning/infrastructure/owner_contracts.py",
       "load_kind": "planning_typed",
       "packaging": "services/planning/Dockerfile",

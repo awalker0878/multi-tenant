@@ -81,12 +81,6 @@
       "governance",
       "catalogue"
     ],
-    "contracts/openapi/governance-delegation-v1.1.json": [
-      "console",
-      "governance",
-      "lifecycle",
-      "planning"
-    ],
     "contracts/openapi/governance-directory-v1.json": [
       "governance",
       "console"
@@ -313,10 +307,6 @@
     "contracts/schemas/common/error-v2.json": [
       "contract-platform"
     ],
-    "contracts/schemas/planning/governance-delegation-response-v1.json": [
-      "governance",
-      "planning"
-    ],
     "contracts/schemas/planning/placement-reservation-v1.json": [
       "lifecycle",
       "planning"
@@ -328,6 +318,16 @@
     ],
     "contracts/schemas/lifecycle/alert-delivery-v1.json": [
       "lifecycle"
+    ],
+    "contracts/openapi/governance-delegation-v2.json": [
+      "console",
+      "governance",
+      "lifecycle",
+      "planning"
+    ],
+    "contracts/schemas/planning/governance-delegation-response-v2.json": [
+      "governance",
+      "planning"
     ]
   },
   "scope": "Implemented consumers: Planning consumes Catalogue reference facts; Console uses Governance identity APIs and five tenant-administration notifications as refresh hints. Diagnostics are owned by all seven applications. No shared SQL authority is implied.",
@@ -528,7 +528,7 @@
       "depends_on": []
     },
     {
-      "path": "contracts/openapi/governance-delegation-v1.1.json",
+      "path": "contracts/openapi/governance-delegation-v2.json",
       "owner": "governance",
       "consumers": [
         "console",
@@ -536,7 +536,7 @@
         "planning"
       ],
       "copies": [
-        "services/lifecycle/src/lifecycle/infrastructure/contracts/governance-delegation-v1.1.json"
+        "services/lifecycle/src/lifecycle/infrastructure/contracts/governance-delegation-v2.json"
       ],
       "source_manifest": null,
       "depends_on": []
@@ -1045,13 +1045,13 @@
       "depends_on": []
     },
     {
-      "path": "contracts/schemas/planning/governance-delegation-response-v1.json",
+      "path": "contracts/schemas/planning/governance-delegation-response-v2.json",
       "owner": "governance",
       "consumers": [
         "planning"
       ],
       "copies": [
-        "services/planning/src/planning/infrastructure/inputs/governance-delegation-response-v1.json"
+        "services/planning/src/planning/infrastructure/inputs/governance-delegation-response-v2.json"
       ],
       "source_manifest": null,
       "depends_on": []

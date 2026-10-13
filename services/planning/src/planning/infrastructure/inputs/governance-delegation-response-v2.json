@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.multi-tenant.local/contracts/schemas/planning/governance-delegation-response-v1.json",
+  "$id": "https://schemas.multi-tenant.local/contracts/schemas/planning/governance-delegation-response-v2.json",
   "title": "Current Governance delegated authorization response validated by Planning",
   "type": "object",
   "additionalProperties": false,
@@ -24,7 +24,8 @@
         "catalogue",
         "inventory",
         "planning",
-        "assurance"
+        "assurance",
+        "lifecycle"
       ]
     },
     "tenant_id": {
