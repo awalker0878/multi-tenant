@@ -106,16 +106,15 @@ def verified_consumers(root: Path = ROOT) -> list[dict]:
                     "test": test,
                 })
     releases = {release["path"]: release for release in inventory(root)["releases"]}
-    for test, bindings in RELEASE_TESTS.items():
-        for path, claims in bindings:
-            if path not in releases:
-                raise ValueError("Non-HTTP test targets an inactive release: " + path)
-            for claim in claims:
-                evidence.append({
-                    "key": path, "claim": claim,
-                    "source": "live-producer" if claim == "producer" else "live-consumer",
-                    "result": "PASS", "release_sha256": releases[path]["sha256"], "test": test,
-                })
+    for test, (path, claims) in RELEASE_TESTS.items():
+        if path not in releases:
+            raise ValueError("Non-HTTP test targets an inactive release: " + path)
+        for claim in claims:
+            evidence.append({
+                "key": path, "claim": claim,
+                "source": "live-producer" if claim == "producer" else "live-consumer",
+                "result": "PASS", "release_sha256": releases[path]["sha256"], "test": test,
+            })
     for observation in evidence:
         observation["run_id"] = os.environ.get("GITHUB_RUN_ID")
         observation["revision"] = os.environ.get("GITHUB_SHA")
