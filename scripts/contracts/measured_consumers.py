@@ -159,15 +159,32 @@ def verified_consumers(root: Path = ROOT) -> list[dict]:
             if len(parts) > 1:
                 classname += "." + ".".join(parts[:-1])
             test_name = parts[-1]
-            if not any(
-                (name == test_name or name.startswith(test_name + "["))
-                and (candidate == classname or (
-                    not candidate and name == test_name and
-                    sum(x.rsplit("::", 1)[-1] == test_name for x in cases) == 1
-                ))
-                for candidate, name in executed
-            ):
-                raise RuntimeError("Producer/consumer selector did not execute: " + selector)
+            # Pytest importlib mode may abbreviate the module to its file
+            # stem. An abbreviation is admissible only if that stem belongs
+            # to one selected file and the test name is unique; never accept
+            # an unrelated module that merely shares a test function name.
+            module_stem = Path(path).stem
+            stem_unique = len({
+                candidate.split("::", 1)[0] for candidate in cases
+                if Path(candidate.split("::", 1)[0]).stem == module_stem
+            }) == 1
+            name_unique = sum(
+                candidate.rsplit("::", 1)[-1] == test_name for candidate in cases
+            ) == 1
+            def matches(candidate: str, name: str) -> bool:
+                if not (name == test_name or name.startswith(test_name + "[")):
+                    return False
+                if candidate == classname:
+                    return True
+                if not name_unique or name != test_name:
+                    return False
+                if not candidate:
+                    return True
+                return (stem_unique and classname.endswith("." + candidate)
+                        and candidate.split(".")[-1] == module_stem)
+            if not any(matches(candidate, name) for candidate, name in executed):
+                raise RuntimeError("Producer/consumer selector did not execute: " + selector
+                                   + "; observed=" + repr(sorted(executed)))
     evidence = []
     for test, bindings in TESTS.items():
         for owner, method, path, claims in bindings:
