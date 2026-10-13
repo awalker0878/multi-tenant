@@ -326,6 +326,28 @@ class ReleaseAggregateTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Missing/extra release runtime"):
             self.call()
 
+    def test_previous_ci_run_attestation_is_rejected(self):
+        with patch.dict(os.environ, {
+            "GITHUB_ACTIONS": "true",
+            "GITHUB_RUN_ID": "991",
+            "GITHUB_RUN_ATTEMPT": "2",
+        }):
+            with self.assertRaisesRegex(ValueError, "different CI run"):
+                self.call()
+            for file in self.out.glob("*.json"):
+                data = json.loads(file.read_text())
+                data["github_run_id"] = "991"
+                data["github_run_attempt"] = "2"
+                file.write_text(json.dumps(data))
+            report = self.call()
+            self.assertEqual(report["github_run_id"], "991")
+            file = self.out / "b-image.json"
+            data = json.loads(file.read_text())
+            data["github_run_attempt"] = "1"
+            file.write_text(json.dumps(data))
+            with self.assertRaisesRegex(ValueError, "different CI run"):
+                self.call()
+
     def test_wrong_digest_or_revision_cannot_be_admitted(self):
         file = self.out / "a-image.json"
         changed = json.loads(file.read_text())

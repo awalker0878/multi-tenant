@@ -43,6 +43,14 @@ def run(*argv: str) -> str:
     return process.stdout.strip()
 
 
+def current_run_provenance() -> dict[str, str | None]:
+    """Record the CI invocation, not just a reusable source checkout."""
+    return {
+        "github_run_id": os.environ.get("GITHUB_RUN_ID"),
+        "github_run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT"),
+    }
+
+
 def expected(component: str, root: Path = ROOT) -> tuple[list[dict], list[dict]]:
     if component not in COMPONENTS:
         raise ValueError(f"Unknown deployable component: {component}")
@@ -163,6 +171,7 @@ def check_wheel(component: str, wheel: Path, root: Path = ROOT) -> dict:
         "source_revision": revision,
         "installed_copies": copies, "owner_operations": operations,
         "consumed_releases": consumed_bindings(component, root),
+        **current_run_provenance(),
     }
 
 
@@ -337,6 +346,7 @@ def check_image(component: str, tag: str, root: Path = ROOT) -> dict:
         "source_revision": revision, "installed_copies": copies,
         "owner_operations": operations,
         "consumed_releases": consumed_bindings(component, root),
+        **current_run_provenance(),
     }
 
 

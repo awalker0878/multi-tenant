@@ -50,6 +50,15 @@ def aggregate(folder: Path, root: Path = ROOT, revision: str | None = None) -> d
                 or report.get("consumed_releases") != consumed_bindings(component, root)):
             raise ValueError("Artifact/schema/operation binding does not match active source: "
                              + component)
+        # A source SHA can be reused across different CI attempts. Never
+        # aggregate an attestation produced in a different workflow run.
+        if os.environ.get("GITHUB_ACTIONS") == "true":
+            if (not os.environ.get("GITHUB_RUN_ID")
+                    or not os.environ.get("GITHUB_RUN_ATTEMPT")
+                    or report.get("github_run_id") != os.environ["GITHUB_RUN_ID"]
+                    or report.get("github_run_attempt") != os.environ["GITHUB_RUN_ATTEMPT"]):
+                raise ValueError("Built contract attestation belongs to a different CI run: "
+                                 + component)
         digest = report.get("artifact_sha256")
         if not isinstance(digest, str) or len(digest) != 64 or any(
             c not in "0123456789abcdef" for c in digest
@@ -104,6 +113,8 @@ def aggregate(folder: Path, root: Path = ROOT, revision: str | None = None) -> d
     return {
         "schema_version": 1,
         "source_revision": revision,
+        "github_run_id": os.environ.get("GITHUB_RUN_ID"),
+        "github_run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT"),
         "images": {component: documents[(component, "oci")]["artifact_sha256"]
                    for component in sorted(COMPONENTS)},
         "bindings": [binding_map[key] for key in sorted(binding_map)],
