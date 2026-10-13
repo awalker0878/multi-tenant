@@ -113,8 +113,23 @@ class HttpRouteConformanceTests(unittest.TestCase):
                 compare_composed_routes("Lifecycle", base | {("POST", "/internal/hidden")}, ("example.json",), root)
 
     def test_actual_native_job_and_worker_effect_route_handlers(self):
+        from assurance_routes import prove
+
         self.assertEqual(verify_lifecycle_native_jobs(ROOT), 4)
         self.assertEqual(verify_lifecycle_worker_effect_routes(ROOT), 2)
+        for app, expected in (("lifecycle-native-jobs", 4),
+                              ("lifecycle-worker-effects", 2)):
+            observations = prove(app, root=ROOT)
+            denials = [row for row in observations if row["claim"] == "authorization"]
+            self.assertEqual(len(denials), expected)
+            self.assertEqual(len([row for row in observations if row["claim"] == "route"]),
+                             expected)
+            for denial in denials:
+                self.assertEqual(denial["source"], "live-denial")
+                self.assertEqual(denial["denial_kind"], "invalid-credential")
+                self.assertEqual(denial["status_code"], 401)
+                self.assertNotIn("tenant_isolation", denial["claim"])
+
 
     def test_declared_paths_include_each_method(self):
         spec = {"paths": {"/v1/example": {"get": {}, "post": {}}}}

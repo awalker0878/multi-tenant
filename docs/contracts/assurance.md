@@ -46,6 +46,9 @@ exception grants coverage.
 - `scripts/contracts/laravel_denials.php` sends missing-token requests to
   the **real** locked Laravel applications. Only 401/403 count as auth-denial
   evidence; 503/404/5xx do not count. It requires locked PHP dependencies.
+- `scripts/contracts/assurance_routes.py` additionally measures 401 denial from
+  the independent native-job and worker-effect ASGI route verifiers. These
+  receipts never claim tenant isolation or a successful business response.
 - `scripts/contracts/python_denials.py` probes the actual composed Inventory,
   Planning and Lifecycle ASGI services. It omits separately deployed native
   control and worker processes rather than faking coverage.
