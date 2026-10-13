@@ -42,6 +42,12 @@ function initializeIdentityFixture(object $test): void
             if (in_array(basename($migration), ['012_inventory_delegation.sql', '013_lifecycle_delegation.sql'], true)) {
                 continue;
             }
+            if (basename($migration) === '014_delegation_command_keys.sql') {
+                $sql = str_replace(
+                    'delegation_command_keys_expiry ON app.delegation_command_keys',
+                    'app.delegation_command_keys_expiry ON delegation_command_keys', $sql
+                );
+            }
             // Real owner/function privileges are exercised on PostgreSQL, never inferred here.
             $sql = preg_replace('/-- BEGIN POSTGRES RECOVERY FUNCTION.*?-- END POSTGRES RECOVERY FUNCTION/s', '', $sql);
             $sql = str_replace('identity_sessions_expiry ON app.identity_sessions', 'app.identity_sessions_expiry ON identity_sessions', $sql);
