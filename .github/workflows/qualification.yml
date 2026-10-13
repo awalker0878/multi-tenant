@@ -1,5 +1,10 @@
 name: On-demand platform qualification
 on:
+  workflow_call:
+    inputs:
+      suite:
+        required: true
+        type: string
   workflow_dispatch:
     inputs:
       suite:

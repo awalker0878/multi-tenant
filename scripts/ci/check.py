@@ -28,6 +28,7 @@ def verify(needs: dict) -> list[str]:
             problems.append(f"{family}: expected {expected}, got {observed}")
     for job, flag in (("architecture", "docs"), ("contracts", "contracts"),
                       ("contract-assurance", "contracts"),
+                      ("artifact-binding-assurance", "contracts"),
                       ("security", "security"), ("native", "native"),
                       ("authority", "authority"), ("laravel-routes", "routes")):
         if flags.get(flag) not in ("true", "false"):

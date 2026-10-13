@@ -434,10 +434,20 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
+  artifact-binding-assurance:
+    name: CI / Built contract bindings
+    needs: scope
+    if: needs.scope.outputs.contracts == 'true'
+    permissions:
+      contents: read
+    uses: ./.github/workflows/qualification.yml
+    with:
+      suite: contract-artifacts
+
   required:
     name: CI / Required
     if: always()
-    needs: [scope, architecture, python, php, contracts, contract-assurance, security, native, authority, laravel-routes]
+    needs: [scope, architecture, python, php, contracts, contract-assurance, artifact-binding-assurance, security, native, authority, laravel-routes]
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
