@@ -25,7 +25,7 @@ The original architecture command failed because the wheel builds generated
 correctly rejected those unregistered copies. The P09 campaign now runs architecture
 validation before building wheels. Only the generated directories were moved out
 of the checkout; the unchanged architecture validator then passed. Both the original
-[failure](architecture.log) and [corrected check](architecture-corrected.log) remain
+failure and corrected check remain
 retained with hashes. No architecture rule or source-layer boundary was relaxed.
 
 PostgreSQL is unavailable in this environment and switching to its unprivileged
