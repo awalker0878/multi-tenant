@@ -86,7 +86,7 @@ RELEASE_TESTS = {
     ),
     "services/planning/tests/test_owner_operation_contracts.py::"
     "test_capacity_and_governance_owner_responses_are_schema_and_scope_validated": (
-        "contracts/schemas/planning/governance-delegation-response-v1.json", ("consumer",)
+        "contracts/schemas/planning/governance-delegation-response-v2.json", ("consumer",)
     ),
 }
 
