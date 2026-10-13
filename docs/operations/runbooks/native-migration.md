@@ -30,7 +30,7 @@ discover. Save and confirm the exact revision. API facts cannot be overridden.
 A lost response offers the same command key/payload; a changed or expired profile
 requires a fresh collection and review. A confirmation is not migration approval.
 
-The [Planning preparation contract](../../../contracts/openapi/planning-migration-v1.json)
+The [Planning preparation contract](../../../contracts/openapi/planning-migration-v1.6.json)
 requires current scoped `plan.create` delegation. It re-reads the confirmed Inventory
 revision and validates each target disk key/format against observed source disks and
 target formats. Preserve the returned review and owner-input digests in the complete
@@ -47,7 +47,7 @@ Do not combine Lifecycle and worker database credentials.
 
 Migration admission uses the version 2 plan/grant and
 [boundary contract](../../../contracts/openapi/lifecycle-migration-boundary-v2.json).
-The [worker contract](../../../contracts/openapi/worker-migration-effect-v2.json)
+The [worker contract](../../../contracts/openapi/worker-migration-effect-v2.1.json)
 binds every effect to its exact operation intent, job, tenant, native scope,
 authorization epoch and custody generation. Version 1 provision contracts remain
 separate. The fixed TLS routes transmit bounded metadata only.
