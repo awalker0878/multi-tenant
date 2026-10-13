@@ -57,8 +57,11 @@ distinction between installed-copy proof and registry-only declarations.
 `scripts/contracts/aggregate_artifacts.py` consumes the immutable outputs
 of all nine image builds and five Python wheel builds, requiring exact match
 against the current canonical registry. It emits one complete
-`runtime-release-bindings.json` mapping of canonical operations to built
-image digests. Shared foundation operations are labelled as shared declarations
+`runtime-release-bindings.json` mapping **all active canonical releases** (HTTP,
+event, schema, capability, and platform) and canonical HTTP operations to built
+image digests. Each release-to-image relationship distinguishes an exact
+installed-copy byte match from a registry-only declaration. A declaration is
+never promoted to runtime usage evidence. Shared foundation operations are labelled as shared declarations
 on the participating service images, not independent HTTP execution results.
 
 The **Contract artifact and runtime binding assurance** workflow must pass

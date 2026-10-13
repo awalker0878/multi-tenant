@@ -300,6 +300,19 @@ class ReleaseAggregateTests(unittest.TestCase):
             "services/a": ("a", "python"),
             "services/b": ("b", "php"),
         }
+        self.foundation_path = "contracts/openapi/foundation-health-v1.json"
+        foundation_source = self.root / self.foundation_path
+        foundation_source.parent.mkdir(parents=True, exist_ok=True)
+        foundation_source.write_text('{"openapi":"3.1.0"}')
+        self.foundation_digest = hashlib.sha256(foundation_source.read_bytes()).hexdigest()
+        self.consumed = {
+            component: [{
+                "canonical": self.foundation_path,
+                "canonical_sha256": self.foundation_digest,
+                "evidence": "declared-consumption-only",
+                "operation_keys": [self.foundation["key"]],
+            }] for component in self.components
+        }
         self.emit("a-image.json", "services/a", "a", "oci", [self.owned])
         self.emit("a-wheel.json", "services/a", "a", "wheel", [self.owned])
         self.emit("b-image.json", "services/b", "b", "oci", [])
@@ -313,7 +326,7 @@ class ReleaseAggregateTests(unittest.TestCase):
             "artifact_sha256": "c" * 64,
             "installed_copies": [],
             "owner_operations": operations,
-            "consumed_releases": [],
+            "consumed_releases": self.consumed.get(component, []),
             "github_run_id": os.environ.get("GITHUB_RUN_ID"),
             "github_run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT"),
         }))
@@ -324,7 +337,7 @@ class ReleaseAggregateTests(unittest.TestCase):
             return ([], [self.owned] if component == "services/a" else [])
         with patch("aggregate_artifacts.COMPONENTS", self.components):
             with patch("aggregate_artifacts.expected", side_effect=owned):
-                with patch("aggregate_artifacts.consumed_bindings", return_value=[]):
+                with patch("aggregate_artifacts.consumed_bindings", side_effect=lambda component, root: self.consumed.get(component, [])):
                     with patch("aggregate_artifacts.inventory", return_value={"operations": rows}):
                         return aggregate(self.out, self.root, self.sha)
 
@@ -333,8 +346,54 @@ class ReleaseAggregateTests(unittest.TestCase):
         self.assertEqual(report["summary"]["runtime_images"], 2)
         self.assertEqual(report["summary"]["contracted_http_operations"], 2)
         self.assertEqual(report["summary"]["shared_foundation_operations"], 1)
+        self.assertEqual(report["summary"]["active_releases"], 1)
+        self.assertEqual(len(report["release_bindings"][0]["relationships"]), 2)
         (self.out / "a-wheel.json").unlink()
         with self.assertRaisesRegex(ValueError, "Missing/extra release runtime"):
+            self.call()
+
+
+    def test_non_http_releases_get_source_pinned_image_bindings(self):
+        schema_path = "contracts/schemas/current-capability-v1.json"
+        file = self.root / schema_path
+        file.parent.mkdir(parents=True, exist_ok=True)
+        file.write_text('{"type":"object","additionalProperties":false}')
+        digest = hashlib.sha256(file.read_bytes()).hexdigest()
+        registry = self.root / "architecture/contract-consumers.json"
+        document = json.loads(registry.read_text())
+        document["active_releases"].append({
+            "path": schema_path, "owner": "a", "consumers": ["b"]
+        })
+        registry.write_text(json.dumps(document))
+        self.consumed["services/b"].append({
+            "canonical": schema_path, "canonical_sha256": digest,
+            "evidence": "declared-consumption-only", "operation_keys": [],
+        })
+        self.emit("b-image.json", "services/b", "b", "oci", [])
+        result = self.call()
+        self.assertEqual(result["summary"]["non_http_releases"], 1)
+        release = next(row for row in result["release_bindings"]
+                       if row["canonical"] == schema_path)
+        self.assertEqual(release["canonical_sha256"], digest)
+        self.assertEqual([row["role"] for row in release["relationships"]],
+                         ["producer", "consumer"])
+        self.assertTrue(all(row["binding_evidence"] == "registry-declaration-only"
+                            for row in release["relationships"]))
+        self.assertTrue(all(len(row["runtime_image_sha256"]) == 64
+                            for row in release["relationships"]))
+
+    def test_non_http_binding_refuses_unmapped_owner(self):
+        schema = "contracts/schemas/orphan-v1.json"
+        file = self.root / schema
+        file.parent.mkdir(parents=True, exist_ok=True)
+        file.write_text("{}")
+        registry = self.root / "architecture/contract-consumers.json"
+        document = json.loads(registry.read_text())
+        document["active_releases"].append({
+            "path": schema, "owner": "unknown-owner", "consumers": []
+        })
+        registry.write_text(json.dumps(document))
+        with self.assertRaisesRegex(ValueError, "no attested runtime"):
             self.call()
 
     def test_previous_ci_run_attestation_is_rejected(self):

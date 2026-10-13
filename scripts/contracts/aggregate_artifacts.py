@@ -17,6 +17,89 @@ from assurance import inventory
 ROOT = Path(__file__).resolve().parents[2]
 
 
+
+def bind_all_releases(documents: dict[tuple[str, str], dict], root: Path = ROOT) -> list[dict]:
+    """Bind every current release to source-attested images without inventing consumption.
+
+    Source-pinned image identity is distinct from actual installed JSON bytes.
+    Releases without an installed copy remain explicit registry declarations.
+    """
+    import hashlib
+
+    registry = json.loads((root / "architecture/contract-consumers.json").read_text())
+    owners = {owner: component for component, (owner, _) in COMPONENTS.items()}
+    if len(owners) != len(COMPONENTS):
+        raise ValueError("Ambiguous owner-to-runtime image mapping")
+    releases = []
+    seen = set()
+    for release in registry["active_releases"]:
+        path = release["path"]
+        if path in seen:
+            raise ValueError("Duplicate canonical release in runtime binding map: " + path)
+        seen.add(path)
+        source = root / path
+        if not source.is_file():
+            raise ValueError("Active canonical release missing from checked-out source: " + path)
+        digest = hashlib.sha256(source.read_bytes()).hexdigest()
+        relationships = []
+        declared = [("producer", release["owner"])] + [
+            ("consumer", consumer) for consumer in release["consumers"]
+        ]
+        if len(release["consumers"]) != len(set(release["consumers"])):
+            raise ValueError("Duplicate active release consumers: " + path)
+        if release["owner"] in release["consumers"]:
+            raise ValueError("Producer cannot also be its cross-service consumer: " + path)
+        for role, owner in declared:
+            if owner == "contract-platform" and role == "producer":
+                # This is a shared protocol convention, not a running service.
+                continue
+            component = owners.get(owner)
+            if component is None:
+                raise ValueError(f"Active release has no attested runtime: {path} {owner}")
+            image = documents[(component, "oci")]
+            copies = sorted(
+                item["path"] for item in image["installed_copies"]
+                if item["canonical"] == path and item["sha256"] == digest
+            )
+            if any(item["canonical"] == path and item["sha256"] != digest
+                   for item in image["installed_copies"]):
+                raise ValueError(f"Built image contains stale canonical release: {path} {component}")
+            if role == "consumer":
+                consumption = [
+                    item for item in image["consumed_releases"]
+                    if item["canonical"] == path
+                ]
+                expected_evidence = (
+                    "verified-installed-copy" if copies else "declared-consumption-only"
+                )
+                if len(consumption) != 1 or (
+                    consumption[0]["canonical_sha256"] != digest
+                    or consumption[0]["evidence"] != expected_evidence
+                ):
+                    raise ValueError(
+                        f"Release consumer not independently attested: {path} {component}"
+                    )
+            relationships.append({
+                "role": role,
+                "owner": owner,
+                "runtime_component": component,
+                "runtime_image_sha256": image["artifact_sha256"],
+                "installed_copies": copies,
+                "binding_evidence": (
+                    "verified-installed-bytes" if copies else "registry-declaration-only"
+                ),
+            })
+        if not relationships:
+            raise ValueError("Canonical release has no runtime image binding: " + path)
+        releases.append({
+            "canonical": path,
+            "kind": path.split("/")[1],
+            "canonical_sha256": digest,
+            "relationships": relationships,
+        })
+    return sorted(releases, key=lambda row: row["canonical"])
+
+
 def aggregate(folder: Path, root: Path = ROOT, revision: str | None = None) -> dict:
     revision = revision or os.environ.get("GITHUB_SHA")
     if not revision or len(revision) != 40 or any(c not in "0123456789abcdef" for c in revision):
@@ -110,6 +193,7 @@ def aggregate(folder: Path, root: Path = ROOT, revision: str | None = None) -> d
     expected_ops = {x["key"] for x in current}
     if set(binding_map) != expected_ops:
         raise ValueError("Contract runtime release binding set differs from canonical OpenAPI")
+    release_bindings = bind_all_releases(documents, root)
     return {
         "schema_version": 1,
         "source_revision": revision,
@@ -118,8 +202,16 @@ def aggregate(folder: Path, root: Path = ROOT, revision: str | None = None) -> d
         "images": {component: documents[(component, "oci")]["artifact_sha256"]
                    for component in sorted(COMPONENTS)},
         "bindings": [binding_map[key] for key in sorted(binding_map)],
+        "release_bindings": release_bindings,
         "summary": {
             "runtime_images": len(COMPONENTS),
+            "active_releases": len(release_bindings),
+            "non_http_releases": sum(row["kind"] != "openapi" for row in release_bindings),
+            "release_image_bindings": sum(len(row["relationships"]) for row in release_bindings),
+            "verified_installed_release_bindings": sum(
+                item["binding_evidence"] == "verified-installed-bytes"
+                for row in release_bindings for item in row["relationships"]
+            ),
             "verified_python_wheels": sum(kind == "python" for _, kind in COMPONENTS.values()),
             "contracted_http_operations": len(current),
             "source_attested_owner_operations": sum(
