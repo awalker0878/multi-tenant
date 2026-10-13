@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Application\Evidence\Contracts\EvidenceAuthority;
 
 it('rejects malformed evidence without opening custody or leaking decoder errors', function (string $raw): void {
+    $this->withToken(str_repeat('a', 64));
     $authority = Mockery::mock(EvidenceAuthority::class);
     $authority->shouldReceive('producer')->once();
     $this->app->instance(EvidenceAuthority::class, $authority);
@@ -24,6 +25,7 @@ it('rejects malformed evidence without opening custody or leaking decoder errors
 ]);
 
 it('rejects extra review fields and non-JSON review bodies before touching evidence custody', function (): void {
+    $this->withToken(str_repeat('a', 64));
     $authority = Mockery::mock(EvidenceAuthority::class);
     $authority->shouldNotReceive('reader');
     $this->app->instance(EvidenceAuthority::class, $authority);

@@ -6,6 +6,7 @@ use App\Application\Planning\Contracts\PlanningInputAuthority;
 
 beforeEach(function (): void {
     $this->id = '10000000-0000-4000-8000-000000000001';
+    $this->withToken(str_repeat('a', 64));
     $authority = Mockery::mock(PlanningInputAuthority::class);
     $authority->shouldReceive('check')->andReturn([]);
     $this->app->instance(PlanningInputAuthority::class, $authority);
