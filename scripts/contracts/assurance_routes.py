@@ -9,6 +9,7 @@ from pathlib import Path
 from assurance import inventory, operation_key
 from route_conformance import (
     routes_in_laravel, verify_app, verify_inventory, verify_lifecycle_native,
+    verify_lifecycle_native_jobs, verify_lifecycle_worker_effect_routes,
     verify_planning_immutable, verify_planning_lifecycle_reads,
     verify_planning_migration, verify_python_composition,
 )
@@ -32,6 +33,8 @@ CHECKED = {
         "contracts/openapi/lifecycle-internal-authority-v1.json",
     },
     "lifecycle-native": {"contracts/openapi/lifecycle-migration-boundary-v2.json"},
+    "lifecycle-native-jobs": {"contracts/openapi/lifecycle-native-jobs-v1.1.json"},
+    "lifecycle-worker-effects": {"contracts/openapi/worker-migration-effect-v2.1.json"},
     "planning-immutable": {"contracts/openapi/planning-immutable-plan-v1.1.json"},
     "planning-lifecycle": {"contracts/openapi/planning-lifecycle-reads-v1.json"},
     "planning-migration": {"contracts/openapi/planning-migration-v1.6.json"},
@@ -40,6 +43,8 @@ CHECKS = {
     "inventory": verify_inventory,
     "python-composed": verify_python_composition,
     "lifecycle-native": verify_lifecycle_native,
+    "lifecycle-native-jobs": verify_lifecycle_native_jobs,
+    "lifecycle-worker-effects": verify_lifecycle_worker_effect_routes,
     "planning-immutable": verify_planning_immutable,
     "planning-lifecycle": verify_planning_lifecycle_reads,
     "planning-migration": verify_planning_migration,

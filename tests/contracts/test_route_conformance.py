@@ -7,7 +7,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts/contracts"))
-from route_conformance import compare_declared, compare_inventory_discovery_routes, compare_inventory_worker_routes, routes_in_laravel, routes_in_openapi, verify_app
+from route_conformance import compare_declared, compare_inventory_discovery_routes, compare_inventory_worker_routes, routes_in_laravel, routes_in_openapi, verify_app, verify_lifecycle_native_jobs, verify_lifecycle_worker_effect_routes
 
 
 class HttpRouteConformanceTests(unittest.TestCase):
@@ -111,6 +111,10 @@ class HttpRouteConformanceTests(unittest.TestCase):
             self.assertEqual(compare_composed_routes("Lifecycle", base, ("example.json",), root), 1)
             with self.assertRaisesRegex(ValueError, "Undocumented Lifecycle"):
                 compare_composed_routes("Lifecycle", base | {("POST", "/internal/hidden")}, ("example.json",), root)
+
+    def test_actual_native_job_and_worker_effect_route_handlers(self):
+        self.assertEqual(verify_lifecycle_native_jobs(ROOT), 4)
+        self.assertEqual(verify_lifecycle_worker_effect_routes(ROOT), 2)
 
     def test_declared_paths_include_each_method(self):
         spec = {"paths": {"/v1/example": {"get": {}, "post": {}}}}

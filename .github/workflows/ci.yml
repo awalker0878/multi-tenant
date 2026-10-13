@@ -175,6 +175,8 @@ jobs:
           python scripts/contracts/assurance_routes.py --app inventory --output "$RUNNER_TEMP/inventory-routes.json"
           python scripts/contracts/assurance_routes.py --app python-composed --output "$RUNNER_TEMP/python-routes.json"
           python scripts/contracts/assurance_routes.py --app lifecycle-native --output "$RUNNER_TEMP/lifecycle-native-routes.json"
+          python scripts/contracts/assurance_routes.py --app lifecycle-native-jobs --output "$RUNNER_TEMP/lifecycle-native-jobs-routes.json"
+          python scripts/contracts/assurance_routes.py --app lifecycle-worker-effects --output "$RUNNER_TEMP/lifecycle-worker-effects-routes.json"
           python scripts/contracts/assurance_routes.py --app planning-immutable --producer-only --output "$RUNNER_TEMP/planning-immutable-producer.json"
           python scripts/contracts/assurance_routes.py --app planning-lifecycle --producer-only --output "$RUNNER_TEMP/planning-lifecycle-producer.json"
           python scripts/contracts/python_denials.py --owner inventory --output "$RUNNER_TEMP/inventory-denials.json"
@@ -190,6 +192,8 @@ jobs:
             ${{ runner.temp }}/inventory-routes.json
             ${{ runner.temp }}/python-routes.json
             ${{ runner.temp }}/lifecycle-native-routes.json
+            ${{ runner.temp }}/lifecycle-native-jobs-routes.json
+            ${{ runner.temp }}/lifecycle-worker-effects-routes.json
             ${{ runner.temp }}/planning-immutable-producer.json
             ${{ runner.temp }}/planning-lifecycle-producer.json
             ${{ runner.temp }}/inventory-denials.json

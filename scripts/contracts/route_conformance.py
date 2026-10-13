@@ -563,9 +563,71 @@ def verify_python_composition(root: Path = ROOT) -> int:
             + compare_composed_routes("Lifecycle", set(lifecycle_routes), tuple(["lifecycle-v1.json","lifecycle-migration-campaigns-v1.json","lifecycle-internal-authority-v1.json"]), root))
 
 
+
+def verify_lifecycle_native_jobs(root: Path = ROOT) -> int:
+    """Exercise every native job handler route without claiming producer behavior."""
+    import asyncio
+    from lifecycle.interfaces.native_jobs import NativeJobsApp
+
+    spec = json.loads((root / "contracts/openapi/lifecycle-native-jobs-v1.1.json").read_text())
+    expected = {
+        ("POST", "/v1/tenants/{tenant}/native-jobs"),
+        ("GET", "/v1/tenants/{tenant}/native-jobs/{job}"),
+        ("POST", "/v1/tenants/{tenant}/native-jobs/{job}/stop"),
+        ("POST", "/v1/tenants/{tenant}/native-jobs/{job}/continue-transfer"),
+    }
+    if routes_in_openapi(spec) != expected:
+        raise ValueError("Native job router differs from published operations")
+    app = NativeJobsApp(workflow=None, authority=None, resolve=lambda *_: {})
+    headers = [(b"authorization", b"Bearer short")]
+    for method, template in sorted(expected):
+        path = synthetic_path(template)
+        code, body = asyncio.run(_exchange(app, path, method, headers))
+        if code != 401 or body != {"error": "invalid_workload"}:
+            raise ValueError(f"Native job handler missing authenticated route: {method} {path}")
+        wrong = "GET" if method == "POST" else "POST"
+        code, _ = asyncio.run(_exchange(app, path, wrong, headers))
+        if code != 404:
+            raise ValueError(f"Native job handler accepted uncontracted method: {wrong} {path}")
+    code, _ = asyncio.run(_exchange(
+        app, f"/v1/tenants/{SAMPLE_UUID}/native-jobs/{SAMPLE_UUID}/uncontracted",
+        "POST", headers,
+    ))
+    if code != 404:
+        raise ValueError("Native job handler accepted uncontracted route")
+    return len(expected)
+
+
+def verify_lifecycle_worker_effect_routes(root: Path = ROOT) -> int:
+    """Exercise worker-native ASGI routes; invalid caller is not producer proof."""
+    import asyncio
+    from lifecycle_worker.interfaces.native import NativeEffectApp
+
+    spec = json.loads((root / "contracts/openapi/worker-migration-effect-v2.1.json").read_text())
+    expected = {
+        ("POST", "/internal/native-effects"),
+        ("POST", "/internal/native-transfer-continuations"),
+    }
+    if routes_in_openapi(spec) != expected:
+        raise ValueError("Native effect router differs from published operations")
+    app = NativeEffectApp(effects=None, caller=lambda *_: (SAMPLE_UUID, SAMPLE_UUID))
+    headers = [(b"authorization", b"Bearer short")]
+    for method, path in sorted(expected):
+        code, body = asyncio.run(_exchange(app, path, method, headers))
+        if code != 401 or body != {"error": "native_effect_held"}:
+            raise ValueError(f"Native worker handler missing authenticated route: {method} {path}")
+        code, _ = asyncio.run(_exchange(app, path, "GET", headers))
+        if code != 404:
+            raise ValueError(f"Native worker accepted uncontracted method: GET {path}")
+    code, _ = asyncio.run(_exchange(app, "/internal/not-a-native-effect", "POST", headers))
+    if code != 404:
+        raise ValueError("Native worker accepted uncontracted route")
+    return len(expected)
+
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--app", choices=["governance", "catalogue", "assurance", "inventory", "planning-migration", "lifecycle-native", "planning-immutable", "planning-lifecycle", "python-composed"], required=True)
+    parser.add_argument("--app", choices=["governance", "catalogue", "assurance", "inventory", "planning-migration", "lifecycle-native", "lifecycle-native-jobs", "lifecycle-worker-effects", "planning-immutable", "planning-lifecycle", "python-composed"], required=True)
     parser.add_argument("--routes", type=Path)
     args = parser.parse_args()
     if args.app == "python-composed":
@@ -578,6 +640,10 @@ def main():
         count = (verify_lifecycle_native() if args.app == "lifecycle-native"
                  else verify_planning_immutable() if args.app == "planning-immutable"
                  else verify_planning_lifecycle_reads())
+        print(json.dumps({"status": "PASS", "app": args.app, "runtime_operations": count}))
+    elif args.app in {"lifecycle-native-jobs", "lifecycle-worker-effects"}:
+        count = (verify_lifecycle_native_jobs() if args.app == "lifecycle-native-jobs"
+                 else verify_lifecycle_worker_effect_routes())
         print(json.dumps({"status": "PASS", "app": args.app, "runtime_operations": count}))
     elif args.app == "planning-migration":
         count = verify_planning_migration()
