@@ -59,8 +59,8 @@ class MeasuredProofTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             dest = Path(folder) / "measured.json"
             with patch.object(measured, "verified_consumers",
-                              return_value=[{"key": "example", "claim": "consumer"}]), \\
-                    patch.object(sys, "argv", ["measured_consumers.py", "--output", str(dest)]), \\
+                              return_value=[{"key": "example", "claim": "consumer"}]), \
+                    patch.object(sys, "argv", ["measured_consumers.py", "--output", str(dest)]), \
                     contextlib.redirect_stdout(io.StringIO()) as output:
                 measured.main()
             self.assertEqual(json.loads(dest.read_text()),
