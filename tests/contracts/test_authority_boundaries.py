@@ -261,3 +261,9 @@ class LifecycleOwnerTransportContracts(unittest.TestCase):
                 execution_owners.request("ASSURANCE", "POST", path, {})
             with self.assertRaises(Rejected):
                 execution_owners.request("ASSURANCE", "POST", f"/v1/tenants/{OTHER}/unregistered", {})
+            # An unknown owner must never bypass the installed response contract.
+            with self.assertRaises(Rejected) as untyped:
+                execution_owners.request("CAPACITY", "POST",
+                    f"/internal/tenants/{TENANT}/placement-reservations/checks", {})
+            self.assertEqual(untyped.exception.status, 503)
+

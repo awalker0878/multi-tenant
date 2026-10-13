@@ -53,7 +53,7 @@ def request(
     try:
         selected = [item for item in OWNER_OPERATIONS
                     if item[0] == owner and item[1] == method and re.fullmatch(item[2], path)]
-        if owner in {"GOVERNANCE", "PLANNING", "ASSURANCE"} and len(selected) != 1:
+        if len(selected) != 1:
             raise ValueError("owner_operation_uncontracted")
         url = urlsplit(os.environ[owner + "_URL"])
         ca = os.environ[owner + "_CA_FILE"]
