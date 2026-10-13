@@ -14,7 +14,7 @@ from unittest.mock import patch
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts/contracts"))
 from dependency_graph import derive
-from artifact_attestation import check_image, check_wheel, check_console_frontend
+from artifact_attestation import check_image, check_wheel, check_console_frontend, compare_runtime_tree
 from aggregate_artifacts import aggregate
 
 
@@ -194,6 +194,36 @@ class ArtifactTests(unittest.TestCase):
             manifest.unlink()
             with self.assertRaisesRegex(ValueError, "lacks compiled Vite manifest"):
                 check_console_frontend(root)
+
+    def test_all_shipped_runtime_files_must_match_the_reviewed_source(self):
+        source = self.root / "source"
+        image = self.root / "image"
+        source.mkdir()
+        image.mkdir()
+        (source / "app.php").write_text("<?php return true;")
+        (image / "app.php").write_text("<?php return true;")
+        self.assertEqual(compare_runtime_tree(source, image, "php-service"), 1)
+        (image / "app.php").write_text("<?php return false;")
+        with self.assertRaisesRegex(ValueError, "differs from reviewed runtime source"):
+            compare_runtime_tree(source, image, "php-service")
+        (image / "app.php").write_text("<?php return true;")
+        (image / "unreviewed.sql").write_text("select 1")
+        with self.assertRaisesRegex(ValueError, "differs from reviewed runtime source"):
+            compare_runtime_tree(source, image, "php-service")
+
+    def test_runtime_bootstrap_cache_is_not_counted_as_authored_source(self):
+        source = self.root / "source"
+        image = self.root / "image"
+        source.mkdir()
+        image.mkdir()
+        (source / "app.php").write_text("<?php return true;")
+        (image / "app.php").write_text("<?php return true;")
+        cache = image / "cache"
+        cache.mkdir()
+        (cache / "services.php").write_text("<?php return [];")
+        self.assertEqual(compare_runtime_tree(source, image, "bootstrap", skip_cache=True), 1)
+        with self.assertRaisesRegex(ValueError, "differs from reviewed runtime source"):
+            compare_runtime_tree(source, image, "bootstrap")
 
     def test_oci_image_requires_exact_source_sha_label(self):
         fake = [{

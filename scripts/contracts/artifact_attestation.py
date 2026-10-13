@@ -160,6 +160,28 @@ def check_wheel(component: str, wheel: Path, root: Path = ROOT) -> dict:
     }
 
 
+def compare_runtime_tree(source_root: Path, image_root: Path, component: str,
+                         skip_cache: bool = False) -> int:
+    """Require exact bytes for every shipped product file, not just route modules."""
+    if not source_root.is_dir() or not image_root.is_dir():
+        raise ValueError(f"Runtime source directory is missing: {component}")
+
+    def files(folder: Path) -> dict[str, str]:
+        return {
+            str(file.relative_to(folder)): sha(file.read_bytes())
+            for file in folder.rglob("*")
+            if file.is_file()
+            and not file.is_symlink()
+            and not (skip_cache and file.relative_to(folder).parts[0] == "cache")
+        }
+
+    expected = files(source_root)
+    actual = files(image_root)
+    if not expected or expected != actual:
+        raise ValueError(f"Image differs from reviewed runtime source tree: {component}")
+    return len(expected)
+
+
 def check_console_frontend(browser: Path) -> int:
     manifest = browser / "manifest.json"
     if not manifest.is_file():
@@ -270,34 +292,20 @@ def check_image(component: str, tag: str, root: Path = ROOT) -> dict:
             # ALL bounded runtime source code, not only a startup module, is
             # byte-for-byte identical to the reviewed checkout.
             if COMPONENTS[component][1] == "php":
-                for folder in ("app", "routes"):
+                folders = ["app", "routes", "bootstrap", "config", "database"]
+                if component == "apps/console":
+                    folders += ["resources/views", "resources/js/pages"]
+                for folder in folders:
                     source_root = root / component / folder
-                    packaged_root = destination / ("runtime-" + folder)
+                    packaged_root = destination / ("runtime-" + folder.replace("/", "-"))
                     run("docker", "cp", cid + ":/app/" + folder, str(packaged_root))
-                    source_files = {
-                        str(file.relative_to(source_root)): sha(file.read_bytes())
-                        for file in source_root.rglob("*.php")
-                    }
-                    packaged_files = {
-                        str(file.relative_to(packaged_root)): sha(file.read_bytes())
-                        for file in packaged_root.rglob("*.php")
-                    }
-                    if not source_files or source_files != packaged_files:
-                        raise ValueError(f"Image differs from reviewed PHP runtime sources: {component}/{folder}")
+                    compare_runtime_tree(source_root, packaged_root,
+                                         f"{component}/{folder}", skip_cache=folder == "bootstrap")
             else:
                 if not local_root.is_dir():
                     run("docker", "cp", cid + ":" + app_root, str(local_root))
                 source_root = root / component / "src" / pkg
-                source_files = {
-                    str(file.relative_to(source_root)): sha(file.read_bytes())
-                    for file in source_root.rglob("*") if file.is_file()
-                }
-                packaged_files = {
-                    str(file.relative_to(local_root)): sha(file.read_bytes())
-                    for file in local_root.rglob("*") if file.is_file()
-                }
-                if not source_files or source_files != packaged_files:
-                    raise ValueError(f"Image differs from reviewed Python runtime sources: {component}")
+                compare_runtime_tree(source_root, local_root, component)
             if COMPONENTS[component][1] == "python":
                 found = set()
                 for namespace in ("inputs", "contracts", "messaging"):
