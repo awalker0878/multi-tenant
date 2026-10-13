@@ -30,7 +30,7 @@ Every response/export retains `native_write_authorized: false`.
 
 ## Publishing original owner evidence
 
-The [evidence contract](../../contracts/schemas/inventory/commissioning-evidence-v1.json)
+The evidence contract
 defines an observation report, signed receipt and public-key registry. Reports
 contain actual observations from the responsible system; the publisher does not
 run a native check or derive a successful result from a reference string.

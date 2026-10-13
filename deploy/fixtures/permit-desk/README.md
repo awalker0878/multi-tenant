@@ -56,7 +56,7 @@ python3 scripts/p01/run_permit_desk.py \
   --output /absolute/path/to/absent-evidence-directory
 ```
 
-The [CI campaign](../../../.github/workflows/p01-permit-desk-recovery.yml) uses the
+The CI campaign uses the
 same command. Source changes and workflow execution are separate from a passing
 result; current observations belong in the [implementation record](../../../docs/implementation/p01-permit-desk-recovery.md).
 
