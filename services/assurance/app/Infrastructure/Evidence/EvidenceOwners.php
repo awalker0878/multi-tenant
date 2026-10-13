@@ -22,7 +22,16 @@ final class EvidenceOwners implements EvidenceAuthority
 
     public function binding(string $tenant, string $job): array
     {
-        return $this->request('lifecycle', 'GET', '/internal/evidence-bindings/'.$tenant.'/'.$job);
+        $binding = $this->request('lifecycle', 'GET', '/internal/evidence-bindings/'.$tenant.'/'.$job);
+        abort_unless(($binding['tenant_id'] ?? null) === $tenant
+            && ($binding['job_id'] ?? null) === $job
+            && ($binding['evidence_level'] ?? null) === 'E2'
+            && is_string($binding['digest'] ?? null)
+            && preg_match('/\\A[0-9a-f]{64}\\z/', $binding['digest']) === 1
+            && is_array($binding['observations'] ?? null),
+            503, 'lifecycle_binding_contract_invalid');
+
+        return $binding;
     }
 
     public function observe(array $observation): void
@@ -47,6 +56,17 @@ final class EvidenceOwners implements EvidenceAuthority
             ksort($returnedScope, SORT_STRING);
         }
         ksort($scope, SORT_STRING);
+        $fields = array_keys($result);
+        $required = ['allowed', 'delegation_id', 'actor_id', 'delegating_service',
+            'audience', 'tenant_id', 'action', 'scope', 'expires_at',
+            'evaluated_at', 'authority_use'];
+        sort($fields, SORT_STRING);
+        sort($required, SORT_STRING);
+        abort_unless($fields === $required
+            && ($result['delegating_service'] ?? null) === 'console'
+            && preg_match('/\\A[0-9a-f-]{36}\\z/', (string) ($result['delegation_id'] ?? '')) === 1
+            && preg_match('/\\A[0-9a-f-]{36}\\z/', (string) ($result['actor_id'] ?? '')) === 1,
+            503, 'governance_delegation_contract_invalid');
         abort_unless(($result['allowed'] ?? null) === true && ($result['audience'] ?? null) === 'assurance'
             && ($result['tenant_id'] ?? null) === $tenant && ($result['action'] ?? null) === $action && $returnedScope === $scope
             && ($result['authority_use'] ?? null) === 'request_bound' && Carbon::parse($result['expires_at'])->isFuture()
