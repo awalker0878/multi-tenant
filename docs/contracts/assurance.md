@@ -22,7 +22,8 @@ security:
   payload and rejected invalid or stale input
 - `authorization`: an executable boundary rejected a missing/invalid caller
 - `tenant_isolation`: an authenticated cross-tenant request was independently
-  denied, not merely rejected for missing headers
+  denied, not merely rejected for missing headers; receipts require different
+  credential and requested tenant scopes, authentication, and a real 403/404/423
 
 Non-HTTP releases require independently executed producer and consumer proof.
 These include actual broker event publishers/consumers, validated schema
@@ -48,11 +49,11 @@ exception grants coverage.
 - `scripts/contracts/python_denials.py` probes the actual composed Inventory,
   Planning and Lifecycle ASGI services. It omits separately deployed native
   control and worker processes rather than faking coverage.
-- `scripts/contracts/measured_consumers.py` runs exact current Inventory
-  producer/Planning client, Assurance client and Catalogue client tests; only
-  a successful execution yields producer/consumer receipts.
+- `scripts/contracts/measured_consumers.py` executes exact Inventory,
+  Planning, Lifecycle and Governance consumer paths, including the actual
+  Lifecycle ASGI placement receipt through Planning's installed validator.
 - `scripts/contracts/combine_assurance.py` combines ephemeral observations
-  from the same workflow run. Contract Integrity retains an operation-level
+  from the same workflow run. The required CI / Contract assurance job retains an operation-level
   report and invokes **`--require-qualified`**, which fails the workflow
   until *every* current release and operation has earned all required proof.
 

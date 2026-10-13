@@ -165,6 +165,31 @@ jobs:
           python scripts/contracts/route_conformance.py --app planning-immutable
           python scripts/contracts/route_conformance.py --app planning-lifecycle
           python scripts/contracts/measured_consumers.py --output "$RUNNER_TEMP/measured-consumers.json"
+          python scripts/contracts/assurance_routes.py --app inventory --output "$RUNNER_TEMP/inventory-routes.json"
+          python scripts/contracts/assurance_routes.py --app python-composed --output "$RUNNER_TEMP/python-routes.json"
+          python scripts/contracts/assurance_routes.py --app lifecycle-native --output "$RUNNER_TEMP/lifecycle-native-routes.json"
+          python scripts/contracts/assurance_routes.py --app planning-immutable --producer-only --output "$RUNNER_TEMP/planning-immutable-producer.json"
+          python scripts/contracts/assurance_routes.py --app planning-lifecycle --producer-only --output "$RUNNER_TEMP/planning-lifecycle-producer.json"
+          python scripts/contracts/python_denials.py --owner inventory --output "$RUNNER_TEMP/inventory-denials.json"
+          python scripts/contracts/python_denials.py --owner planning --output "$RUNNER_TEMP/planning-denials.json"
+          python scripts/contracts/python_denials.py --owner lifecycle --output "$RUNNER_TEMP/lifecycle-denials.json"
+      - name: Retain independently executed Python contract observations
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: contract-assurance-python-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/measured-consumers.json
+            ${{ runner.temp }}/inventory-routes.json
+            ${{ runner.temp }}/python-routes.json
+            ${{ runner.temp }}/lifecycle-native-routes.json
+            ${{ runner.temp }}/planning-immutable-producer.json
+            ${{ runner.temp }}/planning-lifecycle-producer.json
+            ${{ runner.temp }}/inventory-denials.json
+            ${{ runner.temp }}/planning-denials.json
+            ${{ runner.temp }}/lifecycle-denials.json
+          if-no-files-found: warn
+          retention-days: 14
 
   security:
     name: CI / Security
@@ -218,6 +243,7 @@ jobs:
       - run: python -m pip install --disable-pip-version-check -r requirements-docs.txt
       - name: Qualify affected migration method contracts and native non-equivalence
         run: |
+          python -m pip install --disable-pip-version-check -r scripts/contracts/requirements.txt
           python scripts/generate_capabilities.py --check
           python scripts/p08/qualify.py --output "$RUNNER_TEMP/native-p08"
           python scripts/p09/qualify.py --output "$RUNNER_TEMP/native-p09"
@@ -358,10 +384,49 @@ jobs:
           retention-days: 14
 
 
+  contract-assurance:
+    name: CI / Contract assurance
+    if: always() && needs.scope.outputs.contracts == 'true'
+    needs: [scope, contracts, laravel-routes]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12.14'
+      - name: Install pinned contract assurance validators
+        run: python -m pip install --disable-pip-version-check -r scripts/contracts/requirements.txt
+      - name: Download measured receipts from this exact run
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          pattern: contract-assurance-*-${{ github.sha }}
+          path: ${{ runner.temp }}/contract-measurements
+          merge-multiple: true
+      - name: Fail closed on absent, stale or incomplete contract qualification
+        env:
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_SHA: ${{ github.sha }}
+        run: |
+          python scripts/contracts/combine_assurance.py \
+            --input-directory "$RUNNER_TEMP/contract-measurements" \
+            --output "$RUNNER_TEMP/contract-assurance-report.json" \
+            --require-qualified
+      - name: Retain explicit qualification gaps even on failed admission
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: contract-assurance-report-${{ github.sha }}
+          path: ${{ runner.temp }}/contract-assurance-report.json
+          if-no-files-found: warn
+          retention-days: 14
+
   required:
     name: CI / Required
     if: always()
-    needs: [scope, architecture, python, php, contracts, security, native, authority, laravel-routes]
+    needs: [scope, architecture, python, php, contracts, contract-assurance, security, native, authority, laravel-routes]
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:

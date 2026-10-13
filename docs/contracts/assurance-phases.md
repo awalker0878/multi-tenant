@@ -24,11 +24,11 @@ duplicate evidence is rejected. The aggregate
 `scripts/contracts/combine_assurance.py` writes a detailed per-operation and
 per-release report with every missing claim.
 
-**Normal Contract Integrity CI publishes incomplete coverage as incomplete.**
-It is not a certificate of release readiness. To require 100% measured
-qualification, explicitly dispatch **Contract source and consumer integrity**
-with `require_full_qualification=true`. That invocation fails closed until
-every required claim is measured. Where a real producer or tenant isolation
+**CI / Contract assurance** is a mandatory affected-change job. It consumes
+fresh observations from the Python and Laravel owners and requires complete
+qualified coverage, not just source validity. Missing tests keep the required
+gate red until executable evidence exists for each current operation and
+non-HTTP release. No manual bypass or compatibility exception qualifies it. Where a real producer or tenant isolation
 probe does not exist, write the actual test; never substitute a route match,
 static fixture or blanket allowlist.
 
@@ -75,7 +75,7 @@ python -m unittest discover -s tests/contracts -p 'test_assurance.py' -v
 python -m unittest discover -s tests/contracts -p 'test_phase2_artifacts.py' -v
 python scripts/contracts/assurance.py --output /tmp/contract-inventory.json
 # CI produces /tmp/contract-assurance-report.json from measured evidence.
-# Strict approval is deliberately an explicit, separate CI workflow dispatch.
+# Required CI / Contract assurance fails on an incomplete measurement set.
 ```
 
 Retired canonical versions still have separately managed consumer-clearance
