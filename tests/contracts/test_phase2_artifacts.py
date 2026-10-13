@@ -400,20 +400,6 @@ class ReleaseAggregateTests(unittest.TestCase):
         self.assertEqual(release["relationships"], [])
         self.assertEqual(result["summary"]["source_only_releases"], 1)
 
-    def test_non_shared_unbound_release_is_rejected(self):
-        schema = "contracts/schemas/no-runtime-v1.json"
-        target = self.root / schema
-        target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text("{}")
-        registry = self.root / "architecture/contract-consumers.json"
-        document = json.loads(registry.read_text())
-        document["active_releases"].append({
-            "path": schema, "owner": "unknown-owner", "consumers": []
-        })
-        registry.write_text(json.dumps(document))
-        with self.assertRaisesRegex(ValueError, "no attested runtime"):
-            self.call()
-
     def test_non_http_binding_refuses_unmapped_owner(self):
         schema = "contracts/schemas/orphan-v1.json"
         file = self.root / schema

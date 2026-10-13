@@ -128,7 +128,8 @@ class HttpRouteConformanceTests(unittest.TestCase):
                 self.assertEqual(denial["source"], "live-denial")
                 self.assertEqual(denial["denial_kind"], "invalid-credential")
                 self.assertEqual(denial["status_code"], 401)
-                self.assertNotIn("tenant_isolation", denial["claim"])
+            self.assertFalse(any(row["claim"] == "tenant_isolation"
+                                 for row in observations))
 
 
     def test_declared_paths_include_each_method(self):
