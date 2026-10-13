@@ -26,11 +26,14 @@ class MeasuredProofTests(unittest.TestCase):
     def test_every_claim_points_to_a_real_executable_selector(self):
         self.assertTrue(measured.TESTS)
         self.assertTrue(measured.RELEASE_TESTS)
-        for registry in (measured.TESTS, measured.RELEASE_TESTS):
-            for selector, bindings in registry.items():
-                self.assertTrue((ROOT / selector.split("::", 1)[0]).is_file(), selector)
-                self.assertTrue(bindings, selector)
-                self.assertTrue(all(isinstance(binding, tuple) for binding in bindings))
+        for selector, bindings in measured.TESTS.items():
+            self.assertTrue((ROOT / selector.split("::", 1)[0]).is_file(), selector)
+            self.assertTrue(bindings, selector)
+            for owner, method, path, claims in bindings:
+                self.assertTrue(owner and method and path and claims)
+        for selector, (path, claims) in measured.RELEASE_TESTS.items():
+            self.assertTrue((ROOT / selector.split("::", 1)[0]).is_file(), selector)
+            self.assertTrue(path and claims, selector)
 
     def test_successful_execution_attributes_only_explicit_current_claims(self):
         with patch.object(measured.subprocess, "run",
