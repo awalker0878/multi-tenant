@@ -13,7 +13,7 @@ owner-backed returned quota and waits for form processing to finish before
 reload or further navigation. Network exceptions are still failures. No retry,
 browser exclusion, timeout increase or product authorization change was added.
 
-The [original report](../../verification/p02/identity/run-37371858388/webkit/report.json)
+The original report
 and archive retain the failure. Its 284 source hashes and eight artifact hashes
 match the recorded commit and original downloaded bytes. Local discovery of the
 corrected two-journey suite passes; hosted execution must establish the correction

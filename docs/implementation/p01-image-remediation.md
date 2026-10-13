@@ -13,7 +13,7 @@ from product image and runtime qualification.
 
 Run 37271464232 at `50b5362dad2ec3686fd9ce433978d081bd4e6c95` measured zero
 blocking or secret findings in both Alpine 3.24.2 bases. Trixie still reports
-167 blocking matches for PHP and 53 for Python. The [retained report](../../verification/p01/image-remediation/run-37271464232/report.json)
+167 blocking matches for PHP and 53 for Python. The retained report
 contains the exact manifest identities, scanner/database hashes and findings.
 
 The nine product Dockerfiles now select the two observed Alpine child manifests.
@@ -38,10 +38,10 @@ can describe code not built into the installed binary. That example does not
 waive this candidate set or replace exact-artifact evidence.
 
 The first full PHP rebuild (run 37272257487) rejected an incomplete OpenSSL
-upgrade closure. The [retained failed build](../../verification/p01/image-remediation/run-37272257487/catalogue-build.zip)
+upgrade closure. The retained failed build
 records the conflict; it was not bypassed. Run 37272419641 then included the
 matching OpenSSL executable and successfully installed each build/runtime/Composer
-group into the exact base with networking disabled. Its [full observation](../../verification/p01/image-remediation/run-37272419641/report.json)
+group into the exact base with networking disabled. Its full observation
 and package-resolution/install logs are retained separately from the initial comparison.
 
 ## Passing full-image and runtime requalification
