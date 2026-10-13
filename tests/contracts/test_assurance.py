@@ -145,6 +145,11 @@ class AssuranceCoverageTests(unittest.TestCase):
         spoofed["status_code"] = 503
         with self.assertRaisesRegex(ValueError, "authenticated cross-tenant denial"):
             assess(self.root, [spoofed])
+        # A 423 means an operation was held (possibly for unrelated freshness
+        # or policy reasons); it is not an access-control isolation verdict.
+        spoofed["status_code"] = 423
+        with self.assertRaisesRegex(ValueError, "authenticated cross-tenant denial"):
+            assess(self.root, [spoofed])
         spoofed = self.evidence("authorization")
         spoofed["status_code"] = 404
         with self.assertRaisesRegex(ValueError, "real credential denial"):
