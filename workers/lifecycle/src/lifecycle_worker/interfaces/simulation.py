@@ -72,6 +72,43 @@ class SimulationApp:
                 body = json.loads(raw, object_pairs_hook=pairs)
                 if not isinstance(body, dict):
                     raise ValueError("invalid_shape")
+                # Reject an untyped transport before consulting simulated effects.
+                import re
+                required = (
+                    {"tenant_id", "job_id", "operation_id", "attempt_id",
+                     "plan_digest", "epoch", "simulation", "id", "step",
+                     "worker_id", "expires_at", "campaign_id", "scope", "adapter"}
+                    if scope["path"] == "/v1/effects" else
+                    {"tenant_id", "job_id", "operation_id", "attempt_id",
+                     "plan_digest", "epoch", "simulation"}
+                )
+                if set(body) != required or body["simulation"] is not True:
+                    raise ValueError("simulation_request_contract_invalid")
+                for field in ("tenant_id", "job_id", "operation_id", "attempt_id", "epoch"):
+                    if not isinstance(body[field], str) or not re.fullmatch(
+                        r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                        body[field]
+                    ):
+                        raise ValueError("simulation_identity_invalid")
+                if not isinstance(body["plan_digest"], str) or not re.fullmatch(
+                    r"[0-9a-f]{64}", body["plan_digest"]
+                ):
+                    raise ValueError("simulation_plan_digest_invalid")
+                if scope["path"] == "/v1/effects":
+                    for field in ("id", "worker_id", "campaign_id"):
+                        if not isinstance(body[field], str) or not re.fullmatch(
+                            r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+                            body[field]
+                        ):
+                            raise ValueError("simulation_grant_identity_invalid")
+                    if (body["adapter"] != "p06-simulator-v1"
+                            or not isinstance(body["step"], str)
+                            or not 1 <= len(body["step"]) <= 128
+                            or type(body["expires_at"]) is not int
+                            or body["expires_at"] < 0
+                            or not isinstance(body["scope"], dict)
+                            or not body["scope"]):
+                        raise ValueError("simulation_grant_contract_invalid")
                 # Retries are bound to the precise operation and request bytes;
                 # no arbitrary caller-chosen replay key may authorize effects.
                 import hashlib
@@ -98,9 +135,19 @@ class SimulationApp:
                     raise ValueError("simulation_receipt_scope_mismatch")
                 status = 200
         except (ValueError, KeyError, TypeError, TimeoutError):
-            status, payload = 403, {"error": "simulation_denied"}
+            from uuid import uuid4
+            status = 403
+            payload = {
+                "code": "simulation_denied", "message": "Simulation request denied",
+                "correlation_id": str(uuid4()), "retryable": False,
+            }
         except Exception:
-            pass
+            from uuid import uuid4
+            status = 503
+            payload = {
+                "code": "simulation_unavailable", "message": "Simulation unavailable",
+                "correlation_id": str(uuid4()), "retryable": True,
+            }
         encoded = json.dumps(payload, separators=(",", ":")).encode()
         await send(
             {
