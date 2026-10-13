@@ -408,7 +408,8 @@ def main() -> int:
         "run_id": os.environ.get("GITHUB_RUN_ID"), "run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT"),
         "commands": [], "checks": [], "source_sha256": {},
     })
-    component = output / "component"
+    stage = output / "staged"
+    component = stage / config["path"]
     try:
         source = workspace / config["path"]
         e.require("component-path-inside-repository", source.resolve().is_relative_to(workspace))
@@ -420,6 +421,32 @@ def main() -> int:
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(path, target)
             e.state["source_sha256"][str(path.relative_to(workspace))] = sha256(path)
+        # Preserve the repository's relative layout in this isolated candidate.
+        # Owner tests read *current* canonical schemas and fixtures through
+        # paths resolved from their own test directories. A flat /component
+        # staging root redirected those reads outside the checkout and broke
+        # real schema conformance tests before they could execute.
+        #
+        # Copy the checked-in contract inputs only into the disposable stage:
+        # never fetch retired contracts or use a runtime compatibility loader.
+        contract_source = workspace / "contracts"
+        contract_files = files(contract_source)
+        e.require("canonical-test-inputs-present", bool(contract_files))
+        e.require(
+            "canonical-test-inputs-have-no-symlinks",
+            all(
+                not path.is_symlink()
+                and all(not parent.is_symlink()
+                        for parent in path.parents if parent.is_relative_to(contract_source))
+                for path in contract_files
+            ),
+        )
+        for path in contract_files:
+            relative = path.relative_to(workspace)
+            target = stage / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(path, target)
+            e.state["source_sha256"][str(relative)] = sha256(path)
         for path in [*files(workspace / "scripts/p01"), workspace / ".github/workflows/ci.yml"]:
             e.state["source_sha256"][str(path.relative_to(workspace))] = sha256(path)
         e.save()
