@@ -182,6 +182,36 @@ class AssuranceCoverageTests(unittest.TestCase):
         self.write(self.api, doc)
         self.assertFalse(inventory(self.root)["operations"][0]["security_required"])
 
+    def test_shared_health_bearer_requires_auth_without_invented_tenant_scope(self):
+        document = json.loads((self.root / self.api).read_text())
+        document["paths"] = {
+            "/health/dependencies": {
+                "get": {
+                    "operationId": "inspectDependencies",
+                    "responses": {"200": {"description": "Ready"}},
+                    "security": [{"Caller": []}],
+                },
+            },
+        }
+        self.write(self.api, document)
+        self.write("architecture/contract-consumers.json", {
+            "active_releases": [
+                {"path": self.api, "owner": "contract-platform",
+                 "consumers": ["sample"], "copies": []},
+                {"path": self.schema, "owner": "sample",
+                 "consumers": [], "copies": []},
+            ],
+        })
+        operation = inventory(self.root)["operations"][0]
+        self.assertTrue(operation["security_required"])
+        self.assertFalse(operation["tenant_isolation_required"])
+        result = assess(self.root)
+        self.assertEqual(
+            result["coverage"][0]["required"],
+            ["route", "producer", "consumer", "authorization"],
+        )
+        self.assertNotIn("tenant_isolation", result["coverage"][0]["missing"])
+
     def test_missing_declared_canonical_cannot_be_qualified(self):
         (self.root / self.api).unlink()
         with self.assertRaisesRegex(ValueError, "Missing canonical contract"):

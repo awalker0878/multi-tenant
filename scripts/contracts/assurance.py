@@ -104,6 +104,13 @@ def inventory(root: Path = ROOT) -> dict:
                         # operation publicly callable even if other alternatives
                         # require credentials.
                         "security_required": bool(security) and all(bool(x) for x in security),
+                        # Shared foundation health is service-scoped diagnostic
+                        # access, not a tenant-bound authority operation. Bearer
+                        # checks still apply, but a fabricated tenant credential
+                        # cannot be required to qualify a tenantless health read.
+                        "tenant_isolation_required": bool(security) and all(bool(x) for x in security)
+                        and not (release["owner"] == "contract-platform"
+                                 and uri.startswith("/health/")),
                         "response_statuses": cases,
                         "has_request_body": bool(spec.get("requestBody")),
                     })
@@ -186,7 +193,9 @@ def assess(root: Path = ROOT, observations: list[dict] | None = None,
     for key, operation in operations.items():
         required = ["route", "producer", "consumer"]
         if operation["security_required"]:
-            required += ["authorization", "tenant_isolation"]
+            required.append("authorization")
+            if operation["tenant_isolation_required"]:
+                required.append("tenant_isolation")
         missing = [claim for claim in required if claim not in proofs[key]]
         coverage.append({
             "key": key, "release": operation["release"],

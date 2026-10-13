@@ -24,6 +24,8 @@ security:
 - `tenant_isolation`: an authenticated cross-tenant request was independently
   denied, not merely rejected for missing headers; receipts require different
   credential and requested tenant scopes, authentication, and a real 403/404/423
+  (shared contract-platform health diagnostics are not tenant-authority calls;
+  protected health checks still require independent authorization proof)
 
 Non-HTTP releases require independently executed producer and consumer proof.
 These include actual broker event publishers/consumers, validated schema
