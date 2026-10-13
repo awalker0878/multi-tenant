@@ -83,6 +83,7 @@ async def probe(owner: str) -> tuple[list[dict], list[str]]:
         return [], [owner + " router-unavailable:" + type(error).__name__]
     measured = []
     unresolved = []
+    eligible = 0
     for op in operations:
         if op["owner"] != owner or not op["security_required"]:
             continue
@@ -96,6 +97,7 @@ async def probe(owner: str) -> tuple[list[dict], list[str]]:
                     "contracts/openapi/worker-migration-effect-v2.1.json",
                 }):
             continue
+        eligible += 1
         try:
             code = await exchange(app, op["method"], actual_path(op["path"]))
         except Exception as error:
@@ -111,6 +113,8 @@ async def probe(owner: str) -> tuple[list[dict], list[str]]:
             "test": "python_denials.py:unauthenticated_" + str(code),
             "denial_kind": "missing-credential", "status_code": code,
         })
+    if eligible == 0:
+        unresolved.append(owner + " no-secured-runtime-operations-exercised")
     for observation in measured:
         observation["run_id"] = os.environ.get("GITHUB_RUN_ID")
         observation["revision"] = os.environ.get("GITHUB_SHA")
@@ -128,9 +132,10 @@ def main() -> int:
     args.output.write_text(json.dumps(measured, indent=2) + "\n")
     print(json.dumps({"owner": args.owner, "verified_denials": len(measured),
                       "unresolved": unresolved[:35], "unresolved_total": len(unresolved)}))
-    # Incomplete probes remain unqualified in the aggregate report; a success
-    # here NEVER claims that all interfaces are ready for release.
-    return 0
+    # Never mark the service probe green when the router could not start,
+    # a secure route could not execute, or an unauthenticated request escaped
+    # with a non-denial status. The evidence file is retained for diagnosis.
+    return int(bool(unresolved))
 
 
 if __name__ == "__main__":

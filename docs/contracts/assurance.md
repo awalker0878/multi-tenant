@@ -1,4 +1,4 @@
-# Contract assurance — evidence-gated qualification (Phase 1)
+# Contract assurance — evidence-gated qualification (Phases 1 and 2)
 
 This phase inventories **every** active canonical contract and every HTTP operation
 directly from `architecture/contract-consumers.json`; it does not copy a second
@@ -52,8 +52,10 @@ exception grants coverage.
   the independent native-job and worker-effect ASGI route verifiers. These
   receipts never claim tenant isolation or a successful business response.
 - `scripts/contracts/python_denials.py` probes the actual composed Inventory,
-  Planning and Lifecycle ASGI services. It omits separately deployed native
-  control and worker processes rather than faking coverage.
+  Planning and Lifecycle ASGI services. Any unresolved route, failed bootstrap,
+  wrong denial status or empty secured-operation set exits nonzero while still
+  writing the measured evidence for diagnostics. It omits separately deployed
+  native control and worker processes rather than faking coverage.
 - `scripts/contracts/measured_consumers.py` executes exact Inventory,
   Planning, Lifecycle and Governance consumer paths, including the actual
   Lifecycle ASGI placement receipt through Planning's installed validator.
@@ -81,7 +83,7 @@ without that proof must not be described as assurance completion.
 4. Emit a receipt from the **test runner after successful execution**, not from
    a manually edited ledger. Bind it to `GITHUB_RUN_ID`, `GITHUB_SHA`, release
    `sha256`, `operation_key`, evidence `claim`, `source`, `test`, and `PASS`.
-5. Run the full Contract Integrity workflow; inspect the uploaded
+5. Run the `CI / Contracts` and `CI / Contract assurance` jobs; inspect the uploaded
    `contract-assurance-report` for remaining unqualified interfaces.
 
 Local structural inventory:
