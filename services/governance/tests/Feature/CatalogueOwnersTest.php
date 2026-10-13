@@ -23,13 +23,13 @@ afterEach(function (): void {
 
 it('gives reference administration only to the current tenant administrator', function (): void {
     $input = ['audience' => 'catalogue', 'action' => 'reference.write', 'scope' => $this->scope];
-    $this->withHeader('X-Console-Session', $this->author)->postJson('/v1/tenants/'.$this->tenant.'/actor-delegations', $input)->assertForbidden();
-    $this->withHeader('X-Console-Session', $this->token)->postJson('/v1/tenants/'.$this->tenant.'/actor-delegations', $input)->assertCreated();
-    $this->withHeader('X-Console-Session', $this->author)->postJson('/v1/tenants/'.$this->tenant.'/actor-delegations', array_replace($input, ['action' => 'reference.read']))->assertCreated();
+    $this->withHeader('X-Console-Session', $this->author)->withHeader('Idempotency-Key', bin2hex(random_bytes(16)))->postJson('/v1/tenants/'.$this->tenant.'/actor-delegations', $input)->assertForbidden();
+    $this->withHeader('X-Console-Session', $this->token)->withHeader('Idempotency-Key', bin2hex(random_bytes(16)))->postJson('/v1/tenants/'.$this->tenant.'/actor-delegations', $input)->assertCreated();
+    $this->withHeader('X-Console-Session', $this->author)->withHeader('Idempotency-Key', bin2hex(random_bytes(16)))->postJson('/v1/tenants/'.$this->tenant.'/actor-delegations', array_replace($input, ['action' => 'reference.read']))->assertCreated();
 });
 
 it('validates service owners against current tenant membership and denies guessed or disabled principals', function (): void {
-    $grant = $this->withHeader('X-Console-Session', $this->author)->postJson('/v1/tenants/'.$this->tenant.'/actor-delegations', ['audience' => 'catalogue', 'action' => 'application.write', 'scope' => $this->scope])->assertCreated()->json();
+    $grant = $this->withHeader('X-Console-Session', $this->author)->withHeader('Idempotency-Key', bin2hex(random_bytes(16)))->postJson('/v1/tenants/'.$this->tenant.'/actor-delegations', ['audience' => 'catalogue', 'action' => 'application.write', 'scope' => $this->scope])->assertCreated()->json();
     $this->withHeader('Authorization', 'Bearer '.$this->serviceToken)->withHeader('X-Actor-Delegation', $grant['delegation_token']);
     $path = '/v1/tenants/'.$this->tenant.'/catalogue-owner-checks';
     $input = ['action' => 'application.write', 'scope' => $this->scope, 'owners' => [$this->member['actor_id']]];

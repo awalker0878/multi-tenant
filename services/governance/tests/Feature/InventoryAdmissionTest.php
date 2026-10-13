@@ -45,7 +45,7 @@ it('denies foreign sites revoked owners forged fields and recovery holds', funct
 
 it('delegates Inventory actions with current role and exact site scope', function (): void {
     $grant = $this->withHeader('Authorization', 'Bearer '.$this->workload)->withHeader('X-Console-Session', $this->token)
-        ->postJson('/v1/tenants/'.$this->tenant.'/actor-delegations', ['audience' => 'inventory', 'action' => 'inventory.admin', 'scope' => ['site_id' => $this->site, 'environment' => null, 'resource_id' => null]])->assertCreated()->json();
+        ->withHeader('Idempotency-Key', bin2hex(random_bytes(16)))->postJson('/v1/tenants/'.$this->tenant.'/actor-delegations', ['audience' => 'inventory', 'action' => 'inventory.admin', 'scope' => ['site_id' => $this->site, 'environment' => null, 'resource_id' => null]])->assertCreated()->json();
     $this->withHeader('Authorization', 'Bearer '.$this->inventoryToken)->withHeader('X-Actor-Delegation', $grant['delegation_token'])
         ->postJson('/v1/tenants/'.$this->tenant.'/delegated-authorizations', ['action' => 'inventory.admin', 'scope' => ['site_id' => $this->site, 'environment' => null, 'resource_id' => null]])
         ->assertOk()->assertJsonPath('audience', 'inventory');
@@ -57,6 +57,6 @@ it('does not give ordinary readers discovery or enrollment authority', function 
     $reader = federatedLogin($this, 'p04-reader');
     foreach (['inventory.admin', 'inventory.discover', 'inventory.match'] as $action) {
         $this->withHeader('Authorization', 'Bearer '.$this->workload)->withHeader('X-Console-Session', $reader)
-            ->postJson('/v1/tenants/'.$this->tenant.'/actor-delegations', ['audience' => 'inventory', 'action' => $action, 'scope' => ['site_id' => $this->site, 'environment' => null, 'resource_id' => null]])->assertForbidden();
+            ->withHeader('Idempotency-Key', bin2hex(random_bytes(16)))->postJson('/v1/tenants/'.$this->tenant.'/actor-delegations', ['audience' => 'inventory', 'action' => $action, 'scope' => ['site_id' => $this->site, 'environment' => null, 'resource_id' => null]])->assertForbidden();
     }
 });
