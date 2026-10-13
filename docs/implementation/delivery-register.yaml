@@ -535,7 +535,6 @@ work_packages:
   - docs/implementation/p00-image-results.md
   - docs/implementation/p00-contract-tooling-results.md
   - spikes/compatibility/images/README.md
-  - spikes/compatibility/contracts/README.md
   - docs/implementation/p00-engineering-selections.md
   - docs/qualification/gate-reviews/g00-engineering-assessment-2026-10-04.md
 - id: P00.04
