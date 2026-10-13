@@ -228,7 +228,9 @@ def source_profile_read_count(profile: dict[str, Any]) -> int:
         identities = port.get("security_groups")
         if identities is None:
             continue  # Unobserved membership remains an independent hold.
-        if not isinstance(identities, list) or any(not isinstance(i, str) for i in identities):
+        if (not isinstance(identities, list)
+                or any(not isinstance(i, str) or not i for i in identities)
+                or len(identities) != len(set(identities))):
             raise Rejected("source_profile_security_collection_incomplete")
         attached.update(identities)
     if attached != set(group_ids):
