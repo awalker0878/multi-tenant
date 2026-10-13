@@ -57,6 +57,11 @@ def request(
             "Accept-Encoding": "identity",
             "Content-Type": "application/json",
         }
+        if owner == "GOVERNANCE":
+            headers["Idempotency-Key"] = hashlib.sha256(json.dumps(
+                {"path": path, "body": body}, sort_keys=True,
+                separators=(",", ":"), allow_nan=False,
+            ).encode()).hexdigest()
         if delegation:
             headers["X-Actor-Delegation"] = delegation
         if action:

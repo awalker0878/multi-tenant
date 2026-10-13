@@ -59,6 +59,10 @@ class GovernanceAuthority:
                     {
                         "Authorization": "Bearer " + outgoing,
                         "X-Actor-Delegation": delegation,
+                        "Idempotency-Key": hashlib.sha256(json.dumps(
+                            {"tenant": tenant, "action": action, "scope": scope},
+                            sort_keys=True, separators=(",", ":")
+                        ).encode()).hexdigest(),
                         "Content-Type": "application/json",
                         "Accept": "application/json",
                         "Accept-Encoding": "identity",

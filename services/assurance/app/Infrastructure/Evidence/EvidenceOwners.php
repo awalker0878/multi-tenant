@@ -114,8 +114,10 @@ final class EvidenceOwners implements EvidenceAuthority
             && ($url['path'] ?? '') === '' && is_string($ca) && str_starts_with($ca, '/') && is_readable($ca) && $credential !== null, 503);
         try {
             $headers = $delegation === null ? [] : ['X-Actor-Delegation' => $delegation];
-            if ($owner === 'simulator') {
-                abort_unless($body !== null && $path === '/v1/observations', 503);
+            if ($owner === 'simulator' || $owner === 'governance') {
+                if ($owner === 'simulator') {
+                    abort_unless($body !== null && $path === '/v1/observations', 503);
+                }
                 $encoded = json_encode(self::canonicalize(['path' => $path, 'body' => $body]),
                     JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
                 $headers['Idempotency-Key'] = hash('sha256', $encoded);

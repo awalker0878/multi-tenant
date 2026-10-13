@@ -29,6 +29,13 @@ final class GovernanceClient
             || ($ca !== null && (! is_string($ca) || ! str_starts_with($ca, '/') || ! is_file($ca) || ! is_readable($ca)))) {
             throw new IdentityFailure(503);
         }
+        // Each issuance is at most once for an explicit key. Generate one
+        // for callers that do not supply an HTTP retry identity; never reuse
+        // a key across distinct grants or sessions.
+        if ($method === 'POST' && (str_ends_with($path, '/actor-delegations')
+            || str_ends_with($path, '/revocation'))) {
+            $commandKey ??= bin2hex(random_bytes(16));
+        }
         try {
             $response = Http::acceptJson()->asJson()->withToken($credential)
                 ->withHeaders(['X-Console-Session' => $token, ...($commandKey === null ? [] : ['Idempotency-Key' => $commandKey])])->connectTimeout(2)->timeout(5)

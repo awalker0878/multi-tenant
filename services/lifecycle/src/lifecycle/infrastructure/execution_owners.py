@@ -86,6 +86,11 @@ def request(
                     {"$ref": "#/$defs/Command", "$defs": schema["$defs"]},
                     format_checker=FormatChecker()).is_valid(body)):
                 raise ValueError("alert_command_contract_invalid")
+        if owner == "GOVERNANCE":
+            import hashlib
+            raw_key = json.dumps({"path": path, "body": body},
+                                 sort_keys=True, separators=(",", ":"), allow_nan=False)
+            headers["Idempotency-Key"] = hashlib.sha256(raw_key.encode()).hexdigest()
         if owner == "SIMULATOR":
             import hashlib
             raw_key = json.dumps({"path": path, "body": body},
