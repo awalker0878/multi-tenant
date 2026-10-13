@@ -72,8 +72,12 @@ class PlacementReservationApp:
                 files("lifecycle.infrastructure.contracts")
                 .joinpath("placement-reservation-v1.json").read_text()
             )
-            if not Draft202012Validator(schema, format_checker=FormatChecker()).is_valid(payload):
+            if (not Draft202012Validator(schema, format_checker=FormatChecker()).is_valid(payload)
+                    or payload["tenant_id"] != tenant
+                    or payload["plan_digest"] != body["plan_digest"]):
                 raise ValueError("placement_receipt_contract_invalid")
+            # A structurally valid receipt for another tenant or another plan
+            # is never admissible as this caller's authoritative result.
             status = 200
         except Held as error:
             status, payload = 423, {"error": str(error)}

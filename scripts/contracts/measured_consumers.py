@@ -47,6 +47,12 @@ TESTS = {
     "OwnerBoundaryContracts::test_all_placement_owner_operations_use_strict_openapi": (
         ("lifecycle", "POST",
          "/internal/tenants/{tenant}/placement-reservations/reserve", ("producer",)),
+        ("lifecycle", "POST",
+         "/internal/tenants/{tenant}/placement-reservations/confirm", ("producer",)),
+        ("lifecycle", "POST",
+         "/internal/tenants/{tenant}/placement-reservations/renew", ("producer",)),
+        ("lifecycle", "POST",
+         "/internal/tenants/{tenant}/placement-reservations/release", ("producer",)),
     ),
     "tests/contracts/test_authority_boundaries.py::"
     "LifecycleOwnerTransportContracts::test_real_lifecycle_consumer_validates_current_assurance_receipt": (
@@ -86,28 +92,30 @@ def verified_consumers(root: Path = ROOT) -> list[dict]:
         raise RuntimeError("Exact producer/consumer qualification failed:\n"
                            + (result.stdout + result.stderr)[-9000:])
     evidence = []
-    for test, (owner, method, path, claims) in TESTS.items():
-        key = operation_key(owner, method, path)
-        if key not in current:
-            raise ValueError(f"Producer/consumer test does not target an active operation: {key}")
-        for claim in claims:
-            evidence.append({
-                "key": key,
-                "claim": claim,
-                "source": "live-producer" if claim == "producer" else "live-consumer",
-                "result": "PASS", "release_sha256": current[key]["release_sha256"],
-                "test": test,
-            })
+    for test, bindings in TESTS.items():
+        for owner, method, path, claims in bindings:
+            key = operation_key(owner, method, path)
+            if key not in current:
+                raise ValueError(f"Producer/consumer test does not target an active operation: {key}")
+            for claim in claims:
+                evidence.append({
+                    "key": key,
+                    "claim": claim,
+                    "source": "live-producer" if claim == "producer" else "live-consumer",
+                    "result": "PASS", "release_sha256": current[key]["release_sha256"],
+                    "test": test,
+                })
     releases = {release["path"]: release for release in inventory(root)["releases"]}
-    for test, (path, claims) in RELEASE_TESTS.items():
-        if path not in releases:
-            raise ValueError("Non-HTTP test targets an inactive release: " + path)
-        for claim in claims:
-            evidence.append({
-                "key": path, "claim": claim,
-                "source": "live-producer" if claim == "producer" else "live-consumer",
-                "result": "PASS", "release_sha256": releases[path]["sha256"], "test": test,
-            })
+    for test, bindings in RELEASE_TESTS.items():
+        for path, claims in bindings:
+            if path not in releases:
+                raise ValueError("Non-HTTP test targets an inactive release: " + path)
+            for claim in claims:
+                evidence.append({
+                    "key": path, "claim": claim,
+                    "source": "live-producer" if claim == "producer" else "live-consumer",
+                    "result": "PASS", "release_sha256": releases[path]["sha256"], "test": test,
+                })
     for observation in evidence:
         observation["run_id"] = os.environ.get("GITHUB_RUN_ID")
         observation["revision"] = os.environ.get("GITHUB_SHA")
@@ -121,7 +129,7 @@ def main() -> None:
     evidence = verified_consumers()
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(evidence, indent=2) + "\n")
-    print(f"Validated {len(cases)} executable producer/consumer tests, "
+    print(f"Validated {len(set(TESTS) | set(RELEASE_TESTS))} executable producer/consumer tests, "
           f"{len(evidence)} operation proofs")
 
 

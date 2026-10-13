@@ -82,7 +82,9 @@ class OwnerBoundaryContracts(unittest.TestCase):
     def test_real_asgi_owner_never_emits_an_uncontracted_success(self):
         for poisoned in ({**RECEIPT, "native_write_authorized": True},
                          {**RECEIPT, "unexpected_authority": True},
-                         {**RECEIPT, "allocations": []}):
+                         {**RECEIPT, "allocations": []},
+                         {**RECEIPT, "tenant_id": OTHER},
+                         {**RECEIPT, "plan_digest": "b" * 64}):
             status, body = invoke(Service(poisoned))
             self.assertEqual(status, 503)
             self.assertEqual(body, {"error": "placement_owner_unavailable"})
@@ -152,6 +154,15 @@ class OwnerBoundaryContracts(unittest.TestCase):
                                     command={**command, "uncontracted": True})
             self.assertEqual(status, 423)
             self.assertEqual(denial["error"], "placement_request_invalid")
+            # Exercise the same authenticated HTTP boundary with another
+            # tenant route. A service-owned credential is not treated as a
+            # tenant-scoped credential for assurance reporting.
+            status, refusal = invoke(Service(), tenant=OTHER, operation=operation,
+                                     command=command)
+            self.assertEqual(status, 423)
+            self.assertIn(refusal["error"],
+                          {"placement_scope_invalid", "placement_reservation_missing",
+                           "placement_transition_invalid"})
 
     def test_real_asgi_owner_and_planning_consumer_roundtrip(self):
         import os
