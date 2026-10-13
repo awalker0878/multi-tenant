@@ -29,7 +29,7 @@ SHA = "a" * 64
     ("ASSURANCE", "POST", f"/v1/tenants/{TENANT}/migration-qualifications", "migration-support-v2"),
     ("ASSURANCE", "POST", f"/v1/tenants/{TENANT}/planning-qualification-v2", "qualification-v2.1"),
     ("ASSURANCE", "POST", f"/internal/tenants/{TENANT}/qualification-checks", "qualification-v2.1"),
-    ("GOVERNANCE", "POST", f"/v1/tenants/{TENANT}/delegated-authorizations", "governance-delegation-response-v1"),
+    ("GOVERNANCE", "POST", f"/v1/tenants/{TENANT}/delegated-authorizations", "governance-delegation-response-v2"),
     ("CAPACITY", "POST", f"/internal/tenants/{TENANT}/placement-reservations/checks", "placement-reservation-v1"),
 ])
 def test_runtime_operation_has_one_immutable_schema(owner, method, path, expected):

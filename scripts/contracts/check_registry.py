@@ -122,7 +122,7 @@ def check_owner_operation_bindings():
         ("INVENTORY", "migration-input-v4"),
         ("ASSURANCE", "qualification-v2.1"),
         ("ASSURANCE", "migration-support-v2"),
-        ("GOVERNANCE", "governance-delegation-response-v1"),
+        ("GOVERNANCE", "governance-delegation-response-v2"),
         ("CAPACITY", "placement-reservation-v1"),
     }
     present = set()

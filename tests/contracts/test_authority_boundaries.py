@@ -107,7 +107,7 @@ class OwnerBoundaryContracts(unittest.TestCase):
 
     def test_governance_and_lifecycle_operations_have_no_untyped_bypass(self):
         self.assertEqual(contract_for_operation("GOVERNANCE", "POST",
-            f"/v1/tenants/{TENANT}/delegated-authorizations"), "governance-delegation-response-v1")
+            f"/v1/tenants/{TENANT}/delegated-authorizations"), "governance-delegation-response-v2")
         self.assertEqual(contract_for_operation("CAPACITY", "POST",
             f"/internal/tenants/{TENANT}/placement-reservations/checks"), "placement-reservation-v1")
         with self.assertRaises(ValueError):

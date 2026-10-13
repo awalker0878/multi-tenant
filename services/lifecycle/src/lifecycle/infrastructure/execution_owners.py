@@ -23,7 +23,7 @@ from lifecycle.infrastructure.foundation import mounted_secret
 # Actual owner operations, each resolved to one immutable installed OpenAPI response.
 OWNER_OPERATIONS = (
     ("GOVERNANCE", "POST", r"/v1/tenants/[^/]+/delegated-authorizations",
-     "governance-delegation-v1.1.json", "CurrentDelegation", 200),
+     "governance-delegation-v2.json", "CurrentDelegation", 200),
     ("GOVERNANCE", "POST", r"/v1/tenants/[^/]+/execution-approval-checks",
      "governance-service-checks-v1.json", "SimulationConsent", 200),
     ("PLANNING", "GET", r"/v1/tenants/[^/]+/execution-plans/[^/]+/revisions/[1-9][0-9]*",
@@ -39,7 +39,7 @@ OWNER_OPERATIONS = (
 
 # Named immutable snapshots are packaged in the Lifecycle wheel/image.
 OWNER_APIS = {
-    "governance-delegation-v1.1.json": json.loads(files("lifecycle.infrastructure.contracts").joinpath("governance-delegation-v1.1.json").read_text()),
+    "governance-delegation-v2.json": json.loads(files("lifecycle.infrastructure.contracts").joinpath("governance-delegation-v2.json").read_text()),
     "governance-service-checks-v1.json": json.loads(files("lifecycle.infrastructure.contracts").joinpath("governance-service-checks-v1.json").read_text()),
     "planning-lifecycle-reads-v1.json": json.loads(files("lifecycle.infrastructure.contracts").joinpath("planning-lifecycle-reads-v1.json").read_text()),
     "assurance-evidence-v1.json": json.loads(files("lifecycle.infrastructure.contracts").joinpath("assurance-evidence-v1.json").read_text()),
