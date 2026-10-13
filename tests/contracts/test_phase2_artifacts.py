@@ -115,12 +115,12 @@ class ArtifactTests(unittest.TestCase):
         self.source.parent.mkdir(parents=True)
         self.source.write_text("def serve(): pass\n")
         project = self.root / "services/planning/pyproject.toml"
-        project.write_text('[project]\nname = "product-planning"\nversion = "0.1.0.dev0"\n')
+        project.write_text('[project]\nname = "product-planning"\nversion = "0.1.0.dev0"\n[project.scripts]\nplanning-serve = "planning.bootstrap.server:serve"\n')
         current = self.root / "services/planning/src/planning/infrastructure/inputs/current.json"
         current.parent.mkdir(parents=True)
         current.write_bytes(self.contract)
 
-    def wheel_contents(self, schema=None, extra=None, code=None, tamper_record=False):
+    def wheel_contents(self, schema=None, extra=None, code=None, tamper_record=False, tamper_scripts=False):
         # A real wheel must carry a complete, correct RECORD and distribution
         # identity; the tests must never pass using a plain zip-shaped fixture.
         dist = "product_planning-0.1.0.dev0.dist-info"
@@ -135,6 +135,11 @@ class ArtifactTests(unittest.TestCase):
                 "Metadata-Version: 2.3\nName: product-planning\nVersion: 0.1.0.dev0\n"
             ),
             dist + "/WHEEL": "Wheel-Version: 1.0\nRoot-Is-Purelib: true\nTag: py3-none-any\n",
+            dist + "/entry_points.txt": (
+                "[console_scripts]\nplanning-serve = " +
+                ("other.bootstrap:run" if tamper_scripts else "planning.bootstrap.server:serve") +
+                "\n"
+            ),
         }
         if extra is not None:
             payloads["planning/infrastructure/inputs/orphan.json"] = extra
@@ -176,6 +181,9 @@ class ArtifactTests(unittest.TestCase):
         with patch.dict(os.environ, {"GITHUB_SHA": "a" * 40}), \
                 patch("artifact_attestation.expected", return_value=([self.copy], [])), \
                 patch("artifact_attestation.consumed_bindings", return_value=[]):
+            self.wheel_contents(tamper_scripts=True)
+            with self.assertRaisesRegex(ValueError, "console scripts differ"):
+                check_wheel("services/planning", self.wheel, self.root)
             self.wheel_contents(tamper_record=True)
             with self.assertRaisesRegex(ValueError, "RECORD digest/size"):
                 check_wheel("services/planning", self.wheel, self.root)
