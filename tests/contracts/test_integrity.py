@@ -54,7 +54,7 @@ class ContractIntegrityTests(unittest.TestCase):
 
     def test_owner_release_components_are_rebuilt_from_source_contracts(self):
         from generate_authority_releases import verify as verify_authority, assemble
-        self.assertEqual(verify_authority(), 3)
+        self.assertEqual(verify_authority(), 4)
         generated = assemble("inventory-native-input-v1.3.json")
         modified = load("contracts/openapi/inventory-native-input-v1.3.json")
         modified["components"]["schemas"]["CapabilityInput"]["properties"].pop("capability_snapshot")
