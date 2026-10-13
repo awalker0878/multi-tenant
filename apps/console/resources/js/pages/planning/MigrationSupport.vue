@@ -328,7 +328,7 @@ async function refreshWorkloadReadiness(): Promise<void> {
           </label>
           <p v-if="omissionFor(choice.source_flow_id)" role="alert">This is a request only. A separate receiving approver and independent E4 Assurance proof are required before migration.</p>
         </div>
-        <p v-if="flowForm.errors.flow_mapping" role="alert" class="mt-2">{{ flowForm.errors.flow_mapping }}</p>
+        <p v-if="flowForm.errors.selections" role="alert" class="mt-2">{{ flowForm.errors.selections }}</p>
         <button type="button" class="mt-4 rounded border px-4 py-2" :disabled="!selectionsComplete || flowForm.processing || flowBusy || unavailable || !!flowFailure || flowState.expires_at <= Math.floor(Date.now() / 1000)" @click="saveFlowChoices">Save reviewed application flow selections</button>
         <button type="button" class="ml-3 mt-4 underline" :disabled="flowBusy" @click="refreshFlowChoices">Refresh native options</button>
       </template>

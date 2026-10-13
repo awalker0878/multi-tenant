@@ -17,8 +17,23 @@ const initial = saved?.input && (!props.profileId || saved.input.source_profile_
   owner_inputs: Object.fromEntries(props.workspace.owner_fields.map(field => [field, ''])) as MigrationReviewInput['owner_inputs'],
   objectives: { owner_id: '', acceptance_sha256: '', max_outage_seconds: 0, max_data_loss_bytes: 0 }, overrides: [],
 };
+// This review-specific Catalogue association is validated at the Console HTTP
+// boundary. It must not be mistaken for native write or migration authority.
+type CatalogueAssociation = {
+  application_id: string; environment_id: string; revision_id: string;
+  intent_sha256: string; workload_id: string;
+  disk_mappings: { logical_device_id: string; native_key: number }[];
+  nic_mappings: { logical_device_id: string; native_key: number }[];
+  disk_dispositions?: {
+    logical_device_id: string; native_key: number;
+    disposition: 'uncatalogued_attested'; owner_approval_sha256: string; impact_sha256: string;
+  }[];
+};
+type ReviewDraft = Omit<MigrationReviewInput, 'method'> & {
+  method: string; catalogue_binding?: CatalogueAssociation;
+};
 const form = useForm({ operation: 'save', command_key: crypto.randomUUID(), revision: saved?.revision ?? null,
-  digest: saved?.digest ?? null, review: JSON.parse(JSON.stringify(initial)) as Omit<MigrationReviewInput, 'method'> & { method: string } });
+  digest: saved?.digest ?? null, review: JSON.parse(JSON.stringify(initial)) as ReviewDraft });
 const dirty = computed(() => JSON.stringify(form.review) !== JSON.stringify(initial));
 const errors = computed(() => form.errors as Record<string, string>);
 const uncertain = computed(() => errors.value.inventory_status === '503');
@@ -88,13 +103,14 @@ function chooseCatalogueEnvironment(id: string): void {
 function chooseCatalogueWorkload(id: string): void {
   const current = catalogueCurrent.value;
   const workload = current?.workloads.find(w => w.id === id);
-  if (!source.value || !current || !workload) return;
+  const facts = source.value?.facts;
+  if (!facts || facts.profile_type !== 'SourceWorkloadProfile' || !current || !workload) return;
   form.review.catalogue_binding = {
     application_id: current.application_id, environment_id: current.environment_id,
     revision_id: current.revision_id, intent_sha256: current.intent_sha256,
     workload_id: id, disk_dispositions: [],
-    disk_mappings: source.value.facts.disks.map(d => ({ logical_device_id: '', native_key: d.key })),
-    nic_mappings: source.value.facts.nics.map(n => ({ logical_device_id: '', native_key: n.key })),
+    disk_mappings: facts.disks.map(d => ({ logical_device_id: '', native_key: d.key })),
+    nic_mappings: facts.nics.map(n => ({ logical_device_id: '', native_key: n.key })),
   };
 }
 function attestUncataloguedDisk(id: string): void {
