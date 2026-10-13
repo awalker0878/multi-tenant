@@ -320,6 +320,11 @@
     "contracts/schemas/planning/placement-reservation-v1.json": [
       "lifecycle",
       "planning"
+    ],
+    "contracts/openapi/worker-simulation-v1.json": [
+      "lifecycle-workers",
+      "lifecycle",
+      "assurance"
     ]
   },
   "scope": "Implemented consumers: Planning consumes Catalogue reference facts; Console uses Governance identity APIs and five tenant-administration notifications as refresh hints. Diagnostics are owned by all seven applications. No shared SQL authority is implied.",
@@ -1152,6 +1157,19 @@
         "lifecycle-workers"
       ],
       "copies": [],
+      "source_manifest": null,
+      "depends_on": []
+    },
+    {
+      "path": "contracts/openapi/worker-simulation-v1.json",
+      "owner": "lifecycle-workers",
+      "consumers": [
+        "lifecycle",
+        "assurance"
+      ],
+      "copies": [
+        "services/lifecycle/src/lifecycle/infrastructure/contracts/worker-simulation-v1.json"
+      ],
       "source_manifest": null,
       "depends_on": []
     }

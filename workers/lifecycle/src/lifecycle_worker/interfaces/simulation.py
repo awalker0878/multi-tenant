@@ -72,12 +72,30 @@ class SimulationApp:
                 body = json.loads(raw, object_pairs_hook=pairs)
                 if not isinstance(body, dict):
                     raise ValueError("invalid_shape")
+                # Retries are bound to the precise operation and request bytes;
+                # no arbitrary caller-chosen replay key may authorize effects.
+                import hashlib
+                idempotency = [v.decode("ascii") for k, v in headers
+                               if k.lower() == b"idempotency-key"]
+                expected_key = hashlib.sha256(json.dumps(
+                    {"path": scope["path"], "body": body}, sort_keys=True,
+                    separators=(",", ":"), allow_nan=False).encode()).hexdigest()
+                if len(idempotency) != 1 or not hmac.compare_digest(idempotency[0], expected_key):
+                    raise ValueError("idempotency_binding_invalid")
                 action = {
                     "/v1/effects": self.simulation.execute,
                     "/v1/reconciliations": self.simulation.reconcile,
                     "/v1/observations": self.simulation.observe,
                 }[scope["path"]]
                 payload = await asyncio.to_thread(action, body)
+                # The scope of a sealed readback is the exact authenticated
+                # request. A structurally valid but foreign receipt is denied.
+                if scope["path"] != "/v1/effects" and (
+                    not isinstance(payload, dict) or
+                    any(payload.get(k) != body.get(k) for k in (
+                        "tenant_id", "job_id", "operation_id", "attempt_id",
+                        "plan_digest", "epoch", "simulation"))):
+                    raise ValueError("simulation_receipt_scope_mismatch")
                 status = 200
         except (ValueError, KeyError, TypeError, TimeoutError):
             status, payload = 403, {"error": "simulation_denied"}

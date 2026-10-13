@@ -32,6 +32,8 @@ OWNER_OPERATIONS = (
      "assurance-evidence-v1.json", "UploadReceipt", 201),
     ("ASSURANCE", "POST", r"/v1/tenants/[^/]+/evidence-uploads/[^/]+/finalization",
      "assurance-evidence-v1.json", "Evidence", 200),
+    ("SIMULATOR", "POST", r"/v1/effects", "worker-simulation-v1.json", "EffectReceipt", 200),
+    ("SIMULATOR", "POST", r"/v1/reconciliations", "worker-simulation-v1.json", "ObservationReceipt", 200),
 )
 
 # Named immutable snapshots are packaged in the Lifecycle wheel/image.
@@ -40,6 +42,7 @@ OWNER_APIS = {
     "governance-service-checks-v1.json": json.loads(files("lifecycle.infrastructure.contracts").joinpath("governance-service-checks-v1.json").read_text()),
     "planning-lifecycle-reads-v1.json": json.loads(files("lifecycle.infrastructure.contracts").joinpath("planning-lifecycle-reads-v1.json").read_text()),
     "assurance-evidence-v1.json": json.loads(files("lifecycle.infrastructure.contracts").joinpath("assurance-evidence-v1.json").read_text()),
+    "worker-simulation-v1.json": json.loads(files("lifecycle.infrastructure.contracts").joinpath("worker-simulation-v1.json").read_text()),
 }
 
 
@@ -75,6 +78,11 @@ def request(
             "Content-Type": "application/json",
             "Accept-Encoding": "identity",
         }
+        if owner == "SIMULATOR":
+            import hashlib
+            raw_key = json.dumps({"path": path, "body": body},
+                                 sort_keys=True, separators=(",", ":"), allow_nan=False)
+            headers["Idempotency-Key"] = hashlib.sha256(raw_key.encode()).hexdigest()
         if delegation:
             headers["X-Actor-Delegation"] = delegation
         connection = http.client.HTTPSConnection(
@@ -106,6 +114,12 @@ def request(
                 if (tenant_route and "tenant_id" in result
                         and result["tenant_id"] != tenant_route[1]):
                     raise ValueError("owner_response_tenant_mismatch")
+                if owner == "SIMULATOR" and path == "/v1/reconciliations":
+                    if body is None or any(result.get(field) != body.get(field)
+                                           for field in ("tenant_id", "job_id", "operation_id",
+                                                         "attempt_id", "plan_digest", "epoch",
+                                                         "simulation")):
+                        raise ValueError("simulation_receipt_scope_mismatch")
             return result
         finally:
             connection.close()
