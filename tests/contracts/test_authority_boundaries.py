@@ -225,7 +225,6 @@ class LifecycleOwnerTransportContracts(unittest.TestCase):
         from lifecycle.infrastructure import execution_owners
         from planning.domain.model import Rejected as PlanningRejected
         from planning.interfaces.planning import PlanningApp
-        from route_conformance import _exchange
 
         fixture = json.loads(
             (ROOT / "contracts/fixtures/planning/synthetic-plan-v1.1.json").read_text()
@@ -248,10 +247,26 @@ class LifecycleOwnerTransportContracts(unittest.TestCase):
                     raise PlanningRejected("not_found", 404)
                 return produced
 
-        status, wire_payload = asyncio.run(_exchange(
-            PlanningApp(Planning(), Authority()), path, "GET",
-            [(b"authorization", b"Bearer " + b"a" * 64)],
-        ))
+        async def exchange(app, uri):
+            captured = []
+
+            async def receive():
+                return {"type": "http.request", "body": b"", "more_body": False}
+
+            async def send(message):
+                captured.append(message)
+
+            await app({
+                "type": "http", "path": uri, "method": "GET",
+                "headers": [(b"authorization", b"Bearer " + b"a" * 64)],
+                "query_string": b"",
+            }, receive, send)
+            self.assertEqual(len(captured), 2)
+            return captured[0]["status"], json.loads(captured[1]["body"])
+
+        status, wire_payload = asyncio.run(
+            exchange(PlanningApp(Planning(), Authority()), path)
+        )
         self.assertEqual(status, 200)
         self.assertEqual(wire_payload, produced)
         wire = [wire_payload]
