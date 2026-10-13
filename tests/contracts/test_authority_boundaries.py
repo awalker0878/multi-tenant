@@ -217,6 +217,108 @@ class OwnerBoundaryContracts(unittest.TestCase):
 
 
 class LifecycleOwnerTransportContracts(unittest.TestCase):
+    def test_planning_execution_plan_asgi_response_reaches_lifecycle_installed_validator(self):
+        import os
+        from unittest.mock import patch
+
+        from lifecycle.domain.execution import Rejected as LifecycleRejected
+        from lifecycle.infrastructure import execution_owners
+        from planning.domain.model import Rejected as PlanningRejected
+        from planning.interfaces.planning import PlanningApp
+        from route_conformance import _exchange
+
+        fixture = json.loads(
+            (ROOT / "contracts/fixtures/planning/synthetic-plan-v1.1.json").read_text()
+        )
+        produced = {
+            "content": fixture["content"], "binding": fixture["binding"],
+            "invalidated": False,
+        }
+        plan = fixture["binding"]["plan_id"]
+        path = f"/v1/tenants/{TENANT}/execution-plans/{plan}/revisions/1"
+
+        class Authority:
+            def caller(self, credential, audience="console"):
+                if credential != "a" * 64 or audience != "lifecycle_reader":
+                    raise PlanningRejected("not_authorized", 403)
+
+        class Planning:
+            def execution_plan(self, tenant, requested, revision):
+                if tenant != TENANT or requested != plan or revision != 1:
+                    raise PlanningRejected("not_found", 404)
+                return produced
+
+        status, wire_payload = asyncio.run(_exchange(
+            PlanningApp(Planning(), Authority()), path, "GET",
+            [(b"authorization", b"Bearer " + b"a" * 64)],
+        ))
+        self.assertEqual(status, 200)
+        self.assertEqual(wire_payload, produced)
+        wire = [wire_payload]
+
+        class Response:
+            status = 200
+
+            def read(self, limit):
+                return json.dumps(wire[0]).encode()
+
+            def getheader(self, name, default=None):
+                return "identity"
+
+        class Connection:
+            def __init__(self, *args, **kwargs):
+                pass
+
+            def request(self, method, requested, data, headers):
+                assert method == "GET" and requested.endswith("/revisions/1")
+
+            def getresponse(self):
+                return Response()
+
+            def close(self):
+                pass
+
+        with (
+            patch.dict(os.environ, {
+                "PLANNING_URL": "https://planning.example",
+                "PLANNING_CA_FILE": "/tmp/synthetic-ca",
+            }),
+            patch.object(execution_owners, "mounted_secret",
+                         return_value="synthetic-token"),
+            patch.object(execution_owners.ssl, "create_default_context",
+                         return_value=object()),
+            patch.object(execution_owners.http.client, "HTTPSConnection",
+                         Connection),
+        ):
+            self.assertEqual(
+                execution_owners.request("PLANNING", "GET", path), wire_payload
+            )
+            poison = (
+                {**produced, "content": {
+                    **produced["content"], "scope": {
+                        **produced["content"]["scope"], "tenant_id": OTHER,
+                    },
+                }},
+                {**produced, "binding": {**produced["binding"],
+                                        "tenant_id": OTHER}},
+                {**produced, "binding": {**produced["binding"],
+                                        "plan_id": OTHER}},
+                {**produced, "binding": {**produced["binding"],
+                                        "revision": 2}},
+                {**produced, "binding": {**produced["binding"],
+                                        "site_id": OTHER}},
+                {**produced, "native_write_authorized": True},
+            )
+            for candidate in poison:
+                wire[0] = candidate
+                with self.assertRaises(LifecycleRejected) as caught:
+                    execution_owners.request("PLANNING", "GET", path)
+                self.assertEqual(caught.exception.status, 503)
+            wire[0] = produced
+            with self.assertRaises(LifecycleRejected):
+                execution_owners.request("PLANNING", "GET",
+                    f"/v1/tenants/{OTHER}/execution-plans/{plan}/revisions/1")
+
     def test_real_lifecycle_consumer_validates_current_assurance_receipt(self):
         import os
         from unittest.mock import patch

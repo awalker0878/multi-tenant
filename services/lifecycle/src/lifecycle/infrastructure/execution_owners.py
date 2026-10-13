@@ -131,6 +131,24 @@ def request(
                 if (tenant_route and "tenant_id" in result
                         and result["tenant_id"] != tenant_route[1]):
                     raise ValueError("owner_response_tenant_mismatch")
+                if owner == "PLANNING":
+                    requested = re.fullmatch(
+                        r"/v1/tenants/([^/]+)/execution-plans/([^/]+)/revisions/([1-9][0-9]*)",
+                        path,
+                    )
+                    if requested is None:
+                        raise ValueError("planning_operation_not_request_bound")
+                    tenant, plan, revision = requested.groups()
+                    scope = result["content"]["scope"]
+                    binding = result["binding"]
+                    if (scope["tenant_id"] != tenant
+                            or binding["tenant_id"] != tenant
+                            or binding["plan_id"] != plan
+                            or binding["revision"] != int(revision)
+                            or any(binding[field] != scope[field] for field in (
+                                "site_id", "environment", "resource_id"
+                            ))):
+                        raise ValueError("planning_response_scope_mismatch")
                 if owner == "SIMULATOR" and path == "/v1/reconciliations":
                     if body is None or any(result.get(field) != body.get(field)
                                            for field in ("tenant_id", "job_id", "operation_id",

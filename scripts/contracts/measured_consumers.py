@@ -60,6 +60,12 @@ TESTS = {
     "LifecycleOwnerTransportContracts::test_real_lifecycle_consumer_validates_current_assurance_receipt": (
         ("assurance", "POST", "/v1/tenants/{tenant}/evidence-uploads", ("consumer",)),
     ),
+    "tests/contracts/test_authority_boundaries.py::"
+    "LifecycleOwnerTransportContracts::test_planning_execution_plan_asgi_response_reaches_lifecycle_installed_validator": (
+        ("planning", "GET",
+         "/v1/tenants/{tenant}/execution-plans/{plan}/revisions/{revision}",
+         ("consumer",)),
+    ),
     "tests/contracts/test_simulation_owner.py::"
     "SimulationOwnerContracts::test_authenticated_worker_and_lifecycle_consumer": (
         ("lifecycle-workers", "POST", "/v1/effects", ("route", "producer", "consumer", "authorization")),
