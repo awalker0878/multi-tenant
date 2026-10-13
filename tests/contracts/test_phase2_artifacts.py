@@ -37,6 +37,11 @@ class DependencyTests(unittest.TestCase):
         self.usage = {"copies": [{"copy": self.copy, "canonical": self.path}]}
         self._save()
 
+    def verified(self):
+        # Synthetic contract fixtures have no executable loader; real CI does.
+        with patch("dependency_graph.verify_installed_usage", return_value=1):
+            return derive(self.root)
+
     def _save(self):
         for name, value in (
             ("architecture/contract-consumers.json", self.registry),
@@ -47,7 +52,7 @@ class DependencyTests(unittest.TestCase):
             path.write_text(json.dumps(value))
 
     def test_edges_are_derived_and_typed_without_runtime_inference(self):
-        graph = derive(self.root)
+        graph = self.verified()
         self.assertEqual(len(graph["edges"]), 2)
         installed = next(x for x in graph["edges"] if x["consumer"] == "console")
         self.assertEqual(installed["kind"], "http")
@@ -56,11 +61,15 @@ class DependencyTests(unittest.TestCase):
         other = next(x for x in graph["edges"] if x["consumer"] == "planning")
         self.assertEqual(other["evidence"], "registry-declaration")
 
+    def test_loader_claim_rejected_without_actual_installed_usage(self):
+        with self.assertRaisesRegex(ValueError, "does not cover active installed copies"):
+            derive(self.root)
+
     def test_producer_owned_copy_is_local_validation_not_dependency(self):
         self.registry["active_releases"][0]["owner"] = "console"
         self.registry["active_releases"][0]["consumers"] = ["planning"]
         self._save()
-        graph = derive(self.root)
+        graph = self.verified()
         self.assertEqual(len(graph["edges"]), 1)
         self.assertEqual(graph["summary"]["producer_local_copies"], 1)
         self.assertEqual(graph["producer_local_copies"][0]["copy"], self.copy)
@@ -69,12 +78,12 @@ class DependencyTests(unittest.TestCase):
         self.registry["active_releases"][0]["consumers"] = ["planning"]
         self._save()
         with self.assertRaisesRegex(ValueError, "Installed consumer omitted"):
-            derive(self.root)
+            self.verified()
         self.registry["active_releases"][0]["consumers"] = ["console", "planning"]
         self.usage["copies"][0]["canonical"] = "contracts/openapi/other-v1.json"
         self._save()
         with self.assertRaisesRegex(ValueError, "Unknown installed dependency"):
-            derive(self.root)
+            self.verified()
 
 
 class ArtifactTests(unittest.TestCase):

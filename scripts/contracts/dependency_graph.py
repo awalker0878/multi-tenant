@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
+from installed_usage import verify_installed_usage
 
 ROOT = Path(__file__).resolve().parents[2]
 TYPE = {
@@ -24,6 +25,8 @@ def derive(root: Path = ROOT) -> dict:
     registry = json.loads((root / "architecture/contract-consumers.json").read_text())
     usage = json.loads((root / "architecture/installed-contract-usage.json").read_text())
     copies = {item["copy"]: item for item in usage["copies"]}
+    # A declared copy is not executable loader evidence: verify real imports.
+    verify_installed_usage(root, registry)
     edges = []
     producer_local = []
     installed_seen = set()

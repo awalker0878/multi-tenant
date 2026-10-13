@@ -17,6 +17,7 @@ import zipfile
 from pathlib import Path, PurePosixPath
 
 from assurance import inventory
+from installed_usage import verify_installed_usage
 
 ROOT = Path(__file__).resolve().parents[2]
 COMPONENTS = {
@@ -67,6 +68,7 @@ def consumed_bindings(component: str, root: Path = ROOT) -> list[dict]:
     """Declare consumer API bindings; only an installed copy proves packaged bytes."""
     owner = COMPONENTS[component][0]
     ledger = json.loads((root / "architecture/contract-consumers.json").read_text())
+    verify_installed_usage(root, ledger)
     operation_map = inventory(root)["operations"]
     installed = {
         row["canonical"] for row in ledger["active_releases"]

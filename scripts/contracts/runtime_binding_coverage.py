@@ -7,6 +7,7 @@ from pathlib import Path
 import yaml
 
 from artifact_attestation import COMPONENTS
+from installed_usage import verify_installed_usage
 from assurance import inventory
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -15,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[2]
 def verify(root: Path = ROOT) -> dict:
     registry = json.loads((root / "architecture/contract-consumers.json").read_text())
     active = inventory(root)
+    verify_installed_usage(root, registry)
     owner_components = {owner for owner, _ in COMPONENTS.values()}
     owners = {release["owner"] for release in registry["active_releases"]}
     unknown = owners - owner_components - {"contract-platform"}
