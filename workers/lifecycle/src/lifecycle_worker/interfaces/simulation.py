@@ -127,12 +127,30 @@ class SimulationApp:
                 payload = await asyncio.to_thread(action, body)
                 # The scope of a sealed readback is the exact authenticated
                 # request. A structurally valid but foreign receipt is denied.
-                if scope["path"] != "/v1/effects" and (
-                    not isinstance(payload, dict) or
-                    any(payload.get(k) != body.get(k) for k in (
-                        "tenant_id", "job_id", "operation_id", "attempt_id",
-                        "plan_digest", "epoch", "simulation"))):
-                    raise ValueError("simulation_receipt_scope_mismatch")
+                if scope["path"] == "/v1/effects":
+                    if (not isinstance(payload, dict)
+                            or set(payload) != {"accepted", "duplicate"}
+                            or payload["accepted"] is not True
+                            or type(payload["duplicate"]) is not bool):
+                        raise ValueError("simulation_effect_receipt_invalid")
+                else:
+                    if (not isinstance(payload, dict) or
+                            set(payload) != {
+                                "tenant_id", "job_id", "operation_id", "attempt_id",
+                                "plan_digest", "epoch", "simulation", "sealed",
+                                "effect_count", "observed_at", "outcome",
+                            } or any(payload.get(k) != body.get(k) for k in (
+                                "tenant_id", "job_id", "operation_id", "attempt_id",
+                                "plan_digest", "epoch", "simulation"))
+                            or payload["sealed"] is not True
+                            or type(payload["effect_count"]) is not int
+                            or payload["effect_count"] < 0
+                            or type(payload["observed_at"]) is not int
+                            or payload["observed_at"] < 0
+                            or payload["outcome"] not in {
+                                "confirmed_succeeded", "confirmed_failed",
+                            }):
+                        raise ValueError("simulation_observation_receipt_invalid")
                 status = 200
         except (ValueError, KeyError, TypeError, TimeoutError):
             from uuid import uuid4

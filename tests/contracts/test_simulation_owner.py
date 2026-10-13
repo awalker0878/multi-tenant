@@ -147,6 +147,16 @@ class SimulationOwnerContracts(unittest.TestCase):
                     client.request("SIMULATOR", "POST", "/uncontracted", body)
             status, rejected = request_worker(route, {**body, "uncontracted": True})
             self.assertEqual(status, 403)
+            class ExtraReceipt(Effects):
+                def execute(self, grant):
+                    return {"accepted": True, "duplicate": False, "uncontracted": True}
+
+                def reconcile(self, data):
+                    return {**OBSERVATION, "uncontracted": True}
+
+            status, denied = request_worker(route, body, service=ExtraReceipt())
+            self.assertEqual(status, 403)
+            self.assertEqual(denied["code"], "simulation_denied")
             Draft202012Validator(
                 {"$ref": "#/components/schemas/Error",
                  "components": API["components"]},
