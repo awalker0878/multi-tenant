@@ -15,8 +15,8 @@ from `91acffa4200a7e3a4d5d5d767f6db981149d0774`; the approved audit baseline was
 `eda64354816b4884530118f6595c037a5a556807`. Platform discovery, typed outcomes,
 source/destination mechanisms, guest preparation, method contracts, durable
 continuation, native observations, progress and console parity are implemented.
-The [P09-A record](docs/implementation/p09-any-to-any.md) maps G1–G6 and A01–A11;
-the [runbook](docs/operations/runbooks/any-to-any-migration.md) names concrete
+The [P09-A record](../../docs/implementation/p09-any-to-any.md) maps G1–G6 and A01–A11;
+the [runbook](../../docs/operations/runbooks/any-to-any-migration.md) names concrete
 commissioning and operating requirements.
 
 The user explicitly approved publication to `awalker0878/multi-tenant` and opening
@@ -42,10 +42,10 @@ Operator readiness now follows the selected task, migration method and observed
 platforms, with accountable actions and independently signed evidence checks.
 AHV discovery supports bounded numbered pages; export archives can explicitly
 opt into same-lease byte-range continuation. The
-[implementation and operating instructions](docs/implementation/contextual-commissioning.md)
+[implementation and operating instructions](../../docs/implementation/contextual-commissioning.md)
 record the exact behavior, verification commands and remaining native boundaries.
 The user authorizes publishing these tested changes to main.
-[Retained verification](verification/p08/commissioning/README.md) records 1,336
+[Retained verification](../../verification/p08/commissioning/README.md) records 1,336
 component tests without skips and five passing browser journeys.
 
 The next concrete work is to enroll the actual source/destination and owner
@@ -64,7 +64,7 @@ checks pass. This increment closes
 credential-rotation/expiry and incomplete-response defects across OpenStack,
 VMware, Glance, owner protocols and platform transport, with pre-effect mounted
 observer checks. Original hosted test failures and the receipt-synchronized test
-correction are retained in [the current evidence](verification/p10/engineering-b1ee0355/README.md).
+correction are retained in [the current evidence](../../verification/p10/engineering-b1ee0355/README.md).
 Candidate `4d48a81d3a44a807a80cd2cebc97055ec419d2cd6aa0c355d73af067e3241e03`
 still holds all six P10 operating packages. Complete the actual native and owner
 inputs below; these engineering results do not close BL-P07-001, BL-P08-001/002
@@ -81,8 +81,8 @@ nine engineering campaign commands. The 19 P10 tooling checks pass. Candidate
 identity now survives evidence-only commits, original observations and artifact
 identities are required, and receiving reviews bind the exact reviewed packet.
 Independent observation origins and credential rotation at effect boundaries are
-covered by the worker corrections. See [P10's receiving packet](docs/implementation/p10-completion-review.md) and
-[tool instructions](scripts/p10/README.md).
+covered by the worker corrections. See [P10's receiving packet](../../docs/implementation/p10-completion-review.md) and
+[tool instructions](../../scripts/p10/README.md).
 
 **P07/P08/P09/P10 remain IN_PROGRESS; G07–G10 remain NOT_REVIEWED.** A passing
 synthetic-owner integration campaign cannot qualify an installed platform or
@@ -107,21 +107,21 @@ change, deployment, merge to main or unsupported support claim is implied.
 P08 operations now include authenticated campaign APIs, a Console schedule/control
 page, staggered windows/blackouts, dependency and outage-group admission, measured
 phase-concurrency limits and independently published resource observations. See
-[P08 operations](docs/implementation/p08-operations.md) for semantics and tested
-limits. The [runtime/commissioning increment](docs/implementation/p08-runtime-commissioning.md)
+[P08 operations](../../docs/implementation/p08-operations.md) for semantics and tested
+limits. The [runtime/commissioning increment](../../docs/implementation/p08-runtime-commissioning.md)
 adds six-account read-only checks, protected native worker composition, immutable
 recipe-based Planning proposals, bulk Console plan creation and VM-scoped custody.
-The [native control increment](docs/implementation/p08-native-control.md) now supplies
+The [native control increment](../../docs/implementation/p08-native-control.md) now supplies
 the Lifecycle process/dispatcher, live Planning/Governance/Inventory owner reads, an
 immutable resolver, unattended recipe revocation and explicit long movement budgets.
 Actual account/provider-custody commissioning, native measurement producers, selected
 guest/data/service/recovery adapters, interrupted-transfer reconciliation and Q07/G08
 acceptance remain open. The
-[completion packet](docs/implementation/p08-completion-review.md) identifies the
+[completion packet](../../docs/implementation/p08-completion-review.md) identifies the
 source/target secret references, lab placement and application-owner protocols
 needed to make that work concrete. Existing development authorization continues.
 
-The [native control evidence](verification/p08/control/README.md) qualifies source
+The [native control evidence](../../verification/p08/control/README.md) qualifies source
 `f765eb9fba61a16565d4085d8e51a4e0ec681ddd`: all 36 commands and 951 component tests
 without skips, all 30 compiler-to-resolver combinations and three migration browser
 journeys pass. Separate unchanged Governance source passes 219 PostgreSQL tests,
@@ -129,17 +129,17 @@ journeys pass. Separate unchanged Governance source passes 219 PostgreSQL tests,
 failure/correction are retained at `c801a13e4b172e6b307303a4c7eccb6e1511e8c6`.
 EV-P08-008 records these boundaries without closing either P08 blocker.
 
-The [runtime evidence](verification/p08/runtime/README.md) qualifies source
+The [runtime evidence](../../verification/p08/runtime/README.md) qualifies source
 `7860616293cc0be7a1983ca7bc38529aed5e5b7f`: 893 component tests without skips,
 all three browser journeys and all 23 Console quality commands pass. Console
 records 195 Pest passes, 922 assertions and seven separate broker-campaign skips.
 The evidence is retained at `dd5450138ca29bb07468177d56165d3e6a136dd0`.
 Original image-manifest, contract-version and apt-mirror failures are retained;
 the corrected image and strict restored-contract checks pass. Source Kubernetes
-is still queued at the [regression observation](verification/p08/runtime/regression-status.json).
+is still queued at the [regression observation](../../verification/p08/runtime/regression-status.json).
 EV-P08-007 records these measured boundaries without closing either P08 blocker.
 
-The [campaign evidence](verification/p08/campaigns/README.md) qualifies source
+The [campaign evidence](../../verification/p08/campaigns/README.md) qualifies source
 `5e2b4a62f2c940bbdb06432c8922d43301e3482c`: 811 component tests without skips,
 all three migration browser journeys and all Console quality commands pass.
 Console records 192 Pest passes and seven explicit separate-campaign broker skips.
@@ -147,17 +147,17 @@ The original formatting failure and exact final archives remain retained.
 
 P08 development continues on the native-only baseline. Source fleet browsing, named
 groups, VM-specific review and bulk OpenStack preparation are implemented and qualified
-in the [fleet evidence](verification/p08/fleet/README.md): 785 component tests without
+in the [fleet evidence](../../verification/p08/fleet/README.md): 785 component tests without
 skips, both browser journeys and all Console quality commands pass at `74ab8e4`.
 Console records 187 passed tests and seven explicit separate-campaign broker skips.
-Bulk preparation grants no native write authority. The [implementation record](docs/implementation/p08-execution.md)
+Bulk preparation grants no native write authority. The [implementation record](../../docs/implementation/p08-execution.md)
 now covers scoped leased profile collection, immutable review/confirmation,
 Console dataset mapping, authenticated Planning preparation and current Lifecycle
 admission, alongside exact-S0 isolated capture, NFC/OVF archives, copy conversion,
-Glance import and durable recovery. The earlier [profile evidence](verification/p08/profiles/qualification-index.json)
+Glance import and durable recovery. The earlier [profile evidence](../../verification/p08/profiles/qualification-index.json)
 and all original failures and corrections remain recorded with their exact source.
 
-**P08 remains incomplete and G08 NOT_REVIEWED.** The [completion packet](docs/implementation/p08-completion-review.md)
+**P08 remains incomplete and G08 NOT_REVIEWED.** The [completion packet](../../docs/implementation/p08-completion-review.md)
 separates unfinished software (BL-P08-001) from actual native/owner inputs
 (BL-P08-002). Continue in this order under the existing development authorization:
 
@@ -180,7 +180,7 @@ separates unfinished software (BL-P08-001) from actual native/owner inputs
    policy/services/restore and measured owner objectives. Retain original results
    and record real G08 receiving decisions. Software tests cannot supply these.
 
-Use the [native migration runbook](docs/operations/runbooks/native-migration.md).
+Use the [native migration runbook](../../docs/operations/runbooks/native-migration.md).
 No native environment, commissioned owner protocols or Q07/G08 outcomes were supplied.
 No migration effect is enabled by this evidence publication.
 
@@ -193,10 +193,10 @@ compatibility path remains in the execution implementation.
 
 The native API source at `4ee67fdd704f6b6c401237137e3d8e2940ba3d1a` passes
 276 Lifecycle and 139 worker tests without skips, 93 preparation tests and 43
-Temporal checks with six replayed histories. The [qualification index](verification/p07/native-api/qualification-index.json)
+Temporal checks with six replayed histories. The [qualification index](../../verification/p07/native-api/qualification-index.json)
 retains exact-source archives, original failures and corrections. These E2 checks
 establish component behavior, not installed-platform acceptance.
-The [completion receipt](verification/p07/native-api/regression-completion.json)
+The [completion receipt](../../verification/p07/native-api/regression-completion.json)
 records all 12 source workflows and six publication workflows passing.
 
 1. Preserve the current native-only contracts and qualified software boundaries.
@@ -212,10 +212,10 @@ records all 12 source workflows and six publication workflows passing.
 
 No native environment, selected service-owner protocols, actual Q05/Q06 evidence
 or G07 acceptance is supplied. Those missing inputs remain explicit in
-[the completion packet](docs/implementation/p07-completion-review.md). Software
+[the completion packet](../../docs/implementation/p07-completion-review.md). Software
 checks cannot establish installed-platform acceptance or complete those outcomes.
 
-P08 follows [the native migration design](docs/implementation/p08-native-migration.md):
+P08 follows [the native migration design](../../docs/implementation/p08-native-migration.md):
 explicit method selection, isolated snapshot-bound clone/export, copy-only conversion
 and guest changes, delta strategies, native import, validation and recovery. The
 newer P08 components and their remaining work are recorded above; they do not
@@ -232,19 +232,19 @@ readback, Assurance custody and the Console Jobs experience. The final run passe
 WebKit. Each live campaign replays four actual workflow histories, records five
 alert receipts and preserves 29 accepted effects through an older-journal restore.
 
-Use the [implementation record](docs/implementation/p06-execution.md),
-[qualification index](verification/p06/final/qualification-index.json),
-[check matrix](verification/p06/check-matrix.md),
-[corrections](verification/p06/corrections.md) and
-[simulation runbook](docs/operations/runbooks/durable-simulation.md).
+Use the [implementation record](../../docs/implementation/p06-execution.md),
+[qualification index](../../verification/p06/final/qualification-index.json),
+[check matrix](../../verification/p06/check-matrix.md),
+[corrections](../../verification/p06/corrections.md) and
+[simulation runbook](../../docs/operations/runbooks/durable-simulation.md).
 
-The [regression completion receipt](verification/p06/final/regression-completion.json)
+The [regression completion receipt](../../verification/p06/final/regression-completion.json)
 records all 15 associated workflow passes, including final-source Kubernetes.
 
 1. **BL-P06-001 — designated receiving:** product, qualification, security,
    Lifecycle, Assurance and SRE reviewers examine the exact evidence and perform
    the six representative operator tasks in the
-   [completion packet](docs/implementation/p06-completion-review.md). Record actual
+   [completion packet](../../docs/implementation/p06-completion-review.md). Record actual
    names, dates, ADR dispositions and decisions. The register keeps formal P06
    receiving IN_PROGRESS and G06 NOT_REVIEWED; all scoped engineering outputs and
    automated P06 checks are delivered.
@@ -252,7 +252,7 @@ records all 15 associated workflow passes, including final-source Kubernetes.
    actual OpenStack tuple, project/endpoints/trust, scoped identities, immutable
    tooling, state/locking/custody owners, image/network/storage constraints,
    quotas and independent observer. Populate the exact Q05 campaign inputs and
-   record missing inputs with owners using the [P07 card](docs/implementation/phases/p07.md).
+   record missing inputs with owners using the [P07 card](../../docs/implementation/phases/p07.md).
    Existing development authorization continues. A native effect still requires
    the actual exact-scope campaign authority and operating inputs.
 3. **Carry prior receiving and native limits:** P06 remains E2 isolated simulation;
@@ -267,16 +267,16 @@ P05 engineering and automated qualification are delivered at
 capability assessment, exact-source immutable compilation, independent owner reads,
 Lifecycle reservation simulation, Console comparison/diff/approval handoff and
 operational versus isolated-campaign admission contracts. Use the
-[implementation record](docs/implementation/p05-planning.md),
-[verified index](verification/p05/final/qualification-index.json),
-[check matrix](verification/p05/check-matrix.md) and
-[runbook](docs/operations/runbooks/planning-review.md).
+[implementation record](../../docs/implementation/p05-planning.md),
+[verified index](../../verification/p05/final/qualification-index.json),
+[check matrix](../../verification/p05/check-matrix.md) and
+[runbook](../../docs/operations/runbooks/planning-review.md).
 
 1. **BL-P05-001 — G05 receiving:** designated Planning/quality, architecture/Governance,
    security/Assurance and Lifecycle/quality reviewers examine the exact evidence.
    Product/quality complete the operator task sheet with the selected managed and
    assistive combinations. Record actual names, dates, findings and the decision
-   using the [completion packet](docs/implementation/p05-completion-review.md).
+   using the [completion packet](../../docs/implementation/p05-completion-review.md).
    The register keeps G05 NOT_REVIEWED; development authority is already supplied.
 2. **P06 engineering delivered:** the verified implementation above now consumes
    P05's immutable contracts and current approvals through real PostgreSQL and
@@ -290,23 +290,23 @@ operational versus isolated-campaign admission contracts. Use the
 # Retained P04 native receiving obligations
 
 P04 engineering and its automated qualification are delivered at
-`6b21490af3a9b0fbd5ce288bfbca8f82c790d6d9`. The [implementation record](docs/implementation/p04-inventory.md)
-and [verified index](verification/p04/final/qualification-index.json) retain all
+`6b21490af3a9b0fbd5ce288bfbca8f82c790d6d9`. The [implementation record](../../docs/implementation/p04-inventory.md)
+and [verified index](../../verification/p04/final/qualification-index.json) retain all
 75 Inventory and 24 worker tests passing without skips, plus three live campaigns
 of 60 checks each in Chromium, Firefox and WebKit. Enrollment, scoped collectors,
 durable generations, budget/retry controls, confirmed facts and the Console pass
 those measured boundaries. Twenty local quality commands also pass. Evidence is
 committed at `91ee1152ccd723857056aa32cf2217a5d87608fb`.
 
-The [delivery register](docs/implementation/delivery-register.yaml) keeps P04
+The [delivery register](../../docs/implementation/delivery-register.yaml) keeps P04
 IN_PROGRESS and G04 NOT_REVIEWED: the canonical gate requires actual native E3
 observations and designated receiving reviews, neither of which can be replaced
-by these fixtures. Complete the [receiving packet](docs/implementation/p04-completion-review.md):
+by these fixtures. Complete the [receiving packet](../../docs/implementation/p04-completion-review.md):
 
 1. **BL-P04-001 — Actual native qualification:** obtain the installed VMware and
    OpenStack tuples, approved destinations/trust, tenant/project/datacenter scope,
    restricted read identities, independent visibility audit, budgets and observer.
-   Run the five Q02 task groups using the [discovery runbook](docs/operations/runbooks/inventory-discovery.md)
+   Run the five Q02 task groups using the [discovery runbook](../../docs/operations/runbooks/inventory-discovery.md)
    and retain original before/after no-change, negative and recovery observations.
 2. **BL-P04-002 — Receiving and operator review:** the named platform, security,
    SRE, qualification and product roles examine every G04 criterion and the operator
@@ -315,7 +315,7 @@ by these fixtures. Complete the [receiving packet](docs/implementation/p04-compl
 3. **Completed regression receipt:** final runtime-source Kubernetes run
    `37438932585` passed at `fb37bb22`; source-impact checks establish identical
    product/deployment inputs at the qualified `6b21490a` source. The
-   [completion receipt](verification/p04/final/regression-completion.json) also
+   [completion receipt](../../verification/p04/final/regression-completion.json) also
    records passing affected identity, Governance events, messaging, recovery and
    Catalogue campaigns. The earlier status receipt remains unchanged. These
    results supply no native or operating acceptance.
@@ -329,17 +329,17 @@ external inputs. P01/P02/P03 receiving obligations remain below.
 
 P03 engineering and its automated qualification are delivered at
 `1c51f56a928291870e5125508aeb04935583fd56`. The
-[P03 record](docs/implementation/p03-catalogue.md) and
-[retained index](verification/p03/final/qualification-index.json) bind 89 passing
+[P03 record](../../docs/implementation/p03-catalogue.md) and
+[retained index](../../verification/p03/final/qualification-index.json) bind 89 passing
 PostgreSQL tests and all three passing 38-check live campaigns. The generated
 clients, complete Console workspace, concurrency/restart, broker fault/replay and
 post-revocation delivery are verified. Evidence is committed at
 `187ead3a02521cc3d6be063c6f449f0e3b79113a`; original failures remain available.
 
-The [delivery register](docs/implementation/delivery-register.yaml) retains P03
+The [delivery register](../../docs/implementation/delivery-register.yaml) retains P03
 IN_PROGRESS and G03 NOT_REVIEWED because actual representative-user and designated
 review obligations remain. Continue with the concrete
-[completion packet](docs/implementation/p03-completion-review.md):
+[completion packet](../../docs/implementation/p03-completion-review.md):
 
 1. **BL-P03-001 — Product/operator review:** identify the representative operator,
    observer and OP07 browser/OS/policy/assistive combinations. Execute all seven
@@ -347,7 +347,7 @@ review obligations remain. Continue with the concrete
    draft tasks; retain comprehension/accessibility findings and resolve defects.
 2. **BL-P03-002 — Criterion reviews:** Catalogue, architecture/quality, independent
    quality and product owners examine EV-P03-001–003 through the
-   [G03 assessment](docs/qualification/gate-reviews/g03-engineering-assessment-2026-10-06.md).
+   [G03 assessment](../../docs/qualification/gate-reviews/g03-engineering-assessment-2026-10-06.md).
    Record actual identities, dates, evidence and the G03 decision. Development and
    the accepted initial DC03 rules do not require renewed authorization.
 3. **Resolved foundation regression:** final-source Kubernetes run `37405120379`
@@ -366,14 +366,14 @@ continues to authorize P02 development. Support/break-glass policy and bounded
 implementation are complete. Independent recovery custody, signed reconciliation
 and separate resumption are implemented through
 `d5ccd142cca22e51448a1a86996bbd0a14cba2b5`.
-The [delivery register](docs/implementation/delivery-register.yaml) owns status.
+The [delivery register](../../docs/implementation/delivery-register.yaml) owns status.
 **P02 remains IN_PROGRESS and G02 NOT_REVIEWED** pending the actual operating,
 accessibility and receiving obligations below. G01 receiving conditions carry forward.
 
 ## Delivered recovery procedure
 
-Use the [recovery runbook](docs/operations/runbooks/identity-recovery-custody.md)
-and [implementation record](docs/implementation/p02-recovery-custody.md). The
+Use the [recovery runbook](../../docs/operations/runbooks/identity-recovery-custody.md)
+and [implementation record](../../docs/implementation/p02-recovery-custody.md). The
 separate custody process enrolls verified public keys and holds/rotates the epoch.
 Two independent operators sign an exact-state reconciliation plan; owner-only SQL
 revokes stale authority while retaining history. A new two-person release plan,
@@ -382,21 +382,21 @@ Runtime cannot rewrite recovery bindings/receipts/releases. Credentials must rot
 without cross-identity reuse. Unselected memberships are revoked and tenants held.
 Local bootstrap remains retired; pre-activation lost-password reset is unsupported.
 
-The [final qualification index](verification/p02/recovery-custody/terminal-hardening/qualification-index.json)
+The [final qualification index](../../verification/p02/recovery-custody/terminal-hardening/qualification-index.json)
 retains exact-source local and hosted observations, original archives and source/log
-hash verification. The [final regression receipt](verification/p02/recovery-custody/hosted-final.json)
+hash verification. The [final regression receipt](../../verification/p02/recovery-custody/hosted-final.json)
 records all nine workflows passing at Governance/runtime source `7ec7a60`, including
 Compose and Kubernetes. The final protected-terminal refinement repeats all three
 156-check recovery campaigns with 13 custody cases; unchanged runtime tree identities
 are retained explicitly. Failed observations remain failed in
-[the corrections record](verification/p02/corrections.md). The earlier support
-[qualification](verification/p02/support/qualification-index.json) and final
-[regression receipt](verification/p02/support/hosted-final.json) remain unchanged.
+[the corrections record](../../verification/p02/corrections.md). The earlier support
+[qualification](../../verification/p02/support/qualification-index.json) and final
+[regression receipt](../../verification/p02/support/hosted-final.json) remain unchanged.
 Published contracts, mandatory checks and phase scope are unchanged.
 
 ## Remaining actions to complete P02
 
-The [completion review packet](docs/implementation/p02-completion-review.md)
+The [completion review packet](../../docs/implementation/p02-completion-review.md)
 contains the concrete input table and manual task sheet:
 
 1. **BL-P02-002 — Actual operating custody:** supply the verified recovery owner,
@@ -413,7 +413,7 @@ contains the concrete input table and manual task sheet:
    actual reviewer identities, dates, immutable evidence and receiving decisions.
 
 BL-P02-001 is resolved; the accepted support policy does not need to be requested
-again. The [G02 assessment](docs/qualification/gate-reviews/g02-engineering-assessment-2026-10-05.md)
+again. The [G02 assessment](../../docs/qualification/gate-reviews/g02-engineering-assessment-2026-10-05.md)
 separates measured implementation from outstanding operating/review evidence.
 P03 owns Catalogue resource/wire integration; P05.04 owns the real immutable-plan
 producer; P06.03 owns immediate native-effect rechecks. They keep their own
@@ -425,9 +425,9 @@ checkpoints. OIDC settings remain Console-managed application data.
 image-security blocker BL-P01-002 remains resolved.** All nine pinned Alpine
 candidates pass exact-image admission at source
 `36a14811b5afa23717566d5e8a08632e011f44a5`. No finding was waived and no severity or scanner
-exclusion was relaxed. The [candidate manifest](release/p01-candidate-set.json)
+exclusion was relaxed. The [candidate manifest](../../release/p01-candidate-set.json)
 now records zero held components and `REQUIRES_INDEPENDENT_QUALIFICATION`;
-`promotion_authorized` remains false. [EV-P01-024 and the remediation record](docs/implementation/p01-image-remediation.md)
+`promotion_authorized` remains false. [EV-P01-024 and the remediation record](../../docs/implementation/p01-image-remediation.md)
 retain the original failures, complete APK correction and passing results.
 
 - **Artifact trust:** all nine isolated builds pass, with 18 CycloneDX image/source
@@ -443,11 +443,11 @@ retain the original failures, complete APK correction and passing results.
   loss, stale-acknowledgment preservation and collection recovery. Seven authorized
   diagnostic spans match the common caller trace; denial responses and concurrent
   readiness probes remain in the collected population. See
-  [the telemetry record](docs/implementation/p01-telemetry.md). Each also records 30
+  [the telemetry record](../../docs/implementation/p01-telemetry.md). Each also records 30
   cgroup-v2 resource samples across all 15 containers before/after recovery,
   including effective limits and zero observed OOM kills. Compose's observed
   limits are unlimited; production budgets remain an OP01 decision. See
-  [the resource record](docs/implementation/p01-resource-observation.md).
+  [the resource record](../../docs/implementation/p01-resource-observation.md).
 - **Affected requalification:** EV-P01-031 retains 28 HTTP fixtures, 79 Permit
   Desk recovery checks and 59 policy-control tests at the current source. All
   pass; the repository secret scan reports zero findings across 10,187 tracked
@@ -464,10 +464,10 @@ retain the original failures, complete APK correction and passing results.
 1. Activate repository admission (BL-P01-001): obtain verified reviewer GitHub
    IDs/logins and the authorized administration/independent reporting path, then
    install the trusted default-branch hook, role-based CODEOWNERS and required
-   exact-PR checks. The [fresh settings observation](verification/p01/admission/telemetry-settings-observation.json)
+   exact-PR checks. The [fresh settings observation](../../verification/p01/admission/telemetry-settings-observation.json)
    still shows `protected: false` and no rulesets. The implemented policy and
    prepared settings body are not active enforcement.
-2. Complete actual [OP01–OP07 inputs](release/operating-inputs.json): runtime/BOM
+2. Complete actual [OP01–OP07 inputs](../../release/operating-inputs.json): runtime/BOM
    and resource/network budgets; registries/signer/trust; secret/PKI/evidence/key
    custody; reviewer assignments; real alert route/response owner; recovery and
    retained inventory; support/accessibility ownership. The strict readiness
@@ -480,7 +480,7 @@ retain the original failures, complete APK correction and passing results.
    collection-failure recovery and resource sampling are already implemented
    and measured in the disposable Compose/Kubernetes environments.
 4. Complete independent criterion-by-criterion receiving reviews using
-   [the refreshed G01 assessment](docs/qualification/gate-reviews/g01-engineering-assessment-2026-10-05.md).
+   [the refreshed G01 assessment](../../docs/qualification/gate-reviews/g01-engineering-assessment-2026-10-05.md).
    Record the accountable receiving decision; P02 development entry does not pass G01.
 
 **P01 receiving work and verification remain IN_PROGRESS; G01 remains NOT_REVIEWED.** The
@@ -490,7 +490,7 @@ completed foundation campaigns; do not restart P00 or ask for G00 approval again
 
 ## P02 identity baseline
 
-[ADR-009](docs/decisions/adr-009-identity-delegation-and-authorization.md) defines
+[ADR-009](../../docs/decisions/adr-009-identity-delegation-and-authorization.md) defines
 console-managed external OIDC and a deployment-created local administrator.
 Initial deployment generates a random temporary password and displays it once
 to the authorized installer. First login requires a different password before
@@ -507,10 +507,10 @@ their distinct receiving inputs.
 
 ## Carried inputs and checkpoint ownership
 
-The user's reviewer identity, G00 approval, baseline decision scope, migration direction/method and later checkpoints are recorded with immutable provenance in the [input record](docs/qualification/feasibility/input-record.md). Do not request that baseline approval again. Remaining unknown integration and native fields describe actual inputs still needed, not a reason to stop independent foundation work.
+The user's reviewer identity, G00 approval, baseline decision scope, migration direction/method and later checkpoints are recorded with immutable provenance in the [input record](../../docs/qualification/feasibility/input-record.md). Do not request that baseline approval again. Remaining unknown integration and native fields describe actual inputs still needed, not a reason to stop independent foundation work.
 
 - Review the completed representative Permit Desk fixture and bounded Compose application/configuration recovery in P01.02/P01.06 before G01. Retain EV-P01-013 and the two original P00 database/attachment recovery boundaries with their distinct measured scopes.
-- Review EV-P01-014 against G01.02/G01.05/G01.06 using the [dependency recovery runbook](docs/operations/runbooks/stateful-dependency-recovery.md). Its single-node synthetic probes and one selected object version do not establish product integration, whole-store recovery, HA, retention authority or operational acceptance.
+- Review EV-P01-014 against G01.02/G01.05/G01.06 using the [dependency recovery runbook](../../docs/operations/runbooks/stateful-dependency-recovery.md). Its single-node synthetic probes and one selected object version do not establish product integration, whole-store recovery, HA, retention authority or operational acceptance.
 - Obtain actual runtime, registry/signer, trust, network and dependency facts before the affected P01 integration. Local development artifacts do not establish operated deployment or promotion controls.
 - Obtain installed VMware/OpenStack facts and permitted discovery scope before G04 work, and exact campaign effects/authority before G07/G08 native tests. Native qualifications remain unrun.
 - Retain application outage/data objectives before P08, operating/retained-state obligations at P10/P11, and staffing/dependency dates when supplied. Approval does not invent these facts.
@@ -521,11 +521,11 @@ Historical `implementation/all-waves` source is pinned at `a2963d8d43e25f08d70fb
 
 ## Document each implementation increment
 
-Use the [engineering standards](docs/engineering/README.md) and [coverage map](docs/engineering/coverage.md) when refining P02 and the carried foundation work. P00.03 has measured framework/tool locks, candidate image builds and schema/client tooling. Production adoption, complete service dependencies, managed-browser requirements and the actual mirror/trust path still need operating decisions and evidence. P01 must implement the documented structure, ownership, static analysis, contract and runtime checks before feature expansion; the written standards are not a completed foundation.
+Use the [engineering standards](../../docs/engineering/README.md) and [coverage map](../../docs/engineering/coverage.md) when refining P02 and the carried foundation work. P00.03 has measured framework/tool locks, candidate image builds and schema/client tooling. Production adoption, complete service dependencies, managed-browser requirements and the actual mirror/trust path still need operating decisions and evidence. P01 must implement the documented structure, ownership, static analysis, contract and runtime checks before feature expansion; the written standards are not a completed foundation.
 
-Apply the [pragmatic Laravel convention](docs/decisions/adr-024-pragmatic-laravel-domain-convention.md) within the [owning microservice](docs/architecture/context-code-structure.md): capability-based `app/Domain/` and `app/Application/`, Eloquent model behavior, Actions with `handle()`, external adapters in `app/Infrastructure/`, and normal Laravel entrypoints. Capabilities do not automatically become microservices. P00.02 aligns [the context registry](architecture/context-map.yaml) with that accepted convention and settles the remaining service decisions. P00.03 has verified the candidate architecture tools against actual spike locks and intentional violations; P01 must map these rules to the complete registered product source. P01.01/P01.04 implement PHP/Python/frontend dependency checks and actual ownership/review protection. The current registry/fixture workflow has explicit analysis limits; a source-empty pass does not close those packages.
+Apply the [pragmatic Laravel convention](../../docs/decisions/adr-024-pragmatic-laravel-domain-convention.md) within the [owning microservice](../../docs/architecture/context-code-structure.md): capability-based `app/Domain/` and `app/Application/`, Eloquent model behavior, Actions with `handle()`, external adapters in `app/Infrastructure/`, and normal Laravel entrypoints. Capabilities do not automatically become microservices. P00.02 aligns [the context registry](../../architecture/context-map.yaml) with that accepted convention and settles the remaining service decisions. P00.03 has verified the candidate architecture tools against actual spike locks and intentional violations; P01 must map these rules to the complete registered product source. P01.01/P01.04 implement PHP/Python/frontend dependency checks and actual ownership/review protection. The current registry/fixture workflow has explicit analysis limits; a source-empty pass does not close those packages.
 
-For every coherent change, identify requirement/package IDs and the owning service. Update its behavior/contract specification and any affected ADR; put future API/event schemas in the contract tree, operational procedures under `docs/operations/runbooks/`, and qualification definitions/evidence indexes under `docs/qualification/`. The [documentation guide](docs/documentation-guide.md) defines the complete placement and naming rules.
+For every coherent change, identify requirement/package IDs and the owning service. Update its behavior/contract specification and any affected ADR; put future API/event schemas in the contract tree, operational procedures under `docs/operations/runbooks/`, and qualification definitions/evidence indexes under `docs/qualification/`. The [documentation guide](../../docs/documentation-guide.md) defines the complete placement and naming rules.
 
 Record actual source/artifact revisions, environment, positive/negative/recovery results, evidence identity and reviewer in `delivery-register.yaml`. Add a blocker with owner and unblock condition when necessary. Regenerate the progress/traceability views and validate references. Update this file to name the next concrete task, without copying a second status table here.
 
