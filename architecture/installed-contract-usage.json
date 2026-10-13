@@ -239,7 +239,7 @@
     {
       "copy": "services/lifecycle/src/lifecycle/infrastructure/contracts/migration-readiness-v2.2.json",
       "canonical": "contracts/schemas/planning/migration-readiness-v2.2.json",
-      "loader": "services/lifecycle/src/lifecycle/domain/migration_readiness.py",
+      "loader": "services/lifecycle/src/lifecycle/infrastructure/migration_readiness_contract.py",
       "load_kind": "literal",
       "packaging": "services/lifecycle/Dockerfile",
       "packaging_marker": "COPY src/ ./src/",
@@ -343,7 +343,7 @@
     {
       "copy": "services/planning/src/planning/infrastructure/inputs/migration-readiness-v2.2.json",
       "canonical": "contracts/schemas/planning/migration-readiness-v2.2.json",
-      "loader": "services/planning/src/planning/application/migration_support.py",
+      "loader": "services/planning/src/planning/infrastructure/migration_readiness_contract.py",
       "load_kind": "literal",
       "packaging": "services/planning/Dockerfile",
       "packaging_marker": "COPY src/ ./src/",
