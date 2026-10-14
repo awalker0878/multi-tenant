@@ -39,6 +39,15 @@ afterEach(function (): void {
     $this->travelBack();
 });
 
+it('rejects a valid plan identifier outside its tenant without a compatibility route', function (): void {
+    $other = tenantCommand($this, '/v1/tenants', [
+        'name' => 'Unrelated tenant', 'administrator_subject' => 'other-admin',
+    ])->assertCreated()->json('id');
+    $this->source->unavailable = false;
+    tenantCommand($this, '/v1/tenants/'.$other.'/approvals',
+        $this->input, $this->author)->assertStatus(404);
+});
+
 function requestApproval(object $test): string
 {
     return tenantCommand($test, $test->path, $test->input, $test->author)->assertCreated()->json('id');

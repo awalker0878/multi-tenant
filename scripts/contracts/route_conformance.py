@@ -426,7 +426,7 @@ def verify_planning_immutable(root: Path = ROOT) -> int:
     from planning.interfaces.planning import PlanningApp
 
     spec = json.loads((root / "contracts/openapi/planning-immutable-plan-v1.1.json").read_text())
-    if routes_in_openapi(spec) != {("GET", "/v1/plans/{plan}/revisions/{revision}")}:
+    if routes_in_openapi(spec) != {("GET", "/v1/tenants/{tenant}/plans/{plan}/revisions/{revision}")}:
         raise ValueError("Planning immutable-plan OpenAPI operation changed")
     bound = {
         "plan_id": SAMPLE_UUID, "revision": 1, "tenant_id": SAMPLE_UUID,
@@ -445,19 +445,25 @@ def verify_planning_immutable(root: Path = ROOT) -> int:
             checked.append(credential)
 
     class Planning:
-        def bound_plan(self, plan, revision):
-            if plan != SAMPLE_UUID or revision != 1:
-                raise ValueError("Wrong planning input binding")
+        def bound_plan(self, tenant, plan, revision):
+            if tenant != SAMPLE_UUID or plan != SAMPLE_UUID or revision != 1:
+                from planning.domain.model import Rejected
+                raise Rejected("not_found", 404)
             return bound
 
     app = PlanningApp(Planning(), Authority())
-    path = f"/v1/plans/{SAMPLE_UUID}/revisions/1"
+    path = f"/v1/tenants/{SAMPLE_UUID}/plans/{SAMPLE_UUID}/revisions/1"
     headers = [(b"authorization", b"Bearer " + b"a" * 64)]
     status, result = asyncio.run(_exchange(app, path, "GET", headers))
     if status != 200 or result != bound or checked != ["a" * 64]:
         raise ValueError("Planning immutable plan authorized response failed")
     schema = spec["components"]["schemas"]["BoundPlan"]
     Draft202012Validator(schema, format_checker=FormatChecker()).validate(result)
+    other = "10000000-0000-4000-8000-000000000002"
+    rejected_path = f"/v1/tenants/{other}/plans/{SAMPLE_UUID}/revisions/1"
+    status, _ = asyncio.run(_exchange(app, rejected_path, "GET", headers))
+    if status != 404:
+        raise ValueError("Planning immutable plan allowed a cross-tenant read")
     return 1
 
 

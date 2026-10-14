@@ -426,13 +426,14 @@ class Planning:
             "native_write_authorized": False,
         }
 
-    def bound_plan(self, identity: str, revision: int) -> dict[str, Any]:
+    def bound_plan(self, tenant: str, identity: str, revision: int) -> dict[str, Any]:
         if revision != 1:
             raise Rejected("not_found", 404)
         with self.database.transaction() as tx:
             row = tx.one(
-                "SELECT tenant,payload FROM app.planning_records WHERE id=%s AND kind='plan'",
-                (identifier(identity),),
+                "SELECT tenant,payload FROM app.planning_records "
+                "WHERE tenant=%s AND id=%s AND kind='plan'",
+                (identifier(tenant), identifier(identity)),
             )
             if row is None:
                 raise Rejected("not_found", 404)
@@ -441,7 +442,7 @@ class Planning:
                 pinned_tenant = row["payload"]["content"]["scope"]["tenant_id"]
             except (KeyError, TypeError):
                 raise Rejected("plan_tenant_mismatch", 423) from None
-            if pinned_tenant != tenant:
+            if pinned_tenant != tenant or str(row["tenant"]) != tenant:
                 raise Rejected("plan_tenant_mismatch", 423)
             if self.qualification_hold(tx, tenant, identity) is not None:
                 raise Rejected("qualification_invalidation_held", 423)

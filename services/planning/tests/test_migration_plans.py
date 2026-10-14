@@ -428,13 +428,17 @@ def test_unattended_execution_and_governance_reads_recheck_recipe_revocation() -
                     "invalidated": False}
         if "SELECT tenant,payload" in query:
             return {"tenant": tenant, "payload": payload}
+        if "WHERE tenant=%s AND id=%s" in query:
+            return {"tenant": tenant, "payload": payload} if args[0] == tenant else None
         return {"payload": payload}
 
     tx.one.side_effect = record_lookup
     with pytest.raises(Rejected, match="validation_authority"):
         denied.execution_plan(tenant, key, 1)
     assert planning.execution_plan(tenant, key, 1)["invalidated"] is False
-    assert planning.bound_plan(key, 1) == payload["binding"]
+    assert planning.bound_plan(tenant, key, 1) == payload["binding"]
+    with pytest.raises(Rejected, match="not_found"):
+        planning.bound_plan(str(uuid4()), key, 1)
     assert recipes.call_count == 2
     recipes.return_value = recipe | {"expires_at": 999}
     for native in (True, False):
@@ -442,7 +446,7 @@ def test_unattended_execution_and_governance_reads_recheck_recipe_revocation() -
             if native:
                 planning.execution_plan(tenant, key, 1)
             else:
-                planning.bound_plan(key, 1)
+                planning.bound_plan(tenant, key, 1)
 
 
 def test_ahv_recipe_binds_exact_reviewed_destination_devices() -> None:

@@ -14,7 +14,7 @@ final class PlanningPlanSource implements ImmutablePlanSource
 {
     public function __construct(private readonly MountedSecret $secrets) {}
 
-    public function fetch(string $planId, int $revision): array
+    public function fetch(string $tenant, string $planId, int $revision): array
     {
         $base = config('governance.planning_url');
         $parts = is_string($base) && filter_var($base, FILTER_VALIDATE_URL) ? parse_url($base) : false;
@@ -29,12 +29,14 @@ final class PlanningPlanSource implements ImmutablePlanSource
         try {
             $response = Http::acceptJson()->withToken($credential)->connectTimeout(2)->timeout(5)
                 ->withOptions(['allow_redirects' => false, 'verify' => $ca ?? true])
-                ->get(rtrim($base, '/').'/v1/plans/'.$planId.'/revisions/'.$revision);
+                ->get(rtrim($base, '/').'/v1/tenants/'.$tenant.'/plans/'.$planId.'/revisions/'.$revision);
         } catch (ConnectionException) {
             throw new IdentityDenied('plan_authority_unavailable', 503);
         }
         $body = $response->json();
-        if (! $response->successful() || ! is_array($body) || array_is_list($body) || strlen($response->body()) > 65536) {
+        if (! $response->successful() || ! is_array($body) || array_is_list($body)
+            || ($body['tenant_id'] ?? null) !== $tenant || ($body['plan_id'] ?? null) !== $planId
+            || ($body['revision'] ?? null) !== $revision || strlen($response->body()) > 65536) {
             throw new IdentityDenied('plan_authority_unavailable', 503);
         }
 

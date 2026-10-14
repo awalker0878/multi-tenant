@@ -45,7 +45,7 @@ MIGRATION_SUFFIXES = ("/migration-preparations", "/migration-plans", "/migration
 HTTP_OPERATIONS = (
     ("POST", "/internal/qualification-events"),
     ("GET", "/internal/tenants/{tenant}/placement-proposals/{plan}/revisions/{revision}"),
-    ("GET", "/v1/plans/{plan}/revisions/{revision}"),
+    ("GET", "/v1/tenants/{tenant}/plans/{plan}/revisions/{revision}"),
     ("POST", "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/assessments"),
     ("GET", "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/assessments/{record}"),
     ("POST", "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/migration-flow-choices"),

@@ -82,7 +82,7 @@ class PlanningApp:
                 raise Rejected("invalid_workload", 401)
             credential = authorization[7:]
             immutable = re.fullmatch(
-                rf"/v1/plans/({UUID})/revisions/([1-9][0-9]{{0,8}})", scope["path"]
+                rf"/v1/tenants/({UUID})/plans/({UUID})/revisions/([1-9][0-9]{{0,8}})", scope["path"]
             )
             execution = re.fullmatch(
                 rf"/v1/tenants/({UUID})/execution-plans/({UUID})/revisions/([1-9][0-9]{{0,8}})",
@@ -108,7 +108,7 @@ class PlanningApp:
             elif immutable and scope["method"] == "GET":
                 await asyncio.to_thread(self.authority.caller, credential, "governance_reader")
                 payload = await asyncio.to_thread(
-                    self.planning.bound_plan, immutable[1], int(immutable[2])
+                    self.planning.bound_plan, immutable[1], immutable[2], int(immutable[3])
                 )
                 status = 200
             else:

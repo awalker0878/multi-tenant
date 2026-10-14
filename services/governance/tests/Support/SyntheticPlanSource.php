@@ -13,9 +13,9 @@ final class SyntheticPlanSource implements ImmutablePlanSource
 
     public function __construct(public array $plan) {}
 
-    public function fetch(string $planId, int $revision): array
+    public function fetch(string $tenant, string $planId, int $revision): array
     {
-        if ($this->unavailable || $planId !== $this->plan['plan_id'] || $revision !== $this->plan['revision']) {
+        if ($this->unavailable || $tenant !== $this->plan['tenant_id'] || $planId !== $this->plan['plan_id'] || $revision !== $this->plan['revision']) {
             throw new IdentityDenied('plan_authority_unavailable', 503);
         }
 

@@ -3,7 +3,7 @@
   "info": {
     "title": "Immutable planning binding consumed by Governance",
     "version": "1.1.0",
-    "description": "P05 producer binding. The semantic content digest and authority lane are included in the canonical approval digest. Version 1.0 is retained only as the historical P02 consumer contract."
+    "description": "Current tenant-bound P05 producer binding. Governance reads an immutable plan only through a tenant-scoped endpoint; workload credentials never grant cross-tenant plan lookup."
   },
   "security": [
     {
@@ -11,10 +11,19 @@
     }
   ],
   "paths": {
-    "/v1/plans/{plan}/revisions/{revision}": {
+    "/v1/tenants/{tenant}/plans/{plan}/revisions/{revision}": {
       "get": {
         "operationId": "getImmutablePlan",
         "parameters": [
+          {
+            "in": "path",
+            "name": "tenant",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
           {
             "in": "path",
             "name": "plan",

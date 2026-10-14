@@ -7,5 +7,5 @@ namespace App\Application\Approvals\Contracts;
 interface ImmutablePlanSource
 {
     /** @return array<string, mixed> */
-    public function fetch(string $planId, int $revision): array;
+    public function fetch(string $tenant, string $planId, int $revision): array;
 }
