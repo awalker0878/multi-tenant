@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Infrastructure\Foundation\MountedSecret;
+use App\Application\Foundation\Contracts\SecretReader;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 /** Service-only latest-revision check; never accepts an operator-supplied revision. */
 final class CurrentPlanningIntentController
 {
-    public function __invoke(Request $request, string $tenant, string $application, string $environment, MountedSecret $secrets): JsonResponse
+    public function __invoke(Request $request, string $tenant, string $application, string $environment, SecretReader $secrets): JsonResponse
     {
         $planning = $secrets->read(config('planning.credential_file'));
         $lifecycle = $secrets->read(config('planning.lifecycle_credential_file'));

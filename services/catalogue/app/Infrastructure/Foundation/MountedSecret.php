@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Foundation;
 
-final class MountedSecret
+use App\Application\Foundation\Contracts\SecretReader;
+
+final class MountedSecret implements SecretReader
 {
     public function read(mixed $path): ?string
     {
