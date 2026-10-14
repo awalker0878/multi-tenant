@@ -41,6 +41,10 @@ Phase 1 is contract integrity, dependency closure and release rationalization.
 Phase 2 is runtime producer/consumer and security conformance. See the
 [implementation ledger](phase1-ledger.md) for executed checks and the
 [conditional Phase 2 handoff](phase2-handoff.md) for entry points and open evidence.
+The independently executed [Phase 2 preflight ledger](phase2-ledger.md) and its
+[machine-readable baseline](../../verification/contracts/phase2-preflight.json)
+record the unresolved handoff prerequisite, reproduced runtime mismatch and
+actual CI qualification gaps. They do not establish Phase 2 completion.
 
 `scripts/contracts/discovery.py` independently resolves JSON/YAML references,
 URI schema identities, embedded projections, capability/profile schemas and
