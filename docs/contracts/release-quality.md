@@ -49,7 +49,8 @@ not rewritten in place.
 ### Events
 
 New AsyncAPI contracts use version 3.0 and canonical event payloads with an
-explicit tenant/identity/correlation envelope. Each channel must define
+explicit, typed tenant/identity/correlation envelope (UUID identities and
+date-time occurrence). Each channel must define
 at-least-once delivery, tenant ordering, event-ID deduplication, bounded
 retry attempts, exponential jitter backoff, after-commit acknowledgment,
 a dead-letter address, a retention window and a bounded deduplication

@@ -469,6 +469,27 @@ def quality_event(path: str, doc: dict, policy: dict, root: Path) -> None:
         fields = set(payload.get("required", []))
         if not set(policy["event_required_fields"]) <= fields or payload.get("additionalProperties") is not False:
             raise ValueError("Event message lacks mandatory immutable envelope: " + name)
+        # Merely requiring envelope field names does not prevent empty or
+        # incorrectly typed identities and timestamps from being published.
+        shapes = {
+            "event_id": ("string", "uuid"),
+            "event_type": ("string", None),
+            "tenant_id": ("string", "uuid"),
+            "correlation_id": ("string", "uuid"),
+            "occurred_at": ("string", "date-time"),
+            "schema_version": ("string", None),
+        }
+        properties = payload.get("properties", {})
+        if not isinstance(properties, dict):
+            raise ValueError("Event payload lacks typed envelope properties: " + name)
+        for field in policy["event_required_fields"]:
+            shape = properties.get(field)
+            expected_type, expected_format = shapes[field]
+            if (not isinstance(shape, dict)
+                    or shape.get("type") != expected_type
+                    or (expected_format is not None and shape.get("format") != expected_format)):
+                raise ValueError("Event payload envelope field has invalid type/format: "
+                                 + name + "/" + field)
     covered_channels = set()
     for key, operation in operations.items():
         if operation.get("action") not in ("send", "receive"):

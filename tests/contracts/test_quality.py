@@ -265,7 +265,11 @@ class SchemaAndEvents(unittest.TestCase):
             schema = {
                 "type": "object", "additionalProperties": False,
                 "required": POLICY["event_required_fields"],
-                "properties": {key: {"type": "string"} for key in POLICY["event_required_fields"]}
+                "properties": {key: {
+                    "type": "string", **({"format": "uuid"} if key in
+                        ("event_id", "tenant_id", "correlation_id") else
+                        {"format": "date-time"} if key == "occurred_at" else {})
+                } for key in POLICY["event_required_fields"]}
             }
             (root / "contracts/schemas/events/pulse-v2.json").write_text(json.dumps(schema))
             channel = {
@@ -285,6 +289,12 @@ class SchemaAndEvents(unittest.TestCase):
                 "operations": {"publish": {"action": "send", "channel": {"$ref": "#/channels/changed"}}}
             }
             quality_event("contracts/asyncapi/pulse-v2.yaml", event, POLICY, root)
+            malformed = copy.deepcopy(schema)
+            malformed["properties"]["tenant_id"]["type"] = "number"
+            (root / "contracts/schemas/events/pulse-v2.json").write_text(json.dumps(malformed))
+            with self.assertRaisesRegex(ValueError, "invalid type/format"):
+                quality_event("contracts/asyncapi/pulse-v2.yaml", event, POLICY, root)
+            (root / "contracts/schemas/events/pulse-v2.json").write_text(json.dumps(schema))
             broken = copy.deepcopy(event)
             broken["channels"]["changed"]["x-delivery"]["max_attempts"] = 0
             with self.assertRaisesRegex(ValueError, "bounded ordering"):
