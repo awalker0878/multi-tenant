@@ -4,6 +4,7 @@ import asyncio
 import hmac
 import json
 from collections.abc import Callable
+from typing import Any
 
 from uvicorn._types import ASGIReceiveCallable, ASGISendCallable, Scope
 
@@ -19,7 +20,8 @@ class SimulationApp:
     ) -> None:
         if scope["type"] != "http":
             return
-        status, payload = 503, {"error": "simulation_unavailable"}
+        status = 503
+        payload: dict[str, Any] = {"error": "simulation_unavailable"}
         try:
             if scope["path"] == "/health/live" and scope["method"] == "GET":
                 status, payload = 200, {"status": "alive"}

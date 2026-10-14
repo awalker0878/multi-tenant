@@ -1,7 +1,5 @@
 """Native image URL import and powered-off AHV VM creation with durable task receipts."""
 
-
-
 import time
 from collections.abc import Callable
 from pathlib import Path

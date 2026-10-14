@@ -5,8 +5,6 @@ passthrough/key-bearing devices require their own route qualification. Native
 task acceptance is retained before polling and uncertain submissions are held.
 """
 
-
-
 import re
 import time
 from collections.abc import Callable

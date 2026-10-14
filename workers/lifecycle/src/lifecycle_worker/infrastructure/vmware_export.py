@@ -1,7 +1,5 @@
 """Vmware export; platform mechanisms retain native semantics."""
 
-
-
 import hashlib
 import http.client
 import re

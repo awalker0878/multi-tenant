@@ -4,8 +4,6 @@ Cinder/Nova consume the planned image UUIDs through the existing OpenStack creat
 adapter. This adapter does not change route when image staging/import fails.
 """
 
-
-
 import time
 from collections.abc import Callable
 from pathlib import Path
@@ -22,8 +20,8 @@ from lifecycle_worker.application.native import (
     sha256,
 )
 from lifecycle_worker.infrastructure.image_conversion import file_digest
-from lifecycle_worker.infrastructure.migration_budget import seconds
 from lifecycle_worker.infrastructure.migration_custody import ArtifactCustody
+from lifecycle_worker.infrastructure.migration_budget import seconds
 from lifecycle_worker.infrastructure.native_files import protected_read
 from lifecycle_worker.infrastructure.openstack_image_transport import GlanceImport
 

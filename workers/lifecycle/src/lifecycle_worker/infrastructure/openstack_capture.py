@@ -5,8 +5,6 @@ server and exact complete disk mapping are mandatory. Native submissions are
 never replayed by this adapter; partial resource receipts remain in custody.
 """
 
-
-
 import re
 import time
 from collections.abc import Callable

@@ -17,7 +17,7 @@ from lifecycle_worker.application.migration_runtime import MIGRATION_STAGES
 from lifecycle_worker.application.native import NativeHeld
 from lifecycle_worker.domain.capability_definitions import AFTER, BEFORE, STAGES
 from lifecycle_worker.infrastructure.migration_method import OPERATIONS, contract, measured
-from test_method_protocol import method_plan, measurement
+from test_method_protocol import measurement, method_plan
 
 ROOT = Path(__file__).resolve().parents[3]
 DEFINITIONS = json.loads((ROOT / "contracts/capabilities/definitions-v1.json").read_text())
