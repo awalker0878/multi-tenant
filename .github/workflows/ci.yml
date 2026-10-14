@@ -401,6 +401,13 @@ jobs:
           python scripts/contracts/assurance_routes.py --app "${{ matrix.app }}" --routes "$RUNNER_TEMP/laravel-routes.json" --output "$RUNNER_TEMP/${{ matrix.app }}-routes.json"
       - name: Probe missing credentials on every published secured Laravel operation
         run: php scripts/contracts/laravel_denials.php "${{ matrix.app }}" "$RUNNER_TEMP/${{ matrix.app }}-denials.json"
+      - name: Verify Catalogue event with Planning installed decoder
+        if: matrix.app == 'catalogue'
+        env:
+          PYTHONPATH: services/planning/src
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_SHA: ${{ github.sha }}
+        run: python scripts/contracts/catalogue_foundation_assurance.py --output "$RUNNER_TEMP/catalogue-foundation-evidence.json"
       - name: Retain measured Laravel route and denial evidence
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
@@ -409,6 +416,7 @@ jobs:
           path: |
             ${{ runner.temp }}/${{ matrix.app }}-routes.json
             ${{ runner.temp }}/${{ matrix.app }}-denials.json
+            ${{ runner.temp }}/catalogue-foundation-evidence.json
           if-no-files-found: warn
           retention-days: 14
 
