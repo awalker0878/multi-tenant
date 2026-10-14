@@ -204,7 +204,7 @@ def main():
                     return response.status, json.loads(payload), response.headers, len(payload)
 
             def gov(path, body, token=None, expected=201):
-                status, value, _, _ = wire('https://127.0.0.1:8442', path, 'POST', body, {'Authorization': 'Bearer '+credentials['console-governance'][0], 'X-Console-Session': token or fixture['admin_token'], 'Idempotency-Key': str(uuid.uuid4())})
+                status, value, _, _ = wire('https://127.0.0.1:8442', path, 'POST', body, {'Authorization': 'Bearer '+credentials['console-governance'][0], 'X-Console-Session': token or fixture['admin_token'], 'Idempotency-Key': secrets.token_hex(32)})
                 if status != expected:
                     raise RuntimeError('governance_wire_'+path+'_'+str(status))
                 return value

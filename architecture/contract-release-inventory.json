@@ -1974,7 +1974,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/openapi/catalogue-v1.0.1.json",
           "source": "scripts/p03/verify_live.py",
-          "source_sha256": "4d8c02146ad5d07ef2983fb9f5c607fd350dc05c3477d47dfb8dae70dabcb3b8"
+          "source_sha256": "ea1963999a772bffd7139eca3204d902bed680410bac516c1d31a9e82392c171"
         }
       ]
     },
@@ -2394,7 +2394,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/openapi/governance-catalogue-owners-v1.json",
           "source": "scripts/p03/verify_live.py",
-          "source_sha256": "4d8c02146ad5d07ef2983fb9f5c607fd350dc05c3477d47dfb8dae70dabcb3b8"
+          "source_sha256": "ea1963999a772bffd7139eca3204d902bed680410bac516c1d31a9e82392c171"
         }
       ]
     },
@@ -2825,7 +2825,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/openapi/governance-local-identity-v1.json",
           "source": "scripts/p02/verify_identity.py",
-          "source_sha256": "c4741ddfd887d2c8c3b21ad4da426172539094471ed025ae05c77cd611e73779"
+          "source_sha256": "8e088c8ac31fe95a106e705df1bc663acadd746060d51d1b0ac33263b0adf12a"
         }
       ]
     },
@@ -3009,12 +3009,6 @@
           "marker": "/support-security-revocations",
           "source": "services/governance/routes/api.php",
           "source_sha256": "ea077c2f0f0c20f9baca02eee5c8b7f86f7ce6b4ba54aa319e130c21803b66e6"
-        },
-        {
-          "kind": "validation-or-generation",
-          "marker": "contracts/openapi/governance-support-v1.json",
-          "source": "scripts/p02/verify_identity.py",
-          "source_sha256": "c4741ddfd887d2c8c3b21ad4da426172539094471ed025ae05c77cd611e73779"
         },
         {
           "kind": "validation-or-generation",
@@ -4240,13 +4234,13 @@
           "kind": "validation-or-generation",
           "marker": "contracts/openapi/inventory-v1.9.json",
           "source": "scripts/p04/verify_live.py",
-          "source_sha256": "051dd23889d700c487d1414f3af0547591ea49e9556e93e8015e413893768fcc"
+          "source_sha256": "2788553b5226ef17ff1fd20f329bfa4af145513d8c4c980ad199410470867e4c"
         },
         {
           "kind": "validation-or-generation",
           "marker": "contracts/openapi/inventory-v1.9.json",
           "source": "scripts/p05/verify_live.py",
-          "source_sha256": "d654ab58c5c5b0cd3c2bc6f562408e2d2ac88aafef626f7d221e5416a4bdc304"
+          "source_sha256": "93b076957e9b6f35e6dd9d052f1419baa78ee3fa4c61e3eaf0ee2367236895b0"
         },
         {
           "kind": "validation-or-generation",
@@ -6361,7 +6355,7 @@
           "kind": "validation-or-generation",
           "marker": "intent-v1.json",
           "source": "scripts/p03/verify_live.py",
-          "source_sha256": "4d8c02146ad5d07ef2983fb9f5c607fd350dc05c3477d47dfb8dae70dabcb3b8"
+          "source_sha256": "ea1963999a772bffd7139eca3204d902bed680410bac516c1d31a9e82392c171"
         }
       ]
     },
@@ -6621,7 +6615,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/schemas/events/catalogue-intent-v1.json",
           "source": "scripts/p03/verify_live.py",
-          "source_sha256": "4d8c02146ad5d07ef2983fb9f5c607fd350dc05c3477d47dfb8dae70dabcb3b8"
+          "source_sha256": "ea1963999a772bffd7139eca3204d902bed680410bac516c1d31a9e82392c171"
         }
       ]
     },
@@ -6689,7 +6683,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/schemas/events/governance-change-v1.json",
           "source": "scripts/p02/verify_identity.py",
-          "source_sha256": "c4741ddfd887d2c8c3b21ad4da426172539094471ed025ae05c77cd611e73779"
+          "source_sha256": "8e088c8ac31fe95a106e705df1bc663acadd746060d51d1b0ac33263b0adf12a"
         }
       ]
     },
@@ -6771,7 +6765,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/schemas/events/identity-change-v1.json",
           "source": "scripts/p02/verify_identity.py",
-          "source_sha256": "c4741ddfd887d2c8c3b21ad4da426172539094471ed025ae05c77cd611e73779"
+          "source_sha256": "8e088c8ac31fe95a106e705df1bc663acadd746060d51d1b0ac33263b0adf12a"
         },
         {
           "kind": "validation-or-generation",
@@ -6936,7 +6930,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/schemas/inventory/fact-v1.1.json",
           "source": "scripts/p04/verify_live.py",
-          "source_sha256": "051dd23889d700c487d1414f3af0547591ea49e9556e93e8015e413893768fcc"
+          "source_sha256": "2788553b5226ef17ff1fd20f329bfa4af145513d8c4c980ad199410470867e4c"
         }
       ]
     },

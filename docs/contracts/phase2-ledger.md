@@ -237,3 +237,15 @@ The integration and aggregate required gates remain failed until the corrected
 branch is executed again. The complete qualification gate remains red for
 missing authenticated authority and other operation-specific evidence. No test
 fixture, successful build or missing receipt is promoted to runtime assurance.
+
+The next run, `38644129101` at `e0fd55d35b1a6badb28267f062f6d4a2e64ddf02`,
+passed the corrected SQL bootstrap and exposed two additional executable defects:
+P03–P06 harnesses sent UUID issuance keys rejected by Governance v2's unchanged
+lowercase-hex schema (422), and P02 migration replay found that migration 014's
+table/index creation was not idempotent. Harness issuance now uses a fresh
+cryptographic 64-character hex key; production delegation callers already send
+valid hex keys. Migration 014 uses `IF NOT EXISTS`, retaining existing data and
+reapplying current owner privileges. The actual replay journey is the regression
+entry point, and the original implementation fails it. The source evidence
+inventory also requires regeneration after modifying its bound P02 harness;
+the strict stale-inventory rejection is preserved and the report is regenerated.
