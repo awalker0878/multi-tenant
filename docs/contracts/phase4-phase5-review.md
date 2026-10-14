@@ -1,6 +1,6 @@
 # Contract framework: Phase 4 and Phase 5 implementation assessment
 
-Date: 2026-10-12  
+Date: 2026-10-14  
 Branch: `codex/capability-runtime-assurance-audit-fixes`  
 Pull request: [#64](https://github.com/awalker0878/multi-tenant/pull/64) — draft
 
@@ -18,8 +18,10 @@ and typed method-plan validators. The qualification gate:
   invented, removed or unimplemented method aliases;
 - requires each native method-stage combination to have measured dispatch cases
   for every VMware, AHV and OpenStack source/target direction (nine cases);
-- checks complete negative method faults and independent dataset readback
-  variants, source capture, durable partial receipts and revocation;
+- checks exact negative method faults and all 12 independent dataset-readback
+  variants by identity (not merely by count), plus source capture, durable
+  partial receipts and revocation;
+- verifies JUnit-declared suite and root test totals match executed cases;
 - produces a source-revision and JUnit-digest-bound **E2-only** result with
   `installed_provider_qualified=false` and `native_write_authorized=false`.
 
@@ -51,8 +53,11 @@ Tests were updated to import their genuine owner modules, not a proxy.
 ### Active-only release inventory
 
 The checkout ships only current canonical releases, active installed copies and
-executable consumer bindings. Historical retirement manifests and archived
-compatibility tests are not part of the release. New contract publications
+executable consumer bindings. Historical retirement manifests, six obsolete
+contract-compatibility snapshots, and archived compatibility tests are not part
+of the release. Retained P08 E2 verification no longer reads a frozen contract
+baseline or emits an original-contracts count; the current registry and
+source-bound executable checks own that invariant. New contract publications
 still require the current strict quality profile and semantic comparison.
 
 ## Verification
@@ -69,4 +74,6 @@ python scripts/p08/qualify.py --output /tmp/p08-qualification
 ```
 
 Keep PR #64 draft until these checks pass and any legitimate failures are fixed.
+The 2026-10-14 CI run still reports incomplete release/operation assurance and
+unrelated service quality failures. Source cleanup must not bypass those gates.
 Do not claim E3/E4 qualification from an E2 passing result.

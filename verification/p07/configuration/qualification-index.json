@@ -205,7 +205,7 @@
       "report_sha256": "26ffcb4b16f0ed164abfac37857ba8e799171f928559ef74d1a9802d1a46f35c",
       "source_revision": "22479431b581dbf6875c9109f6a2bff21f1d08f0",
       "reported_result": "FAIL",
-      "error_summary": "browser failed: \nRunning 1 test using 1 worker\n\n  \u2718  1 [chromium] \u203a tests/browser-p04/inventory.spec.ts:4:1 \u203a browses scoped observations, preserves uncertain enrollment and clears revoked access (8.8"
+      "error_summary": "browser failed: \nRunning 1 test using 1 worker\n\n  ✘  1 [chromium] › tests/browser-p04/inventory.spec.ts:4:1 › browses scoped observations, preserves uncertain enrollment and clears revoked access (8.8"
     },
     {
       "archive": "failures/2247943-contracts.zip",
@@ -223,7 +223,7 @@
       "report_sha256": "b8c032e6ce54bfb54943cbc6b36376b0266da679855d9005a0de13c334caefad",
       "source_revision": "2a81322929754cf1bc80b18f362c5a30f43f60f5",
       "reported_result": "FAIL",
-      "error_summary": "browser failed: \nRunning 1 test using 1 worker\n\n  \u2718  1 [chromium] \u203a tests/browser-p04/inventory.spec.ts:4:1 \u203a browses scoped observations, preserves uncertain enrollment and clears revoked access (9.8"
+      "error_summary": "browser failed: \nRunning 1 test using 1 worker\n\n  ✘  1 [chromium] › tests/browser-p04/inventory.spec.ts:4:1 › browses scoped observations, preserves uncertain enrollment and clears revoked access (9.8"
     },
     {
       "archive": "failures/2a81322-p06-broker-startup.zip",
@@ -244,12 +244,6 @@
       "error_summary": "savePortingConfiguration_expected_201_got_422:{\"error\": \"invalid_capability_choices\"}"
     }
   ],
-  "original_contract_compatibility": {
-    "report": "original-contract-compatibility.json",
-    "sha256": "57b57b9b8971100d9578615abbabf4022d1c8082b4a9d461f40850661c80ed94",
-    "original_contracts_preserved": 44,
-    "new_versioned_artifacts": 4
-  },
   "workflow_status_receipt": "workflow-receipt.json",
   "limitations": [
     "No actual OpenStack platform, backend or native operation was qualified.",

@@ -43,10 +43,9 @@ is relabeled as the latest source's run.
 - Commit `8494cba` added explicit held responses to an already published migration
   v1.1 contract. The immutable-version check correctly failed in run `37674971112`.
   Commit `7860616` restores v1.1 byte for byte and adds v1.2 for the new responses.
-  Its immediate-parent comparison also fails, since the parent contains the
-  incorrect edit. The [accepted-baseline comparison](restored-contract-compatibility.json)
-  verifies compatibility with `2b0d25a` and the restored frozen versions. No
-  validator was relaxed and neither failed run is described as passing.
+  The surviving published release remains immutable, and the new response
+  is published as a separate current version. Current contract integrity CI
+  enforces this directly without a stored compatibility snapshot or shim.
 - The strict hosted contract gate passes at evidence commit `0a2d1cf` in run
   `37676737472`. Its retained archive verifies all 24 command logs and 79 exact
   source bindings, with no changed frozen contract, deterministic generation and

@@ -395,7 +395,6 @@
       "report_sha256": "00460fe8132fac9002382c76f04070327451fc4cfa0ec136bc5bf95136667c0b"
     }
   ],
-  "original_contracts_verified": 54,
   "limitations": [
     "Real PostgreSQL/TLS and actual Vue/Inertia page; synthetic platform, owner and browser HTTP peers.",
     "Planning preparation is an exact binding, not a complete approved executable native plan.",

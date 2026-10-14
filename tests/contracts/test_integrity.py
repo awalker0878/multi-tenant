@@ -18,6 +18,22 @@ from check_registry import check_consumer_registry
 from check_http import check_error_policy
 
 class ContractIntegrityTests(unittest.TestCase):
+    def test_retired_contract_history_and_compatibility_snapshots_are_not_shipped(self):
+        absent = (
+            "architecture/retired-contract-releases.json",
+            "architecture/retirement-clearances.json",
+            "scripts/contracts/uuid-legacy-v1.json",
+            "spikes/compatibility/results/contracts/local-20261004/generated-sha256.json",
+            "spikes/compatibility/results/contracts/run-37232194144/retrieval.json",
+            "verification/p02/contracts/restored-compatibility.json",
+            "verification/p07/configuration/original-contract-compatibility.json",
+            "verification/p08/profiles/original-contract-compatibility.json",
+            "verification/p08/runtime/restored-contract-compatibility.json",
+        )
+        for item in absent:
+            with self.subTest(path=item):
+                self.assertFalse((ROOT / item).exists(), item)
+
     def test_catalogue_embedded_schema_references_rebase_to_active_release(self):
         canonical = load("contracts/openapi/catalogue-internal-v1.json")
         local_refs(canonical, "catalogue-internal-v1.json")

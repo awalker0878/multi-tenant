@@ -62,14 +62,11 @@ def verify():
             campaigns.append(record | {'result': report['result'], 'source_bindings_verified': len(bindings),
                 'commands': len(report['commands']), 'test_suites': suites, 'stats': report.get('stats'), 'artifact_hashes_unavailable': unavailable,
                 'report': str(report_path.relative_to(DEST)), 'report_sha256': sha(raw)})
-    baseline = json.loads((DEST/'original-contract-compatibility.json').read_text())
-    assert not baseline['conflicts']
-    for path, expected in baseline['baseline_sha256'].items():
-        assert source_hash(baseline['base_revision'], path) == expected
-        assert sha((ROOT/path).read_bytes()) == expected, path
+    # All currently shipped contracts are checked against the active registry
+    # by scripts/contracts/check.py. Old revision snapshots are not an input
+    # to E2 profile evidence and must not be retained as compatibility gates.
     return {'schema_version': 1, 'evidence_level': 'E2', 'native_write_authorized': False,
             'native_platforms_tested': [], 'campaigns': campaigns,
-            'original_contracts_verified': len(baseline['baseline_sha256']),
             'limitations': ['Real PostgreSQL/TLS and actual Vue/Inertia page; synthetic platform, owner and browser HTTP peers.',
                            'Planning preparation is an exact binding, not a complete approved executable native plan.',
                            'Actual native-owner/stage composition, converter/guest and selected application/service/recovery protocols remain required.',
