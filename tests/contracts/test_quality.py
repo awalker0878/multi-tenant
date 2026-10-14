@@ -352,6 +352,15 @@ class SchemaAndEvents(unittest.TestCase):
             with self.assertRaises(ValueError):
                 quality_schema("contracts/schemas/new-v2.json", broken, POLICY)
 
+    def test_schema_identity_rejects_query_aliases(self):
+        schema = {
+            "$schema": POLICY["schema_dialect"],
+            "$id": "https://example.invalid/schemas/new-v2?shadow=1",
+            "type": "object", "additionalProperties": False,
+        }
+        with self.assertRaisesRegex(ValueError, "absolute HTTPS"):
+            quality_schema("contracts/schemas/new-v2.json", schema, POLICY)
+
     def test_new_capability_catalogues_require_exact_versioned_schema(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
@@ -445,6 +454,14 @@ class SchemaAndEvents(unittest.TestCase):
             malformed["properties"]["tenant_id"]["type"] = "number"
             (root / "contracts/schemas/events/pulse-v2.json").write_text(json.dumps(malformed))
             with self.assertRaisesRegex(ValueError, "invalid type/format"):
+                quality_event("contracts/asyncapi/pulse-v2.yaml", event, POLICY, root)
+            (root / "contracts/schemas/events/pulse-v2.json").write_text(json.dumps(schema))
+            invalid_schema = copy.deepcopy(schema)
+            invalid_schema["required"] = "not-an-array"
+            (root / "contracts/schemas/events/pulse-v2.json").write_text(
+                json.dumps(invalid_schema)
+            )
+            with self.assertRaisesRegex(ValueError, "invalid JSON Schema"):
                 quality_event("contracts/asyncapi/pulse-v2.yaml", event, POLICY, root)
             (root / "contracts/schemas/events/pulse-v2.json").write_text(json.dumps(schema))
             broken = copy.deepcopy(event)

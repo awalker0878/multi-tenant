@@ -406,7 +406,7 @@ def quality_schema(path: str, schema: dict, policy: dict) -> None:
         raise ValueError("New schema must use draft-2020-12: " + path)
     uid = schema.get("$id")
     parsed = urlparse(uid) if isinstance(uid, str) else None
-    if not parsed or parsed.scheme != "https" or not parsed.hostname or parsed.fragment:
+    if not parsed or parsed.scheme != "https" or not parsed.hostname or parsed.fragment or parsed.query or parsed.params:
         raise ValueError("New canonical schema must have stable absolute HTTPS $id: " + path)
     stem, _ = version(path)
     tail = stem.split("/")[-1]
@@ -612,6 +612,10 @@ def quality_event(path: str, doc: dict, policy: dict, root: Path) -> None:
         if not source.is_relative_to((root / "contracts/schemas/events").resolve()) or not source.is_file():
             raise ValueError("Event payload references unavailable canonical schema: " + name)
         payload = load(source)
+        try:
+            Draft202012Validator.check_schema(payload)
+        except Exception as exc:
+            raise ValueError("Event payload has an invalid JSON Schema: " + name) from exc
         fields = set(payload.get("required", []))
         if not set(policy["event_required_fields"]) <= fields or payload.get("additionalProperties") is not False:
             raise ValueError("Event message lacks mandatory immutable envelope: " + name)
