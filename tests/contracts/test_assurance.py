@@ -224,6 +224,52 @@ class AssuranceCoverageTests(unittest.TestCase):
 
 
 
+class PlanningDenialProbeTests(unittest.TestCase):
+    def test_ephemeral_invalidation_principal_is_scoped_and_cleaned_up(self):
+        import asyncio
+        from unittest.mock import patch
+
+        from python_denials import probe
+
+        async def verified_probe(owner):
+            self.assertEqual(owner, "planning")
+            path = os.environ.get("PLANNING_ASSURANCE_INVALIDATION_CREDENTIAL_FILE")
+            self.assertIsNotNone(path)
+            self.assertTrue(Path(path).is_file())
+            self.assertEqual(Path(path).stat().st_mode & 0o777, 0o600)
+            self.assertTrue(Path(path).read_text().startswith(
+                "synthetic-independent-denial-principal-"
+            ))
+            return [{"test": "scoped"}], []
+
+        with patch.dict(os.environ, {}, clear=True), \
+             patch("python_denials._probe_with_router", new=verified_probe):
+            self.assertEqual(asyncio.run(probe("planning")), ([{"test": "scoped"}], []))
+            self.assertNotIn(
+                "PLANNING_ASSURANCE_INVALIDATION_CREDENTIAL_FILE", os.environ
+            )
+            self.assertEqual(asyncio.run(probe("inventory")), ([{"test": "scoped"}], []))
+
+    def test_explicit_invalidation_mount_is_not_replaced_by_fixture(self):
+        import asyncio
+        from unittest.mock import patch
+
+        from python_denials import probe
+
+        async def verify(owner):
+            self.assertEqual(
+                os.environ["PLANNING_ASSURANCE_INVALIDATION_CREDENTIAL_FILE"],
+                "/tmp/explicit-test-mount",
+            )
+            return [], []
+
+        with patch.dict(os.environ, {
+            "PLANNING_ASSURANCE_INVALIDATION_CREDENTIAL_FILE":
+                "/tmp/explicit-test-mount",
+        }), patch("python_denials._probe_with_router", new=verify):
+            self.assertEqual(asyncio.run(probe("planning")), ([], []))
+
+
 class MissingArtifactFailClosedTests(unittest.TestCase):
     def test_missing_upstream_artifacts_produce_no_proof(self):
         from combine_assurance import combine
