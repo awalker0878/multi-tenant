@@ -49,7 +49,13 @@ attestation job.
 filesystems and wheel ZIPs; it verifies all registered packaged JSON bytes,
 detects unregistered contract JSON and malicious wheel entries, compares
 entire Python package bytes and shipped PHP runtime configuration, bootstrap,
-the migrations actually shipped, and application resources against the reviewed checkout, and pins the built artifact content ID
+public PHP entrypoints, the migrations actually shipped, and application resources
+against the reviewed checkout. PHP images also attest the shipped Artisan entrypoint,
+Composer manifests and their installed production dependency identities against the
+reviewed lockfiles. Compiled Console Vite output is checked through its emitted
+manifest and referenced asset files instead of being mistaken for checked-in source.
+This does not independently attest third-party vendor source bytes. The verifier pins
+the built artifact content ID
 to the exact 40-character Git release SHA. It records owned operation IDs,
 canonical file digests, and consumed release identities with an explicit
 distinction between installed-copy proof and registry-only declarations.
