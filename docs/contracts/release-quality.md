@@ -24,6 +24,12 @@ and unreviewed canonical deletion.
 
 ### HTTP/OpenAPI
 
+Every new operation must have a unique stable `operationId`. URL template
+variables require matching, non-duplicated, mandatory string-typed path
+parameters. Only explicit numeric HTTP statuses are admitted: a `default`
+response cannot conceal unmodelled failures or bypass the Error v2 policy.
+
+
 New HTTP interfaces use OpenAPI 3.1 with exact `info.version` parity. Each
 operation must declare a resolvable, non-anonymous security requirement.
 Public unauthenticated endpoints must be explicitly marked and limited to

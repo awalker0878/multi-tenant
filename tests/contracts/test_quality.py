@@ -110,6 +110,50 @@ class HttpQualityTests(unittest.TestCase):
         op["responses"]["404"] = {"description": "Not found, no body guaranteed"}
         quality_api("contracts/openapi/things-v2.json", api, ERROR, POLICY)
 
+    def test_default_response_cannot_mask_unmodelled_failures(self):
+        api = good_api()
+        op = api["paths"]["/v2/things"]["post"]
+        op["responses"]["default"] = response({"type": "object"})
+        with self.assertRaisesRegex(ValueError, "explicit HTTP status"):
+            quality_api("contracts/openapi/things-v2.json", api, ERROR, POLICY)
+
+    def test_operation_ids_must_exist_and_be_unique(self):
+        for missing in (None, ""):
+            api = good_api()
+            api["paths"]["/v2/things"]["post"]["operationId"] = missing
+            with self.assertRaisesRegex(ValueError, "operationId"):
+                quality_api("contracts/openapi/things-v2.json", api, ERROR, POLICY)
+        api = good_api()
+        api["paths"]["/v2/other"] = copy.deepcopy(api["paths"]["/v2/things"])
+        with self.assertRaisesRegex(ValueError, "operationId"):
+            quality_api("contracts/openapi/things-v2.json", api, ERROR, POLICY)
+
+    def test_path_variables_need_unique_required_typed_bindings(self):
+        api = good_api()
+        api["paths"]["/v2/things/{tenant}"] = api["paths"].pop("/v2/things")
+        op = api["paths"]["/v2/things/{tenant}"]["post"]
+        with self.assertRaisesRegex(ValueError, "path parameter"):
+            quality_api("contracts/openapi/things-v2.json", api, ERROR, POLICY)
+        op["parameters"].append({
+            "name": "tenant", "in": "path", "required": True,
+            "schema": {"type": "string", "format": "uuid"},
+        })
+        quality_api("contracts/openapi/things-v2.json", api, ERROR, POLICY)
+        for mutation in ("optional", "untyped", "extraneous"):
+            invalid = copy.deepcopy(api)
+            route = invalid["paths"]["/v2/things/{tenant}"]["post"]
+            if mutation == "optional":
+                route["parameters"][-1]["required"] = False
+            elif mutation == "untyped":
+                route["parameters"][-1]["schema"] = {}
+            else:
+                route["parameters"].append({
+                    "name": "plan", "in": "path", "required": True,
+                    "schema": {"type": "string"},
+                })
+            with self.subTest(mutation=mutation), self.assertRaisesRegex(ValueError, "path parameter"):
+                quality_api("contracts/openapi/things-v2.json", invalid, ERROR, POLICY)
+
     def test_empty_new_api_cannot_pass_release_admission(self):
         api = good_api()
         api["paths"] = {}

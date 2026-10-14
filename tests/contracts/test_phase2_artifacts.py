@@ -708,6 +708,31 @@ class RuntimeWorkflowTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "does not invoke"):
                 verify_required_ci_gate(root)
 
+    def test_strict_assurance_job_cannot_be_omitted_or_weakened(self):
+        import yaml
+        ci = yaml.safe_load((ROOT / ".github/workflows/ci.yml").read_text())
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            target = root / ".github/workflows/ci.yml"
+            target.parent.mkdir(parents=True)
+            for corruption in ("missing", "optional", "non_strict", "missing_upstream"):
+                changed = copy.deepcopy(ci)
+                job = changed["jobs"]["contract-assurance"]
+                if corruption == "missing":
+                    del changed["jobs"]["contract-assurance"]
+                elif corruption == "optional":
+                    job["if"] = "needs.scope.outputs.contracts == 'true'"
+                elif corruption == "non_strict":
+                    for step in job["steps"]:
+                        if "--require-qualified" in str(step.get("run", "")):
+                            step["run"] = step["run"].replace("--require-qualified", "")
+                else:
+                    job["needs"].remove("laravel-routes")
+                target.write_text(yaml.safe_dump(changed))
+                with self.subTest(corruption=corruption), self.assertRaisesRegex(
+                        ValueError, "complete measured qualification"):
+                    verify_required_ci_gate(root)
+
     def test_real_workflow_runs_builds_attestation_and_aggregation(self):
         result = verify_runtime_bindings(ROOT)
         self.assertGreater(result["bound_http_operations"], 0)

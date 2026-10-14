@@ -406,11 +406,39 @@ def quality_api(path: str, doc: dict, error: dict, policy: dict) -> None:
     stripped = {key: val for key, val in error.items() if key not in ("$id", "$schema")}
     if defined_error != stripped:
         raise ValueError("New API must embed current exact Error v2 definition: " + path)
+    # A security-sensitive contract must name one unambiguous executable
+    # handler and bind every path variable to a required typed parameter.
+    operation_ids: set[str] = set()
     for endpoint, item in doc.get("paths", {}).items():
+        if not isinstance(endpoint, str) or not endpoint.startswith("/") or not isinstance(item, dict):
+            raise ValueError("Malformed OpenAPI path item: " + str(endpoint))
+        placeholders = re.findall(r"\{([^{}]+)\}", endpoint)
+        if len(placeholders) != len(set(placeholders)):
+            raise ValueError("Duplicate OpenAPI path variable: " + endpoint)
         for verb, op in item.items():
             if verb not in HTTP:
                 continue
             label = path + " " + verb.upper() + " " + endpoint
+            if not isinstance(op, dict):
+                raise ValueError("Malformed HTTP operation: " + label)
+            operation_id = op.get("operationId")
+            if (not isinstance(operation_id, str)
+                    or not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]*", operation_id)
+                    or operation_id in operation_ids):
+                raise ValueError("Missing or duplicate operationId: " + label)
+            operation_ids.add(operation_id)
+            path_params = [
+                parameter for parameter in parameters(op, item)
+                if isinstance(parameter, dict) and parameter.get("in") == "path"
+            ]
+            path_names = [param.get("name") for param in path_params]
+            if (set(path_names) != set(placeholders)
+                    or len(path_names) != len(placeholders)
+                    or any(param.get("required") is not True
+                           or not isinstance(param.get("schema"), dict)
+                           or param["schema"].get("type") != "string"
+                           for param in path_params)):
+                raise ValueError("Unbound or non-required typed path parameter: " + label)
             sec = op.get("security", doc.get("security"))
             if not isinstance(sec, list) or not sec or any(not isinstance(s, dict) or not s for s in sec):
                 if not (endpoint in policy["public_paths"]
@@ -423,8 +451,8 @@ def quality_api(path: str, doc: dict, error: dict, policy: dict) -> None:
             if not isinstance(codes, dict) or not any(re.fullmatch(r"2[0-9]{2}", str(c)) for c in codes):
                 raise ValueError("Operation missing successful response: " + label)
             for status, response in codes.items():
-                if status != "default" and not re.fullmatch(r"[1-5][0-9]{2}", str(status)):
-                    raise ValueError("Response must have an explicit HTTP status: " + label)
+                if not re.fullmatch(r"[1-5][0-9]{2}", str(status)):
+                    raise ValueError("Response must have an explicit HTTP status (no default): " + label)
                 if not isinstance(response, dict):
                     raise ValueError("Malformed HTTP response: " + label + " " + str(status))
                 if str(status) in {"200", "201"} and (

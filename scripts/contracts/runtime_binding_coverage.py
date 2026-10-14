@@ -22,6 +22,16 @@ def verify_required_ci_gate(root: Path) -> None:
             or caller.get("with", {}).get("suite") != "contract-artifacts"
             or "scope" not in caller.get("needs", [])):
         raise ValueError("CI does not invoke source-pinned contract artifact qualification")
+    # The required result must depend on an actual executed, strict
+    # qualification job. A job name alone (or a report without
+    # --require-qualified) is not a measured security release gate.
+    assurance = jobs.get("contract-assurance", {})
+    prerequisite = assurance.get("needs", [])
+    if (not {"scope", "contracts", "laravel-routes"}.issubset(set(prerequisite))
+            or "always()" not in str(assurance.get("if", ""))
+            or "--require-qualified" not in str(assurance.get("steps", []))
+            or "scripts/contracts/combine_assurance.py" not in str(assurance.get("steps", []))):
+        raise ValueError("CI contract assurance does not enforce complete measured qualification")
     required = jobs.get("required", {})
     if ("artifact-binding-assurance" not in required.get("needs", [])
             or "contract-assurance" not in required.get("needs", [])
