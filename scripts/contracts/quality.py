@@ -436,7 +436,7 @@ def quality_api(path: str, doc: dict, error: dict, policy: dict) -> None:
                     or len(path_names) != len(placeholders)
                     or any(param.get("required") is not True
                            or not isinstance(param.get("schema"), dict)
-                           or param["schema"].get("type") != "string"
+                           or param["schema"].get("type") not in {"string", "integer", "number", "boolean"}
                            for param in path_params)):
                 raise ValueError("Unbound or non-required typed path parameter: " + label)
             sec = op.get("security", doc.get("security"))

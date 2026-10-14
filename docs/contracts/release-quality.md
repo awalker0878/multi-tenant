@@ -26,7 +26,7 @@ and unreviewed canonical deletion.
 
 Every new operation must have a unique stable `operationId`. URL template
 variables require matching, non-duplicated, mandatory string-typed path
-parameters. Only explicit numeric HTTP statuses are admitted: a `default`
+parameters (including bounded integer revision identifiers). Only explicit numeric HTTP statuses are admitted: a `default`
 response cannot conceal unmodelled failures or bypass the Error v2 policy.
 
 

@@ -139,6 +139,13 @@ class HttpQualityTests(unittest.TestCase):
             "schema": {"type": "string", "format": "uuid"},
         })
         quality_api("contracts/openapi/things-v2.json", api, ERROR, POLICY)
+        # Path revisions in actual Planning interfaces are bounded integers;
+        # URL encoding does not turn their declared wire type into a string.
+        integer_path = copy.deepcopy(api)
+        integer_path["paths"]["/v2/things/{tenant}"]["post"]["parameters"][-1]["schema"] = {
+            "type": "integer", "minimum": 1,
+        }
+        quality_api("contracts/openapi/things-v2.json", integer_path, ERROR, POLICY)
         for mutation in ("optional", "untyped", "extraneous"):
             invalid = copy.deepcopy(api)
             route = invalid["paths"]["/v2/things/{tenant}"]["post"]
