@@ -18,6 +18,10 @@ from assurance import inventory, operation_key
 
 ROOT = Path(__file__).resolve().parents[2]
 TESTS = {
+    "services/planning/tests/test_qualification_invalidation_http.py::"
+    "test_exact_authenticated_held_event_is_acked_after_receiver_persistence": (
+        ("planning", "POST", "/internal/qualification-events", ("producer",)),
+    ),
     "tests/contracts/test_inventory_planning_contract.py::"
     "test_real_inventory_planning_response_validates_installed_strict_schema": (
         ("inventory", "GET",

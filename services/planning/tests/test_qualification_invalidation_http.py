@@ -78,6 +78,15 @@ def test_exact_authenticated_held_event_is_acked_after_receiver_persistence(
     body = b'{"event_id":"10000000-0000-4000-8000-000000000001"}'
     status, reply = exchange(app, body)
     assert status == 200 and reply["persisted"] is True
+    # Measure actual handler output against the active success contract.
+    from jsonschema import Draft202012Validator, FormatChecker
+    canonical = Path(__file__).resolve().parents[3] / (
+        "contracts/openapi/planning-qualification-events-v1.json"
+    )
+    document = json.loads(canonical.read_text())
+    operation = document["paths"]["/internal/qualification-events"]["post"]
+    success = operation["responses"]["200"]["content"]["application/json"]["schema"]
+    Draft202012Validator(success, format_checker=FormatChecker()).validate(reply)
     inbox.accept.assert_called_once_with({"event_id": "10000000-0000-4000-8000-000000000001"})
 
 
