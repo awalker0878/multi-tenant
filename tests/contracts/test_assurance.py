@@ -232,14 +232,17 @@ class PlanningDenialProbeTests(unittest.TestCase):
         from python_denials import probe
 
         async def verified_probe(owner):
-            self.assertEqual(owner, "planning")
             path = os.environ.get("PLANNING_ASSURANCE_INVALIDATION_CREDENTIAL_FILE")
-            self.assertIsNotNone(path)
-            self.assertTrue(Path(path).is_file())
-            self.assertEqual(Path(path).stat().st_mode & 0o777, 0o600)
-            self.assertTrue(Path(path).read_text().startswith(
-                "synthetic-independent-denial-principal-"
-            ))
+            if owner == "planning":
+                self.assertIsNotNone(path)
+                self.assertTrue(Path(path).is_file())
+                self.assertEqual(Path(path).stat().st_mode & 0o777, 0o600)
+                self.assertTrue(Path(path).read_text().startswith(
+                    "synthetic-independent-denial-principal-"
+                ))
+            else:
+                self.assertEqual(owner, "inventory")
+                self.assertIsNone(path)
             return [{"test": "scoped"}], []
 
         with patch.dict(os.environ, {}, clear=True), \
