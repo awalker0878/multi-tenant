@@ -290,6 +290,18 @@ class HttpQualityTests(unittest.TestCase):
         del new["paths"]["/v2/things"]["post"]["responses"]["409"]
         self.assertIn("response status removed", repr(api_breakages(old, new)))
 
+    def test_new_success_status_requires_a_new_major(self):
+        old = good_api()
+        changed = copy.deepcopy(old)
+        changed["paths"]["/v2/things"]["post"]["responses"]["202"] = response({
+            "type": "object", "additionalProperties": False,
+            "required": ["id"], "properties": {"id": {"type": "string"}}})
+        self.assertIn("new successful response status", repr(api_breakages(old, changed)))
+        changed = copy.deepcopy(old)
+        changed["paths"]["/v2/things"]["post"]["responses"]["429"] = response({
+            "$ref": "#/components/schemas/Error"})
+        self.assertNotIn("new successful response status", repr(api_breakages(old, changed)))
+
     def test_unclassified_constraints_and_parameter_changes_are_breaking(self):
         old = {"type": "object", "additionalProperties": False,
                "properties": {"reference": {"type": "string", "format": "uuid"}}}

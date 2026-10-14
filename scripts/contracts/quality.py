@@ -279,6 +279,18 @@ def api_breakages(old: dict, new: dict) -> list[str]:
             for name, parameter in new_params.items():
                 if name not in old_params and parameter.get("required"):
                     failures.append(at + ": required parameter introduced " + repr(name))
+            # A new success status can change a generated client\'s return
+            # branch or cause a previously exhaustive consumer to reject it.
+            # A new wire outcome is a new major promise, even if the original
+            # response payloads remain identical.
+            additional_success = {
+                status for status in current.get("responses", {})
+                if re.fullmatch(r"2[0-9]{2}", str(status))
+                and status not in prior.get("responses", {})
+            }
+            if additional_success:
+                failures.append(at + ": new successful response status " +
+                                repr(sorted(additional_success)))
             for status, response in prior.get("responses", {}).items():
                 if status not in current.get("responses", {}):
                     failures.append(at + ": response status removed " + status)

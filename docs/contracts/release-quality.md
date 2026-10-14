@@ -74,7 +74,7 @@ schema files, unrecognized properties and invalid statuses fail closed.
 The admission script resolves the latest previously published version in
 the Git review base. It evaluates removed methods and routes, security
 changes, operation IDs, request constraints and required fields across **every declared request media type**,
-response statuses/media/guarantees across **every response media type**,
+response statuses/media/guarantees across **every response media type** (including newly introduced 2xx outcomes),
 media encoding, nested arrays, JSON Schema 2020-12 `$ref` sibling assertions,
 event routing/delivery, and capability/platform declaration changes. Existing method semantics, ordered migration stages, qualified statuses and field inventories cannot be removed or changed in a minor release. New schema
 identifiers are collision-checked against all current canonical schemas.

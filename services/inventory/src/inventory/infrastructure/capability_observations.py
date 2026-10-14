@@ -90,6 +90,7 @@ class MountedCapabilityObservations:
                 )
                 if (
                     key["role"] != "observer"
+                    or key.get("revoked") is not False
                     or observed["subject_id"] != key["subject_id"]
                     or key["expires_at"] <= now
                     or any(
@@ -109,6 +110,8 @@ class MountedCapabilityObservations:
                     or not now < observed["expires_at"] <= observed["observed_at"] + 120
                     or observed["expires_at"] > key["expires_at"]
                     or set(observed["dimensions"]) != set(DIMENSIONS)
+                    or any(observed["cases"].get(name) != "passed"
+                           for name in ("adapter_behavior", "installed_identity", "runtime_artifacts"))
                     or any(observed["cases"].get("dimension:" + d) != "passed" for d in DIMENSIONS)
                     or not isinstance(observed.get("method_modes"), dict)
                     or set(observed["method_modes"]) != method_keys

@@ -47,7 +47,8 @@ def test_projection_preserves_discovery_holds_and_expiry() -> None:
 
 @pytest.mark.parametrize(
     "fault",
-    ["none", "signature", "expired", "tuple", "suspended", "missing_method", "false_method"],
+    ["none", "signature", "expired", "tuple", "suspended", "missing_method",
+     "false_method", "revoked", "missing_revocation", "missing_core_case"],
 )
 def test_signed_observation_is_not_an_adapter_assertion(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, fault: str
@@ -76,6 +77,8 @@ def test_signed_observation_is_not_an_adapter_assertion(
         "expires_at": now + 30,
         "dimensions": list(DIMENSIONS),
         "cases": {
+            **{name: "passed" for name in
+               ("adapter_behavior", "installed_identity", "runtime_artifacts")},
             **{"dimension:" + d: "passed" for d in DIMENSIONS},
             **method_modes,
         },
@@ -90,6 +93,8 @@ def test_signed_observation_is_not_an_adapter_assertion(
         payload["method_modes"].pop(next(iter(method_modes)))
     if fault == "false_method":
         payload["method_modes"][next(iter(method_modes))] = "passed"
+    if fault == "missing_core_case":
+        payload["cases"].pop("installed_identity")
     raw = json.dumps(payload).encode()
     import hashlib
 
@@ -122,6 +127,8 @@ def test_signed_observation_is_not_an_adapter_assertion(
                     "observer-key": {
                         "role": "observer",
                         "subject_id": "observer",
+                        **({} if fault == "missing_revocation" else
+                           {"revoked": fault == "revoked"}),
                         "public_key_pem": key.public_key()
                         .public_bytes(
                             serialization.Encoding.PEM,
