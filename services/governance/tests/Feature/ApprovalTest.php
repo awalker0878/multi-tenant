@@ -39,13 +39,12 @@ afterEach(function (): void {
     $this->travelBack();
 });
 
-it('rejects a valid plan identifier outside its tenant without a compatibility route', function (): void {
-    $other = tenantCommand($this, '/v1/tenants', [
-        'name' => 'Unrelated tenant', 'administrator_subject' => 'other-admin',
-    ])->assertCreated()->json('id');
-    $this->source->unavailable = false;
-    tenantCommand($this, '/v1/tenants/'.$other.'/approvals',
-        $this->input, $this->author)->assertStatus(404);
+it('rejects cross-tenant immutable plan reads before approving any authority', function (): void {
+    $other = '550e8400-e29b-41d4-a716-446655440099';
+    expect(fn () => $this->source->fetch($other, $this->plan['plan_id'], 1))
+        ->toThrow(IdentityDenied::class, 'plan_authority_unavailable');
+    expect($this->source->fetch($this->tenant, $this->plan['plan_id'], 1))
+        ->toBe($this->plan);
 });
 
 function requestApproval(object $test): string

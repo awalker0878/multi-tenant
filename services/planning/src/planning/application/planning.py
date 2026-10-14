@@ -437,12 +437,13 @@ class Planning:
             )
             if row is None:
                 raise Rejected("not_found", 404)
-            tenant = str(row["tenant"])
             try:
                 pinned_tenant = row["payload"]["content"]["scope"]["tenant_id"]
+                bound_tenant = row["payload"]["binding"]["tenant_id"]
             except (KeyError, TypeError):
                 raise Rejected("plan_tenant_mismatch", 423) from None
-            if pinned_tenant != tenant or str(row["tenant"]) != tenant:
+            if (pinned_tenant != tenant or bound_tenant != tenant
+                    or str(row["tenant"]) != tenant):
                 raise Rejected("plan_tenant_mismatch", 423)
             if self.qualification_hold(tx, tenant, identity) is not None:
                 raise Rejected("qualification_invalidation_held", 423)

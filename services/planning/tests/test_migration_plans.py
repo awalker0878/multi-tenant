@@ -402,7 +402,9 @@ def test_unattended_execution_and_governance_reads_recheck_recipe_revocation() -
     content["native_migration"]["api_selection"] = pin_api_selection(
         qualified_api_readiness(), 1000
     )
-    payload = {"content": content, "binding": {"requested_by": str(uuid4())}}
+    payload = {"content": content, "binding": {
+        "requested_by": str(uuid4()), "tenant_id": recipe["scope"]["tenant_id"],
+    }}
     database = MagicMock()
     tx = database.transaction.return_value.__enter__.return_value
     recipes = Mock(return_value=recipe)
@@ -427,8 +429,7 @@ def test_unattended_execution_and_governance_reads_recheck_recipe_revocation() -
             return {"scope_sha256": "a" * 64, "state": "qualified",
                     "invalidated": False}
         if "SELECT tenant,payload" in query:
-            return {"tenant": tenant, "payload": payload}
-        if "WHERE tenant=%s AND id=%s" in query:
+            assert "WHERE tenant=%s AND id=%s" in query
             return {"tenant": tenant, "payload": payload} if args[0] == tenant else None
         return {"payload": payload}
 
@@ -440,6 +441,10 @@ def test_unattended_execution_and_governance_reads_recheck_recipe_revocation() -
     with pytest.raises(Rejected, match="not_found"):
         planning.bound_plan(str(uuid4()), key, 1)
     assert recipes.call_count == 2
+    payload["binding"]["tenant_id"] = str(uuid4())
+    with pytest.raises(Rejected, match="plan_tenant_mismatch"):
+        planning.bound_plan(tenant, key, 1)
+    payload["binding"]["tenant_id"] = tenant
     recipes.return_value = recipe | {"expires_at": 999}
     for native in (True, False):
         with pytest.raises(Rejected, match="recipe_changed"):
