@@ -408,11 +408,12 @@ def quality_schema(path: str, schema: dict, policy: dict) -> None:
     parsed = urlparse(uid) if isinstance(uid, str) else None
     if not parsed or parsed.scheme != "https" or not parsed.hostname or parsed.fragment or parsed.query or parsed.params:
         raise ValueError("New canonical schema must have stable absolute HTTPS $id: " + path)
-    stem, _ = version(path)
-    tail = stem.split("/")[-1]
-    if not (parsed.path.endswith(tail + "-v" + path.rsplit("-v", 1)[-1].split(".json")[0])
-            or parsed.path.endswith(path.split("/")[-1])):
-        raise ValueError("New schema $id must identify its canonical name and version: " + path)
+    # A suffix-only check lets an unrelated authority mint the same schema
+    # identity under an attacker-controlled host or a different directory.
+    # New releases have exactly one canonical HTTPS identity, with no aliases.
+    canonical_id = policy["schema_id_origin"].rstrip("/") + "/" + path
+    if uid != canonical_id:
+        raise ValueError("New schema $id must equal its canonical repository identity: " + path)
     Draft202012Validator.check_schema(schema)
     if schema.get("type") == "object" and schema.get("additionalProperties") is not False:
         raise ValueError("New top-level object schema must reject undeclared fields: " + path)

@@ -128,7 +128,13 @@ final class NativeQualification
             && is_int($receipt['observed_at'] ?? null) && $receipt['observed_at'] <= $now
             && ($receipt['expires_at'] ?? 0) > $now && $receipt['expires_at'] <= $key['expires_at'], 'evidence_scope_or_freshness_invalid');
 
-        return $receipt + ['_key_sha256' => hash('sha256', $details['key'])];
+        // Signed payload fields must not impersonate verifier-owned metadata.
+        // PHP array union would otherwise preserve an attacker-supplied key
+        // fingerprint and bypass independent observer/reviewer/receiver checks.
+        $this->require(! array_key_exists('_key_sha256', $receipt), 'evidence_reserved_field');
+        $receipt['_key_sha256'] = hash('sha256', $details['key']);
+
+        return $receipt;
     }
 
     /** @param array<string, mixed> $receipt

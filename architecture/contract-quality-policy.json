@@ -32,5 +32,6 @@
     "correlation_id",
     "occurred_at",
     "schema_version"
-  ]
+  ],
+  "schema_id_origin": "https://schemas.multi-tenant.local"
 }

@@ -342,7 +342,7 @@ class HttpQualityTests(unittest.TestCase):
 class SchemaAndEvents(unittest.TestCase):
     def test_schema_dialect_id_and_unknown_fields(self):
         schema = {
-            "$schema": POLICY["schema_dialect"], "$id": "https://example.invalid/schemas/new-v2",
+            "$schema": POLICY["schema_dialect"], "$id": POLICY["schema_id_origin"] + "/contracts/schemas/new-v2.json",
             "type": "object", "additionalProperties": False,
         }
         quality_schema("contracts/schemas/new-v2.json", schema, POLICY)
@@ -360,6 +360,22 @@ class SchemaAndEvents(unittest.TestCase):
         }
         with self.assertRaisesRegex(ValueError, "absolute HTTPS"):
             quality_schema("contracts/schemas/new-v2.json", schema, POLICY)
+
+    def test_schema_identity_rejects_foreign_host_and_shadow_directory(self):
+        canonical = POLICY["schema_id_origin"] + "/contracts/schemas/new-v2.json"
+        for identifier in (
+            "https://untrusted.invalid/contracts/schemas/new-v2.json",
+            POLICY["schema_id_origin"] + "/shadow/new-v2.json",
+            canonical + "#alternate",
+            canonical + "?shadow=1",
+        ):
+            with self.subTest(identifier=identifier):
+                schema = {
+                    "$schema": POLICY["schema_dialect"], "$id": identifier,
+                    "type": "object", "additionalProperties": False,
+                }
+                with self.assertRaises(ValueError):
+                    quality_schema("contracts/schemas/new-v2.json", schema, POLICY)
 
     def test_new_capability_catalogues_require_exact_versioned_schema(self):
         with tempfile.TemporaryDirectory() as folder:
