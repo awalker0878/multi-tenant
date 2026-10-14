@@ -437,13 +437,14 @@ def quality_api(path: str, doc: dict, error: dict, policy: dict) -> None:
                     for media in response["content"].values()
                 ):
                     raise ValueError("Response body media type lacks a schema: " + label)
-            # Every documented 4xx/5xx is part of the client wire contract,
-            # not only the mandatory minimum status set.
-            for status in codes:
-                if re.fullmatch(r"[45][0-9]{2}", str(status)) and body(op, str(status)) != {
-                        "$ref": "#/components/schemas/Error"}:
-                    raise ValueError("All explicit HTTP error responses require Error v2: "
-                                     + label + " " + str(status))
+            # A declared error BODY must be the canonical error. A status
+            # without content does not assert that a JSON body exists: do
+            # not fabricate guarantees for owner/framework 404/429 handlers.
+            for status, declared_response in codes.items():
+                if re.fullmatch(r"[45][0-9]{2}", str(status)) and declared_response.get("content"):
+                    if body(op, str(status)) != {"$ref": "#/components/schemas/Error"}:
+                        raise ValueError("Declared HTTP error body must use Error v2: "
+                                         + label + " " + str(status))
             required_errors = [] if sec == [] else policy["required_error_responses"]
             request = op.get("requestBody")
             if request is not None:

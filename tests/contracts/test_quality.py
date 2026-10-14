@@ -100,11 +100,14 @@ class HttpQualityTests(unittest.TestCase):
     def test_every_declared_http_failure_uses_the_standard_error_envelope(self):
         api = good_api()
         op = api["paths"]["/v2/things"]["post"]
-        for invalid in (response({"type": "object"}), {"description": "No schema"}):
-            op["responses"]["404"] = invalid
-            with self.subTest(invalid=invalid), self.assertRaisesRegex(ValueError, "All explicit HTTP error responses"):
-                quality_api("contracts/openapi/things-v2.json", api, ERROR, POLICY)
+        op["responses"]["404"] = response({"type": "object"})
+        with self.assertRaisesRegex(ValueError, "Declared HTTP error body"):
+            quality_api("contracts/openapi/things-v2.json", api, ERROR, POLICY)
         op["responses"]["404"] = response({"$ref": "#/components/schemas/Error"})
+        quality_api("contracts/openapi/things-v2.json", api, ERROR, POLICY)
+        # No response body is a distinct wire guarantee; do not pretend the
+        # current owner/framework necessarily emits the Error v2 JSON body.
+        op["responses"]["404"] = {"description": "Not found, no body guaranteed"}
         quality_api("contracts/openapi/things-v2.json", api, ERROR, POLICY)
 
     def test_empty_new_api_cannot_pass_release_admission(self):

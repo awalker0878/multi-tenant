@@ -29,10 +29,10 @@ operation must declare a resolvable, non-anonymous security requirement.
 Public unauthenticated endpoints must be explicitly marked and limited to
 approved diagnostic paths. Typed 200/201 JSON responses and explicit 401, 403 and 503
 failure responses must be present; any request body, including non-JSON
-media, requires an explicit schema and a 422 response; mutations require 409. All explicitly documented 4xx/5xx responses, including statuses beyond the required minimum, use the exact new canonical
+media, requires an explicit schema and a 422 response; mutations require 409. Any explicitly documented 4xx/5xx JSON error body, including statuses beyond the required minimum, uses the exact new canonical
 `contracts/schemas/common/error-v2.json` envelope: stable machine code,
 safe message, correlation UUID, retryability and optional bounded field
-details. No generic default response substitutes for these cases.
+details. No generic default response substitutes for these cases. Additional bodyless statuses may be documented when the producer makes no response-envelope guarantee; these must not be represented as verified Error v2 payloads.
 
 Mutating operations must require one bounded `Idempotency-Key` header, record
 an exact scope of tenant, actor, operation and request digest, set a finite
