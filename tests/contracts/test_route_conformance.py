@@ -7,7 +7,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts/contracts"))
-from route_conformance import compare_declared, compare_inventory_discovery_routes, compare_inventory_worker_routes, routes_in_laravel, routes_in_openapi, verify_app, verify_lifecycle_native_jobs, verify_lifecycle_worker_effect_routes
+from route_conformance import compare_declared, compare_inventory_discovery_routes, compare_inventory_worker_routes, routes_in_laravel, routes_in_openapi, verify_app, verify_lifecycle_native, verify_lifecycle_native_jobs, verify_lifecycle_worker_effect_routes
 
 
 class HttpRouteConformanceTests(unittest.TestCase):
@@ -122,9 +122,11 @@ class HttpRouteConformanceTests(unittest.TestCase):
     def test_actual_native_job_and_worker_effect_route_handlers(self):
         from assurance_routes import prove
 
+        self.assertEqual(verify_lifecycle_native(ROOT), 1)
         self.assertEqual(verify_lifecycle_native_jobs(ROOT), 4)
         self.assertEqual(verify_lifecycle_worker_effect_routes(ROOT), 2)
-        for app, expected in (("lifecycle-native-jobs", 4),
+        for app, expected in (("lifecycle-native", 1),
+                              ("lifecycle-native-jobs", 4),
                               ("lifecycle-worker-effects", 2)):
             observations = prove(app, root=ROOT)
             denials = [row for row in observations if row["claim"] == "authorization"]
@@ -133,7 +135,10 @@ class HttpRouteConformanceTests(unittest.TestCase):
                              expected)
             for denial in denials:
                 self.assertEqual(denial["source"], "live-denial")
-                self.assertEqual(denial["denial_kind"], "invalid-credential")
+                self.assertEqual(
+                    denial["denial_kind"],
+                    "missing-credential" if app == "lifecycle-native" else "invalid-credential",
+                )
                 self.assertEqual(denial["status_code"], 401)
             self.assertFalse(any(row["claim"] == "tenant_isolation"
                                  for row in observations))

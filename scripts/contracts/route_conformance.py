@@ -417,6 +417,14 @@ def verify_lifecycle_native(root: Path = ROOT) -> int:
     code, _ = asyncio.run(_exchange(app, path, "GET", headers))
     if code != 404:
         raise ValueError("Lifecycle native-boundary accepts uncontracted verb")
+    # Exercise the actual protected ASGI boundary without a bearer. A route
+    # declaration or a 422 response cannot establish authentication denial.
+    denied_headers = [(b"content-type", b"application/json")]
+    code, denial = asyncio.run(_exchange(
+        app, path, "POST", denied_headers, json.dumps(request).encode()
+    ))
+    if code != 401 or denial.get("error") != "invalid_workload" or len(calls) != 1:
+        raise ValueError("Lifecycle native-boundary allowed a missing credential")
     return 1
 
 

@@ -94,6 +94,13 @@ def prove(app: str, route_list: Path | None = None, root: Path = ROOT,
         # These verifiers independently execute every native job/worker route
         # with an invalid bearer and assert the real ASGI handler returns 401.
         # This is authorization-denial evidence, never tenant-isolation proof.
+        if not producer_only and app == "lifecycle-native" and op["security_required"]:
+            rows.append({
+                "key": key, "claim": "authorization", "source": "live-denial",
+                "result": "PASS", "release_sha256": op["release_sha256"],
+                "test": check_name + ":missing_bearer_asgi_401",
+                "denial_kind": "missing-credential", "status_code": 401,
+            })
         if not producer_only and app in {"lifecycle-native-jobs", "lifecycle-worker-effects"} and op["security_required"]:
             rows.append({
                 "key": key, "claim": "authorization", "source": "live-denial",
