@@ -222,7 +222,8 @@ def test_missing_scope_binding_fails_closed_before_any_plan_effects(
                 ACTOR,
                 APP,
                 ENV,
-                '{"content":{"scope":{"tenant_id":"' + TENANT + '"}}}',
+                '{"content":{"scope":{"tenant_id":"' + TENANT
+                + '"}},"binding":{"tenant_id":"' + TENANT + '"}}',
                 "a" * 64,
                 NOW,
             ),
