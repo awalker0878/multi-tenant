@@ -164,7 +164,7 @@ def reconcile(
     for item in links:
         logical = item.get("workload_id")
         native_identity = item.get("source_identity_sha256")
-        if (logical not in by_id or logical in bindings
+        if (not isinstance(logical, str) or logical not in by_id or logical in bindings
                 or not isinstance(native_identity, str) or len(native_identity) != 64
                 or native_identity in native_ids):
             raise Rejected("source_intent_link_ambiguous", 423)

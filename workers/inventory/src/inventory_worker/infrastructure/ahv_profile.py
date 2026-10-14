@@ -234,7 +234,7 @@ def collect_ahv(
         }
     )
     for group_kind in ("entity_groups", "address_groups", "service_groups"):
-        route = commissioned.get(group_kind) if authorized else None
+        route = commissioned.get(group_kind) if authorized and isinstance(commissioned, dict) else None
         expected_prefix = "/api/microseg/" + versions["microseg"] + "/config/"
         if (not isinstance(route, str)
                 or not route.startswith(expected_prefix)

@@ -4,6 +4,7 @@ import asyncio
 import json
 import re
 from collections.abc import Callable
+from typing import Any
 
 from uvicorn._types import ASGIReceiveCallable, ASGISendCallable, Scope
 
@@ -23,7 +24,10 @@ class PlanningInputApp:
         native_authority: Callable[[str, str, str, str, str, int, str], None] | None = None,
         observations: CapabilityObservations | None = None,
         capability_authority: Callable[[str, str, str, str, str, str, str], None] | None = None,
-        collection_read=None,
+        collection_read: Callable[
+            [str, str, dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any], int],
+            list[dict[str, Any]],
+        ] | None = None,
     ) -> None:
         self.capability_authority = capability_authority
         self.collection_read = collection_read

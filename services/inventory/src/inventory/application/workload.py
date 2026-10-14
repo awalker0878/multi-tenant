@@ -1,5 +1,6 @@
 """Inventory-owned profile history, exact review bindings and current Planning reads."""
 
+from collections.abc import Callable
 from typing import Any
 
 from inventory.application.discovery import Discovery
@@ -12,7 +13,13 @@ from inventory.domain.workload import METHODS, OWNER_FIELDS, review_input
 
 
 class WorkloadProfiles:
-    def __init__(self, discovery: Discovery, collection_read=None) -> None:
+    def __init__(
+        self, discovery: Discovery,
+        collection_read: Callable[
+            [str, str, dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any], int],
+            list[dict[str, Any]],
+        ] | None = None,
+    ) -> None:
         self.d = discovery
         self.collection_read = collection_read
 

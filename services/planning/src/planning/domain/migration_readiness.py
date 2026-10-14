@@ -198,7 +198,7 @@ def resolve_workload(
                 })
             ):
                 holds.append("migration_field_collection_stale_or_incomplete")
-            if manifest_valid:
+            if manifest_valid and isinstance(collection_manifest, dict):
                 side = entry.get("scope")
                 platform = route["target"]["platform"] if side == "target" else route["source"]["platform"]
                 declared = collection_manifest["platforms"].get(platform, {})

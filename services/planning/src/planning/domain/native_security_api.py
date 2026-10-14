@@ -36,14 +36,16 @@ def qualify(document: dict[str, Any]) -> bool:
     profile = document.get("api_profile")
     if not isinstance(profile, dict):
         return False
-    key = (
-        document.get("platform"),
-        profile.get("namespace"),
-        profile.get("api_version"),
-    )
-    if not all(isinstance(value, str) and value for value in key):
+    platform = document.get("platform")
+    namespace = profile.get("namespace")
+    api_version = profile.get("api_version")
+    if (
+        not isinstance(platform, str) or not platform
+        or not isinstance(namespace, str) or not namespace
+        or not isinstance(api_version, str) or not api_version
+    ):
         return False
-    platform, _, _ = key
+    key = (platform, namespace, api_version)
     needed = FEATURES.get(key)
     installed = profile.get("installed")
     features = profile.get("qualified_features")
