@@ -45,6 +45,7 @@ def scoped_recovery_readbacks(observed: dict[str, Any], now: int) -> bool:
     if not isinstance(measurements, list):
         return False
     latest: dict[tuple[str, str, str], dict[str, Any]] = {}
+    seen_sequences: set[tuple[str, str, str, int]] = set()
     for sample in measurements:
         if (
             not isinstance(sample, dict)
@@ -63,9 +64,11 @@ def scoped_recovery_readbacks(observed: dict[str, Any], now: int) -> bool:
         ):
             return False
         key = (sample["method"], sample["mode"], sample["dataset_id"])
-        prior = latest.get(key)
-        if prior is not None and prior["sequence"] == sample["sequence"]:
+        identity = (*key, sample["sequence"])
+        if identity in seen_sequences:
             return False
+        seen_sequences.add(identity)
+        prior = latest.get(key)
         if prior is None or sample["sequence"] > prior["sequence"]:
             latest[key] = sample
     if any(

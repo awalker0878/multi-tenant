@@ -99,6 +99,13 @@ it('requires distinct readback evidence for each passed installed recovery metho
         ->toThrow(RuntimeException::class, 'native_recovery_readback_missing');
     $proof['snapshot']['recovery_measurements'][] = $receipt($other, 'dataset-two');
     $check->invoke($resolver, $proof, $scope);
+    $original = $proof['snapshot']['recovery_measurements'][0];
+    $proof['snapshot']['recovery_measurements'][] = array_replace($original, ['sequence' => 2]);
+    $proof['snapshot']['recovery_measurements'][] = $original;
+    expect(fn () => $check->invoke($resolver, $proof, $scope))
+        ->toThrow(RuntimeException::class, 'native_recovery_sequence_conflict');
+    array_pop($proof['snapshot']['recovery_measurements']);
+    array_pop($proof['snapshot']['recovery_measurements']);
     $proof['snapshot']['recovery_measurements'][1]['scope_sha256'] = str_repeat('e', 64);
     expect(fn () => $check->invoke($resolver, $proof, $scope))
         ->toThrow(RuntimeException::class, 'native_recovery_readback_invalid');

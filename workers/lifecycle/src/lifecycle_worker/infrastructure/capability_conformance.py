@@ -157,6 +157,7 @@ class ConformancePublisher:
             if not isinstance(measurements, list):
                 raise NativeHeld("conformance_recovery_readback_invalid")
             latest_restores: dict[tuple[str, str, str], dict[str, Any]] = {}
+            seen_sequences: set[tuple[str, str, str, int]] = set()
             for sample in measurements:
                 if (
                     not isinstance(sample, dict)
@@ -175,9 +176,11 @@ class ConformancePublisher:
                 ):
                     raise NativeHeld("conformance_recovery_readback_invalid")
                 key = (sample["method"], sample["mode"], sample["dataset_id"])
-                prior = latest_restores.get(key)
-                if prior is not None and sample["sequence"] == prior["sequence"]:
+                identity = (*key, sample["sequence"])
+                if identity in seen_sequences:
                     raise NativeHeld("conformance_recovery_sequence_conflict")
+                seen_sequences.add(identity)
+                prior = latest_restores.get(key)
                 if prior is None or sample["sequence"] > prior["sequence"]:
                     latest_restores[key] = sample
             if any(

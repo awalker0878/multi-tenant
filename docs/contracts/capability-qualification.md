@@ -51,7 +51,7 @@ Inventory reader and Assurance reviewer.
 
 Independently signed native conformance also binds the nested Inventory installation and scope to the probed installed tuple; a conflicting Inventory projection is suspended before publication.
 
-Passing installed rollback and recovery method/mode outcomes each require their own fresh restoration/readback measurement, tied to the exact method, mode, dataset, scope, installed artifacts, sequence and readback digest. The latest measurement per dataset must pass. One readback cannot qualify a different method or mode; missing, stale or contradictory rows fail closed independently in the signer, Inventory and Assurance. Unsupported combinations remain explicit holds.
+Passing installed rollback and recovery method/mode outcomes each require their own fresh restoration/readback measurement, tied to the exact method, mode, dataset, scope, installed artifacts, sequence and readback digest. The latest measurement per dataset must pass. Each sequence number is unique for the whole method/mode/dataset history, including sequences that precede the latest observation. One readback cannot qualify a different method or mode; missing, stale, duplicate or contradictory rows fail closed independently in the signer, Inventory and Assurance. Unsupported combinations remain explicit holds.
 
 Signed records and runtime observations are compared canonically: JSON
 object property ordering is not authority. E3/E4 approval remains tied to

@@ -171,6 +171,7 @@ final class NativeQualification
         $measurements = $receipt['snapshot']['recovery_measurements'] ?? [];
         $this->require(is_array($measurements) && array_is_list($measurements), 'native_recovery_readback_invalid');
         $latest = [];
+        $seenSequences = [];
         foreach ($measurements as $sample) {
             $this->require(is_array($sample)
                 && in_array($sample['method'] ?? null, CapabilityDefinitions::WIRE_METHODS, true)
@@ -187,8 +188,11 @@ final class NativeQualification
                 && preg_match('/^[0-9a-f]{64}$/D', $sample['readback_sha256']) === 1,
                 'native_recovery_readback_invalid');
             $slot = $sample['method'].':'.$sample['mode'].':'.$sample['dataset_id'];
-            $this->require(! isset($latest[$slot]) || $sample['sequence'] !== $latest[$slot]['sequence'],
-                'native_recovery_sequence_conflict');
+            // Every sequence is unique within a dataset/method/mode, not
+            // merely distinct from the latest (highest) observed sequence.
+            $sequenceKey = $slot.':'.$sample['sequence'];
+            $this->require(! isset($seenSequences[$sequenceKey]), 'native_recovery_sequence_conflict');
+            $seenSequences[$sequenceKey] = true;
             if (! isset($latest[$slot]) || $sample['sequence'] > $latest[$slot]['sequence']) {
                 $latest[$slot] = $sample;
             }

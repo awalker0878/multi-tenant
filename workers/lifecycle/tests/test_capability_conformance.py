@@ -159,6 +159,16 @@ def test_failure_suspends_review_until_a_new_decision(tmp_path: Path) -> None:
     state = json.loads(output.read_text())
     receipt = json.loads(base64.b64decode(state["records"]["2" * 64]["content_base64"]))
     assert receipt["adapter_conformant"] is True
+    # Duplicating an older sequence after a newer one cannot hide a
+    # contradictory readback in an otherwise passing installed record.
+    original = observed["snapshot"]["recovery_measurements"][0]
+    observed["snapshot"]["recovery_measurements"].extend(
+        [original | {"sequence": 2}, dict(original)]
+    )
+    publisher.publish(assignment | {"decision_sha256": "4" * 64})
+    state = json.loads(output.read_text())
+    assert state["suspended"]["4" * 64] == "conformance_recovery_sequence_conflict"
+    del observed["snapshot"]["recovery_measurements"][-2:]
     # Top-level native outcome and nested inventory cannot disagree about
     # the actual installed tuple, even with otherwise valid signed cases.
     observed["inventory"]["installed_tuple"] = {"platform": "foreign"}
