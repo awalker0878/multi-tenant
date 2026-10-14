@@ -197,7 +197,7 @@ def test_revocation_blocks_approval_execution_and_placement_boundaries(
     saved = p.get(TENANT, APP, ENV, planned["id"], "plan")
     assert not p.validity(actor, saved, {})["current"]
     for boundary in (
-        lambda: p.bound_plan(planned["id"], 1),
+        lambda: p.bound_plan(TENANT, planned["id"], 1),
         lambda: p.execution_plan(TENANT, planned["id"], 1),
         lambda: p.placement_proposal(TENANT, planned["id"], 1),
     ):
@@ -229,7 +229,7 @@ def test_missing_scope_binding_fails_closed_before_any_plan_effects(
         )
         assert p.qualification_hold(tx, TENANT, identity) == "qualification_scope_unverified"
     with pytest.raises(Rejected, match="qualification_invalidation_held"):
-        p.bound_plan(identity, 1)
+        p.bound_plan(TENANT, identity, 1)
     with pytest.raises(Rejected, match="qualification_scope_unverified"):
         p.execution_plan(TENANT, identity, 1)
 
@@ -292,4 +292,4 @@ def test_bound_plan_refuses_payload_scope_of_a_different_tenant(
         )
     p, _, _ = setup(database)
     with pytest.raises(Rejected, match="plan_tenant_mismatch"):
-        p.bound_plan(identity, 1)
+        p.bound_plan(TENANT, identity, 1)
