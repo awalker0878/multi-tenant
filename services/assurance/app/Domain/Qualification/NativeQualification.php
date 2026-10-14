@@ -109,7 +109,7 @@ final class NativeQualification
     {
         $key = $keys[$value['key_id'] ?? ''] ?? null;
         $this->require(is_array($key) && ($key['role'] ?? null) === $role && ($key['expires_at'] ?? 0) > $now
-            && ($key['revoked'] ?? false) === false, 'evidence_key_unenrolled');
+            && ($key['revoked'] ?? null) === false, 'evidence_key_unenrolled');
         foreach (['tenant_id', 'site_id', 'endpoint_id'] as $field) {
             $this->require(($key['scope'][$field] ?? null) === ($scope[$field] ?? null), 'evidence_key_scope_denied');
         }

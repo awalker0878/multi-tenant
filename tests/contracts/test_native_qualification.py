@@ -22,7 +22,7 @@ class NativeQualificationTest(unittest.TestCase):
             result = subprocess.run([os.environ.get('CAPABILITY_PHP_BIN','php'),
                                      str(ROOT/'scripts/check_native_qualification.php'),str(fixture)],
                                     check=True,capture_output=True,text=True)
-            self.assertIn('ten negative controls passed (E2)',result.stdout)
+            self.assertIn('twelve negative controls passed (E2)',result.stdout)
 
     def test_receiving_acceptance_is_independent_and_bound(self):
         with tempfile.TemporaryDirectory(prefix='receiving-protocol-e2-') as directory:

@@ -32,7 +32,7 @@ def signed_fixture(record, directory, now=None, inventory=None, snapshot=None, r
         public = subprocess.check_output(['openssl', 'pkey', '-in', str(private), '-pubout'], text=True)
         keys[role] = {'role': role, 'subject_id': 'fixture-' + role, 'public_key_pem': public,
                       'scope': {k: scope[k] for k in ('tenant_id', 'site_id', 'endpoint_id')},
-                      'expires_at': now + 7200}
+                      'expires_at': now + 7200, 'revoked': False}
 
     def sign(payload, role):
         raw = json.dumps(payload, sort_keys=True, ensure_ascii=True, separators=(',', ':')).encode()

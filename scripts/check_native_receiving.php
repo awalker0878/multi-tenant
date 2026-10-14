@@ -14,11 +14,15 @@ $resolved = $resolver->resolve($fixture['bundle'], $fixture['keys'], $fixture['s
 if ($resolved['evidence_level'] !== 'E4' || $resolved['verification']['valid'] !== true) {
     throw new RuntimeException('receiving_signature_control_failed');
 }
-foreach (['missing', 'wrong_role', 'unbound'] as $fault) {
+foreach (['missing', 'wrong_role', 'unbound', 'revoked_receiver', 'missing_revocation_receiver'] as $fault) {
     $bundle = $fixture['bundle'];
     $keys = $fixture['keys'];
     if ($fault === 'missing') {
         unset($bundle['acceptance']);
+    } elseif ($fault === 'revoked_receiver') {
+        $keys['receiver']['revoked'] = true;
+    } elseif ($fault === 'missing_revocation_receiver') {
+        unset($keys['receiver']['revoked']);
     } elseif ($fault === 'wrong_role') {
         $keys['receiver']['role'] = 'reviewer';
     } else {

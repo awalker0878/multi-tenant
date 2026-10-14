@@ -20,7 +20,7 @@ if (NativeQualification::canonical($unordered)
     !== NativeQualification::canonical($fixture['bundle']['record']['method_modes'])) {
     throw new RuntimeException('method_matrix_canonicalization_failed');
 }
-foreach (['unresolved', 'tampered', 'signature', 'foreign', 'expired', 'role', 'runtime', 'definition', 'missing_method', 'false_support'] as $fault) {
+foreach (['unresolved', 'tampered', 'signature', 'foreign', 'expired', 'role', 'runtime', 'definition', 'missing_method', 'false_support', 'revoked', 'missing_revocation'] as $fault) {
     $bundle = $fixture['bundle'];
     $keys = $fixture['keys'];
     $scope = $fixture['scope'];
@@ -34,6 +34,10 @@ foreach (['unresolved', 'tampered', 'signature', 'foreign', 'expired', 'role', '
         $scope['tenant_id'] = '00000000-0000-4000-8000-000000000001';
     } elseif ($fault === 'expired') {
         $keys['observer']['expires_at'] = $now;
+    } elseif ($fault === 'revoked') {
+        $keys['observer']['revoked'] = true;
+    } elseif ($fault === 'missing_revocation') {
+        unset($keys['observer']['revoked']);
     } elseif ($fault === 'role') {
         $keys['reviewer']['role'] = 'observer';
     } elseif ($fault === 'runtime') {
@@ -53,4 +57,4 @@ foreach (['unresolved', 'tampered', 'signature', 'foreign', 'expired', 'role', '
     }
     throw new RuntimeException('unsafe_qualification_accepted:'.$fault);
 }
-echo "Native qualification cryptographic positive and ten negative controls passed (E2)\n";
+echo "Native qualification cryptographic positive and twelve negative controls passed (E2)\n";

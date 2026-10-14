@@ -56,7 +56,7 @@ object property ordering is not authority. E3/E4 approval remains tied to
 the exact installed tuple, reviewed inventory and provider evidence; no
 synthetic test or metadata declaration can promote an unsupported combination.
 
-Production E3/E4 Inventory readers reject revoked or revocation-state-unknown observer keys and require signed core adapter/installed-identity/runtime-artifact claims before admitting an installed observation. A cryptographically valid signature is not sufficient after revocation.
+Production E3/E4 Inventory and Assurance verifiers reject revoked or revocation-state-unknown enrolled keys and require signed core adapter/installed-identity/runtime-artifact claims before admitting an installed observation. A cryptographically valid signature is not sufficient after revocation.
 
 Production E3/E4 qualification requires real, independently enrolled
 observer evidence through the existing
