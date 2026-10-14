@@ -97,6 +97,21 @@ class HttpQualityTests(unittest.TestCase):
             with self.subTest(change=change), self.assertRaisesRegex(ValueError, "Idempotency|idempotency"):
                 quality_api("contracts/openapi/things-v2.json", api, ERROR, POLICY)
 
+    def test_non_json_requests_cannot_bypass_body_validation(self):
+        api = good_api()
+        operation = api["paths"]["/v2/things"]["post"]
+        operation["requestBody"] = {"required": True, "content": {
+            "text/plain": {"schema": {"type": "string", "minLength": 1}}
+        }}
+        del operation["responses"]["422"]
+        with self.assertRaisesRegex(ValueError, "response missing"):
+            quality_api("contracts/openapi/things-v2.json", api, ERROR, POLICY)
+        operation["responses"]["422"] = response({"$ref": "#/components/schemas/Error"})
+        quality_api("contracts/openapi/things-v2.json", api, ERROR, POLICY)
+        operation["requestBody"]["content"]["text/plain"] = {}
+        with self.assertRaisesRegex(ValueError, "lacks a schema"):
+            quality_api("contracts/openapi/things-v2.json", api, ERROR, POLICY)
+
     def test_request_must_be_structurally_strict(self):
         api = good_api()
         del api["paths"]["/v2/things"]["post"]["requestBody"]["content"]["application/json"]["schema"]["additionalProperties"]

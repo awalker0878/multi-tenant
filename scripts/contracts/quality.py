@@ -340,11 +340,19 @@ def quality_api(path: str, doc: dict, error: dict, policy: dict) -> None:
                 ):
                     raise ValueError("Response body media type lacks a schema: " + label)
             required_errors = [] if sec == [] else policy["required_error_responses"]
-            if body(op) is not None:
+            request = op.get("requestBody")
+            if request is not None:
+                content = request.get("content") if isinstance(request, dict) else None
+                if not isinstance(content, dict) or not content:
+                    raise ValueError("Request body must declare typed media content: " + label)
                 required_errors = [*required_errors, policy["body_validation_status"]]
-                resolved = ref(body(op), doc)
-                if resolved.get("type") == "object" and resolved.get("additionalProperties") is not False:
-                    raise ValueError("Request object must reject unknown fields: " + label)
+                for media_type, definition in content.items():
+                    if not isinstance(definition, dict) or not isinstance(definition.get("schema"), dict):
+                        raise ValueError("Request body media type lacks a schema: " + label + " " + media_type)
+                    resolved = ref(definition["schema"], doc)
+                    if (resolved.get("type") == "object"
+                            and resolved.get("additionalProperties") is not False):
+                        raise ValueError("Request object must reject unknown fields: " + label)
             if verb in MUTATIONS:
                 required_errors = [*required_errors, policy["mutation_conflict_status"]]
                 headers = [param for param in parameters(op, item)

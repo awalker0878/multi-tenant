@@ -28,8 +28,8 @@ New HTTP interfaces use OpenAPI 3.1 with exact `info.version` parity. Each
 operation must declare a resolvable, non-anonymous security requirement.
 Public unauthenticated endpoints must be explicitly marked and limited to
 approved diagnostic paths. Typed 200/201 JSON responses and explicit 401, 403 and 503
-failure responses must be present; JSON requests require 422, and mutations
-require 409. Error responses use the exact new canonical
+failure responses must be present; any request body, including non-JSON
+media, requires an explicit schema and a 422 response; mutations require 409. Error responses use the exact new canonical
 `contracts/schemas/common/error-v2.json` envelope: stable machine code,
 safe message, correlation UUID, retryability and optional bounded field
 details. No generic default response substitutes for these cases.
