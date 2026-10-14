@@ -20,6 +20,8 @@ final class NativeQualification
             && ($record['status'] ?? null) === 'qualified' && ($record['revoked'] ?? null) === false
             && in_array($record['evidence_level'] ?? null, ['E3', 'E4'], true) && ($record['expires_at'] ?? 0) > $now
             && self::canonical($record['scope'] ?? null) === self::canonical($scope), 'qualification_unverified');
+        // Reviewer-signed record input never owns the verifier's result field.
+        $this->require(! array_key_exists('verification', $record), 'qualification_reserved_field');
         $decision = $this->verify($bundle['decision'] ?? [], $keys, 'reviewer', $scope, $now);
         $this->require(($decision['kind'] ?? null) === 'qualification_decision'
             && ($decision['decision'] ?? null) === 'accepted_native'
@@ -95,10 +97,10 @@ final class NativeQualification
             $expiry = min($expiry, $acceptance['expires_at']);
         }
 
-        return $record + ['verification' => ['valid' => true, 'definition_sha256' => CapabilityDefinitions::SHA256,
+        return array_replace($record, ['verification' => ['valid' => true, 'definition_sha256' => CapabilityDefinitions::SHA256,
             'decision_sha256' => $bundle['decision']['sha256'], 'runtime_sha256' => $bundle['runtime']['sha256'],
             'record_sha256' => self::digest($record), 'resolved_at' => $now, 'expires_at' => $expiry,
-            'acceptance_sha256' => $record['evidence_level'] === 'E4' ? $bundle['acceptance']['sha256'] : null]];
+            'acceptance_sha256' => $record['evidence_level'] === 'E4' ? $bundle['acceptance']['sha256'] : null]]);
     }
 
     /** @param array<string, mixed> $value

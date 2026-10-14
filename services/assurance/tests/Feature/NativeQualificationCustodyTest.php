@@ -102,3 +102,19 @@ it('requires distinct readback evidence for each passed installed recovery metho
     expect(fn () => $check->invoke($resolver, $proof, $scope))
         ->toThrow(RuntimeException::class, 'native_recovery_readback_invalid');
 });
+
+it('rejects qualification records containing forged verifier-owned status', function (): void {
+    $now = time();
+    $scope = [
+        'tenant_id' => '10000000-0000-4000-8000-000000000001',
+        'site_id' => '10000000-0000-4000-8000-000000000002',
+        'endpoint_id' => '10000000-0000-4000-8000-000000000003',
+    ];
+    $record = [
+        'version' => 2, 'status' => 'qualified', 'revoked' => false,
+        'evidence_level' => 'E3', 'expires_at' => $now + 60, 'scope' => $scope,
+        'verification' => ['valid' => true, 'native_write_authorized' => true],
+    ];
+    expect(fn () => (new NativeQualification)->resolve(['record' => $record], [], $scope, $now))
+        ->toThrow(RuntimeException::class, 'qualification_reserved_field');
+});
