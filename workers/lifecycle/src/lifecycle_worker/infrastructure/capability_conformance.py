@@ -84,6 +84,17 @@ class ConformancePublisher:
                 or not 0 <= now - observed["observed_at"] <= 30
             ):
                 raise NativeHeld("conformance_native_scope_changed")
+            # The signed Inventory projection must describe the same native
+            # installation as the independently probed conformance outcome.
+            # An independently valid top-level tuple must not conceal a
+            # conflicting nested inventory identity.
+            inventory = observed.get("inventory")
+            if not isinstance(inventory, dict) or any(
+                inventory.get(name) != scope[name]
+                for name in ("installed_tuple", "tenant_id", "site_id",
+                             "endpoint_id", "native_scope") if name in scope
+            ):
+                raise NativeHeld("conformance_inventory_scope_changed")
             required = {"adapter_behavior", "installed_identity", "runtime_artifacts"}
             required.update("dimension:" + d for d in DIMENSIONS)
             required.update("capability:" + c for c in observed["capabilities"])

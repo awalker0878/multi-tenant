@@ -71,7 +71,7 @@ def test_failure_suspends_review_until_a_new_decision(tmp_path: Path) -> None:
         "cases": cases,
         "method_modes": method_modes,
         "capabilities": {},
-        "inventory": {},
+        "inventory": {"installed_tuple": scope["installed_tuple"]},
         "snapshot": {},
     }
     read = Mock(return_value=observed)
@@ -130,6 +130,15 @@ def test_failure_suspends_review_until_a_new_decision(tmp_path: Path) -> None:
     state = json.loads(output.read_text())
     accepted = json.loads(base64.b64decode(state["records"]["e" * 64]["content_base64"]))
     assert accepted["adapter_conformant"] is True
+    # Top-level native outcome and nested inventory cannot disagree about
+    # the actual installed tuple, even with otherwise valid signed cases.
+    observed["inventory"]["installed_tuple"] = {"platform": "foreign"}
+    publisher.publish(assignment | {"decision_sha256": "f" * 64})
+    state = json.loads(output.read_text())
+    denied = json.loads(base64.b64decode(state["records"]["f" * 64]["content_base64"]))
+    assert denied["adapter_conformant"] is False
+    assert state["suspended"]["f" * 64] == "conformance_inventory_scope_changed"
+    observed["inventory"]["installed_tuple"] = scope["installed_tuple"]
     artifact.write_text("drift")
     publisher.publish(assignment | {"decision_sha256": "b" * 64})
     assert "b" * 64 in json.loads(output.read_text())["suspended"]

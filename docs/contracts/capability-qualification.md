@@ -49,6 +49,8 @@ fresh, scope-bound native case receipt. Missing results, contradictory states,
 stale observations and partial matrices fail closed in the worker signer,
 Inventory reader and Assurance reviewer.
 
+Independently signed native conformance also binds the nested Inventory installation and scope to the probed installed tuple; a conflicting Inventory projection is suspended before publication.
+
 Passing installed rollback and recovery method/mode outcomes additionally require a nonempty, successful independent restoration/readback measurement; empty recovery evidence cannot silently qualify a method. Unsupported combinations remain explicit holds.
 
 Signed records and runtime observations are compared canonically: JSON
