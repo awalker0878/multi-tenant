@@ -108,6 +108,18 @@ RELEASE_TESTS = {
     "test_capacity_and_governance_owner_responses_are_schema_and_scope_validated": (
         "contracts/schemas/planning/governance-delegation-response-v2.json", ("consumer",)
     ),
+    # These executed owner transport tests validate the exact installed
+    # consumer schemas and reject malformed replies. Their upstream producer
+    # is deliberately NOT credited: a synthetic HTTPS peer is not Catalogue
+    # or Assurance running its own service code.
+    "services/planning/tests/test_owner_operation_contracts.py::"
+    "test_catalogue_current_owner_response_uses_real_published_intent": (
+        "contracts/schemas/planning/catalogue-current-v2.json", ("consumer",)
+    ),
+    "services/planning/tests/test_owner_operation_contracts.py::"
+    "test_real_owner_transport_validates_qualified_assurance_response": (
+        "contracts/schemas/planning/migration-support-v2.json", ("consumer",)
+    ),
 }
 
 
