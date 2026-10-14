@@ -43,6 +43,15 @@ def test_projection_preserves_discovery_holds_and_expiry() -> None:
         )
     assert result["holds"] == ["ownership_collision"]
     assert result["expires_at"] == 900
+    assert "inventory" in observed
+    with patch("inventory.application.capability_observations.planning_input", return_value={
+        "holds": ["ownership_collision"], "expires_at": 1000,
+    }):
+        repeated = capability_input(
+            Mock(), "t", "s", "e", "g", Mock(read=Mock(return_value=observed))
+        )
+    assert repeated["capability_snapshot"] == result["capability_snapshot"]
+    assert "inventory" in observed
 
 
 @pytest.mark.parametrize(

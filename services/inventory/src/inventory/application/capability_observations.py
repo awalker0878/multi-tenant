@@ -22,7 +22,9 @@ def capability_input(
     observed = observations.read(base) if observations is not None else None
     base["capability_snapshot"] = None
     if observed is not None:
-        inventory = observed.pop("inventory")
+        # Observations are owned by the signed-evidence reader. Never mutate
+        # its result when constructing an independent Planning projection.
+        inventory = observed["inventory"]
         for key in (
             "dimensions",
             "capabilities",
@@ -33,5 +35,7 @@ def capability_input(
             base[key] = inventory[key]
         base["installed_provenance"] = "observed"
         base["expires_at"] = min(base["expires_at"], observed["expires_at"])
-        base["capability_snapshot"] = observed
+        base["capability_snapshot"] = {
+            key: value for key, value in observed.items() if key != "inventory"
+        }
     return base
