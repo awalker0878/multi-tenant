@@ -5,6 +5,7 @@ from unittest.mock import MagicMock
 from uuid import uuid4
 
 import pytest
+from jsonschema import ValidationError
 from psycopg.pq import TransactionStatus
 
 from planning.infrastructure.messaging.codec import decode
@@ -46,7 +47,17 @@ def event() -> bytes:
 
 
 def test_foundation_message_retains_valid_wire_support() -> None:
-    assert decode(event()).tenant_id == "tenant_a"
+    # Decode via the installed consumer schema, not a copied in-test schema.
+    valid = event()
+    assert decode(valid).tenant_id == "tenant_a"
+    mutated = json.loads(valid)
+    mutated["schema_version"] = 2
+    with pytest.raises(ValidationError):
+        decode(json.dumps(mutated).encode())
+    mutated["schema_version"] = 1
+    mutated["unknown_compatibility_field"] = True
+    with pytest.raises(ValidationError):
+        decode(json.dumps(mutated).encode())
 
 
 @pytest.mark.parametrize("fault", ["duplicate_key", "deep_nesting"])
