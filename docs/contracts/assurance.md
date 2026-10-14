@@ -27,6 +27,11 @@ security:
   (shared contract-platform health diagnostics are not tenant-authority calls;
   protected health checks still require independent authorization proof)
 
+A policy hold (423) is not proof of tenant isolation: it may be caused by missing
+capacity, stale qualification, or another policy failure. A qualifying test must
+establish an independently authenticated caller bound to tenant A, request
+tenant B, and prove that tenant mismatch causes the 403/404 denial.
+
 Non-HTTP releases require independently executed producer and consumer proof.
 These include actual broker event publishers/consumers, validated schema
 boundaries and installed capability/platform consumers. Their canonical

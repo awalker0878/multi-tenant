@@ -18,6 +18,10 @@ from assurance import inventory, operation_key
 
 ROOT = Path(__file__).resolve().parents[2]
 TESTS = {
+    "services/planning/tests/test_qualification_invalidation_http.py::"
+    "test_exact_authenticated_held_event_is_acked_after_receiver_persistence": (
+        ("planning", "POST", "/internal/qualification-events", ("producer",)),
+    ),
     "tests/contracts/test_inventory_planning_contract.py::"
     "test_real_inventory_planning_response_validates_installed_strict_schema": (
         ("inventory", "GET",
@@ -80,6 +84,11 @@ TESTS = {
 
 # Non-HTTP proof is earned only by a single test exercising both live sides.
 RELEASE_TESTS = {
+    "services/planning/tests/test_messaging.py::"
+    "test_foundation_message_retains_valid_wire_support": (
+        "contracts/schemas/events/catalogue-foundation-recorded-v1.json",
+        ("consumer",),
+    ),
     "tests/contracts/test_migration_readiness_wire.py::"
     "test_planning_producer_to_lifecycle_installed_readiness_contract": (
         "contracts/schemas/planning/migration-readiness-v2.2.json",
