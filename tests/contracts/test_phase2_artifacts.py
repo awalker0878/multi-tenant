@@ -78,6 +78,34 @@ class DependencyTests(unittest.TestCase):
         self.assertEqual(graph["summary"]["producer_local_copies"], 1)
         self.assertEqual(graph["producer_local_copies"][0]["copy"], self.copy)
 
+    def test_worker_installed_copy_keeps_independent_worker_authority(self):
+        worker_copy = "workers/lifecycle/src/lifecycle_worker/infrastructure/inputs/source-v1.json"
+        installed = self.root / worker_copy
+        installed.parent.mkdir(parents=True, exist_ok=True)
+        installed.write_text('{"openapi":"3.1.0"}')
+        self.registry["active_releases"][0]["consumers"] = ["lifecycle-workers"]
+        self.registry["active_releases"][0]["copies"] = [worker_copy]
+        self.usage["copies"] = [{"copy": worker_copy, "canonical": self.path}]
+        self._save()
+        graph = self.verified()
+        self.assertEqual(len(graph["edges"]), 1)
+        edge = graph["edges"][0]
+        self.assertEqual(edge["consumer"], "lifecycle-workers")
+        self.assertEqual(edge["installed_copies"], [worker_copy])
+        self.assertEqual(edge["evidence"], "installed-loader")
+        self.assertNotIn("lifecycle", [edge["consumer"]])
+
+    def test_unknown_installed_component_cannot_inherit_an_owner_name(self):
+        rogue = "applications/lifecycle/resources/contracts/source-v1.json"
+        installed = self.root / rogue
+        installed.parent.mkdir(parents=True, exist_ok=True)
+        installed.write_text('{"openapi":"3.1.0"}')
+        self.registry["active_releases"][0]["copies"] = [rogue]
+        self.usage["copies"] = [{"copy": rogue, "canonical": self.path}]
+        self._save()
+        with self.assertRaisesRegex(ValueError, "Unknown runtime component"):
+            self.verified()
+
     def test_no_unknown_or_orphaned_installed_copy(self):
         self.registry["active_releases"][0]["consumers"] = ["planning"]
         self._save()

@@ -9,6 +9,8 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
+
+from artifact_attestation import COMPONENTS
 from installed_usage import verify_installed_usage
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -45,8 +47,9 @@ def derive(root: Path = ROOT) -> dict:
             if copy not in copies or copies[copy]["canonical"] != canonical:
                 raise ValueError(f"Unknown installed dependency: {copy}")
             component = "/".join(Path(copy).parts[:2])
-            consumer = ("console" if component == "apps/console"
-                        else component.split("/")[1])
+            if component not in COMPONENTS:
+                raise ValueError(f"Unknown runtime component for installed copy: {copy}")
+            consumer = COMPONENTS[component][0]
             if consumer == owner:
                 # Producer-installed schema is an internal encoding/validation
                 # boundary, not a cross-service dependency.
