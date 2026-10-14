@@ -22,6 +22,7 @@ class ActiveContractTests(unittest.TestCase):
         self.git("config", "user.email", "fixture@example.invalid")
         self.write(PATH, "{}\n")
         self.registry([PATH])
+        self.write("architecture/installed-contract-usage.json", '{"copies": []}\n')
         self.base = self.commit()
 
     def git(self, *args):
@@ -33,10 +34,12 @@ class ActiveContractTests(unittest.TestCase):
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(content)
 
-    def registry(self, paths):
+    def registry(self, paths, *, consumers=None, copies=None, depends_on=None):
         self.write("architecture/contract-consumers.json",
                    __import__("json").dumps({"active_releases": [
-                       {"path": path} for path in paths
+                       {"path": path, "owner": "inventory",
+                        "consumers": consumers or [], "copies": copies or [],
+                        "depends_on": depends_on or []} for path in paths
                    ]}))
 
     def commit(self):
@@ -71,6 +74,40 @@ class ActiveContractTests(unittest.TestCase):
         report = check(self.root, self.base)
         self.assertEqual(report["removed"], [PATH])
         self.assertEqual(report["checked_active_releases"], 0)
+
+    def test_retirement_blocked_by_prior_declared_consumer(self):
+        self.registry([PATH], consumers=["planning"])
+        self.base = self.commit()
+        self.registry([])
+        (self.root / PATH).unlink()
+        with self.assertRaisesRegex(ValueError, "declared consumers"):
+            check(self.root, self.base)
+
+    def test_retirement_blocked_by_prior_installed_copy(self):
+        self.registry([PATH], copies=["services/inventory/resources/contracts/current-v1.json"])
+        self.base = self.commit()
+        self.registry([])
+        (self.root / PATH).unlink()
+        with self.assertRaisesRegex(ValueError, "installed copies"):
+            check(self.root, self.base)
+
+    def test_retirement_blocked_by_prior_dependent_release(self):
+        self.registry([PATH, NEW], depends_on=[PATH])
+        self.write(NEW, "{}\\n")
+        self.base = self.commit()
+        self.registry([NEW])
+        (self.root / PATH).unlink()
+        with self.assertRaisesRegex(ValueError, "dependent releases"):
+            check(self.root, self.base)
+
+    def test_retirement_blocked_by_prior_runtime_registration(self):
+        self.write("architecture/installed-contract-usage.json",
+                   '{"copies": [{"canonical": "' + PATH + '"}]}\\n')
+        self.base = self.commit()
+        self.registry([])
+        (self.root / PATH).unlink()
+        with self.assertRaisesRegex(ValueError, "runtime loader registrations"):
+            check(self.root, self.base)
 
     def test_base_revision_must_exist(self):
         with self.assertRaisesRegex(ValueError, "explicit existing base"):
