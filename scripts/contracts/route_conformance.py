@@ -462,7 +462,7 @@ def verify_planning_immutable(root: Path = ROOT) -> int:
     other = "10000000-0000-4000-8000-000000000002"
     rejected_path = f"/v1/tenants/{other}/plans/{SAMPLE_UUID}/revisions/1"
     status, error = asyncio.run(_exchange(app, rejected_path, "GET", headers))
-    if status != 404 or error.get("code") != "not_found":
+    if status != 404 or error.get("code") != "not-found":
         raise ValueError("Planning immutable plan allowed a cross-tenant read")
     Draft202012Validator(
         spec["components"]["schemas"]["Error"], format_checker=FormatChecker()
@@ -470,7 +470,7 @@ def verify_planning_immutable(root: Path = ROOT) -> int:
     status, error = asyncio.run(_exchange(
         app, path, "GET", [(b"authorization", b"Bearer bad")]
     ))
-    if status != 401 or error.get("code") != "invalid_workload":
+    if status != 401 or error.get("code") != "invalid-workload":
         raise ValueError("Planning immutable plan invalid credentials were not denied")
     Draft202012Validator(
         spec["components"]["schemas"]["Error"], format_checker=FormatChecker()

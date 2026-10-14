@@ -256,9 +256,10 @@ class PlanningApp:
             rf"/v1/tenants/({UUID})/plans/({UUID})/revisions/([1-9][0-9]{{0,8}})",
             scope["path"],
         ):
-            reason = payload.get("error", "plan_authority_unavailable")
-            if not isinstance(reason, str) or not re.fullmatch(r"[a-z][a-z0-9_.-]{2,95}", reason):
-                reason = "plan_authority_unavailable"
+            original = payload.get("error", "plan-authority-unavailable")
+            reason = original.replace("_", "-") if isinstance(original, str) else ""
+            if not re.fullmatch(r"[a-z][a-z0-9_.-]{2,95}", reason):
+                reason = "plan-authority-unavailable"
             payload = {
                 "code": reason, "message": reason.replace("_", " "),
                 "correlation_id": str(uuid4()), "retryable": status >= 500,
