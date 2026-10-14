@@ -154,7 +154,6 @@ def main() -> int:
                 'snapshot_sha256': approval_archive, 'table_fingerprints': approval_before,
                 'decision_states': ['rejected', 'revoked'], 'approval_events': 5,
                 'limits': ['No native effect or real P05 plan producer', 'Restored authority is not resumed']}
-            check('packaged-support-openapi-contract', (root / 'contracts/openapi/governance-support-v1.json').read_bytes() == (root / 'services/governance/resources/contracts/governance-support-v1.json').read_bytes())
             run(['php', 'vendor/bin/pest', 'tests/Feature/SupportAccessTest.php', '--filter=retains nonempty terminal support history',
                  '--fail-on-warning', '--fail-on-risky', '--fail-on-empty-test-suite', '--colors=never'],
                 cwd=root / 'services/governance', env=os.environ.copy(), label='support-history-producer')

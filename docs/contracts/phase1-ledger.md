@@ -151,3 +151,16 @@ input needed and the separately observed runtime conformance gaps.
 - `scripts/p09/check_contract.py` exposed an actual Planning response/schema
   conformance failure, documented in the Phase 2 handoff. It was not suppressed
   and no runtime implementation was started to hide that future-phase result.
+
+## Authorized remediation follow-up — 2026-10-14
+
+The preceding closeout describes its earlier checkpoint. The current instruction
+authorizes runtime correction despite independent external enrollment blockers.
+See [the current remediation ledger](phase2-ledger.md) for subsequent evidence.
+An intentional major Planning migration release replaces the prior active
+release and its sole installed consumer; no surviving published canonical bytes
+change. Independent disk/ref/embedded-schema discovery now finds 75 releases,
+166 HTTP operations, **48** canonical edges (including the new Error v2 edge),
+83 consumer relationships, 35 installed copies, six source manifests and nine
+deployable components. No further safe retirement is proved. Deployment-owned
+collection enrollment and actual mount provenance remain blocked.

@@ -215,3 +215,25 @@ remain a Phase 1 blocker. Installed native provider/custody E3/E4 evidence remai
 unavailable. Complete authenticated per-operation/consumer and event recovery
 qualification must still be established from applicable executed integration
 results. Do not describe this ledger, a source build or E2 fixtures as completion.
+
+### Required integration follow-up
+
+Checkpoint `4058a28bb113bdfa53a05919823ac48c75bb6ac8`, CI run `38642332673`,
+tested merge revision `0c9a7b2b772fc75c35a1b99b84c37066a5c17cea`.
+All five Python quality jobs, three other Laravel quality jobs, live Laravel
+route checks, E2 authority transactions, and the five real PostgreSQL/broker
+integration jobs pass. Planning's new database tests execute without local skips.
+These bounded results do not qualify every HTTP operation or native authority.
+
+| Finding | Boundary | Reproduction and correction |
+| --- | --- | --- |
+| Invalid PostgreSQL migration command (high) | Governance production provisioning | All P03–P06 live journeys fail with `psql: invalid command \\`. Migration 014 contains two leading backslashes; correct it to the actual psql `\set`. Feature fixtures strip meta-commands and therefore did not expose the production defect. Required live journeys execute the actual migration files. |
+| Retired producer-copy reference (medium) | P02 support qualification | All three P02 journeys fail opening the removed Governance OpenAPI copy. Remove the obsolete packaged-copy assertion; the preceding real PostgreSQL `SupportContractTest` already validates actual owner outputs against the canonical contract. No unused runtime copy is recreated. |
+| Obsolete migration error specimen (medium) | Console installed consumer | `MigrationFleetTest` expects old `{error}` data to pass v2 validation. Use the exact Error v2 envelope for the positive denial and retain the old envelope as an explicit incompatible-wire rejection. The new Error v2 test passed on supported PHP. |
+| Stale composition specimen (medium) | Native E2 compiler/resolver | Native qualification fails at command 32 because the synthetic owner configuration lacks Catalogue and the current workload-readiness receipt. Update the existing E2 check to exercise current readiness and independent Catalogue membership. All 30 combinations and 90 missing/stale/foreign controls pass locally. This is not E3/E4 evidence. |
+| Transient pinned APK 404 | Catalogue image acquisition | CI reports 404 for pinned zlib. Independent retrieval returns 200, 56,195 bytes and SHA256 `b636306cbf8a0c15493b38de608ba11605fd8f11ade631f5ece6f7fdf5a1e09e`, exactly matching the lock. Extend the existing three-attempt network retry narrowly to official APK 404 responses; all signature, byte-count and digest checks remain mandatory. |
+
+The integration and aggregate required gates remain failed until the corrected
+branch is executed again. The complete qualification gate remains red for
+missing authenticated authority and other operation-specific evidence. No test
+fixture, successful build or missing receipt is promoted to runtime assurance.

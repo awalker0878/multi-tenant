@@ -1,4 +1,4 @@
-\\set ON_ERROR_STOP on
+\set ON_ERROR_STOP on
 BEGIN;
 SET LOCAL ROLE governance_owner;
 -- A bounded at-most-once issuance ledger: never store or replay the bearer token.
