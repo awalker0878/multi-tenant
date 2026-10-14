@@ -77,7 +77,7 @@ class PlanningApp:
             headers = list(scope["headers"])
             if len(headers) > 40 or scope["query_string"]:
                 raise Rejected("request_bound", 413)
-            authorization = single(headers, b"authorization")
+            authorization = single(headers, b"authorization", optional=True)
             if not re.fullmatch(r"Bearer [A-Za-z0-9_-]{32,4096}", authorization):
                 raise Rejected("invalid_workload", 401)
             credential = authorization[7:]

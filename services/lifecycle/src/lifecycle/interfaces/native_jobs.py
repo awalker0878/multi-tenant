@@ -49,7 +49,7 @@ class NativeJobsApp:
             ):
                 raise Rejected("not_found", 404)
             headers = list(scope["headers"])
-            auth = single(headers, b"authorization")
+            auth = single(headers, b"authorization", optional=True)
             if len(headers) > 40 or not re.fullmatch(r"Bearer [A-Za-z0-9_-]{32,4096}", auth):
                 raise Rejected("invalid_workload", 401)
             if any(k.lower() == b"content-encoding" for k, _ in headers):

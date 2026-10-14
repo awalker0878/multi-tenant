@@ -48,6 +48,29 @@ class PythonDenialExecutionTests(unittest.TestCase):
                 ))
                 self.assertEqual(status, 401)
 
+    def test_planning_and_lifecycle_missing_credentials_are_authentication_denials(self):
+        # These are composed ASGI services using production router dispatch.
+        # Keep malformed/duplicate headers rejected independently by single().
+        for owner, cases in (
+            ("planning", (
+                ("GET", "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/assessments/{record}"),
+                ("GET", "/v1/plans/{plan}/revisions/{revision}"),
+                ("GET", "/v1/tenants/{tenant}/execution-plans/{plan}/revisions/{revision}"),
+            )),
+            ("lifecycle", (
+                ("GET", "/v1/tenants/{tenant}/jobs/{job}"),
+                ("GET", "/v1/tenants/{tenant}/migration-campaigns"),
+                ("POST", "/internal/tenants/{tenant}/placement-reservations/checks"),
+            )),
+        ):
+            app = python_denials.get_app(owner)
+            for method, template in cases:
+                with self.subTest(owner=owner, method=method, route=template):
+                    status = asyncio.run(python_denials.exchange(
+                        app, method, python_denials.actual_path(template)
+                    ))
+                    self.assertEqual(status, 401 if owner == "planning" or "placement-reservations" not in template else 423)
+
     def test_wrong_status_is_unresolved_not_a_pass(self):
         operation = {
             "owner": "inventory", "security_required": True,
