@@ -14,7 +14,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 import yaml
-from jsonschema import Draft202012Validator
+from jsonschema import Draft202012Validator, FormatChecker
 
 ROOT = Path(__file__).resolve().parents[2]
 CANONICAL = ("openapi", "schemas", "asyncapi", "capabilities", "platforms")
@@ -436,6 +436,27 @@ def quality_event(path: str, doc: dict, policy: dict, root: Path) -> None:
                          + repr(sorted(set(channels) - covered_channels)))
 
 
+def quality_catalogue(path: str, document: dict, root: Path) -> None:
+    """Validate new capability/platform declarations against their active schema.
+
+    A nonempty JSON object is not evidence of an admissible platform profile.
+    Both canonical categories use versioned schema files in contracts/schemas.
+    No alias, fallback schema, or legacy catalogue format is accepted.
+    """
+    kind = path.split("/")[1]
+    if kind not in {"capabilities", "platforms"} or not isinstance(document, dict):
+        raise ValueError("Invalid capability/platform publication: " + path)
+    schema_path = root / "contracts" / "schemas" / kind / Path(path).name
+    if not schema_path.is_file():
+        raise ValueError("New capability/platform release lacks its canonical schema: " + path)
+    schema = load(schema_path)
+    Draft202012Validator.check_schema(schema)
+    try:
+        Draft202012Validator(schema, format_checker=FormatChecker()).validate(document)
+    except Exception as exc:
+        raise ValueError("Capability/platform declaration violates its canonical schema: " + path) from exc
+
+
 def git_base_paths(root: Path, revision: str) -> set[str]:
     try:
         result = subprocess.run(
@@ -487,8 +508,7 @@ def check_new_releases(root: Path, revision: str) -> dict:
         elif kind == "schemas":
             quality_schema(path, doc, policy)
         elif kind in ("capabilities", "platforms"):
-            if not isinstance(doc, dict):
-                raise ValueError("Non-schema canonical must be an object: " + path)
+            quality_catalogue(path, doc, root)
         else:
             raise ValueError("Unsupported canonical publication: " + path)
         predecessor = old_versions.get(family)

@@ -55,6 +55,13 @@ retry attempts, exponential jitter backoff, after-commit acknowledgment,
 a dead-letter address, a retention window and a bounded deduplication
 window. Publishing and receiving operations must bind declared channels.
 
+### Capability and platform declarations
+
+New capability catalogues and platform profiles must validate their contents
+against their active, versioned canonical JSON Schema. A JSON object that only
+passes a structural parse is not an admissible capability declaration; missing
+schema files, unrecognized properties and invalid statuses fail closed.
+
 ### Semantic change admission
 
 The admission script resolves the latest previously published version in

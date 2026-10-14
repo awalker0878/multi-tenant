@@ -14,6 +14,7 @@ sys.path.insert(0, str(ROOT / "scripts/contracts"))
 from quality import (
     quality_api, quality_schema, quality_event,
     api_breakages, schema_breakages, event_breakages, check_new_releases,
+    quality_catalogue,
 )
 
 POLICY = json.loads((ROOT / "architecture/contract-quality-policy.json").read_text())
@@ -182,6 +183,27 @@ class SchemaAndEvents(unittest.TestCase):
             del broken[key]
             with self.assertRaises(ValueError):
                 quality_schema("contracts/schemas/new-v2.json", broken, POLICY)
+
+    def test_new_capability_catalogues_require_exact_versioned_schema(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            schema_dir = root / "contracts/schemas/capabilities"
+            schema_dir.mkdir(parents=True)
+            schema = {
+                "$schema": POLICY["schema_dialect"], "type": "object",
+                "additionalProperties": False, "required": ["status"],
+                "properties": {"status": {"const": "proposed_not_qualified"}},
+            }
+            (schema_dir / "candidate-v2.json").write_text(json.dumps(schema))
+            path = "contracts/capabilities/candidate-v2.json"
+            quality_catalogue(path, {"status": "proposed_not_qualified"}, root)
+            with self.assertRaisesRegex(ValueError, "violates its canonical schema"):
+                quality_catalogue(path, {"status": "qualified"}, root)
+            with self.assertRaisesRegex(ValueError, "violates its canonical schema"):
+                quality_catalogue(path, {"status": "proposed_not_qualified", "unknown": 1}, root)
+            (schema_dir / "candidate-v2.json").unlink()
+            with self.assertRaisesRegex(ValueError, "lacks its canonical schema"):
+                quality_catalogue(path, {"status": "proposed_not_qualified"}, root)
 
     def test_new_event_requires_delivery_ordering_dedupe_dlq_and_schema_envelope(self):
         with tempfile.TemporaryDirectory() as directory:
