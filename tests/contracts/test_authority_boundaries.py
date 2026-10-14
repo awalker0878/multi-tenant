@@ -108,7 +108,7 @@ class OwnerBoundaryContracts(unittest.TestCase):
     def test_governance_and_lifecycle_operations_have_no_untyped_bypass(self):
         self.assertEqual(contract_for_operation("GOVERNANCE", "POST",
             f"/v1/tenants/{TENANT}/delegated-authorizations"), "governance-delegation-response-v2")
-        self.assertEqual(contract_for_operation("CAPACITY", "POST",
+        self.assertEqual(contract_for_operation("LIFECYCLE", "POST",
             f"/internal/tenants/{TENANT}/placement-reservations/checks"), "placement-reservation-v1")
         with self.assertRaises(ValueError):
             contract_for_operation("GOVERNANCE", "POST",
@@ -198,13 +198,13 @@ class OwnerBoundaryContracts(unittest.TestCase):
 
         path = f"/internal/tenants/{TENANT}/placement-reservations/checks"
         with (
-            patch.dict(os.environ, {"CAPACITY_URL": "https://capacity.example",
-                                    "CAPACITY_CA_FILE": "/tmp/synthetic-ca"}),
+            patch.dict(os.environ, {"LIFECYCLE_URL": "https://lifecycle.example",
+                                    "LIFECYCLE_CA_FILE": "/tmp/synthetic-ca"}),
             patch.object(owners, "mounted_secret", return_value="synthetic-token"),
             patch.object(owners.ssl, "create_default_context", return_value=object()),
             patch.object(owners.http.client, "HTTPSConnection", Connection),
         ):
-            self.assertEqual(owners.request("CAPACITY", "POST", path, {"plan_digest": HEX}), produced)
+            self.assertEqual(owners.request("LIFECYCLE", "POST", path, {"plan_digest": HEX}), produced)
             for poisoned in (
                 {**produced, "tenant_id": OTHER},
                 {**produced, "plan_digest": "b" * 64},
@@ -212,7 +212,7 @@ class OwnerBoundaryContracts(unittest.TestCase):
             ):
                 wire[0] = poisoned
                 with self.assertRaises(Rejected) as caught:
-                    owners.request("CAPACITY", "POST", path, {"plan_digest": HEX})
+                    owners.request("LIFECYCLE", "POST", path, {"plan_digest": HEX})
                 self.assertEqual(caught.exception.status, 503)
 
 
@@ -391,7 +391,7 @@ class LifecycleOwnerTransportContracts(unittest.TestCase):
                 execution_owners.request("ASSURANCE", "POST", f"/v1/tenants/{OTHER}/unregistered", {})
             # An unknown owner must never bypass the installed response contract.
             with self.assertRaises(Rejected) as untyped:
-                execution_owners.request("CAPACITY", "POST",
+                execution_owners.request("UNKNOWN", "POST",
                     f"/internal/tenants/{TENANT}/placement-reservations/checks", {})
             self.assertEqual(untyped.exception.status, 503)
 

@@ -30,7 +30,7 @@ SHA = "a" * 64
     ("ASSURANCE", "POST", f"/v1/tenants/{TENANT}/planning-qualification-v2", "qualification-v2.1"),
     ("ASSURANCE", "POST", f"/internal/tenants/{TENANT}/qualification-checks", "qualification-v2.1"),
     ("GOVERNANCE", "POST", f"/v1/tenants/{TENANT}/delegated-authorizations", "governance-delegation-response-v2"),
-    ("CAPACITY", "POST", f"/internal/tenants/{TENANT}/placement-reservations/checks", "placement-reservation-v1"),
+    ("LIFECYCLE", "POST", f"/internal/tenants/{TENANT}/placement-reservations/checks", "placement-reservation-v1"),
 ])
 def test_runtime_operation_has_one_immutable_schema(owner, method, path, expected):
     assert contract_for_operation(owner, method, path) == expected
@@ -201,7 +201,7 @@ def test_capacity_and_governance_owner_responses_are_schema_and_scope_validated(
         def close(self):
             pass
 
-    for owner in ("GOVERNANCE", "CAPACITY"):
+    for owner in ("GOVERNANCE", "LIFECYCLE"):
         monkeypatch.setenv(owner + "_URL", "https://owner.example")
         monkeypatch.setenv(owner + "_CA_FILE", "/tmp/ca.pem")
     monkeypatch.setattr(owners, "mounted_secret", lambda _: "test-only-token")
@@ -211,7 +211,7 @@ def test_capacity_and_governance_owner_responses_are_schema_and_scope_validated(
     routes = [
         ("GOVERNANCE", f"/v1/tenants/{TENANT}/delegated-authorizations",
          {"action": "plan.read", "scope": scope}, delegation),
-        ("CAPACITY", f"/internal/tenants/{TENANT}/placement-reservations/checks",
+        ("LIFECYCLE", f"/internal/tenants/{TENANT}/placement-reservations/checks",
          {"plan_digest": SHA}, reservation),
     ]
     for owner, path, body, success in routes:

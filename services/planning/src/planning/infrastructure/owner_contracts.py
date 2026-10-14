@@ -13,7 +13,7 @@ OWNER_OPERATIONS: tuple[tuple[str, str, str, str], ...] = (
     ("GOVERNANCE", "POST",
      r"/v1/tenants/[^/]+/delegated-authorizations",
      "governance-delegation-response-v2"),
-    ("CAPACITY", "POST",
+    ("LIFECYCLE", "POST",
      r"/internal/tenants/[^/]+/placement-reservations/checks",
      "placement-reservation-v1"),
     ("CATALOGUE", "GET",

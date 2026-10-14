@@ -92,7 +92,7 @@ def request(
                 raise ValueError
             # A valid JSON shape must also belong to the actual request scope.
             # Never let an authorized service credential substitute for tenant authority.
-            if owner == "CAPACITY":
+            if owner == "LIFECYCLE":
                 tenant = path.split("/")[3]
                 if (result["tenant_id"] != tenant or body is None
                         or result["plan_digest"] != body["plan_digest"]):
@@ -396,7 +396,7 @@ def placement_current(plan: dict[str, Any], current: dict[str, Any]) -> None:
         raise Rejected("placement_binding_invalid", 423)
     placed = current_placement
     receipt = request(
-        "CAPACITY", "POST",
+        "LIFECYCLE", "POST",
         f"/internal/tenants/{scope['tenant_id']}/placement-reservations/checks",
         {"plan_digest": plan["binding"]["digest"]},
     )
