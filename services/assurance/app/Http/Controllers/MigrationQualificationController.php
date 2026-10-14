@@ -203,7 +203,7 @@ final class MigrationQualificationController
                                     || ($case['revoked'] ?? null) !== false
                                     || ! is_int($case['observed_at'] ?? null)
                                     || ! is_int($case['expires_at'] ?? null)
-                                    || ! (0 <= time() - $case['observed_at']
+                                    || ! (time() - $case['observed_at'] >= 0
                                           && time() - $case['observed_at'] <= 30)
                                     || $case['expires_at'] <= time()
                                     || $case['expires_at'] > ($candidateFlows['expires_at'] ?? 0)) {
@@ -268,7 +268,7 @@ final class MigrationQualificationController
                                     || ($case['revoked'] ?? null) !== false
                                     || ! is_int($case['observed_at'] ?? null)
                                     || ! is_int($case['expires_at'] ?? null)
-                                    || ! (0 <= time() - $case['observed_at']
+                                    || ! (time() - $case['observed_at'] >= 0
                                           && time() - $case['observed_at'] <= 30)
                                     || $case['expires_at'] <= time()
                                     || $case['expires_at'] > ($candidateFlows['expires_at'] ?? 0)) {
@@ -324,7 +324,7 @@ final class MigrationQualificationController
                                     || ($case['revoked'] ?? null) !== false
                                     || ! is_int($case['observed_at'] ?? null)
                                     || ! is_int($case['expires_at'] ?? null)
-                                    || ! (0 <= time() - $case['observed_at'] && time() - $case['observed_at'] <= 30)
+                                    || ! (time() - $case['observed_at'] >= 0 && time() - $case['observed_at'] <= 30)
                                     || $case['expires_at'] <= time()
                                     || $case['expires_at'] > ($candidateFlows['expires_at'] ?? 0)) {
                                     $bootValid = false;

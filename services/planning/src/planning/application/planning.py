@@ -10,8 +10,8 @@ from planning.application.ports import Database, Sources, Transaction
 from planning.application.validation import PlanValidation
 from planning.domain.assessment import assess
 from planning.domain.compilation import bind, compile_plan
-from planning.domain.placement import fit
 from planning.domain.model import Actor, Rejected, canonical, digest, identifier, integer, shape
+from planning.domain.placement import fit
 
 
 class Planning:
@@ -117,9 +117,9 @@ class Planning:
                 scope_sha256: str | None = None
                 try:
                     if retained is not None:
-                        qualification_scope = retained["payload"]["inputs"][
-                            payload["candidate"]
-                        ]["qualification"]["scope"]
+                        qualification_scope = retained["payload"]["inputs"][payload["candidate"]][
+                            "qualification"
+                        ]["scope"]
                         if (
                             isinstance(qualification_scope, dict)
                             and qualification_scope.get("tenant_id") == actor.tenant
@@ -442,8 +442,7 @@ class Planning:
                 bound_tenant = row["payload"]["binding"]["tenant_id"]
             except (KeyError, TypeError):
                 raise Rejected("plan_tenant_mismatch", 423) from None
-            if (pinned_tenant != tenant or bound_tenant != tenant
-                    or str(row["tenant"]) != tenant):
+            if pinned_tenant != tenant or bound_tenant != tenant or str(row["tenant"]) != tenant:
                 raise Rejected("plan_tenant_mismatch", 423)
             if self.qualification_hold(tx, tenant, identity) is not None:
                 raise Rejected("qualification_invalidation_held", 423)

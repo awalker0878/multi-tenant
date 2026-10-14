@@ -14,8 +14,8 @@ from test_planning_http import exchange
 from planning.application.migration_plans import MigrationPlans
 from planning.application.validation import MigrationValidation, PlanValidation
 from planning.domain.migration import bind_migration
-from planning.domain.migration_plan import DELTA, compose_migration, stage_order
 from planning.domain.migration_api_selection import pin as pin_api_selection
+from planning.domain.migration_plan import DELTA, compose_migration, stage_order
 from planning.domain.model import Actor, Rejected, digest
 from planning.infrastructure.migration_recipes import recipe_for
 from planning.interfaces.migration import MigrationPreparationApp
@@ -55,7 +55,7 @@ def values(
         "ownership": [],
         "native_api": {"custody_id": str(uuid4()), "custody_generation": 1},
     }
-    recipe = {
+    recipe: dict[str, Any] = {
         "schema_version": 1,
         "scope": scope,
         "base_content_sha256": digest(base),
@@ -113,22 +113,31 @@ def values(
 
 def qualified_api_readiness(now: int = 1000) -> dict[str, Any]:
     return {
-        "schema_version": 2, "kind": "migration_workload_readiness",
-        "status": "eligible", "holds": [], "native_write_authorized": False,
+        "schema_version": 2,
+        "kind": "migration_workload_readiness",
+        "status": "eligible",
+        "holds": [],
+        "native_write_authorized": False,
         "expires_at": now + 100,
-        "route_sha256": digest("route"), "release_sha256": digest("release"),
+        "route_sha256": digest("route"),
+        "release_sha256": digest("release"),
         "source": {"platform": "vmware", "profile_sha256": digest("src")},
         "target": {"platform": "openstack", "profile_sha256": digest("tgt")},
         "api_compatibility": {
             "operationally_eligible": True,
-            "cases": [{
-                "capability_id": "vm.disk.export", "side": "source",
-                "criticality": "critical", "status": "eligible",
-                "omission_accepted": False, "selected_api_family": "vmware.vi_json",
-                "selected_api_version": "9.0.0.0",
-                "evidence_sha256": digest("native-e3"),
-                "expires_at": now + 100,
-            }],
+            "cases": [
+                {
+                    "capability_id": "vm.disk.export",
+                    "side": "source",
+                    "criticality": "critical",
+                    "status": "eligible",
+                    "omission_accepted": False,
+                    "selected_api_family": "vmware.vi_json",
+                    "selected_api_version": "9.0.0.0",
+                    "evidence_sha256": digest("native-e3"),
+                    "expires_at": now + 100,
+                }
+            ],
         },
     }
 
@@ -234,14 +243,14 @@ def test_complete_plan_http_requires_idempotency_and_authority_before_compile() 
     authority, service = Mock(), Mock()
     service.create.return_value = {"native_write_authorized": False, "id": str(uuid4())}
     app: Any = MigrationPreparationApp(authority, Mock(), service)
-    body = {
+    body: dict[str, Any] = {
         "site_id": SITE,
         "review": {"revision": 1, "digest": digest("review")},
         "disks": mapping(),
         "recipe_id": str(uuid4()),
         "base_plan_id": str(uuid4()),
     }
-    headers = [
+    headers: list[Any] = [
         (b"authorization", b"Bearer " + b"a" * 64),
         (b"content-type", b"application/json"),
         (b"x-actor-delegation", b"b" * 64),
@@ -283,7 +292,7 @@ def test_plan_revalidation_observes_recipe_revocation_and_inventory_changes() ->
         qualified_api_readiness(), 1000
     )
     content["native_migration"]["recipe_id"] = str(uuid4())
-    plan = {"content": content}
+    plan: dict[str, Any] = {"content": content}
     service.current(actor, plan, {recipe["scope"]["site_id"]: "delegation"})
     assert prepare.call_args.kwargs == {"action": "plan.read"}
     prepare.return_value = bound | {"owner_inputs_sha256": "e" * 64}
@@ -357,7 +366,7 @@ def test_complete_plan_options_persistence_retry_and_wire_schema(database: Any) 
     service = MigrationPlans(
         planner, validation, lambda a, s: [{"id": recipe_id, "recipe": recipe}]
     )
-    body = {
+    body: dict[str, Any] = {
         "site_id": SITE,
         "review": bound["review"],
         "disks": [
@@ -402,9 +411,13 @@ def test_unattended_execution_and_governance_reads_recheck_recipe_revocation() -
     content["native_migration"]["api_selection"] = pin_api_selection(
         qualified_api_readiness(), 1000
     )
-    payload = {"content": content, "binding": {
-        "requested_by": str(uuid4()), "tenant_id": recipe["scope"]["tenant_id"],
-    }}
+    payload: dict[str, Any] = {
+        "content": content,
+        "binding": {
+            "requested_by": str(uuid4()),
+            "tenant_id": recipe["scope"]["tenant_id"],
+        },
+    }
     database = MagicMock()
     tx = database.transaction.return_value.__enter__.return_value
     recipes = Mock(return_value=recipe)
@@ -415,19 +428,23 @@ def test_unattended_execution_and_governance_reads_recheck_recipe_revocation() -
     denied = Planning(database, Mock(), clock, PlanValidation.unavailable(clock))
     validation = PlanValidation.unavailable(clock)
     validation = PlanValidation(
-        validation.native, MigrationValidation(
-            Mock(), recipes,
-            Mock(return_value=qualified_api_readiness()), clock,
-        ), Mock()
+        validation.native,
+        MigrationValidation(
+            Mock(),
+            recipes,
+            Mock(return_value=qualified_api_readiness()),
+            clock,
+        ),
+        Mock(),
     )
     planning = Planning(database, Mock(), clock, validation)
     key, tenant = str(uuid4()), recipe["scope"]["tenant_id"]
+
     # Query-aware test doubles must represent both the plan and its independent
     # qualification head; static row lists silently under-count revalidation.
-    def record_lookup(query: str, args: object) -> dict[str, object]:
+    def record_lookup(query: str, args: Any) -> dict[str, Any] | None:
         if "planning_plan_qualification_scopes" in query:
-            return {"scope_sha256": "a" * 64, "state": "qualified",
-                    "invalidated": False}
+            return {"scope_sha256": "a" * 64, "state": "qualified", "invalidated": False}
         if "SELECT tenant,payload" in query:
             assert "WHERE tenant=%s AND id=%s" in query
             return {"tenant": tenant, "payload": payload} if args[0] == tenant else None

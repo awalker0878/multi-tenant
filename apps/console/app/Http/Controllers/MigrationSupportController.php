@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Application\Planning\Contracts\PlanningGateway;
 use App\Application\Inventory\Contracts\InventoryGateway;
+use App\Application\Planning\Contracts\PlanningGateway;
 use App\Domain\Inventory\InventoryFailure;
 use App\Domain\Planning\PlanningFailure;
 use Illuminate\Http\JsonResponse;
@@ -102,6 +102,7 @@ final class MigrationSupportController
                 'site_id' => $site,
                 'review' => ['revision' => $review['revision'], 'digest' => $review['digest']],
             ]);
+
         return response()->json([
             'available' => true, 'status' => $result['readiness']['status'] ?? 'held',
             'readiness' => $result['readiness'] ?? null,
@@ -114,6 +115,7 @@ final class MigrationSupportController
     {
         $choices = $planning->call($this->session($request), $tenant, $application, $environment,
             'POST', 'migration-flow-choices', [$site], ['site_id' => $site]);
+
         return response()->json(['available' => true, 'flow_choices' => $choices])->header('Cache-Control', 'no-store, private');
     }
 
@@ -154,6 +156,7 @@ final class MigrationSupportController
                     : 'Application flow validation unavailable. No approval was recorded.',
             ]);
         }
+
         return redirect()->back()->with('flow_notice', ($response['status'] ?? '') === 'eligible'
             ? 'Application flow choices saved for review. Execution still requires fresh independent E4 evidence.'
             : 'Application flow draft saved. Required connectivity or isolation evidence remains held.');
@@ -165,6 +168,7 @@ final class MigrationSupportController
         if (! is_string($token)) {
             throw new PlanningFailure(403, 'access_unavailable');
         }
+
         return $token;
     }
 

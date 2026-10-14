@@ -3,8 +3,8 @@
 from typing import Any
 
 from inventory.application.discovery import Discovery
-from inventory.domain.profile_read_manifest import bounds as profile_read_bounds
 from inventory.domain.discovery import Rejected, Worker, identifier, number, shape
+from inventory.domain.profile_read_manifest import bounds as profile_read_bounds
 
 
 def authorize_read(d: Discovery, worker: Worker, body: dict[str, Any]) -> dict[str, Any]:
@@ -44,9 +44,7 @@ def authorize_read(d: Discovery, worker: Worker, body: dict[str, Any]) -> dict[s
         # The OpenStack source collector permits 32 volumes and 64 unique Neutron
         # security groups, plus five fixed GETs. Each is independently charged
         # against the enrolled endpoint budget; completion checks the exact count.
-        _, limit = profile_read_bounds(
-            p.platform, stream["kind"], p.max_pages, stream
-        )
+        _, limit = profile_read_bounds(p.platform, stream["kind"], p.max_pages, stream)
         if (
             stream["kind"] not in {"source_profile", "target_profile"}
             or request != j["profile_reads"] + 1

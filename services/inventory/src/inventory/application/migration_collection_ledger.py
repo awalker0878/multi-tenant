@@ -4,6 +4,7 @@ Ingesting an envelope proves its signature, tenant/site, exact current native
 generations and installed namespace tuple. It never grants E3/E4, equivalence,
 or an executable instruction. Current reads never fall back to older receipts.
 """
+
 from collections.abc import Callable
 from typing import Any
 from uuid import uuid4
@@ -14,15 +15,20 @@ from inventory.domain.discovery import Actor, Rejected, Worker, canonical, diges
 
 
 class MigrationCollectionLedger:
-    def __init__(self, discovery: Discovery, coverage_reader: Callable[..., list[dict[str, Any]]]) -> None:
+    def __init__(
+        self, discovery: Discovery, coverage_reader: Callable[..., list[dict[str, Any]]]
+    ) -> None:
         self.d = discovery
         self.profiles = WorkloadProfiles(discovery)
         self.coverage_reader = coverage_reader
 
     @staticmethod
     def require_unrevoked_generation(
-        tx: Any, tenant: str, site: str,
-        source: dict[str, Any], target: dict[str, Any],
+        tx: Any,
+        tenant: str,
+        site: str,
+        source: dict[str, Any],
+        target: dict[str, Any],
     ) -> None:
         for profile in (source, target):
             revoked = tx.one(
@@ -34,11 +40,21 @@ class MigrationCollectionLedger:
                 raise Rejected("migration_collection_generation_invalidated", 423)
 
     def publish(self, worker: Worker, body: dict[str, Any]) -> dict[str, Any]:
-        shape(body, {
-            "tenant_id", "site_id", "source_profile_id", "target_profile_id", "envelope",
-        })
+        shape(
+            body,
+            {
+                "tenant_id",
+                "site_id",
+                "source_profile_id",
+                "target_profile_id",
+                "envelope",
+            },
+        )
         tenant, site = identifier(body["tenant_id"]), identifier(body["site_id"])
-        source_id, target_id = identifier(body["source_profile_id"]), identifier(body["target_profile_id"])
+        source_id, target_id = (
+            identifier(body["source_profile_id"]),
+            identifier(body["target_profile_id"]),
+        )
         envelope = body["envelope"]
         if not isinstance(envelope, dict) or len(canonical(envelope).encode()) > 524288:
             raise Rejected("migration_collection_envelope_invalid")
@@ -47,19 +63,27 @@ class MigrationCollectionLedger:
             tx.execute("SELECT pg_advisory_xact_lock(7404001)")
             source = self.profiles.profile(tx, actor, source_id)
             target = self.profiles.profile(tx, actor, target_id)
-            if (source["profile_type"] != "SourceWorkloadProfile"
-                    or target["profile_type"] != "TargetCapabilityProfile"
-                    or not source["current"] or not target["current"]):
+            if (
+                source["profile_type"] != "SourceWorkloadProfile"
+                or target["profile_type"] != "TargetCapabilityProfile"
+                or not source["current"]
+                or not target["current"]
+            ):
                 raise Rejected("migration_collection_profiles_not_current", 423)
             enrolled = self.d.endpoint(tx, actor, source["endpoint_id"])
             policy = self.d.policy(enrolled)
-            if (policy.worker, policy.worker_fingerprint) != (
-                    worker.identity, worker.fingerprint):
+            if (policy.worker, policy.worker_fingerprint) != (worker.identity, worker.fingerprint):
                 raise Rejected("migration_collection_unenrolled_publisher", 403)
             self.require_unrevoked_generation(tx, tenant, site, source, target)
             left, right = self.profiles.binding(source), self.profiles.binding(target)
             coverage = self.coverage_reader(
-                tenant, site, source, target, left, right, int(self.d.clock()),
+                tenant,
+                site,
+                source,
+                target,
+                left,
+                right,
+                int(self.d.clock()),
                 signed_envelope=envelope,
             )
             if len(coverage) != 3:
@@ -81,20 +105,26 @@ class MigrationCollectionLedger:
                     continue
                 for entry in page["reads"]:
                     if isinstance(entry, dict):
-                        observed_reads.add((
-                            str(page["job"]), entry.get("native_operation"),
-                            entry.get("response_sha256"), entry.get("observed_at"),
-                        ))
+                        observed_reads.add(
+                            (
+                                str(page["job"]),
+                                entry.get("native_operation"),
+                                entry.get("response_sha256"),
+                                entry.get("observed_at"),
+                            )
+                        )
             for part in envelope["payload"]["scopes"]:
                 generation = (
-                    target["generation_id"] if part["scope"] == "target"
+                    target["generation_id"]
+                    if part["scope"] == "target"
                     else source["generation_id"]
                 )
                 for field in part["observations"]:
                     if field.get("collection_method") != "native_get":
                         continue
                     if (
-                        generation, field.get("native_operation"),
+                        generation,
+                        field.get("native_operation"),
                         field.get("source_response_sha256"),
                         field.get("observed_at"),
                     ) not in observed_reads:
@@ -116,19 +146,29 @@ class MigrationCollectionLedger:
             if prior is not None:
                 if prior["generation_sequence"] > sequence:
                     raise Rejected("migration_collection_delayed_observation_superseded", 409)
-                if (prior["generation_sequence"] == sequence
-                        and prior["envelope_sha256"] != envelope_sha):
+                if (
+                    prior["generation_sequence"] == sequence
+                    and prior["envelope_sha256"] != envelope_sha
+                ):
                     raise Rejected("migration_collection_sequence_conflict", 409)
             observed = [
-                record["observed_at"] for receipt in envelope["payload"]["scopes"]
-                for kind in ("observations", "applicability") for record in receipt[kind]
+                record["observed_at"]
+                for receipt in envelope["payload"]["scopes"]
+                for kind in ("observations", "applicability")
+                for record in receipt[kind]
             ]
-            if (not observed or any(type(t) is not int for t in observed)
-                    or min(observed) > int(self.d.clock())):
+            if (
+                not observed
+                or any(type(t) is not int for t in observed)
+                or min(observed) > int(self.d.clock())
+            ):
                 raise Rejected("migration_collection_observed_time_invalid", 423)
             observed_at = min(observed)
-            if (prior is not None and prior["envelope_sha256"] != envelope_sha
-                    and observed_at <= prior["observed_at"]):
+            if (
+                prior is not None
+                and prior["envelope_sha256"] != envelope_sha
+                and observed_at <= prior["observed_at"]
+            ):
                 raise Rejected("migration_collection_observation_order_regressed", 409)
             envelope_id = str(uuid4())
             tx.execute(
@@ -139,10 +179,19 @@ class MigrationCollectionLedger:
                 "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s::jsonb,%s,%s,%s,%s,%s) "
                 "ON CONFLICT DO NOTHING",
                 (
-                    envelope_id, tenant, site, source_id, target_id,
-                    left["profile_sha256"], right["profile_sha256"],
-                    envelope_sha, canonical(envelope), worker.identity,
-                    self.d.clock(), observed_at, sequence,
+                    envelope_id,
+                    tenant,
+                    site,
+                    source_id,
+                    target_id,
+                    left["profile_sha256"],
+                    right["profile_sha256"],
+                    envelope_sha,
+                    canonical(envelope),
+                    worker.identity,
+                    self.d.clock(),
+                    observed_at,
+                    sequence,
                     envelope["payload"]["expires_at"],
                 ),
             )
@@ -159,7 +208,8 @@ class MigrationCollectionLedger:
                 raise Rejected("migration_collection_receipt_commit_failed", 503)
             for part in envelope["payload"]["scopes"]:
                 for evidence_kind, field_name in (
-                    ("observation", "observations"), ("applicability", "applicability")
+                    ("observation", "observations"),
+                    ("applicability", "applicability"),
                 ):
                     for entry in part[field_name]:
                         evidence_sha = entry.get("evidence_sha256")
@@ -173,33 +223,55 @@ class MigrationCollectionLedger:
                             "VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) "
                             "ON CONFLICT DO NOTHING",
                             (
-                                str(parent["id"]), tenant, site, part["scope"],
-                                entry["attribute_id"], evidence_kind,
-                                entry.get("api_family"), entry.get("api_version"),
-                                entry.get("native_operation"), entry.get("value_sha256"),
+                                str(parent["id"]),
+                                tenant,
+                                site,
+                                part["scope"],
+                                entry["attribute_id"],
+                                evidence_kind,
+                                entry.get("api_family"),
+                                entry.get("api_version"),
+                                entry.get("native_operation"),
+                                entry.get("value_sha256"),
                                 entry.get("source_response_sha256"),
-                                evidence_sha, entry["observed_at"],
+                                evidence_sha,
+                                entry["observed_at"],
                             ),
                         )
             self.d.record(
-                tx, tenant, worker.identity, "migration.collection.receipt",
+                tx,
+                tenant,
+                worker.identity,
+                "migration.collection.receipt",
                 source_id,
-                {"source_profile_id": source_id, "target_profile_id": target_id,
-                 "envelope_sha256": envelope_sha,
-                 "status": "complete" if all(x["status"] == "complete" for x in coverage)
-                 else "held"},
+                {
+                    "source_profile_id": source_id,
+                    "target_profile_id": target_id,
+                    "envelope_sha256": envelope_sha,
+                    "status": "complete"
+                    if all(x["status"] == "complete" for x in coverage)
+                    else "held",
+                },
             )
             return {
                 "envelope_sha256": envelope_sha,
                 "status": "recorded",
-                "coverage": [{"scope": x["scope"], "status": x["status"],
-                              "holds": x["holds"]} for x in coverage],
+                "coverage": [
+                    {"scope": x["scope"], "status": x["status"], "holds": x["holds"]}
+                    for x in coverage
+                ],
                 "native_write_authorized": False,
             }
 
     def read(
-        self, tenant: str, site: str, source: dict[str, Any], target: dict[str, Any],
-        source_binding: dict[str, Any], target_binding: dict[str, Any], now: int,
+        self,
+        tenant: str,
+        site: str,
+        source: dict[str, Any],
+        target: dict[str, Any],
+        source_binding: dict[str, Any],
+        target_binding: dict[str, Any],
+        now: int,
     ) -> list[dict[str, Any]]:
         if not source.get("current") or not target.get("current"):
             return []
@@ -219,10 +291,18 @@ class MigrationCollectionLedger:
         if len(records) != 1:
             return []
         record = records[0]
-        if (record["source_sha256"] != source_binding["profile_sha256"]
-                or record["target_sha256"] != target_binding["profile_sha256"]):
+        if (
+            record["source_sha256"] != source_binding["profile_sha256"]
+            or record["target_sha256"] != target_binding["profile_sha256"]
+        ):
             return []
         return self.coverage_reader(
-            tenant, site, source, target, source_binding, target_binding, int(now),
+            tenant,
+            site,
+            source,
+            target,
+            source_binding,
+            target_binding,
+            int(now),
             signed_envelope=record["envelope"],
         )

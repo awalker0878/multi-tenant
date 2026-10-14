@@ -12,21 +12,23 @@ from uvicorn._types import ASGIReceiveCallable, ASGISendCallable, Scope
 from inventory.application.configuration import PortingConfiguration
 from inventory.application.discovery import Discovery
 from inventory.application.fleet import MigrationFleet
+from inventory.application.migration_collection_ledger import MigrationCollectionLedger
 from inventory.application.operator_inputs import OperatorInputs
 from inventory.application.ports import Authority
 from inventory.application.profile_collection import authorize_read
-from inventory.application.migration_collection_ledger import MigrationCollectionLedger
 from inventory.application.views import InventoryViews
 from inventory.application.workload import WorkloadProfiles
 from inventory.domain.discovery import Rejected
 
 UUID = "[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}"
-WORKER_ROUTES = frozenset({
-    "/internal/collections/claim",
-    "/internal/collections/pages",
-    "/internal/collections/profile-reads",
-    "/internal/collections/receipts",
-})
+WORKER_ROUTES = frozenset(
+    {
+        "/internal/collections/claim",
+        "/internal/collections/pages",
+        "/internal/collections/profile-reads",
+        "/internal/collections/receipts",
+    }
+)
 
 ROUTES = (
     (
@@ -277,9 +279,9 @@ class InventoryApp:
                 raise Rejected("not_found", 404)
             body: dict[str, Any] = {}
             if scope["method"] == "POST":
-                if single(headers, b"content-type", True).split(";")[0] != "application/json" or single(
-                    headers, b"content-encoding", True
-                ):
+                if single(headers, b"content-type", True).split(";")[
+                    0
+                ] != "application/json" or single(headers, b"content-encoding", True):
                     raise Rejected("unsupported_content_type", 415)
                 chunks = bytearray()
                 async with asyncio.timeout(5):
@@ -289,8 +291,11 @@ class InventoryApp:
                             raise Rejected("request_interrupted", 400)
                         chunks.extend(event["body"])
                         maximum = (
-                            2097152 if scope["path"] == "/internal/collections/pages" else
-                            524288 if scope["path"] == "/internal/collections/receipts" else 262144
+                            2097152
+                            if scope["path"] == "/internal/collections/pages"
+                            else 524288
+                            if scope["path"] == "/internal/collections/receipts"
+                            else 262144
                         )
                         if len(chunks) > maximum:
                             raise Rejected("request_bound", 413)

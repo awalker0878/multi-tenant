@@ -4,14 +4,21 @@ Security-group identities are selectable separately from individual native rules
 A VM's application-required flows cannot be inferred from these ACLs; they still
 require owner approval and independent end-to-end allow/deny measurements.
 """
+
 from ipaddress import ip_network
 from typing import Any
 
 from inventory_worker.infrastructure.native import CollectionFailure
 from inventory_worker.infrastructure.profile_digest import fingerprint
 
-RULE_FIELDS = ("direction", "ethertype", "protocol", "port_range_min",
-               "port_range_max", "remote_ip_prefix")
+RULE_FIELDS = (
+    "direction",
+    "ethertype",
+    "protocol",
+    "port_range_min",
+    "port_range_max",
+    "remote_ip_prefix",
+)
 
 
 def rule_choices(group: dict[str, Any]) -> list[dict[str, Any]] | None:
@@ -42,10 +49,10 @@ def rule_choices(group: dict[str, Any]) -> list[dict[str, Any]] | None:
         if not isinstance(identity, str) or not identity or identity in seen:
             raise CollectionFailure("invalid_response")
         seen.add(identity)
-        obj = {k: row.get(k) for k in RULE_FIELDS}
+        obj: dict[str, Any] = {k: row.get(k) for k in RULE_FIELDS}
         if obj["protocol"] is not None and (
-            type(obj["protocol"]) not in (str, int) or
-            (type(obj["protocol"]) is str and not obj["protocol"])
+            type(obj["protocol"]) not in (str, int)
+            or (type(obj["protocol"]) is str and not obj["protocol"])
         ):
             raise CollectionFailure("invalid_response")
         if type(obj["protocol"]) is str:
@@ -78,8 +85,12 @@ def security_semantics(group: dict[str, Any]) -> str | None:
     choices = rule_choices(group)
     if choices is None:
         return None
-    return fingerprint({"stateful": group["stateful"],
-                        "rules": sorted(
-                            [{k: item[k] for k in RULE_FIELDS} for item in choices],
-                            key=lambda rule: str(sorted(rule.items())),
-                        )})
+    return fingerprint(
+        {
+            "stateful": group["stateful"],
+            "rules": sorted(
+                [{k: item[k] for k in RULE_FIELDS} for item in choices],
+                key=lambda rule: str(sorted(rule.items())),
+            ),
+        }
+    )

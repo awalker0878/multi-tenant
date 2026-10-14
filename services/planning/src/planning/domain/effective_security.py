@@ -4,10 +4,12 @@ Only independent, current, version-scoped E4 source/target native documents are
 eligible. In particular, v1's generic first-match implementation is removed:
 NSX, AHV Microseg and Neutron do not share priority or attachment semantics.
 """
+
 from typing import Any
 
 from planning.domain.model import digest
-from planning.domain.packet_paths import PathUnqualified, qualify as qualify_paths
+from planning.domain.packet_paths import PathUnqualified
+from planning.domain.packet_paths import qualify as qualify_paths
 from planning.domain.policy_resolvers import Unqualified, decision
 
 
@@ -48,7 +50,8 @@ def qualify(document: Any, flow: dict[str, Any], now: int) -> dict[str, Any]:
     except (Unqualified, PathUnqualified, TypeError, KeyError, ValueError) as exc:
         return hold(str(exc) if str(exc) else "native_policy_or_path_unqualified")
     return {
-        "status": "qualified", "reason": None,
+        "status": "qualified",
+        "reason": None,
         "native_write_authorized": False,
         "effective_rule_native_ref": native_ref,
         "path_sha256": path["path_sha256"],
@@ -64,15 +67,34 @@ def semantic_security_digest(document: dict[str, Any]) -> str:
     expiring receipt for the same rules and installed path does not require
     the application owner to reselect those native IDs.
     """
-    return digest({
-        key: document.get(key) for key in (
-            "schema_version", "platform", "native_scope", "enforcement_layer",
-            "native_api_qualified", "api_profile", "default_action",
-            "default_deny_native_ref", "native_origin_id", "topology_sha256",
-            "effective_membership_observed", "workloads", "groups", "services",
-            "rules", "rules_complete", "ports", "security_groups",
-            "microseg_policy_priority_qualified", "policy_types_complete",
-            "paths", "path_set_sha256", "routing_generation_id",
-            "boundary_scope",
-        )
-    })
+    return digest(
+        {
+            key: document.get(key)
+            for key in (
+                "schema_version",
+                "platform",
+                "native_scope",
+                "enforcement_layer",
+                "native_api_qualified",
+                "api_profile",
+                "default_action",
+                "default_deny_native_ref",
+                "native_origin_id",
+                "topology_sha256",
+                "effective_membership_observed",
+                "workloads",
+                "groups",
+                "services",
+                "rules",
+                "rules_complete",
+                "ports",
+                "security_groups",
+                "microseg_policy_priority_qualified",
+                "policy_types_complete",
+                "paths",
+                "path_set_sha256",
+                "routing_generation_id",
+                "boundary_scope",
+            )
+        }
+    )

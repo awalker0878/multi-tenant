@@ -14,7 +14,7 @@ from inventory.domain.discovery import Rejected
 from inventory.domain.workload import OWNER_FIELDS, SOURCE_FIELDS, TARGET_FIELDS, review_input
 from inventory.infrastructure.policies import parse_policy
 
-pytest_plugins = ["test_discovery"]
+pytest_plugins: list[Any] = ["test_discovery"]
 
 
 def profile(now: float, source: bool = True) -> dict[str, Any]:
@@ -289,9 +289,12 @@ def test_profiles_reviews_and_confirmations_survive_restart_and_reject_stale_sco
 
 def test_confirmed_review_can_pin_exact_catalogue_logical_workload() -> None:
     body = review(uid(), uid())
-    binding = {
-        "application_id": uid(), "environment_id": uid(),
-        "revision_id": uid(), "workload_id": uid(), "intent_sha256": "1" * 64,
+    binding: dict[str, Any] = {
+        "application_id": uid(),
+        "environment_id": uid(),
+        "revision_id": uid(),
+        "workload_id": uid(),
+        "intent_sha256": "1" * 64,
         "disk_mappings": [{"logical_device_id": uid(), "native_key": 2000}],
         "nic_mappings": [],
     }
@@ -307,16 +310,22 @@ def test_confirmed_review_can_pin_exact_catalogue_logical_workload() -> None:
 
 def test_catalogue_mapping_cannot_skip_or_duplicate_native_devices() -> None:
     body = review(uid(), uid())
-    binding = {
-        "application_id": uid(), "environment_id": uid(),
-        "revision_id": uid(), "workload_id": uid(), "intent_sha256": "2" * 64,
+    binding: dict[str, Any] = {
+        "application_id": uid(),
+        "environment_id": uid(),
+        "revision_id": uid(),
+        "workload_id": uid(),
+        "intent_sha256": "2" * 64,
         "disk_mappings": [{"logical_device_id": uid(), "native_key": 2000}],
         "nic_mappings": [],
     }
     body["catalogue_binding"] = binding
     review_input(body, profile(1000))
-    for bad in ([], [{"logical_device_id": uid(), "native_key": 2001}],
-                binding["disk_mappings"] * 2):
+    for bad in (
+        [],
+        [{"logical_device_id": uid(), "native_key": 2001}],
+        binding["disk_mappings"] * 2,
+    ):
         body["catalogue_binding"] = {**binding, "disk_mappings": bad}
         with pytest.raises(Rejected, match="catalogue_native_device"):
             review_input(body, profile(1000))

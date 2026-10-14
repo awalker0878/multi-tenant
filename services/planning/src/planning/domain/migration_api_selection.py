@@ -4,17 +4,20 @@ Only the exact installed, entitled, independently qualified and executor-
 supported operation/version pair may be bound into an effect plan. A request
 for a different release is not a compatible substitution.
 """
+
 from typing import Any
 
 from planning.domain.model import Rejected, digest
 
 
 def pin(readiness: dict[str, Any], now: int) -> dict[str, Any]:
-    if (not isinstance(readiness, dict)
-            or readiness.get("status") != "eligible"
-            or readiness.get("holds") != []
-            or readiness.get("native_write_authorized") is not False
-            or readiness.get("expires_at", 0) <= now):
+    if (
+        not isinstance(readiness, dict)
+        or readiness.get("status") != "eligible"
+        or readiness.get("holds") != []
+        or readiness.get("native_write_authorized") is not False
+        or readiness.get("expires_at", 0) <= now
+    ):
         raise Rejected("migration_api_selection_readiness_required", 423)
     api = readiness.get("api_compatibility")
     if not isinstance(api, dict) or api.get("operationally_eligible") is not True:
@@ -36,32 +39,44 @@ def pin(readiness: dict[str, Any], now: int) -> dict[str, Any]:
             raise Rejected("migration_api_selection_qualification_required", 423)
         capability = case.get("capability_id")
         side = case.get("side")
-        if not isinstance(capability, str) or not capability or not isinstance(side, str) or not side:
+        if (
+            not isinstance(capability, str)
+            or not capability
+            or not isinstance(side, str)
+            or not side
+        ):
             raise Rejected("migration_api_selection_duplicate", 423)
         key = (capability, side)
         if key in identities:
             raise Rejected("migration_api_selection_duplicate", 423)
         identities.add(key)
-        if (case.get("side") not in {"source", "target"}
-                or not all(isinstance(case.get(k), str)
-                           and case[k] for k in ("selected_api_family",
-                                                "selected_api_version"))
-                or not isinstance(case.get("evidence_sha256"), str)
-                or len(case["evidence_sha256"]) != 64
-                or type(case.get("expires_at")) is not int
-                or case["expires_at"] <= now):
+        if (
+            case.get("side") not in {"source", "target"}
+            or not all(
+                isinstance(case.get(k), str) and case[k]
+                for k in ("selected_api_family", "selected_api_version")
+            )
+            or not isinstance(case.get("evidence_sha256"), str)
+            or len(case["evidence_sha256"]) != 64
+            or type(case.get("expires_at")) is not int
+            or case["expires_at"] <= now
+        ):
             raise Rejected("migration_api_selection_evidence_unbound", 423)
-        if (readiness.get(case["side"], {}).get("platform") == "ahv"
-                and case["selected_api_version"] != "v4.3"):
+        if (
+            readiness.get(case["side"], {}).get("platform") == "ahv"
+            and case["selected_api_version"] != "v4.3"
+        ):
             raise Rejected("migration_api_selection_unimplemented", 423)
-        result.append({
-            "capability_id": case["capability_id"],
-            "side": case["side"],
-            "api_family": case["selected_api_family"],
-            "api_version": case["selected_api_version"],
-            "evidence_sha256": case["evidence_sha256"],
-            "expires_at": case["expires_at"],
-        })
+        result.append(
+            {
+                "capability_id": case["capability_id"],
+                "side": case["side"],
+                "api_family": case["selected_api_family"],
+                "api_version": case["selected_api_version"],
+                "evidence_sha256": case["evidence_sha256"],
+                "expires_at": case["expires_at"],
+            }
+        )
     if not result:
         raise Rejected("migration_api_selection_no_native_operations", 423)
     selected = {

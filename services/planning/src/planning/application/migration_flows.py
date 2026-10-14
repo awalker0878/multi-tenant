@@ -3,40 +3,49 @@
 No source ACL becomes an application dependency. No browser-supplied observation
 can establish policy equivalence or positive/negative traffic measurements.
 """
-from copy import deepcopy
+
 from collections.abc import Callable
+from copy import deepcopy
 from typing import Any
 
 from planning.application.planning import Planning
-from planning.domain.model import Actor, Rejected, canonical, digest, identifier, integer, shape
-from planning.domain.network_evidence import (
-    isolation_checks, native_application_flow_choices,
-    network_checks,
+from planning.domain.effective_security import (
+    qualify as qualify_effective_security,
 )
 from planning.domain.effective_security import (
-    qualify as qualify_effective_security, semantic_security_digest,
+    semantic_security_digest,
 )
+from planning.domain.model import Actor, Rejected, canonical, digest, identifier, integer, shape
+from planning.domain.network_evidence import (
+    isolation_checks,
+    native_application_flow_choices,
+    network_checks,
+)
+from planning.domain.operational_evidence import snapshot
+from planning.domain.qualification import verified
 from planning.domain.security_boundary import compare as compare_policy_boundary
-from planning.domain.operational_evidence import inventory_digest, snapshot
-from planning.domain.qualification import binding_digest, verified
 
-SCOPE_SQL = (
-    "tenant=%s AND application=%s AND environment=%s AND site=%s AND assessment_id=%s"
-)
+SCOPE_SQL = "tenant=%s AND application=%s AND environment=%s AND site=%s AND assessment_id=%s"
 
 
 class MigrationFlows:
     def __init__(
-        self, planning: Planning,
-        execution_proof: Callable[[Actor, str, dict[str, Any], int, dict[str, Any]], dict[str, Any]] | None = None,
+        self,
+        planning: Planning,
+        execution_proof: Callable[[Actor, str, dict[str, Any], int, dict[str, Any]], dict[str, Any]]
+        | None = None,
     ) -> None:
         self.planning = planning
         self.execution_proof = execution_proof
 
     @staticmethod
     def scope(actor: Actor, site: str) -> tuple[str, str, str, str]:
-        return (identifier(actor.tenant), identifier(actor.application),
-                identifier(actor.environment), identifier(site))
+        return (
+            identifier(actor.tenant),
+            identifier(actor.application),
+            identifier(actor.environment),
+            identifier(site),
+        )
 
     def current(self, actor: Actor, site: str, delegation: str) -> dict[str, Any]:
         """Re-read independently authorized current Catalogue, Inventory and Assurance.
@@ -60,32 +69,52 @@ class MigrationFlows:
         if len(rows) != 1:
             raise Rejected("application_migration_assessment_required", 423)
         retained = rows[0]["payload"]
-        matches = [i for i, item in enumerate(retained["candidates"])
-                   if item.get("site_id") == site]
+        matches = [
+            i for i, item in enumerate(retained["candidates"]) if item.get("site_id") == site
+        ]
         if len(matches) != 1 or len(retained.get("inputs", [])) != len(retained["candidates"]):
             raise Rejected("application_flow_scope_ambiguous", 423)
         index = matches[0]
         candidate = retained["candidates"][index]
         original = retained["inputs"][index]
         current_intent, current_inputs = self.planning.sources.resolve(
-            actor, retained["intent"]["id"], [candidate], {site: delegation},
-            retained["action"], retained["method"],
+            actor,
+            retained["intent"]["id"],
+            [candidate],
+            {site: delegation},
+            retained["action"],
+            retained["method"],
         )
-        if (digest(current_intent) != digest(retained["intent"])
-                or not isinstance(current_inputs, list) or len(current_inputs) != 1):
+        if (
+            digest(current_intent) != digest(retained["intent"])
+            or not isinstance(current_inputs, list)
+            or len(current_inputs) != 1
+        ):
             raise Rejected("application_flow_source_intent_changed", 423)
         facts = current_inputs[0]
         # Fresh observation generations are expected. Preserve reviewed native
         # selections across telemetry refreshes, but never accept changes to
         # the commissioned platform, native scope or profile/policy definition.
-        if (digest(facts["policy"]) != digest(original["policy"])
-                or digest(facts["profile"]) != digest(original["profile"])
-                or any(facts["destination"].get(k) != original["destination"].get(k)
-                       for k in ("tenant_id", "site_id", "endpoint_id", "native_scope",
-                                 "platform", "installed_tuple"))):
+        if (
+            digest(facts["policy"]) != digest(original["policy"])
+            or digest(facts["profile"]) != digest(original["profile"])
+            or any(
+                facts["destination"].get(k) != original["destination"].get(k)
+                for k in (
+                    "tenant_id",
+                    "site_id",
+                    "endpoint_id",
+                    "native_scope",
+                    "platform",
+                    "installed_tuple",
+                )
+            )
+        ):
             raise Rejected("application_flow_destination_identity_changed", 423)
         dest, qualification, policy = (
-            facts["destination"], facts["qualification"], facts["policy"]
+            facts["destination"],
+            facts["qualification"],
+            facts["policy"],
         )
         now = self.planning.clock()
         if (
@@ -111,9 +140,7 @@ class MigrationFlows:
             raise Rejected("application_flow_current_native_evidence_required", 423)
         intent = current_intent["intent"]
         cases = observed.get("effective_security_cases")
-        accepted = qualification.get("capabilities", {}).get(
-            "migration.effective_security", {}
-        )
+        accepted = qualification.get("capabilities", {}).get("migration.effective_security", {})
         qualified = (
             qualification.get("evidence_level") == "E4"
             and isinstance(accepted, dict)
@@ -122,62 +149,88 @@ class MigrationFlows:
             and len(cases) <= 512
             and digest(cases) in accepted.get("values", [])
         )
-        if qualified:
+        if qualified and isinstance(cases, list):
             choices = self.qualified_native_choices(
-                intent, dest["platform"], cases, now, policy, dest["native_scope"],
+                intent,
+                dest["platform"],
+                cases,
+                now,
+                policy,
+                dest["native_scope"],
             )
         elif dest["platform"] == "openstack":
             # E2 choices are visible for review only. No E4 admission can
             # consume them without a separately qualified native case set.
             choices = native_application_flow_choices(
-                intent, observed["network"], policy,
+                intent,
+                observed["network"],
+                policy,
             )
         else:
             raise Rejected("native_security_rule_equivalence_unqualified", 423)
-        context_sha = digest({
-            "assessment": retained["id"],
-            "intent": current_intent["digest"],
-            "destination": {
-                k: dest[k] for k in
-                ("tenant_id", "site_id", "endpoint_id", "native_scope",
-                 "platform", "installed_tuple")
-            },
-            "profile": facts["profile"]["digest"],
-            "policy": digest(policy),
-        })
+        context_sha = digest(
+            {
+                "assessment": retained["id"],
+                "intent": current_intent["digest"],
+                "destination": {
+                    k: dest[k]
+                    for k in (
+                        "tenant_id",
+                        "site_id",
+                        "endpoint_id",
+                        "native_scope",
+                        "platform",
+                        "installed_tuple",
+                    )
+                },
+                "profile": facts["profile"]["digest"],
+                "policy": digest(policy),
+            }
+        )
         expires = min(
             dest["capability_snapshot"]["expires_at"],
             qualification["verification"]["expires_at"],
-            policy["expires_at"], now + 60,
+            policy["expires_at"],
+            now + 60,
         )
         return {
-            "intent": intent, "destination": dest, "policy": policy,
+            "intent": intent,
+            "destination": dest,
+            "policy": policy,
             "assessment_id": retained["id"],
             "source_revision_id": current_intent["id"],
             "source_intent_sha256": current_intent["digest"],
             "destination_generation_id": candidate["generation_id"],
-            "data": observed, "choices": choices,
+            "data": observed,
+            "choices": choices,
             "effective_cases_qualified": bool(qualified),
-            "context_sha256": context_sha, "expires_at": expires,
+            "context_sha256": context_sha,
+            "expires_at": expires,
         }
 
     @staticmethod
     def qualified_native_choices(
-        intent: dict[str, Any], platform: str,
-        cases: list[dict[str, Any]], now: int, policy: dict[str, Any],
+        intent: dict[str, Any],
+        platform: str,
+        cases: list[dict[str, Any]],
+        now: int,
+        policy: dict[str, Any],
         destination_scope: str,
     ) -> list[dict[str, Any]]:
         """Only independently E4-qualified existing NSX/Prism controls enter a dropdown."""
         case_map: dict[str, dict[str, Any]] = {}
-        for case in cases:
-            if (not isinstance(case, dict)
-                    or set(case) != {"source_flow_id", "flow", "source_document", "document", "boundary"}
-                    or not isinstance(case["document"], dict)):
-                raise Rejected("native_security_case_incomplete", 423)
-            flow_id = case["source_flow_id"]
+        for qualified_case in cases:
+            if (
+                not isinstance(qualified_case, dict)
+                or set(qualified_case)
+                != {"source_flow_id", "flow", "source_document", "document", "boundary"}
+                or not isinstance(qualified_case["document"], dict)
+            ):
+                raise Rejected("native_security_qualified_case_incomplete", 423)
+            flow_id = qualified_case["source_flow_id"]
             if not isinstance(flow_id, str) or flow_id in case_map:
-                raise Rejected("native_security_case_ambiguous", 423)
-            case_map[flow_id] = case
+                raise Rejected("native_security_qualified_case_ambiguous", 423)
+            case_map[flow_id] = qualified_case
         choices = []
         used = set()
         required_ids = {
@@ -196,38 +249,50 @@ class MigrationFlows:
                 continue
             source = {k: dependency[k] for k in ("from", "to", "protocol", "port")}
             flow_id = digest(source)
-            case = case_map.get(flow_id)
+            case: dict[str, Any] | None = case_map.get(flow_id)
             if case is None and dependency["strength"] != "required":
                 # Optional intent can be omitted, but only through the
                 # independent reason-coded receiving-owner waiver workflow.
-                choices.append({
-                    "source_flow_id": flow_id, "source": source,
-                    "required": False, "destination_firewall_rule_ids": [],
-                    "destination_route_ids": [], "status": "held_optional",
-                    "native_write_authorized": False,
-                })
+                choices.append(
+                    {
+                        "source_flow_id": flow_id,
+                        "source": source,
+                        "required": False,
+                        "destination_firewall_rule_ids": [],
+                        "destination_route_ids": [],
+                        "status": "held_optional",
+                        "native_write_authorized": False,
+                    }
+                )
                 continue
-            if (case is None or case["flow"] != source
-                    or case["document"].get("platform") != platform
-                    or case["document"].get("native_scope") != destination_scope
-                    or not isinstance(case["source_document"], dict)
-                    or case["source_document"].get("platform")
-                       not in {"vmware", "ahv", "openstack"}):
+            if (
+                case is None
+                or case["flow"] != source
+                or case["document"].get("platform") != platform
+                or case["document"].get("native_scope") != destination_scope
+                or not isinstance(case["source_document"], dict)
+                or case["source_document"].get("platform") not in {"vmware", "ahv", "openstack"}
+            ):
                 raise Rejected("native_security_application_coverage_incomplete", 423)
             boundary_classes = {
-                row["id"]: row["requirement"]
-                for row in case["boundary"].get("classes", [])
+                row["id"]: row["requirement"] for row in case["boundary"].get("classes", [])
             }
-            if (any(boundary_classes.get(x) != "required" for x in required_ids)
-                    or any(boundary_classes.get(x) != "forbidden" for x in forbidden_ids)):
+            if any(boundary_classes.get(x) != "required" for x in required_ids) or any(
+                boundary_classes.get(x) != "forbidden" for x in forbidden_ids
+            ):
                 raise Rejected("native_security_policy_universe_incomplete", 423)
             boundary = compare_policy_boundary(
-                case["source_document"], case["document"], case["boundary"], now,
+                case["source_document"],
+                case["document"],
+                case["boundary"],
+                now,
             )
             if boundary["status"] != "qualified":
                 raise Rejected("native_security_" + boundary["reason"], 423)
             source_verdict = qualify_effective_security(
-                case["source_document"], source, now,
+                case["source_document"],
+                source,
+                now,
             )
             if source_verdict["status"] != "qualified":
                 raise Rejected("native_source_security_" + source_verdict["reason"], 423)
@@ -235,25 +300,31 @@ class MigrationFlows:
             if verdict["status"] != "qualified":
                 raise Rejected("native_security_" + verdict["reason"], 423)
             used.add(flow_id)
-            choices.append({
-                "source_flow_id": flow_id,
-                "source": source,
-                "required": dependency["strength"] == "required",
-                "destination_firewall_rule_ids": [verdict["effective_rule_native_ref"]],
-                "destination_route_ids": ["path:" + verdict["path_sha256"]],
-                "destination_path_details": [{
-                    "selector": "path:" + verdict["path_sha256"],
-                    "route_native_refs": verdict["native_route_refs"],
-                    "nat_native_refs": sorted({
-                        hop["nat"]["native_ref"]
-                        for path in case["document"]["paths"]
-                        for hop in path["hops"]
-                        if isinstance(hop.get("nat"), dict)
-                    }),
-                }],
-                "status": "choices_observed",
-                "native_write_authorized": False,
-            })
+            choices.append(
+                {
+                    "source_flow_id": flow_id,
+                    "source": source,
+                    "required": dependency["strength"] == "required",
+                    "destination_firewall_rule_ids": [verdict["effective_rule_native_ref"]],
+                    "destination_route_ids": ["path:" + verdict["path_sha256"]],
+                    "destination_path_details": [
+                        {
+                            "selector": "path:" + verdict["path_sha256"],
+                            "route_native_refs": verdict["native_route_refs"],
+                            "nat_native_refs": sorted(
+                                {
+                                    hop["nat"]["native_ref"]
+                                    for path in case["document"]["paths"]
+                                    for hop in path["hops"]
+                                    if isinstance(hop.get("nat"), dict)
+                                }
+                            ),
+                        }
+                    ],
+                    "status": "choices_observed",
+                    "native_write_authorized": False,
+                }
+            )
         if set(case_map) != used:
             raise Rejected("native_security_unrelated_case", 423)
         return choices
@@ -279,35 +350,39 @@ class MigrationFlows:
         controls = []
         if current.get("effective_cases_qualified") is True:
             cases = {
-                item["source_flow_id"]: item
-                for item in current["data"]["effective_security_cases"]
+                item["source_flow_id"]: item for item in current["data"]["effective_security_cases"]
             }
             for selection in selections:
                 flow_id = selection["source_flow_id"]
                 if flow_id not in choices or flow_id not in cases:
                     raise Rejected("unapproved_application_flow")
                 option = choices[flow_id]
-                if (selection["rule_native_ref"] not in option["destination_firewall_rule_ids"]
-                        or selection["route_native_ref"] not in option["destination_route_ids"]):
+                if (
+                    selection["rule_native_ref"] not in option["destination_firewall_rule_ids"]
+                    or selection["route_native_ref"] not in option["destination_route_ids"]
+                ):
                     raise Rejected("application_flow_native_control_changed", 423)
                 evidence_case = cases[flow_id]
                 document = evidence_case["document"]
-                controls.append({
-                    "flow_id": flow_id,
-                    "source_security_sha256": semantic_security_digest(
-                        evidence_case["source_document"]),
-                    "destination_security_sha256": semantic_security_digest(document),
-                    "boundary_sha256": digest(evidence_case["boundary"]),
-                    "groups": document["groups"],
-                    "services": document["services"],
-                    "rules": document["rules"],
-                    "paths": document["paths"],
-                    "path_set_sha256": document["path_set_sha256"],
-                    "workloads": document["workloads"],
-                    "boundary_scope": document["boundary_scope"],
-                    "default_action": document["default_action"],
-                    "topology_sha256": document["topology_sha256"],
-                })
+                controls.append(
+                    {
+                        "flow_id": flow_id,
+                        "source_security_sha256": semantic_security_digest(
+                            evidence_case["source_document"]
+                        ),
+                        "destination_security_sha256": semantic_security_digest(document),
+                        "boundary_sha256": digest(evidence_case["boundary"]),
+                        "groups": document["groups"],
+                        "services": document["services"],
+                        "rules": document["rules"],
+                        "paths": document["paths"],
+                        "path_set_sha256": document["path_set_sha256"],
+                        "workloads": document["workloads"],
+                        "boundary_scope": document["boundary_scope"],
+                        "default_action": document["default_action"],
+                        "topology_sha256": document["topology_sha256"],
+                    }
+                )
             return digest(sorted(controls, key=lambda row: row["flow_id"]))
         for selection in selections:
             source_id = selection.get("source_flow_id")
@@ -315,27 +390,38 @@ class MigrationFlows:
             if option is None:
                 raise Rejected("unapproved_application_flow")
             flows = option["source"]
-            rule = [r for r in net.get("firewall_rules", []) if isinstance(r, dict)
-                    and r.get("native_ref") == selection.get("rule_native_ref")
-                    and all(r.get(k) == flows[k] for k in
-                            ("from", "to", "protocol", "port"))]
-            route = [r for r in net.get("topology", {}).get("routes", [])
-                     if isinstance(r, dict)
-                     and r.get("native_ref") == selection.get("route_native_ref")
-                     and r.get("from") == flows["from"] and r.get("to") == flows["to"]]
+            rule = [
+                r
+                for r in net.get("firewall_rules", [])
+                if isinstance(r, dict)
+                and r.get("native_ref") == selection.get("rule_native_ref")
+                and all(r.get(k) == flows[k] for k in ("from", "to", "protocol", "port"))
+            ]
+            route = [
+                r
+                for r in net.get("topology", {}).get("routes", [])
+                if isinstance(r, dict)
+                and r.get("native_ref") == selection.get("route_native_ref")
+                and r.get("from") == flows["from"]
+                and r.get("to") == flows["to"]
+            ]
             if len(rule) != 1 or len(route) != 1:
                 raise Rejected("application_flow_native_control_changed", 423)
             transient = {"observed_at", "expires_at", "last_seen_at", "sequence"}
-            controls.append({
-                "flow_id": source_id,
-                "firewall": {k: v for k, v in rule[0].items() if k not in transient},
-                "route": {k: v for k, v in route[0].items() if k not in transient},
-            })
+            controls.append(
+                {
+                    "flow_id": source_id,
+                    "firewall": {k: v for k, v in rule[0].items() if k not in transient},
+                    "route": {k: v for k, v in route[0].items() if k not in transient},
+                }
+            )
         return digest(sorted(controls, key=lambda row: row["flow_id"]))
 
     @staticmethod
     def evaluate(
-        current: dict[str, Any], selections: Any, now: int,
+        current: dict[str, Any],
+        selections: Any,
+        now: int,
         omissions: Any = None,
     ) -> list[str]:
         choices, data = current["choices"], deepcopy(current["data"])
@@ -357,26 +443,36 @@ class MigrationFlows:
         if current["expires_at"] <= now:
             return ["independent_native_flow_observer_required"]
         if not vendor and (
-            not isinstance(observer, str) or not observer
-            or not isinstance(writer, str) or not writer or observer == writer
+            not isinstance(observer, str)
+            or not observer
+            or not isinstance(writer, str)
+            or not writer
+            or observer == writer
         ):
             return ["independent_native_flow_observer_required"]
-        cases = {
-            item["source_flow_id"]: item["document"]
-            for item in data.get("effective_security_cases", [])
-        } if vendor else {}
+        cases = (
+            {
+                item["source_flow_id"]: item["document"]
+                for item in data.get("effective_security_cases", [])
+            }
+            if vendor
+            else {}
+        )
         for selection in selections:
             if not isinstance(selection, dict) or set(selection) != {
-                "source_flow_id", "rule_native_ref", "route_native_ref"
+                "source_flow_id",
+                "rule_native_ref",
+                "route_native_ref",
             }:
                 raise Rejected("invalid_application_flow_selection")
             flow_id = selection["source_flow_id"]
-            if (not isinstance(flow_id, str) or flow_id not in allowed
-                    or flow_id in seen):
+            if not isinstance(flow_id, str) or flow_id not in allowed or flow_id in seen:
                 raise Rejected("unapproved_application_flow")
             option = allowed[flow_id]
-            if (selection["rule_native_ref"] not in option["destination_firewall_rule_ids"]
-                    or selection["route_native_ref"] not in option["destination_route_ids"]):
+            if (
+                selection["rule_native_ref"] not in option["destination_firewall_rule_ids"]
+                or selection["route_native_ref"] not in option["destination_route_ids"]
+            ):
                 raise Rejected("unobserved_application_flow_destination")
             seen.add(flow_id)
             bound[flow_id] = {
@@ -390,16 +486,21 @@ class MigrationFlows:
                 "policy_sha256": digest(current["policy"]),
                 "topology_sha256": network["topology_sha256"],
             }
-        missing = [row["source_flow_id"] for row in choices if row["required"]
-                   and row["source_flow_id"] not in seen]
+        missing = [
+            row["source_flow_id"]
+            for row in choices
+            if row["required"] and row["source_flow_id"] not in seen
+        ]
         if missing:
             return ["application_flow_required_selection_missing"]
         # Optional omissions are typed owner requests, never self-approval.
         # A separate, current E4 Assurance decision must approve exactly
         # these omitted source dependency IDs before native admission.
         reason_codes = {
-            "retired_dependency", "not_required_at_destination",
-            "replaced_by_native_service", "accepted_service_limitation",
+            "retired_dependency",
+            "not_required_at_destination",
+            "replaced_by_native_service",
+            "accepted_service_limitation",
         }
         requested: set[str] = set()
         for omission in omissions:
@@ -416,7 +517,8 @@ class MigrationFlows:
                 raise Rejected("invalid_application_flow_omission")
             requested.add(omission["source_flow_id"])
         missing_optional = {
-            row["source_flow_id"] for row in choices
+            row["source_flow_id"]
+            for row in choices
             if not row["required"] and row["source_flow_id"] not in seen
         }
         if not missing_optional <= requested:
@@ -437,21 +539,25 @@ class MigrationFlows:
                     if not isinstance(certificate, dict):
                         return ["native_security_case_missing"]
                     verdict = qualify_effective_security(certificate, source, now)
-                    if (verdict["status"] != "qualified"
-                            or verdict["effective_rule_native_ref"] != selection["rule_native_ref"]
-                            or "path:" + verdict["path_sha256"] != selection["route_native_ref"]):
+                    if (
+                        verdict["status"] != "qualified"
+                        or verdict["effective_rule_native_ref"] != selection["rule_native_ref"]
+                        or "path:" + verdict["path_sha256"] != selection["route_native_ref"]
+                    ):
                         return ["native_security_effective_policy_changed"]
             else:
                 checks = network_checks(current["intent"], check_data, current["policy"], now)
             checks += isolation_checks(
-                current["intent"], current["destination"], check_data,
-                current["policy"], now,
+                current["intent"],
+                current["destination"],
+                check_data,
+                current["policy"],
+                now,
             )
         except (KeyError, ValueError, TypeError, IndexError):
             return ["application_flow_independent_evidence_incomplete"]
         holds = {
-            reason for _, status, reason, mandatory in checks
-            if mandatory and status != "eligible"
+            reason for _, status, reason, mandatory in checks if mandatory and status != "eligible"
         }
         if omission_hold:
             holds.add("application_flow_optional_omission_approval_required")
@@ -470,7 +576,9 @@ class MigrationFlows:
             changed = True
         if saved and not changed:
             try:
-                if saved["payload"].get("native_controls_sha256") != self.native_control_digest(current, selections):
+                if saved["payload"].get("native_controls_sha256") != self.native_control_digest(
+                    current, selections
+                ):
                     changed = True
                     holds = ["application_flow_native_control_changed", *holds]
             except (Rejected, KeyError, TypeError, ValueError):
@@ -490,8 +598,7 @@ class MigrationFlows:
             "selections": selections,
             "omissions": omissions,
             "holds": list(dict.fromkeys(holds)),
-            "status": ("invalidated" if changed else
-                       "held" if holds else "eligible"),
+            "status": ("invalidated" if changed else "held" if holds else "eligible"),
             "native_write_authorized": False,
         }
 
@@ -507,23 +614,29 @@ class MigrationFlows:
         if body["context_sha256"] != current["context_sha256"]:
             raise Rejected("application_flow_evidence_changed", 412)
         holds = self.evaluate(
-            current, body["selections"], self.planning.clock(), body["omissions"],
+            current,
+            body["selections"],
+            self.planning.clock(),
+            body["omissions"],
         )
         canonical(body)
         if len(canonical(body).encode()) > 32768:
             raise Rejected("application_flow_payload_bound", 413)
-        fingerprint = digest({
-            "operation": "migration_flow_save", "scope": self.scope(actor, site),
-            "assessment_id": current["assessment_id"], "body": body,
-        })
+        fingerprint = digest(
+            {
+                "operation": "migration_flow_save",
+                "scope": self.scope(actor, site),
+                "assessment_id": current["assessment_id"],
+                "body": body,
+            }
+        )
         with self.planning.database.transaction() as tx:
             tx.execute("SELECT pg_advisory_xact_lock(7504001)")
             prior = self.planning.retry(tx, actor, key, fingerprint)
             if prior:
                 return prior
             old = tx.one(
-                "SELECT revision FROM app.planning_application_flow_reviews "
-                "WHERE " + SCOPE_SQL,
+                "SELECT revision FROM app.planning_application_flow_reviews WHERE " + SCOPE_SQL,
                 (*self.scope(actor, site), current["assessment_id"]),
             )
             if (old["revision"] if old else 0) != revision:
@@ -544,25 +657,43 @@ class MigrationFlows:
                 "reviewed_by_actor=excluded.reviewed_by_actor,"
                 "context_sha256=excluded.context_sha256,"
                 "payload=excluded.payload,updated_at=excluded.updated_at",
-                (*self.scope(actor, site), current["assessment_id"], actor.actor,
-                 revision + 1, current["context_sha256"],
-                 canonical({"selections": body["selections"],
-                            "omissions": body["omissions"], "holds": holds,
+                (
+                    *self.scope(actor, site),
+                    current["assessment_id"],
+                    actor.actor,
+                    revision + 1,
+                    current["context_sha256"],
+                    canonical(
+                        {
+                            "selections": body["selections"],
+                            "omissions": body["omissions"],
+                            "holds": holds,
                             "assessment_id": current["assessment_id"],
                             "native_controls_sha256": self.native_control_digest(
-                                current, body["selections"]),
+                                current, body["selections"]
+                            ),
                             "source_revision_id": current["source_revision_id"],
                             "source_intent_sha256": current["source_intent_sha256"],
                             "destination_generation_id": current["destination_generation_id"],
                             "destination_platform": current["destination"]["platform"],
-                            "expires_at": current["expires_at"]}), self.planning.clock()),
+                            "expires_at": current["expires_at"],
+                        }
+                    ),
+                    self.planning.clock(),
+                ),
             )
             tx.execute(
                 "INSERT INTO app.planning_commands "
                 "(tenant,actor,command_key,fingerprint,response,created_at) "
                 "VALUES(%s,%s,%s,%s,%s::jsonb,%s)",
-                (actor.tenant, actor.actor, key, fingerprint,
-                 canonical(outcome), self.planning.clock()),
+                (
+                    actor.tenant,
+                    actor.actor,
+                    key,
+                    fingerprint,
+                    canonical(outcome),
+                    self.planning.clock(),
+                ),
             )
         return outcome
 
@@ -602,13 +733,9 @@ class MigrationFlows:
                 "kind='assessment' AND payload->>'action'='application.migrate' "
                 "AND payload->'candidates' @> %s::jsonb "
                 "ORDER BY created_at DESC,id DESC LIMIT 1",
-                (*self.scope(actor, site)[:3],
-                 canonical([{"site_id": site}])),
+                (*self.scope(actor, site)[:3], canonical([{"site_id": site}])),
             )
-        if (
-            latest is None
-            or str(latest["id"]) != saved["payload"].get("assessment_id")
-        ):
+        if latest is None or str(latest["id"]) != saved["payload"].get("assessment_id"):
             raise Rejected("application_flow_assessment_superseded", 423)
         if self.execution_proof is None:
             raise Rejected("independent_application_flow_e4_required", 423)

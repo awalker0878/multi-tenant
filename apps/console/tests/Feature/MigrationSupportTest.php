@@ -17,7 +17,6 @@ it('reads scoped support without forwarding browser qualification claims', funct
     $this->withSession(['identity.token' => str_repeat('a', 64)])->getJson('/tenants/'.$id.'/applications/'.$id.'/environments/'.$id.'/planning/migration-support/'.$id.'/status?native_qualified=true')->assertOk()->assertJsonPath('support.native_write_authorized', false)->assertHeader('Cache-Control', 'no-store, private');
 });
 
-
 it('shows only current application-scoped native flow choices from Planning', function (): void {
     $id = '00000000-0000-4000-8000-000000000001';
     $identity = Mockery::mock(IdentityGateway::class);

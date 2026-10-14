@@ -7,7 +7,6 @@ independent Inventory, Governance and custody rechecks at every effect.
 
 from typing import Any
 
-
 from lifecycle.domain.admission import digest
 from lifecycle.domain.capability_definitions import METHOD_ALIASES
 from lifecycle.domain.execution import Rejected
@@ -43,21 +42,26 @@ def eligible_field_dispositions(workloads: Any) -> bool:
             seen.add(name)
             if field.get("required") is True and (
                 field.get("disposition") != "matched"
-                or field.get("evidence_source") not in {
-                    "inventory_native_profile", "independent_e4",
+                or field.get("evidence_source")
+                not in {
+                    "inventory_native_profile",
+                    "independent_e4",
                 }
                 or type(field.get("evidence_age_seconds")) is not int
                 or field["evidence_age_seconds"] < 0
-                or (field["evidence_source"] == "independent_e4"
-                    and field["evidence_age_seconds"] >= 30)
+                or (
+                    field["evidence_source"] == "independent_e4"
+                    and field["evidence_age_seconds"] >= 30
+                )
             ):
                 return False
     return True
 
 
-
 def verify_catalogue_membership(
-    readiness: dict[str, Any], published: Any, expected_environment: str,
+    readiness: dict[str, Any],
+    published: Any,
+    expected_environment: str,
 ) -> None:
     """Independently confirm the entire, *current* Catalogue workload set.
 
@@ -72,29 +76,36 @@ def verify_catalogue_membership(
     if not isinstance(intent, dict):
         raise Rejected("migration_catalogue_reference_unavailable", 423)
     environment = intent.get("environment")
-    if (not isinstance(environment, dict)
-            or environment.get("id") != expected_environment
-            or published.get("revision_id") != recon.get("catalogue_revision_id")
-            or published.get("intent_sha256") != recon.get("catalogue_sha256")):
+    if (
+        not isinstance(environment, dict)
+        or environment.get("id") != expected_environment
+        or published.get("revision_id") != recon.get("catalogue_revision_id")
+        or published.get("intent_sha256") != recon.get("catalogue_sha256")
+    ):
         raise Rejected("migration_catalogue_revision_changed", 423)
     desired = intent.get("workloads")
     actual = recon.get("workloads")
-    if (not isinstance(desired, list) or not 1 <= len(desired) <= 100
-            or not isinstance(actual, list)
-            or not all(isinstance(w, dict) for w in desired + actual)):
+    if (
+        not isinstance(desired, list)
+        or not 1 <= len(desired) <= 100
+        or not isinstance(actual, list)
+        or not all(isinstance(w, dict) for w in desired + actual)
+    ):
         raise Rejected("migration_catalogue_workload_set_incomplete", 423)
     expected_ids = [w.get("id") for w in desired]
     actual_ids = [w.get("workload_id") for w in actual]
-    if (any(not isinstance(w, str) or not w for w in expected_ids + actual_ids)
-            or len(set(expected_ids)) != len(expected_ids)
-            or len(set(actual_ids)) != len(actual_ids)
-            or set(actual_ids) != set(expected_ids)):
+    if (
+        any(not isinstance(w, str) or not w for w in expected_ids + actual_ids)
+        or len(set(expected_ids)) != len(expected_ids)
+        or len(set(actual_ids)) != len(actual_ids)
+        or set(actual_ids) != set(expected_ids)
+    ):
         raise Rejected("migration_catalogue_workload_set_incomplete", 423)
     for desired_workload in desired:
-        matched = next(row for row in actual
-                       if row["workload_id"] == desired_workload["id"])
+        matched = next(row for row in actual if row["workload_id"] == desired_workload["id"])
         fields = {
-            row.get("field"): row for row in matched.get("field_dispositions", [])
+            row.get("field"): row
+            for row in matched.get("field_dispositions", [])
             if isinstance(row, dict)
         }
         # Independently derive the disposition universe from the current
@@ -109,8 +120,7 @@ def verify_catalogue_membership(
         if "failure_domain" in desired_workload:
             placement = desired_workload["failure_domain"]
             expected_fields["failure_domain"] = (
-                not isinstance(placement, dict)
-                or placement.get("strength") == "required"
+                not isinstance(placement, dict) or placement.get("strength") == "required"
             )
         for disk in desired_workload.get("disks", []):
             if not isinstance(disk, dict) or not isinstance(disk.get("id"), str):
@@ -123,19 +133,35 @@ def verify_catalogue_membership(
                 expected_fields["requirements." + str(requirement.get("key"))] = (
                     requirement.get("strength") == "required"
                 )
-        if any(name not in fields or fields[name].get("required") is not required
-               for name, required in expected_fields.items()):
+        if any(
+            name not in fields or fields[name].get("required") is not required
+            for name, required in expected_fields.items()
+        ):
             raise Rejected("migration_catalogue_field_set_incomplete", 423)
 
 
-
 REQUIRED = {
-    "schema_version", "kind", "scope", "route_sha256", "tranche_sha256",
-    "release_sha256", "source", "target", "method", "api_compatibility",
-    "native_e3_qualified", "receiving_e4_accepted", "status", "holds",
-    "expires_at", "evaluated_at", "workload_admission_authorized",
-    "native_write_authorized", "readiness_sha256",
-    "workload_reconciliation", "collection_coverages",
+    "schema_version",
+    "kind",
+    "scope",
+    "route_sha256",
+    "tranche_sha256",
+    "release_sha256",
+    "source",
+    "target",
+    "method",
+    "api_compatibility",
+    "native_e3_qualified",
+    "receiving_e4_accepted",
+    "status",
+    "holds",
+    "expires_at",
+    "evaluated_at",
+    "workload_admission_authorized",
+    "native_write_authorized",
+    "readiness_sha256",
+    "workload_reconciliation",
+    "collection_coverages",
 }
 
 
@@ -191,39 +217,43 @@ def verify(value: Any, content: dict[str, Any], tenant: str, now: int) -> None:
     if value["source"]["installation_id"] == value["target"]["installation_id"]:
         raise Rejected("migration_readiness_installation_changed", 423)
     cases = api.get("cases")
-    if not isinstance(cases, list) or not cases or any(
-        not isinstance(case, dict)
-        or (case.get("status") != "eligible" and case.get("omission_accepted") is not True)
-        for case in cases
+    if (
+        not isinstance(cases, list)
+        or not cases
+        or any(
+            not isinstance(case, dict)
+            or (case.get("status") != "eligible" and case.get("omission_accepted") is not True)
+            for case in cases
+        )
     ):
         raise Rejected("migration_readiness_api_held", 423)
-
 
     # Route eligibility cannot substitute for the one-to-one, full-application
     # workload reconciliation or all independently scoped collection fields.
     reconciliation = value["workload_reconciliation"]
-    if (not isinstance(reconciliation, dict)
-            or reconciliation.get("status") != "matched"
-            or reconciliation.get("holds") != []
-            or reconciliation.get("native_write_authorized") is not False
-            or reconciliation.get("source_profile_sha256")
-                != native["source"]["profile_sha256"]
-            or reconciliation.get("native_review_sha256")
-                != native.get("review", {}).get("digest")
-            or type(reconciliation.get("expires_at")) is not int
-            or reconciliation["expires_at"] <= now
-            or reconciliation.get("reconciliation_sha256") != digest({
-                k: v for k, v in reconciliation.items()
-                if k != "reconciliation_sha256"
-            })):
+    if (
+        not isinstance(reconciliation, dict)
+        or reconciliation.get("status") != "matched"
+        or reconciliation.get("holds") != []
+        or reconciliation.get("native_write_authorized") is not False
+        or reconciliation.get("source_profile_sha256") != native["source"]["profile_sha256"]
+        or reconciliation.get("native_review_sha256") != native.get("review", {}).get("digest")
+        or type(reconciliation.get("expires_at")) is not int
+        or reconciliation["expires_at"] <= now
+        or reconciliation.get("reconciliation_sha256")
+        != digest({k: v for k, v in reconciliation.items() if k != "reconciliation_sha256"})
+    ):
         raise Rejected("migration_workload_reconciliation_not_current", 423)
     workloads = reconciliation.get("workloads")
     if not eligible_field_dispositions(workloads):
         raise Rejected("migration_nested_workload_reconciliation_held", 423)
     coverage = value["collection_coverages"]
-    if (not isinstance(coverage, list) or len(coverage) != 3
-            or {c.get("scope") for c in coverage if isinstance(c, dict)}
-                != {"source", "target", "owner"}):
+    if (
+        not isinstance(coverage, list)
+        or len(coverage) != 3
+        or {c.get("scope") for c in coverage if isinstance(c, dict)}
+        != {"source", "target", "owner"}
+    ):
         raise Rejected("migration_collection_coverage_required", 423)
     for item in coverage:
         if (
@@ -231,11 +261,12 @@ def verify(value: Any, content: dict[str, Any], tenant: str, now: int) -> None:
             or item.get("holds") != []
             or not isinstance(item.get("attributes"), list)
             or not item["attributes"]
-            or len({a.get("attribute_id") for a in item["attributes"]
-                    if isinstance(a, dict)}) != len(item["attributes"])
-            or any(not isinstance(a, dict)
-                   or a.get("status") not in {"observed", "not_applicable"}
-                   for a in item["attributes"])
+            or len({a.get("attribute_id") for a in item["attributes"] if isinstance(a, dict)})
+            != len(item["attributes"])
+            or any(
+                not isinstance(a, dict) or a.get("status") not in {"observed", "not_applicable"}
+                for a in item["attributes"]
+            )
             or type(item.get("expires_at")) is not int
             or item["expires_at"] <= now
             or item["expires_at"] < value["expires_at"]
@@ -243,9 +274,8 @@ def verify(value: Any, content: dict[str, Any], tenant: str, now: int) -> None:
             or item.get("independent_e3_e4_qualification") is not False
             or type(item.get("evaluated_at")) is not int
             or not 0 <= now - item["evaluated_at"] <= 5
-            or item.get("coverage_sha256") != digest({
-                k: v for k, v in item.items() if k != "coverage_sha256"
-            })
+            or item.get("coverage_sha256")
+            != digest({k: v for k, v in item.items() if k != "coverage_sha256"})
         ):
             raise Rejected("migration_collection_coverage_not_current", 423)
         side = item["scope"]
@@ -253,12 +283,10 @@ def verify(value: Any, content: dict[str, Any], tenant: str, now: int) -> None:
         if (
             item.get("platform") != value[expected_side]["platform"]
             or item.get("installation_id") != value[expected_side]["installation_id"]
-            or item.get("installed_tuple_sha256")
-                != native[expected_side].get("tuple_sha256")
+            or item.get("installed_tuple_sha256") != native[expected_side].get("tuple_sha256")
         ):
             raise Rejected("migration_collection_identity_changed", 423)
         if side in {"source", "owner"} and (
-            item.get("generation_id")
-            != reconciliation.get("source_generation_id")
+            item.get("generation_id") != reconciliation.get("source_generation_id")
         ):
             raise Rejected("migration_collection_generation_changed", 423)

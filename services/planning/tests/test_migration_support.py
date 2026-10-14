@@ -20,13 +20,15 @@ from planning.infrastructure.migration_support import selected_tranche
 from planning.interfaces.migration import MigrationPreparationApp
 
 
-
-
 def enroll_qualified_api(route: dict[str, Any]) -> None:
-    route["api_usage"] = [{
-        "capability_id": "vm.disk.transfer", "side": "both",
-        "criticality": "critical", "reason": "Transfer all source disk bytes.",
-    }]
+    route["api_usage"] = [
+        {
+            "capability_id": "vm.disk.transfer",
+            "side": "both",
+            "criticality": "critical",
+            "reason": "Transfer all source disk bytes.",
+        }
+    ]
 
 
 def api_owner(route: dict[str, Any]) -> dict[str, Any]:
@@ -38,22 +40,34 @@ def api_owner(route: dict[str, Any]) -> dict[str, Any]:
             "profile_sha256": platform["profile_sha256"],
             "apis": {"native.migration": ["1.0"]},
             "entitlements": {"vm.disk.transfer": "allowed"},
-            "source": "live_probe", "observed_at": 90, "expires_at": 180,
+            "source": "live_probe",
+            "observed_at": 90,
+            "expires_at": 180,
             "evidence_sha256": digest([side, "api-inventory"]),
         }
-        receipts.append({
-            "installation_id": platform["installation_id"],
-            "profile_sha256": platform["profile_sha256"],
-            "capability_id": "vm.disk.transfer",
-            "api_family": "native.migration", "api_version": "1.0",
-            "result": "supported", "source": "live_probe",
-            "observed_at": 90, "expires_at": 180,
-            "evidence_sha256": digest([side, "native-probe"]),
-            "qualification_level": "E3", "qualification_decision": "accepted",
-            "qualification_sha256": digest([side, "independent-assurance"]),
-        })
-    return {"route_sha256": digest(route), "environments": envs,
-            "observations": receipts, "omissions": []}
+        receipts.append(
+            {
+                "installation_id": platform["installation_id"],
+                "profile_sha256": platform["profile_sha256"],
+                "capability_id": "vm.disk.transfer",
+                "api_family": "native.migration",
+                "api_version": "1.0",
+                "result": "supported",
+                "source": "live_probe",
+                "observed_at": 90,
+                "expires_at": 180,
+                "evidence_sha256": digest([side, "native-probe"]),
+                "qualification_level": "E3",
+                "qualification_decision": "accepted",
+                "qualification_sha256": digest([side, "independent-assurance"]),
+            }
+        )
+    return {
+        "route_sha256": digest(route),
+        "environments": envs,
+        "observations": receipts,
+        "omissions": [],
+    }
 
 
 def test_current_direction_binding_and_revocation_are_rechecked() -> None:
@@ -76,7 +90,9 @@ def test_current_direction_binding_and_revocation_are_rechecked() -> None:
     actor = Actor(str(uuid4()), str(uuid4()), "plan.read", str(uuid4()), str(uuid4()))
     operating = {**proof, "level": "E4", "evidence_sha256": "b" * 64}
     support = MigrationSupport(
-        lambda *_: selected, lambda *_: [proof, operating], lambda: 100,
+        lambda *_: selected,
+        lambda *_: [proof, operating],
+        lambda: 100,
         lambda _actor, _site, row: api_owner(row),
     )
     # Route qualification fixtures intentionally omit real full-application E4
@@ -275,7 +291,9 @@ def test_execution_support_binds_entire_qualified_artifact_set(fault: str) -> No
     actor = Actor(str(uuid4()), str(uuid4()), "plan.read", str(uuid4()), str(uuid4()))
     operating = {**proof, "level": "E4", "evidence_sha256": "b" * 64}
     support = MigrationSupport(
-        lambda *_: selected, lambda *_: [proof, operating], lambda: 100,
+        lambda *_: selected,
+        lambda *_: [proof, operating],
+        lambda: 100,
         lambda _actor, _site, row: api_owner(row),
     )
     # Route qualification fixtures intentionally omit real full-application E4
@@ -321,7 +339,9 @@ def test_execution_support_binds_entire_qualified_artifact_set(fault: str) -> No
 
 
 def migration_http_exchange(
-    app: MigrationPreparationApp, path: str, body: bytes,
+    app: MigrationPreparationApp,
+    path: str,
+    body: bytes,
     headers: list[tuple[bytes, bytes]],
 ) -> tuple[int, dict[str, Any]]:
     """Exercise the exact absolute MigrationPreparationApp path, without a PlanningApp prefix."""
@@ -336,11 +356,20 @@ def migration_http_exchange(
     async def invoke() -> None:
         from uvicorn._types import ASGIReceiveCallable, ASGISendCallable, Scope
 
-        await app(cast(Scope, {
-            "type": "http", "method": "POST", "path": path,
-            "query_string": b"", "headers": headers,
-        }), cast(ASGIReceiveCallable, receive),
-            cast(ASGISendCallable, send))
+        await app(
+            cast(
+                Scope,
+                {
+                    "type": "http",
+                    "method": "POST",
+                    "path": path,
+                    "query_string": b"",
+                    "headers": headers,
+                },
+            ),
+            cast(ASGIReceiveCallable, receive),
+            cast(ASGISendCallable, send),
+        )
 
     asyncio.run(invoke())
     assert len(messages) == 2
@@ -355,15 +384,22 @@ def test_workload_readiness_http_is_read_only_and_denies_browser_evidence() -> N
     support.preview.return_value = {
         "schema_version": 1,
         "review": {"revision": 1, "digest": "a" * 64},
-        "readiness": {"schema_version": 2, "kind": "migration_workload_readiness",
-                      "status": "held", "holds": ["missing_e4"],
-                      "native_write_authorized": False,
-                      "workload_admission_authorized": False},
-        "native_write_authorized": False, "workload_admission_authorized": False,
+        "readiness": {
+            "schema_version": 2,
+            "kind": "migration_workload_readiness",
+            "status": "held",
+            "holds": ["missing_e4"],
+            "native_write_authorized": False,
+            "workload_admission_authorized": False,
+        },
+        "native_write_authorized": False,
+        "workload_admission_authorized": False,
     }
     app = MigrationPreparationApp(authority, Mock(), support=support)
-    path = (f"/v1/tenants/{session.tenant}/applications/{session.application}"
-            f"/environments/{session.environment}/migration-workload-readiness")
+    path = (
+        f"/v1/tenants/{session.tenant}/applications/{session.application}"
+        f"/environments/{session.environment}/migration-workload-readiness"
+    )
     headers = [
         (b"authorization", b"Bearer " + b"a" * 64),
         (b"content-type", b"application/json"),
@@ -373,10 +409,50 @@ def test_workload_readiness_http_is_read_only_and_denies_browser_evidence() -> N
     assert migration_http_exchange(app, path, json.dumps(locator).encode(), headers)[0] == 200
     assert authority.actor.call_args.args[3] == "plan.read"
     support.preview.assert_called_once()
-    for injected in ({"native_write_authorized": True},
-                     {"readiness": {"status": "eligible"}},
-                     {"source_profile_sha256": "c" * 64}):
+    for injected in (
+        {"native_write_authorized": True},
+        {"readiness": {"status": "eligible"}},
+        {"source_profile_sha256": "c" * 64},
+    ):
         support.reset_mock()
-        status = migration_http_exchange(app, path, json.dumps(locator | injected).encode(), headers)[0]
+        status = migration_http_exchange(
+            app, path, json.dumps(locator | injected).encode(), headers
+        )[0]
         assert status == 422
         support.preview.assert_not_called()
+
+
+def test_support_wire_excludes_internal_readiness_and_rejects_original_leak() -> None:
+    """The real producer agrees with the exact installed Console contract.
+
+    This is producer regression evidence; controlled owner inputs do not qualify
+    authenticated service integration or a deployment.
+    """
+    from jsonschema import Draft202012Validator, FormatChecker, ValidationError
+
+    api_path = Path(__file__).resolve().parents[3] / (
+        "apps/console/resources/contracts/planning-migration-v1.6.json"
+    )
+    api = json.loads(api_path.read_text())
+    validator = Draft202012Validator(
+        {"$ref": "#/components/schemas/MigrationSupport", "components": api["components"]},
+        format_checker=FormatChecker(),
+    )
+    selected = baseline()
+    session = Actor(str(uuid4()), str(uuid4()), "plan.read", str(uuid4()), str(uuid4()))
+    service = MigrationSupport(lambda *_: selected, lambda *_: [], lambda: 100)
+    result = service.read(session, SITE)
+    validator.validate(result)
+    record = result["directions"][0]["routes"][0]
+    assert "api_capabilities_unresolved" in record["blockers"]
+    assert record["native_qualified"] is False
+    assert record["operationally_accepted"] is False
+    for name, leaked in (
+        ("expires_at", 100),
+        ("api_compatibility", service.api_status(session, SITE, selected["routes"][0])),
+        ("readiness", {"status": "held"}),
+    ):
+        original = deepcopy(result)
+        original["directions"][0]["routes"][0][name] = leaked
+        with pytest.raises(ValidationError, match="Additional properties"):
+            validator.validate(original)

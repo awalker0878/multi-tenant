@@ -10,8 +10,7 @@ import pytest
 from planning.domain.model import digest
 
 VECTORS = (
-    Path(__file__).resolve().parents[3]
-    / "contracts/fixtures/qualification-scope-digests-v1.json"
+    Path(__file__).resolve().parents[3] / "contracts/fixtures/qualification-scope-digests-v1.json"
 )
 
 

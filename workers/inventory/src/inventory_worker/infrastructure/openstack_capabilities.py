@@ -51,7 +51,12 @@ def target_profile(project_id: str, records: dict[str, Any], observed_at: int) -
     types = records["volume_types"].get("volume_types")
     extensions = records["network_extensions"].get("extensions")
     security_groups = records["security_groups"].get("security_groups")
-    for response in (records["flavors"], records["volume_types"], records["network_extensions"], records["security_groups"]):
+    for response in (
+        records["flavors"],
+        records["volume_types"],
+        records["network_extensions"],
+        records["security_groups"],
+    ):
         for key, links in response.items():
             if key.endswith("links") and (
                 not isinstance(links, list)
@@ -65,7 +70,12 @@ def target_profile(project_id: str, records: dict[str, Any], observed_at: int) -
             or not all(isinstance(v, dict) for v in rows)
         ):
             raise CollectionFailure("invalid_response")
-    for rows, identity in ((flavors, "id"), (types, "id"), (extensions, "alias"), (security_groups, "id")):
+    for rows, identity in (
+        (flavors, "id"),
+        (types, "id"),
+        (extensions, "alias"),
+        (security_groups, "id"),
+    ):
         identities = [row.get(identity) for row in rows]
         if any(not isinstance(value, str) or not value for value in identities) or len(
             set(identities)
@@ -117,12 +127,16 @@ def target_profile(project_id: str, records: dict[str, Any], observed_at: int) -
         ],
         "network_extensions": sorted(row["alias"] for row in extensions),
         "security_groups": [
-            {"id": group["id"], "name": group["name"], "project_id": project_id,
-             "stateful": group.get("stateful"),
-             "rules_sha256": fingerprint(group["security_group_rules"]),
-             "semantics_sha256": security_semantics(group),
-             "rules": rule_choices(group),
-             "native_sha256": fingerprint(group)}
+            {
+                "id": group["id"],
+                "name": group["name"],
+                "project_id": project_id,
+                "stateful": group.get("stateful"),
+                "rules_sha256": fingerprint(group["security_group_rules"]),
+                "semantics_sha256": security_semantics(group),
+                "rules": rule_choices(group),
+                "native_sha256": fingerprint(group),
+            }
             for group in sorted(security_groups, key=lambda item: item["id"])
         ],
         "compute_version": {

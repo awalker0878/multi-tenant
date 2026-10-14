@@ -3,6 +3,7 @@
 The domain verifier only compares typed values, digests and independently
 retrieved scope/evidence. The installed canonical schema is owned here.
 """
+
 from __future__ import annotations
 
 import json
@@ -21,7 +22,8 @@ from lifecycle.domain.migration_readiness import verify as verify_domain
 def _readiness_validator() -> Draft202012Validator:
     schema = json.loads(
         files("lifecycle.infrastructure.contracts")
-        .joinpath("migration-readiness-v2.2.json").read_text(encoding="utf-8")
+        .joinpath("migration-readiness-v2.2.json")
+        .read_text(encoding="utf-8")
     )
     Draft202012Validator.check_schema(schema)
     return Draft202012Validator(schema, format_checker=FormatChecker())

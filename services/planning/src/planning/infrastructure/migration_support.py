@@ -75,7 +75,9 @@ def qualification_records(
 
 
 def api_capability_records(
-    actor: Actor, site: str, route: dict[str, Any],
+    actor: Actor,
+    site: str,
+    route: dict[str, Any],
 ) -> dict[str, Any] | None:
     """Read only independently reviewed API evidence from Assurance custody.
 
@@ -119,7 +121,10 @@ def api_capability_records(
 
 
 def current_application_flow_proof(
-    actor: Actor, site: str, saved: dict[str, Any], now: int,
+    actor: Actor,
+    site: str,
+    saved: dict[str, Any],
+    now: int,
     binding: dict[str, Any],
 ) -> dict[str, Any]:
     """Service-only fresh E4 gate, independent of saved Console approval.
@@ -133,26 +138,30 @@ def current_application_flow_proof(
 
     payload = saved["payload"]
     current = request(
-        "CATALOGUE", "GET",
+        "CATALOGUE",
+        "GET",
         f"/internal/tenants/{actor.tenant}/applications/{actor.application}"
         f"/environments/{actor.environment}/current-planning-intent",
         schema_name="catalogue-current-v2",
     )
-    if (
-        current["revision_id"] != payload.get("source_revision_id")
-        or current["intent_sha256"] != payload.get("source_intent_sha256")
-    ):
+    if current["revision_id"] != payload.get("source_revision_id") or current[
+        "intent_sha256"
+    ] != payload.get("source_intent_sha256"):
         raise Rejected("application_flow_source_revision_superseded", 423)
     selected = tranche(selected_tranche(actor, site))
     scope = {
-        "tenant_id": actor.tenant, "site_id": identifier(site),
-        "resource_id": actor.application, "environment": actor.environment,
+        "tenant_id": actor.tenant,
+        "site_id": identifier(site),
+        "resource_id": actor.application,
+        "environment": actor.environment,
     }
     result = request(
-        "ASSURANCE", "POST",
+        "ASSURANCE",
+        "POST",
         f"/v1/tenants/{actor.tenant}/migration-qualifications",
         {
-            "scope": scope, "tranche_sha256": digest(selected),
+            "scope": scope,
+            "tranche_sha256": digest(selected),
             "release_sha256": selected["release_sha256"],
         },
         schema_name="migration-support-v2",
@@ -166,9 +175,8 @@ def current_application_flow_proof(
     receipt = result["flow_evidence"]
     source_platform = binding.get("source", {}).get("platform")
     target_platform = binding.get("target", {}).get("platform")
-    if (
-        source_platform not in {"openstack", "vmware", "ahv"}
-        or target_platform != payload.get("destination_platform")
+    if source_platform not in {"openstack", "vmware", "ahv"} or target_platform != payload.get(
+        "destination_platform"
     ):
         raise Rejected("application_flow_migration_platform_mismatch", 423)
     if not isinstance(receipt, dict) or any(
@@ -206,9 +214,7 @@ def current_application_flow_proof(
         from planning.domain.security_boundary import compare as compare_policy_boundary
 
         selected = {row["source_flow_id"]: row for row in selected_bindings}
-        omitted_ids = {
-            row["source_flow_id"] for row in payload.get("omissions", [])
-        }
+        omitted_ids = {row["source_flow_id"] for row in payload.get("omissions", [])}
         if len(omitted_ids) != len(payload.get("omissions", [])):
             raise Rejected("native_security_optional_omission_ambiguous", 423)
         if len(selected) != len(selected_bindings) or set(selected) & omitted_ids:
@@ -216,7 +222,11 @@ def current_application_flow_proof(
         checked: set[str] = set()
         for case in security_cases:
             if not isinstance(case, dict) or set(case) != {
-                "source_flow_id", "flow", "source_document", "document", "boundary"
+                "source_flow_id",
+                "flow",
+                "source_document",
+                "document",
+                "boundary",
             }:
                 raise Rejected("native_security_e4_case_invalid", 423)
             flow_id = case["source_flow_id"]
@@ -232,9 +242,9 @@ def current_application_flow_proof(
                 or not isinstance(case["source_document"], dict)
                 or case["source_document"].get("platform") != source_platform
                 or case["source_document"].get("api_profile", {}).get("profile_sha256")
-                    != binding["source"]["profile_sha256"]
+                != binding["source"]["profile_sha256"]
                 or case["document"].get("api_profile", {}).get("profile_sha256")
-                    != binding["target"]["profile_sha256"]
+                != binding["target"]["profile_sha256"]
             ):
                 raise Rejected("native_security_e4_case_mismatch", 423)
             if flow_id in omitted_ids:
@@ -245,22 +255,25 @@ def current_application_flow_proof(
                 checked.add(flow_id)
                 continue
             boundary = compare_policy_boundary(
-                case["source_document"], case["document"], case["boundary"], now,
+                case["source_document"],
+                case["document"],
+                case["boundary"],
+                now,
             )
             if boundary["status"] != "qualified":
                 raise Rejected("native_security_policy_boundary_unqualified", 423)
             source_result = qualify_effective_security(
-                case["source_document"], source, now,
+                case["source_document"],
+                source,
+                now,
             )
             if source_result["status"] != "qualified":
                 raise Rejected("native_source_security_e4_unqualified", 423)
             result = qualify_effective_security(case["document"], source, now)
             if (
                 result["status"] != "qualified"
-                or result["effective_rule_native_ref"]
-                    != selected[flow_id]["rule_native_ref"]
-                or "path:" + result["path_sha256"]
-                    != selected[flow_id]["route_native_ref"]
+                or result["effective_rule_native_ref"] != selected[flow_id]["rule_native_ref"]
+                or "path:" + result["path_sha256"] != selected[flow_id]["route_native_ref"]
             ):
                 raise Rejected("native_security_e4_effective_behavior_unqualified", 423)
             checked.add(flow_id)
@@ -280,10 +293,16 @@ def current_application_flow_proof(
         or not 0 <= now - receipt["observed_at"] <= 30
         or type(receipt["expires_at"]) is not int
         or not now < receipt["expires_at"] <= receipt["observed_at"] + 60
-        or receipt["checks"] != {
-            k: "passed" for k in (
-                "native_controls", "source_completeness", "allowed_traffic",
-                "denied_traffic", "return_path", "tenant_isolation",
+        or receipt["checks"]
+        != {
+            k: "passed"
+            for k in (
+                "native_controls",
+                "source_completeness",
+                "allowed_traffic",
+                "denied_traffic",
+                "return_path",
+                "tenant_isolation",
                 "application_validation",
             )
         }

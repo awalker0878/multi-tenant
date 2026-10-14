@@ -17,9 +17,16 @@ API_VERSION = re.compile(r"v?[0-9]+(?:\.[0-9]+){0,3}\Z")
 # These are safety invariants, not a vendor feature catalogue. An owner cannot
 # relabel any of them 'optional' to suppress admission failure.
 CRITICAL_PREFIXES = (
-    "vm.disk.", "vm.boot.", "vm.power.", "storage.data.",
-    "data.", "recovery.", "security.isolation.", "security.encryption.",
-    "network.required.", "network.isolation.",
+    "vm.disk.",
+    "vm.boot.",
+    "vm.power.",
+    "storage.data.",
+    "data.",
+    "recovery.",
+    "security.isolation.",
+    "security.encryption.",
+    "network.required.",
+    "network.isolation.",
 )
 STATES = {"supported", "unsupported", "degraded", "unknown"}
 SOURCES = {"spec_diff", "live_probe", "contract_test", "operator"}
@@ -59,8 +66,14 @@ def environment(profile: dict[str, Any], snapshot: dict[str, Any]) -> dict[str, 
     shape(
         snapshot,
         {
-            "installation_id", "profile_sha256", "apis", "entitlements",
-            "observed_at", "expires_at", "source", "evidence_sha256",
+            "installation_id",
+            "profile_sha256",
+            "apis",
+            "entitlements",
+            "observed_at",
+            "expires_at",
+            "source",
+            "evidence_sha256",
         },
     )
     if (
@@ -102,10 +115,18 @@ def record(value: dict[str, Any], now: int) -> None:
     shape(
         value,
         {
-            "installation_id", "profile_sha256", "capability_id",
-            "api_family", "api_version", "result", "source",
-            "observed_at", "expires_at", "evidence_sha256",
-            "qualification_level", "qualification_decision",
+            "installation_id",
+            "profile_sha256",
+            "capability_id",
+            "api_family",
+            "api_version",
+            "result",
+            "source",
+            "observed_at",
+            "expires_at",
+            "evidence_sha256",
+            "qualification_level",
+            "qualification_decision",
             "qualification_sha256",
         },
     )
@@ -115,9 +136,7 @@ def record(value: dict[str, Any], now: int) -> None:
         value["capability_id"]
     ):
         raise Rejected("migration_api_observation_invalid", 422)
-    if not isinstance(value["api_family"], str) or not API_FAMILY.fullmatch(
-        value["api_family"]
-    ):
+    if not isinstance(value["api_family"], str) or not API_FAMILY.fullmatch(value["api_family"]):
         raise Rejected("migration_api_observation_invalid", 422)
     version_tuple(value["api_version"])
     if value["result"] not in STATES or value["source"] not in SOURCES:
@@ -136,9 +155,13 @@ def record(value: dict[str, Any], now: int) -> None:
 
 
 def evaluate(
-    selected: dict[str, Any], evidence: dict[str, Any] | None,
-    now: int, *, tenant_id: str | None = None,
-    application_id: str | None = None, environment_id: str | None = None,
+    selected: dict[str, Any],
+    evidence: dict[str, Any] | None,
+    now: int,
+    *,
+    tenant_id: str | None = None,
+    application_id: str | None = None,
+    environment_id: str | None = None,
 ) -> dict[str, Any]:
     """Evaluate exactly this route's code/owner-defined usage, never user input."""
     declared = usage(selected["api_usage"])
@@ -157,7 +180,8 @@ def evaluate(
         raise Rejected("migration_api_environments_invalid", 422)
     envs = {
         side: environment(selected[side], environments[side])
-        for side in ("source", "target") if side in environments
+        for side in ("source", "target")
+        if side in environments
     }
     facts = evidence["observations"]
     if not isinstance(facts, list) or len(facts) > 512:
@@ -178,9 +202,7 @@ def evaluate(
             cap = required["capability_id"]
             env = envs.get(side)
             status, reason, ref = "unknown", "api_observation_missing", None
-            if env is not None and (
-                env["observed_at"] > now or env["expires_at"] <= now
-            ):
+            if env is not None and (env["observed_at"] > now or env["expires_at"] <= now):
                 env = None
                 reason = "api_environment_discovery_stale"
             api_family: str | None = None
@@ -194,7 +216,8 @@ def evaluate(
             if env is not None:
                 entitlement = env["entitlements"].get(cap, "unknown")
                 candidates = [
-                    f for f in facts
+                    f
+                    for f in facts
                     if f["installation_id"] == env["installation_id"]
                     and f["profile_sha256"] == env["profile_sha256"]
                     and f["capability_id"] == cap
@@ -213,7 +236,8 @@ def evaluate(
                     reason = "api_observation_ambiguous"
                 else:
                     usable = [
-                        f for f in candidates
+                        f
+                        for f in candidates
                         if f["result"] == "supported"
                         and f["source"] == "live_probe"
                         and f["qualification_level"] in {"E3", "E4"}
@@ -221,12 +245,14 @@ def evaluate(
                         and f["qualification_sha256"] is not None
                     ]
                     executable = [
-                        f for f in usable
+                        f
+                        for f in usable
                         if selected[side]["platform"] != "ahv"
-                        or (f["api_family"].rsplit(".", 1)[-1]
-                            in {"vmm", "prism", "clustermgmt", "networking",
-                                "microseg", "iam"}
-                            and f["api_version"] == "v4.3")
+                        or (
+                            f["api_family"].rsplit(".", 1)[-1]
+                            in {"vmm", "prism", "clustermgmt", "networking", "microseg", "iam"}
+                            and f["api_version"] == "v4.3"
+                        )
                     ]
                     if usable and not executable:
                         status, reason = "blocked", "selected_api_version_not_executable"
@@ -234,9 +260,8 @@ def evaluate(
                         # Prefer the lowest exact qualified release for this
                         # operation; never assume the newest API is supported.
                         observation = min(
-                            executable, key=lambda f: (
-                                f["api_family"], version_tuple(f["api_version"])
-                            )
+                            executable,
+                            key=lambda f: (f["api_family"], version_tuple(f["api_version"])),
                         )
                         status, reason = "eligible", "api_operation_qualified"
                         ref = observation["evidence_sha256"]
@@ -257,7 +282,8 @@ def evaluate(
                 else:
                     for item in omissions:
                         if (
-                            tenant_id is not None and application_id is not None
+                            tenant_id is not None
+                            and application_id is not None
                             and environment_id is not None
                             and item.get("capability_id") == cap
                             and item.get("side") == side
@@ -272,19 +298,20 @@ def evaluate(
                             and isinstance(item.get("approval_sha256"), str)
                             and re.fullmatch(r"[a-f0-9]{64}", item["approval_sha256"])
                             and isinstance(item.get("effect_suppressed_sha256"), str)
-                            and re.fullmatch(
-                                r"[a-f0-9]{64}", item["effect_suppressed_sha256"]
-                            )
+                            and re.fullmatch(r"[a-f0-9]{64}", item["effect_suppressed_sha256"])
                         ):
                             omission_accepted = True
                             deadline = item["expires_at"]
-                            evidence_expiry = min(
-                                evidence_expiry, deadline
-                            ) if evidence_expiry is not None else deadline
+                            evidence_expiry = (
+                                min(evidence_expiry, deadline)
+                                if evidence_expiry is not None
+                                else deadline
+                            )
                     if not omission_accepted:
                         conditional = True
                 warning = {
-                    "capability_id": cap, "side": side,
+                    "capability_id": cap,
+                    "side": side,
                     "severity": "blocker" if required["criticality"] == "critical" else "warning",
                     "reason": reason,
                     "impact": required["reason"],
@@ -294,20 +321,22 @@ def evaluate(
                     "omission_accepted": omission_accepted,
                 }
                 alerts.append(warning)
-            cases.append({
-                "capability_id": cap,
-                "side": side,
-                "criticality": required["criticality"],
-                "status": status,
-                "reason": reason,
-                "evidence_sha256": ref,
-                "selected_api_family": api_family,
-                "selected_api_version": api_version,
-                "omission_accepted": omission_accepted,
-                # The authority's native/entitlement and approved-omission
-                # receipts constrain runtime readiness, never tranche TTL.
-                "expires_at": evidence_expiry,
-            })
+            cases.append(
+                {
+                    "capability_id": cap,
+                    "side": side,
+                    "criticality": required["criticality"],
+                    "status": status,
+                    "reason": reason,
+                    "evidence_sha256": ref,
+                    "selected_api_family": api_family,
+                    "selected_api_version": api_version,
+                    "omission_accepted": omission_accepted,
+                    # The authority's native/entitlement and approved-omission
+                    # receipts constrain runtime readiness, never tranche TTL.
+                    "expires_at": evidence_expiry,
+                }
+            )
     return {
         "status": "blocked" if blocking else "conditional" if conditional else "eligible",
         "operationally_eligible": not blocking and not conditional,

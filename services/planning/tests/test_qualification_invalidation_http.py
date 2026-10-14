@@ -4,9 +4,9 @@ import asyncio
 import json
 import os
 from pathlib import Path
-from uuid import uuid4
 from typing import Any, cast
 from unittest.mock import Mock
+from uuid import uuid4
 
 import pytest
 
@@ -68,7 +68,9 @@ def receiver(
         "authority_epoch": 1,
         "event_sha256": "b" * 64,
     }
-    return QualificationInvalidationApp(cast(QualificationInvalidations, inbox), mounted_secret), inbox
+    return QualificationInvalidationApp(
+        cast(QualificationInvalidations, inbox), mounted_secret
+    ), inbox
 
 
 def test_exact_authenticated_held_event_is_acked_after_receiver_persistence(
@@ -80,6 +82,7 @@ def test_exact_authenticated_held_event_is_acked_after_receiver_persistence(
     assert status == 200 and reply["persisted"] is True
     # Measure actual handler output against the active success contract.
     from jsonschema import Draft202012Validator, FormatChecker
+
     canonical = Path(__file__).resolve().parents[3] / (
         "contracts/openapi/planning-qualification-events-v1.json"
     )
@@ -107,9 +110,7 @@ def test_anonymous_invalidation_is_denied_even_without_mounted_secret() -> None:
     # before refusing a request with no bearer credential.
     inbox = Mock()
     missing_secret = Mock(side_effect=OSError("credential not mounted"))
-    app = QualificationInvalidationApp(
-        cast(QualificationInvalidations, inbox), missing_secret
-    )
+    app = QualificationInvalidationApp(cast(QualificationInvalidations, inbox), missing_secret)
     status, reply = exchange(app, b"{}", credential=None)
     assert status == 401
     assert reply == {"error": "invalidation_unauthorized"}
@@ -218,6 +219,4 @@ def test_authenticated_http_ack_is_committed_before_response_and_safe_to_replay(
     modified = dict(event, decision_sha256="f" * 64)
     assert exchange(app, json.dumps(modified).encode())[0] == 409
     with database.transaction() as tx:
-        assert tx.one(
-            "SELECT count(*) AS n FROM app.planning_qualification_inbox"
-        ) == {"n": 1}
+        assert tx.one("SELECT count(*) AS n FROM app.planning_qualification_inbox") == {"n": 1}

@@ -45,6 +45,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 return response()->json($errorBody($error->reason, $error->status), $error->status,
                     ['Cache-Control' => 'no-store, private']);
             }
+
             return response()->json(['error' => $error->reason], $error->status, [
                 'Cache-Control' => 'no-store, private',
                 ...($error->status === 429 ? ['Retry-After' => (string) config('identity.lock_seconds')] : []),
@@ -54,6 +55,7 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($delegationRequest($request) === false) {
                 return null;
             }
+
             return response()->json($errorBody('delegation_input_invalid', 422), 422,
                 ['Cache-Control' => 'no-store, private']);
         });
@@ -65,6 +67,7 @@ return Application::configure(basePath: dirname(__DIR__))
             if (in_array($status, [401, 403, 404, 409, 422, 429, 503], true) === false) {
                 $status = 503;
             }
+
             return response()->json($errorBody('delegation_unavailable', $status), $status,
                 ['Cache-Control' => 'no-store, private']);
         });

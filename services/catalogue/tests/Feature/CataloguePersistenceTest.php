@@ -30,7 +30,7 @@ beforeEach(function (): void {
     $this->intent = catalogueIntent();
     $this->denied = false;
     $test = $this;
-    $this->app->instance(ConsoleCaller::class, new class() implements ConsoleCaller
+    $this->app->instance(ConsoleCaller::class, new class implements ConsoleCaller
     {
         public function accepts(string $credential): bool
         {
@@ -50,7 +50,7 @@ beforeEach(function (): void {
             return new ActorContext($this->test->actor, $tenant, $action, $scope, '00000000-0000-4000-8000-000000000005');
         }
     });
-    $this->app->instance(OwnerDirectory::class, new class() implements OwnerDirectory
+    $this->app->instance(OwnerDirectory::class, new class implements OwnerDirectory
     {
         public function assertOwners(ActorContext $actor, array $owners): void {}
     });
@@ -184,7 +184,7 @@ it('bounds representative large tenant pages and rejects foreign cursors', funct
 it('retains stable event identity on uncertain delivery and publishes each aggregate in order', function (): void {
     $first = publishCatalogue($this)->assertCreated()->json();
     $second = publishCatalogue($this, $first['application_id'], $first['etag'])->assertCreated()->json();
-    $publisher = new class() implements CataloguePublisher
+    $publisher = new class implements CataloguePublisher
     {
         public bool $fail = true;
 
@@ -213,7 +213,6 @@ it('replays controlled migrations without altering published history or receipts
     $this->admin->exec(preg_replace('/^\\\\set.*$/m', '', $migration));
     expect(DB::table('app.catalogue_revisions')->value('digest'))->toBe($first['digest'])->and(DB::table('app.catalogue_commands')->count())->toBe(1);
 });
-
 
 it('denies superseded Planning intent while service-only reads return current published revision', function (): void {
     $first = publishCatalogue($this)->assertCreated()->json();

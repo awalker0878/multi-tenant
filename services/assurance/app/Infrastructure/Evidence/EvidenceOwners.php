@@ -166,7 +166,7 @@ final class EvidenceOwners implements EvidenceAuthority
             abort(503, 'evidence_owner_unavailable');
         }
     }
-    /** @return mixed */
+
     private static function canonicalize(mixed $value): mixed
     {
         if (! is_array($value)) {
@@ -182,5 +182,4 @@ final class EvidenceOwners implements EvidenceAuthority
 
         return $value;
     }
-
 }

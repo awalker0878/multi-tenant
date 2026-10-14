@@ -1,26 +1,34 @@
 """Scoped source and target Neutron allow/deny rule semantic comparisons."""
+
+from typing import Any
+
 import pytest
 
 from inventory_worker.infrastructure.native import CollectionFailure
 from inventory_worker.infrastructure.openstack_security import rule_choices, security_semantics
 
-def rules(*, dest=False):
+
+def rules(*, dest: Any = False) -> Any:
     return {
         "stateful": True,
-        "security_group_rules": [{
-            "id": "rule-other" if dest else "rule-source",
-            "project_id": "project-b" if dest else "project-a",
-            "security_group_id": "group-b" if dest else "group-a",
-            "direction": "ingress",
-            "ethertype": "IPv4",
-            "protocol": "TCP" if dest else "tcp",
-            "port_range_min": 443, "port_range_max": 443,
-            "remote_ip_prefix": "10.0.0.4/24" if dest else "10.0.0.0/24",
-            "remote_group_id": None,
-        }],
+        "security_group_rules": [
+            {
+                "id": "rule-other" if dest else "rule-source",
+                "project_id": "project-b" if dest else "project-a",
+                "security_group_id": "group-b" if dest else "group-a",
+                "direction": "ingress",
+                "ethertype": "IPv4",
+                "protocol": "TCP" if dest else "tcp",
+                "port_range_min": 443,
+                "port_range_max": 443,
+                "remote_ip_prefix": "10.0.0.4/24" if dest else "10.0.0.0/24",
+                "remote_group_id": None,
+            }
+        ],
     }
 
-def test_rule_signature_ignores_native_ids_but_preserves_flow_semantics():
+
+def test_rule_signature_ignores_native_ids_but_preserves_flow_semantics() -> None:
     assert security_semantics(rules()) == security_semantics(rules(dest=True))
     changed = rules(dest=True)
     changed["security_group_rules"][0]["port_range_min"] = 22
@@ -29,7 +37,8 @@ def test_rule_signature_ignores_native_ids_but_preserves_flow_semantics():
     changed["security_group_rules"][0]["direction"] = "egress"
     assert security_semantics(rules()) != security_semantics(changed)
 
-def test_unknown_statefulness_and_native_remote_group_dependencies_cannot_match():
+
+def test_unknown_statefulness_and_native_remote_group_dependencies_cannot_match() -> None:
     changed = rules()
     changed.pop("stateful")
     assert security_semantics(changed) is None
@@ -37,7 +46,8 @@ def test_unknown_statefulness_and_native_remote_group_dependencies_cannot_match(
     changed["security_group_rules"][0]["remote_group_id"] = "source-group"
     assert security_semantics(changed) is None
 
-def test_invalid_natively_observed_rules_fail_closed():
+
+def test_invalid_natively_observed_rules_fail_closed() -> None:
     for fault in ("direction", "cidr", "port"):
         changed = rules()
         row = changed["security_group_rules"][0]
@@ -51,7 +61,7 @@ def test_invalid_natively_observed_rules_fail_closed():
             security_semantics(changed)
 
 
-def test_source_and_destination_rule_choices_are_exact_api_ids_not_free_text():
+def test_source_and_destination_rule_choices_are_exact_api_ids_not_free_text() -> None:
     source = rule_choices(rules())
     destination = rule_choices(rules(dest=True))
     assert source is not None and destination is not None
@@ -61,10 +71,12 @@ def test_source_and_destination_rule_choices_are_exact_api_ids_not_free_text():
     assert source[0]["remote_ip_prefix"] == "10.0.0.0/24"
     differing = rules(dest=True)
     differing["security_group_rules"][0]["port_range_max"] = 8443
-    assert rule_choices(differing)[0]["semantic_sha256"] != source[0]["semantic_sha256"]
+    changed = rule_choices(differing)
+    assert changed is not None
+    assert changed[0]["semantic_sha256"] != source[0]["semantic_sha256"]
 
 
-def test_unknown_group_references_do_not_generate_selectable_rules():
+def test_unknown_group_references_do_not_generate_selectable_rules() -> None:
     unsafe = rules()
     unsafe["security_group_rules"][0]["remote_group_id"] = "other-group"
     assert rule_choices(unsafe) is None
@@ -73,14 +85,14 @@ def test_unknown_group_references_do_not_generate_selectable_rules():
     assert rule_choices(unknown) is None
 
 
-def test_unqualified_vendor_deny_actions_not_mapped_as_allow_rules():
+def test_unqualified_vendor_deny_actions_not_mapped_as_allow_rules() -> None:
     altered = rules()
     altered["security_group_rules"][0]["action"] = "deny"
     assert rule_choices(altered) is None
     assert security_semantics(altered) is None
 
 
-def test_bad_address_family_and_inverted_port_range_do_not_supply_choices():
+def test_bad_address_family_and_inverted_port_range_do_not_supply_choices() -> None:
     altered = rules()
     altered["security_group_rules"][0]["ethertype"] = "IPv6"
     with pytest.raises(CollectionFailure):

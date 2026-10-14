@@ -22,8 +22,8 @@ from inventory.domain.discovery import (
     shape,
     text,
 )
-from inventory.domain.workload import profile_payload
 from inventory.domain.profile_read_manifest import bounds as profile_read_bounds
+from inventory.domain.workload import profile_payload
 
 
 def uid() -> str:
@@ -622,19 +622,19 @@ class Discovery:
             if not isinstance(receipts, list) or len(receipts) > 128:
                 raise Rejected("native_read_witnesses_invalid")
             for witness in receipts:
-                if (not isinstance(witness, dict)
-                        or set(witness) != {
-                            "native_operation", "api_version",
-                            "response_sha256", "observed_at"}
-                        or not isinstance(witness["native_operation"], str)
-                        or not re.fullmatch(r"GET /[^\r\n]{1,400}",
-                                            witness["native_operation"])
-                        or not isinstance(witness["api_version"], str)
-                        or len(witness["api_version"]) > 160
-                        or not isinstance(witness["response_sha256"], str)
-                        or not re.fullmatch(r"[a-f0-9]{64}", witness["response_sha256"])
-                        or type(witness["observed_at"]) is not int
-                        or not j["updated_at"] - 2 <= witness["observed_at"] <= now + 2):
+                if (
+                    not isinstance(witness, dict)
+                    or set(witness)
+                    != {"native_operation", "api_version", "response_sha256", "observed_at"}
+                    or not isinstance(witness["native_operation"], str)
+                    or not re.fullmatch(r"GET /[^\r\n]{1,400}", witness["native_operation"])
+                    or not isinstance(witness["api_version"], str)
+                    or len(witness["api_version"]) > 160
+                    or not isinstance(witness["response_sha256"], str)
+                    or not re.fullmatch(r"[a-f0-9]{64}", witness["response_sha256"])
+                    or type(witness["observed_at"]) is not int
+                    or not j["updated_at"] - 2 <= witness["observed_at"] <= now + 2
+                ):
                     raise Rejected("native_read_witness_invalid")
             collected = body["collected_at"]
             if (
@@ -750,8 +750,14 @@ class Discovery:
                     "INSERT INTO inventory.migration_collection_invalidations "
                     "(tenant,site,endpoint,generation,reason,observed_at) "
                     "VALUES(%s,%s,%s,%s,%s,%s) ON CONFLICT DO NOTHING",
-                    (p.tenant, p.site, str(e["id"]), job_id,
-                     reason or "native_collection_incomplete", now),
+                    (
+                        p.tenant,
+                        p.site,
+                        str(e["id"]),
+                        job_id,
+                        reason or "native_collection_incomplete",
+                        now,
+                    ),
                 )
             if status in {"complete", "partial"}:
                 self.record(

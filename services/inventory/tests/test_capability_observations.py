@@ -152,9 +152,7 @@ def test_signed_observation_is_not_an_adapter_assertion(
             }
     if fault == "passed_recovery_duplicate_old_sequence":
         first = payload["snapshot"]["recovery_measurements"][0]
-        payload["snapshot"]["recovery_measurements"].extend(
-            [first | {"sequence": 2}, dict(first)]
-        )
+        payload["snapshot"]["recovery_measurements"].extend([first | {"sequence": 2}, dict(first)])
     raw = json.dumps(payload).encode()
     import hashlib
 

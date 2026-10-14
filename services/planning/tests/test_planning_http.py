@@ -8,6 +8,7 @@ import pytest
 from planning_fixture import ACTOR, APP, ENDPOINT, ENV, GENERATION, SITE, TENANT
 
 from planning.domain.model import Actor, Rejected
+from planning.interfaces.migration import MigrationPreparationApp
 from planning.interfaces.planning import PlanningApp
 
 BASE = f"/v1/tenants/{TENANT}/applications/{APP}/environments/{ENV}"
@@ -15,7 +16,7 @@ CANDIDATE = {"site_id": SITE, "endpoint_id": ENDPOINT, "generation_id": GENERATI
 
 
 def exchange(
-    app: PlanningApp,
+    app: PlanningApp | MigrationPreparationApp,
     tail: str,
     body: bytes | None = None,
     headers: list[tuple[bytes, bytes]] | None = None,

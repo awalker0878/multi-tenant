@@ -140,9 +140,13 @@ def collect_ahv(
     # Each namespace has a distinct version. Never infer the Microseg
     # feature namespace from Prism Central or AOS release string.
     routes = {
-        "cluster": f"/api/clustermgmt/{versions['clustermgmt']}/config/clusters/" + stream["cluster_id"],
-        "prism_central": f"/api/prism/{versions['prism']}/config/domain-managers/" + stream["prism_central_id"],
-        "storage_containers": f"/api/clustermgmt/{versions['clustermgmt']}/config/storage-containers",
+        "cluster": f"/api/clustermgmt/{versions['clustermgmt']}/config/clusters/"
+        + stream["cluster_id"],
+        "prism_central": f"/api/prism/{versions['prism']}/config/domain-managers/"
+        + stream["prism_central_id"],
+        "storage_containers": (
+            f"/api/clustermgmt/{versions['clustermgmt']}/config/storage-containers"
+        ),
         "subnets": f"/api/networking/{versions['networking']}/config/subnets",
         "vpcs": f"/api/networking/{versions['networking']}/config/vpcs",
         "categories": f"/api/prism/{versions['prism']}/config/categories",
@@ -202,15 +206,16 @@ def collect_ahv(
             if not isinstance(native_id, str) or not native_id or "/" in native_id:
                 raise CollectionFailure("invalid_response")
             rules, raw_pages = collect_list(
-                stream, routes["policies"] + "/" + native_id + "/rules",
-                1, before_request,
+                stream,
+                routes["policies"] + "/" + native_id + "/rules",
+                1,
+                before_request,
             )
             # If the API also embeds rule bodies, it must agree with the
             # separate native endpoint rather than silently winning.
             inline = policy_row.get("rules")
             if inline is not None and (
-                not isinstance(inline, list)
-                or fingerprint(inline) != fingerprint(rules)
+                not isinstance(inline, list) or fingerprint(inline) != fingerprint(rules)
             ):
                 raise CollectionFailure("invalid_response")
             policy_row["rules"] = rules
@@ -229,17 +234,20 @@ def collect_ahv(
     authorized = (
         stream.get("microseg_reference_endpoint_qualified") is True
         and isinstance(commissioned, dict)
-        and set(commissioned) == {
-            "entity_groups", "address_groups", "service_groups"
-        }
+        and set(commissioned) == {"entity_groups", "address_groups", "service_groups"}
     )
     for group_kind in ("entity_groups", "address_groups", "service_groups"):
-        route = commissioned.get(group_kind) if authorized and isinstance(commissioned, dict) else None
+        route = (
+            commissioned.get(group_kind) if authorized and isinstance(commissioned, dict) else None
+        )
         expected_prefix = "/api/microseg/" + versions["microseg"] + "/config/"
-        if (not isinstance(route, str)
-                or not route.startswith(expected_prefix)
-                or not route[len(expected_prefix):].replace("-", "").isalnum()
-                or "?" in route or ".." in route):
+        if (
+            not isinstance(route, str)
+            or not route.startswith(expected_prefix)
+            or not route[len(expected_prefix) :].replace("-", "").isalnum()
+            or "?" in route
+            or ".." in route
+        ):
             # A still-unqualified API endpoint is an E2 hold, not a reason
             # to discard independently useful VM/storage/network inventory.
             references[group_kind] = []
@@ -247,8 +255,11 @@ def collect_ahv(
             continue
         rows, documents = collect_list(stream, route, 1, before_request)
         references[group_kind] = [
-            {"extId": row["extId"], "native_sha256": fingerprint(row),
-             "resolution": "definition_only"}
+            {
+                "extId": row["extId"],
+                "native_sha256": fingerprint(row),
+                "resolution": "definition_only",
+            }
             for row in rows
         ]
         records["native:" + group_kind] = documents
@@ -257,13 +268,13 @@ def collect_ahv(
     # Never infer rules from policy names, ENFORCE state or category memberships.
     # Referenced service/address/category groups need independent resolution.
     for policy_row in inventory["policies"]:
-        rules = policy_row.get("rules")
-        if rules is None:
+        policy_rules = policy_row.get("rules")
+        if policy_rules is None:
             continue
-        if not isinstance(rules, list) or len(rules) > 512:
+        if not isinstance(policy_rules, list) or len(policy_rules) > 512:
             raise CollectionFailure("invalid_response")
         seen_rule_ids: set[str] = set()
-        for rule in rules:
+        for rule in policy_rules:
             if (
                 not isinstance(rule, dict)
                 or not isinstance(rule.get("extId"), str)
@@ -278,6 +289,7 @@ def collect_ahv(
     # Address, service and nested selector semantics remain unknown unless a
     # separately qualified native API collector observes their definitions.
     categories_observed = {r["extId"] for r in inventory["categories"]}
+
     def rule_refs(spec: dict[str, Any]) -> dict[str, Any]:
         types = {
             "srcCategoryReferences": "category",
@@ -288,15 +300,20 @@ def collect_ahv(
             "serviceGroupReferences": "service_group",
         }
         refs: dict[str, list[str]] = {
-            "category": [], "address_group": [], "service_group": [],
+            "category": [],
+            "address_group": [],
+            "service_group": [],
         }
         unknown = False
         for field, label in types.items():
             values = spec.get(field)
             if values is None:
                 continue
-            if (not isinstance(values, list) or len(values) > 64
-                    or any(not isinstance(item, str) or not item for item in values)):
+            if (
+                not isinstance(values, list)
+                or len(values) > 64
+                or any(not isinstance(item, str) or not item for item in values)
+            ):
                 raise CollectionFailure("invalid_response")
             refs[label].extend(values)
         if any(len(items) != len(set(items)) or len(items) > 64 for items in refs.values()):
@@ -310,17 +327,30 @@ def collect_ahv(
             "service_group_ids": sorted(refs["service_group"]),
             "reference_resolution": "unresolved" if unresolved else "catalogue_ids_only",
         }
+
     projected = {
-        k: [{f: r.get(f) for f in fields if f != "rules"}
-            | ({"rules": [
-                    {"extId": rule["extId"], "type": rule["type"],
-                     "spec_sha256": fingerprint(rule["spec"]),
-                     **rule_refs(rule["spec"])}
-                    for rule in r["rules"]
-                ] if r.get("rules") is not None else None}
-               if k == "policies" else {})
+        k: [
+            {f: r.get(f) for f in fields if f != "rules"}
+            | (
+                {
+                    "rules": [
+                        {
+                            "extId": rule["extId"],
+                            "type": rule["type"],
+                            "spec_sha256": fingerprint(rule["spec"]),
+                            **rule_refs(rule["spec"]),
+                        }
+                        for rule in r["rules"]
+                    ]
+                    if r.get("rules") is not None
+                    else None
+                }
+                if k == "policies"
+                else {}
+            )
             | {"native_sha256": fingerprint(r)}
-            for r in inventory[k]]
+            for r in inventory[k]
+        ]
         for k, fields in FIELDS.items()
     }
     installed = {
@@ -340,15 +370,17 @@ def collect_ahv(
         holds.append("ahv_installed_versions_incomplete")
     if not projected["storage_containers"] or not projected["subnets"]:
         holds.append("ahv_destination_resources_incomplete")
-    if any(row.get("state") == "ENFORCE" and row.get("rules") is None
-           for row in projected["policies"]):
+    if any(
+        row.get("state") == "ENFORCE" and row.get("rules") is None for row in projected["policies"]
+    ):
         holds.append("ahv_security_rule_catalog_incomplete")
     if any(references[k] for k in references):
         holds.append("ahv_effective_group_membership_unqualified")
         holds.append("ahv_service_expansion_unqualified")
     if any(
         rule["reference_resolution"] == "unresolved"
-        for row in projected["policies"] if row.get("rules") is not None
+        for row in projected["policies"]
+        if row.get("rules") is not None
         for rule in row["rules"]
     ):
         holds.append("ahv_security_referenced_objects_unresolved")

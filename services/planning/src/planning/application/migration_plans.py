@@ -7,8 +7,8 @@ from uuid import uuid4
 from planning.application.planning import Planning
 from planning.application.validation import MigrationValidation
 from planning.domain.compilation import bind
-from planning.domain.migration_plan import compose_migration
 from planning.domain.migration_api_selection import pin as pin_api_selection
+from planning.domain.migration_plan import compose_migration
 from planning.domain.model import Actor, Rejected, digest, identifier, integer, sha, shape
 
 

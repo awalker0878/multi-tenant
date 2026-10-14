@@ -17,7 +17,7 @@ def uid() -> str:
 
 def test_ten_budgeted_reads_include_native_microseg_reference_catalogue() -> None:
     project, cluster, pc, storage, subnet, foreign, shared = [uid() for _ in range(7)]
-    stream = {
+    stream: dict[str, Any] = {
         "kind": "target_profile",
         "cluster_id": cluster,
         "prism_central_id": pc,
@@ -30,7 +30,11 @@ def test_ten_budgeted_reads_include_native_microseg_reference_catalogue() -> Non
             for kind in ("entity_groups", "address_groups", "service_groups")
         },
     }
-    policy = {"platform": "ahv", "native_scope": project, "coverage_reference": "q08"}
+    policy: dict[str, Any] = {
+        "platform": "ahv",
+        "native_scope": project,
+        "coverage_reference": "q08",
+    }
     calls: list[str] = []
     budget: list[bool] = []
 
@@ -58,7 +62,7 @@ def test_ten_budgeted_reads_include_native_microseg_reference_catalogue() -> Non
                     "config": {"buildInfo": {"version": "7.6"}, "credentials": ["never exposed"]},
                 }
             }
-        rows = []
+        rows: list[Any] = []
         if "storage-containers" in path:
             rows = [
                 {
@@ -92,37 +96,59 @@ def test_ten_budgeted_reads_include_native_microseg_reference_catalogue() -> Non
     assert profile["observations_sha256"] and result["terminal"] is True
 
 
-def test_unqualified_optional_microseg_group_endpoints_never_trigger_speculative_requests():
+def test_unqualified_optional_microseg_group_endpoints_never_trigger_speculative_requests() -> None:
     from inventory_worker.infrastructure.ahv_profile import collect_ahv
+
     project, cluster, pc, storage, subnet = [uid() for _ in range(5)]
-    routes = []
-    stream = {
-        "kind": "target_profile", "cluster_id": cluster,
-        "prism_central_id": pc, "shared_resource_ids": [],
+    routes: list[Any] = []
+    stream: dict[str, Any] = {
+        "kind": "target_profile",
+        "cluster_id": cluster,
+        "prism_central_id": pc,
+        "shared_resource_ids": [],
         "credential_file": "/fixture",
     }
-    def exchange(conn, path, headers):
+
+    def exchange(conn: Any, path: Any, headers: Any) -> Any:
         routes.append(path)
         if "/clusters/" in path:
-            return {"data": {"extId": cluster, "config": {
-                "isAvailable": True, "hypervisorTypes": ["AHV"],
-                "buildInfo": {"version": "7.6"},
-                "clusterSoftwareMap": [{"softwareType": "AHV", "version": "11.2"}]}}}
+            return {
+                "data": {
+                    "extId": cluster,
+                    "config": {
+                        "isAvailable": True,
+                        "hypervisorTypes": ["AHV"],
+                        "buildInfo": {"version": "7.6"},
+                        "clusterSoftwareMap": [{"softwareType": "AHV", "version": "11.2"}],
+                    },
+                }
+            }
         if "/domain-managers/" in path:
             return {"data": {"extId": pc, "config": {"buildInfo": {"version": "7.6"}}}}
-        rows = []
+        rows: list[Any] = []
         if "/storage-containers" in path:
-            rows = [{"extId": storage, "clusterExtId": cluster,
-                     "isMarkedForRemoval": False, "isInternal": False}]
+            rows = [
+                {
+                    "extId": storage,
+                    "clusterExtId": cluster,
+                    "isMarkedForRemoval": False,
+                    "isInternal": False,
+                }
+            ]
         if "/subnets" in path:
             rows = [{"extId": subnet, "projectExtId": project}]
         return {"metadata": {"totalAvailableResults": len(rows)}, "data": rows}
-    with (patch("inventory_worker.infrastructure.ahv_profile.exchange", side_effect=exchange),
-          patch("inventory_worker.infrastructure.ahv_profile.secret", return_value="fixture")):
+
+    with (
+        patch("inventory_worker.infrastructure.ahv_profile.exchange", side_effect=exchange),
+        patch("inventory_worker.infrastructure.ahv_profile.secret", return_value="fixture"),
+    ):
         profile = collect_ahv({"native_scope": project}, stream, 100, lambda: None)
     assert len(routes) == 7
-    assert not any("entity-groups" in path or "address-groups" in path
-                   or "service-groups" in path for path in routes)
+    assert not any(
+        "entity-groups" in path or "address-groups" in path or "service-groups" in path
+        for path in routes
+    )
     assert "ahv_entity_groups_api_unqualified" in profile["holds"]
     assert profile["inventory_complete"] is True
 
@@ -130,7 +156,7 @@ def test_unqualified_optional_microseg_group_endpoints_never_trigger_speculative
 @pytest.mark.parametrize("count", [0, 1, 100, 101, 200, 1000])
 def test_numbered_pages_charge_each_request_and_never_follow_native_links(count: int) -> None:
     rows = [{"extId": uid()} for _ in range(count)]
-    stream = {"credential_file": "/secret"}
+    stream: dict[str, Any] = {"credential_file": "/secret"}
     calls: list[str] = []
     budget: list[bool] = []
 
@@ -212,7 +238,11 @@ def test_partial_or_ambiguous_pages_never_become_complete(fault: str) -> None:
 
 
 def test_foreign_prism_central_response_cannot_change_authority() -> None:
-    stream = {"cluster_id": uid(), "prism_central_id": uid(), "credential_file": "/secret"}
+    stream: dict[str, Any] = {
+        "cluster_id": uid(),
+        "prism_central_id": uid(),
+        "credential_file": "/secret",
+    }
     with (
         patch(
             "inventory_worker.infrastructure.ahv_profile.exchange",
@@ -226,7 +256,7 @@ def test_foreign_prism_central_response_cannot_change_authority() -> None:
 
 @pytest.mark.parametrize("fault", ["cluster_config", "pc_config", "hypervisors", "hypervisor_type"])
 def test_malformed_ahv_installation_objects_are_rejected(fault: str) -> None:
-    stream = {
+    stream: dict[str, Any] = {
         "cluster_id": uid(),
         "prism_central_id": uid(),
         "credential_file": "/secret",
@@ -255,9 +285,11 @@ def test_malformed_ahv_installation_objects_are_rejected(fault: str) -> None:
 @pytest.mark.parametrize("mode", ["observed", "empty", "duplicate"])
 def test_ahv_policy_rule_lists_use_bounded_native_policy_rule_get(mode: str) -> None:
     project, cluster, pc, storage, subnet, policy_id, rule_id = [uid() for _ in range(7)]
-    stream = {
-        "kind": "target_profile", "cluster_id": cluster,
-        "prism_central_id": pc, "shared_resource_ids": [],
+    stream: dict[str, Any] = {
+        "kind": "target_profile",
+        "cluster_id": cluster,
+        "prism_central_id": pc,
+        "shared_resource_ids": [],
         "credential_file": "/fixture",
         "microseg_reference_endpoint_qualified": True,
         "microseg_reference_endpoints": {
@@ -266,33 +298,47 @@ def test_ahv_policy_rule_lists_use_bounded_native_policy_rule_get(mode: str) -> 
         },
     }
     approvals: list[str] = []
-    native_rule = {
-        "extId": rule_id, "type": "APPLICATION",
-        "spec": {"srcCategoryReferences": [uid()],
-                 "secretNativeDetail": "not for console"},
+    native_rule: dict[str, Any] = {
+        "extId": rule_id,
+        "type": "APPLICATION",
+        "spec": {"srcCategoryReferences": [uid()], "secretNativeDetail": "not for console"},
     }
 
     def exchange(connection: dict[str, Any], route: str, headers: dict[str, str]) -> dict[str, Any]:
         approvals.append(route)
         if "/clusters/" in route:
-            return {"data": {"extId": cluster, "config": {
-                "isAvailable": True, "hypervisorTypes": ["AHV"],
-                "buildInfo": {"version": "7.6"},
-                "clusterSoftwareMap": [{"softwareType": "AHV", "version": "11.2"}],
-            }}}
+            return {
+                "data": {
+                    "extId": cluster,
+                    "config": {
+                        "isAvailable": True,
+                        "hypervisorTypes": ["AHV"],
+                        "buildInfo": {"version": "7.6"},
+                        "clusterSoftwareMap": [{"softwareType": "AHV", "version": "11.2"}],
+                    },
+                }
+            }
         if "/domain-managers/" in route:
             return {"data": {"extId": pc, "config": {"buildInfo": {"version": "7.6"}}}}
-        rows = []
+        rows: list[Any] = []
         if "storage-containers" in route:
-            rows = [{"extId": storage, "clusterExtId": cluster,
-                     "isMarkedForRemoval": False, "isInternal": False}]
+            rows = [
+                {
+                    "extId": storage,
+                    "clusterExtId": cluster,
+                    "isMarkedForRemoval": False,
+                    "isInternal": False,
+                }
+            ]
         elif "/subnets" in route:
             rows = [{"extId": subnet, "projectExtId": project}]
         elif f"/policies/{policy_id}/rules" in route:
             rows = [] if mode == "empty" else [native_rule]
         elif "/policies" in route:
             row: dict[str, Any] = {
-                "extId": policy_id, "projectExtId": project, "state": "ENFORCE",
+                "extId": policy_id,
+                "projectExtId": project,
+                "state": "ENFORCE",
             }
             if mode == "duplicate":
                 row["rules"] = [native_rule, native_rule]
@@ -310,7 +356,10 @@ def test_ahv_policy_rule_lists_use_bounded_native_policy_rule_get(mode: str) -> 
         result = collect_ahv({"native_scope": project}, stream, 100, lambda: None)
     observed = result["policies"][0]["rules"]
     assert len(approvals) == 11
-    assert any(row.startswith(f"/api/microseg/v4.3/config/policies/{policy_id}/rules?") for row in approvals)
+    assert any(
+        row.startswith(f"/api/microseg/v4.3/config/policies/{policy_id}/rules?")
+        for row in approvals
+    )
     assert result["native_qualification"] == "not_established"
     if mode == "empty":
         assert observed == []
@@ -322,37 +371,57 @@ def test_ahv_policy_rule_lists_use_bounded_native_policy_rule_get(mode: str) -> 
         assert "ahv_security_rule_catalog_incomplete" not in result["holds"]
 
 
-def test_prism_microseg_namespace_can_use_installed_v42_while_other_apis_are_v43():
+def test_prism_microseg_namespace_can_use_installed_v42_while_other_apis_are_v43() -> None:
     from inventory_worker.infrastructure.ahv_profile import collect_ahv
+
     project, cluster, pc, storage, subnet = [uid() for _ in range(5)]
-    versions = {k: "v4.3" for k in
-                ("vmm", "prism", "clustermgmt", "networking", "microseg")}
+    versions = {k: "v4.3" for k in ("vmm", "prism", "clustermgmt", "networking", "microseg")}
     versions["microseg"] = "v4.2"
-    stream = {
-        "kind": "target_profile", "cluster_id": cluster,
-        "prism_central_id": pc, "shared_resource_ids": [],
+    stream: dict[str, Any] = {
+        "kind": "target_profile",
+        "cluster_id": cluster,
+        "prism_central_id": pc,
+        "shared_resource_ids": [],
         "credential_file": "/fixture",
-        "api_versions_verified": True, "api_versions": versions,
+        "api_versions_verified": True,
+        "api_versions": versions,
     }
-    observed_paths = []
-    def exchange(conn, path, headers):
+    observed_paths: list[Any] = []
+
+    def exchange(conn: Any, path: Any, headers: Any) -> Any:
         observed_paths.append(path)
         if "/clusters/" in path:
-            return {"data": {"extId": cluster, "config": {
-                "isAvailable": True, "hypervisorTypes": ["AHV"],
-                "buildInfo": {"version": "7.6"},
-                "clusterSoftwareMap": [{"softwareType": "AHV", "version": "11.2"}]}}}
+            return {
+                "data": {
+                    "extId": cluster,
+                    "config": {
+                        "isAvailable": True,
+                        "hypervisorTypes": ["AHV"],
+                        "buildInfo": {"version": "7.6"},
+                        "clusterSoftwareMap": [{"softwareType": "AHV", "version": "11.2"}],
+                    },
+                }
+            }
         if "/domain-managers/" in path:
             return {"data": {"extId": pc, "config": {"buildInfo": {"version": "7.6"}}}}
-        rows = []
+        rows: list[Any] = []
         if "storage-containers" in path:
-            rows = [{"extId": storage, "clusterExtId": cluster,
-                     "isMarkedForRemoval": False, "isInternal": False}]
+            rows = [
+                {
+                    "extId": storage,
+                    "clusterExtId": cluster,
+                    "isMarkedForRemoval": False,
+                    "isInternal": False,
+                }
+            ]
         if "/subnets" in path:
             rows = [{"extId": subnet, "projectExtId": project}]
         return {"data": rows, "metadata": {"totalAvailableResults": len(rows)}}
-    with (patch("inventory_worker.infrastructure.ahv_profile.exchange", side_effect=exchange),
-          patch("inventory_worker.infrastructure.ahv_profile.secret", return_value="fixture")):
+
+    with (
+        patch("inventory_worker.infrastructure.ahv_profile.exchange", side_effect=exchange),
+        patch("inventory_worker.infrastructure.ahv_profile.secret", return_value="fixture"),
+    ):
         result = collect_ahv({"native_scope": project}, stream, 100, lambda: None)
     assert result["api_versions"] == versions
     assert any(path.startswith("/api/microseg/v4.2/config/policies?") for path in observed_paths)

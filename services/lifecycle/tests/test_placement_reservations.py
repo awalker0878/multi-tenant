@@ -37,7 +37,8 @@ class Snapshots:
                 "lease_expires_at": self.now + 3600,
                 "policy_sha256": request["policy_sha256"],
                 "allowed_tenants": (
-                    [] if request["scope"]["tenant_id"] in self.withdrawn_tenants
+                    []
+                    if request["scope"]["tenant_id"] in self.withdrawn_tenants
                     else [request["scope"]["tenant_id"]]
                 ),
                 "limits": {"vcpus": 8, "memory_mib": 8192, "storage_gib": 80, "addresses": 2},
@@ -61,7 +62,7 @@ class Snapshots:
 
 
 def request(source: Snapshots, cpu: int = 8) -> dict[str, Any]:
-    allocations = [
+    allocations: list[Any] = [
         {
             "pool_id": source.pool_id,
             "native_ref": "physical-host",
@@ -87,7 +88,7 @@ def request(source: Snapshots, cpu: int = 8) -> dict[str, Any]:
 def test_two_tenants_compete_for_one_atomic_vector(database: Postgres) -> None:
     source = Snapshots()
     service = PlacementReservations(database, source, lambda: source.now)
-    requests = [request(source), request(source)]
+    requests: list[Any] = [request(source), request(source)]
     with ThreadPoolExecutor(2) as pool:
         receipts = list(pool.map(lambda r: service.reserve(r["scope"]["tenant_id"], r), requests))
     assert sorted(r["state"] for r in receipts) == ["denied", "reserved"]
@@ -139,7 +140,10 @@ def test_provider_usage_drift_revokes_previous_readback_without_freeing_debits(
     accepted = service.reserve(selected["scope"]["tenant_id"], selected)
     assert accepted["state"] == "reserved"
     source.used = {
-        "vcpus": 6, "memory_mib": 6144, "storage_gib": 60, "addresses": 2,
+        "vcpus": 6,
+        "memory_mib": 6144,
+        "storage_gib": 60,
+        "addresses": 2,
     }
     with pytest.raises(Held, match="provider_capacity_changed"):
         service.check(selected["scope"]["tenant_id"], selected["plan_digest"])
@@ -223,7 +227,9 @@ def test_unused_class_limit_does_not_require_an_allocation_in_that_class(
     [("addresses:private:ipv6", 2), ("storage_gib:standard", 41)],
 )
 def test_classified_allocation_must_reconcile_with_aggregate(
-    database: Postgres, class_key: str, amount: int,
+    database: Postgres,
+    class_key: str,
+    amount: int,
 ) -> None:
     """A forged subclass vector cannot consume less aggregate headroom."""
     source = Snapshots()
@@ -234,7 +240,8 @@ def test_classified_allocation_must_reconcile_with_aggregate(
     with pytest.raises(Held, match="placement_vector_class_totals_inconsistent"):
         service.reserve(selected["scope"]["tenant_id"], selected)
     with database.transaction() as tx:
-        assert tx.one("SELECT count(*) AS n FROM app.placement_reservations")["n"] == 0
+        row = tx.one("SELECT count(*) AS n FROM app.placement_reservations")
+        assert row is not None and row["n"] == 0
 
 
 def test_class_limit_owner_rejects_unclassified_demand(database: Postgres) -> None:
@@ -281,7 +288,10 @@ def test_authenticated_cross_tenant_cannot_observe_or_transition_another_reserva
     tenant = selected["scope"]["tenant_id"]
     other_tenant = str(uuid4())
     accepted = service.reserve(tenant, selected)
-    assert service.check(tenant, selected["plan_digest"])["reservation_id"] == accepted["reservation_id"]
+    assert (
+        service.check(tenant, selected["plan_digest"])["reservation_id"]
+        == accepted["reservation_id"]
+    )
     with pytest.raises(Held, match="placement_reservation_missing"):
         service.check(other_tenant, selected["plan_digest"])
     with pytest.raises(Held, match="placement_transition_invalid"):

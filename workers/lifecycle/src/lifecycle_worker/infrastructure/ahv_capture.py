@@ -27,7 +27,6 @@ from lifecycle_worker.infrastructure.ahv_tasks import AhvJournal, completed, sub
 from lifecycle_worker.infrastructure.migration_budget import seconds
 from lifecycle_worker.infrastructure.native_files import protected_read
 
-
 MIGRATION_API_CAPABILITIES = frozenset({"vm.disk.export"})
 
 
@@ -45,7 +44,8 @@ def validate(p: dict[str, Any], binding: NativeBinding) -> dict[str, Any]:
             "vm_sha256",
             "disks",
             "max_seconds",
-        } | ({"api_versions"} if p.get("schema_version") == 3 else set()),
+        }
+        | ({"api_versions"} if p.get("schema_version") == 3 else set()),
     )
     if (
         type(p["schema_version"]) is not int

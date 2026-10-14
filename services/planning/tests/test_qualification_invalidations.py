@@ -66,12 +66,8 @@ def test_duplicate_delivery_and_scope_epoch_conflict(database: Postgres) -> None
     }
     assert inbox.accept(first) == ack
     with database.transaction() as tx:
-        a = tx.one(
-            "SELECT count(*) AS n FROM app.planning_invalidations WHERE plan=%s", (plan,)
-        )
-        b = tx.one(
-            "SELECT count(*) AS n FROM app.planning_invalidations WHERE plan=%s", (foreign,)
-        )
+        a = tx.one("SELECT count(*) AS n FROM app.planning_invalidations WHERE plan=%s", (plan,))
+        b = tx.one("SELECT count(*) AS n FROM app.planning_invalidations WHERE plan=%s", (foreign,))
         assert a is not None and a["n"] == 1
         assert b is not None and b["n"] == 0
 
@@ -174,7 +170,10 @@ def test_same_tenant_unrelated_qualified_scope_is_not_withdrawn(database: Postgr
             for plan in (first, second, unindexed)
         }
     assert all(value is not None for value in counts.values())
-    assert counts[first] is not None and counts[first]["n"] == 1
-    assert counts[second] is not None and counts[second]["n"] == 0
+    first_count = counts[first]
+    assert first_count is not None and first_count["n"] == 1
+    second_count = counts[second]
+    assert second_count is not None and second_count["n"] == 0
     # Missing review-time scope remains fail-closed, never falsely unaffected.
-    assert counts[unindexed] is not None and counts[unindexed]["n"] == 1
+    unindexed_count = counts[unindexed]
+    assert unindexed_count is not None and unindexed_count["n"] == 1

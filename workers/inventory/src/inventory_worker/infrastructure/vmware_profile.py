@@ -88,7 +88,8 @@ def collect_vmware(
                     continue
                 before_request()
                 browser = exchange(
-                    stream, prefix + parent["type"] + "/" + parent["value"] + "/environmentBrowser",
+                    stream,
+                    prefix + parent["type"] + "/" + parent["value"] + "/environmentBrowser",
                     headers,
                 )
                 if (
@@ -100,37 +101,56 @@ def collect_vmware(
                     continue
                 before_request()
                 option = exchange(
-                    stream, prefix + "EnvironmentBrowser/" + browser["value"] + "/QueryConfigOption",
-                    headers, method="POST",
-                    body={"host": {"_typeName": "ManagedObjectReference",
-                                   "type": "HostSystem", "value": key}},
+                    stream,
+                    prefix + "EnvironmentBrowser/" + browser["value"] + "/QueryConfigOption",
+                    headers,
+                    method="POST",
+                    body={
+                        "host": {
+                            "_typeName": "ManagedObjectReference",
+                            "type": "HostSystem",
+                            "value": key,
+                        }
+                    },
                 )
                 if not isinstance(option, dict):
                     continue
                 guests = option.get("guestOSDescriptor")
                 hardware = option.get("version")
                 if (
-                    not isinstance(guests, list) or not 1 <= len(guests) <= 128
+                    not isinstance(guests, list)
+                    or not 1 <= len(guests) <= 128
                     or not isinstance(hardware, str)
                     or re.fullmatch(r"vmx-[0-9]{2}", hardware) is None
                 ):
                     continue
                 guest_ids = [
-                    desc["id"] for desc in guests if isinstance(desc, dict)
+                    desc["id"]
+                    for desc in guests
+                    if isinstance(desc, dict)
                     and isinstance(desc.get("id"), str)
                     and re.fullmatch(r"[A-Za-z0-9_]{1,80}Guest", desc["id"])
                 ]
-                if guest_ids and len(guest_ids) == len(guests) and len(set(guest_ids)) == len(guest_ids):
-                    guest_options_by_host.append({
-                        "host": key, "guest_ids": sorted(guest_ids),
-                        "hardware_versions": [hardware],
-                        "native_sha256": fingerprint([parent, browser, option]),
-                    })
+                if (
+                    guest_ids
+                    and len(guest_ids) == len(guests)
+                    and len(set(guest_ids)) == len(guest_ids)
+                ):
+                    guest_options_by_host.append(
+                        {
+                            "host": key,
+                            "guest_ids": sorted(guest_ids),
+                            "hardware_versions": [hardware],
+                            "native_sha256": fingerprint([parent, browser, option]),
+                        }
+                    )
             except CollectionFailure as error:
                 # A refused/revoked native read cannot be interpreted as an
                 # absent compatibility option. Stop the campaign immediately.
                 if error.reason in {
-                    "permission_denied", "transport_unavailable", "throttled",
+                    "permission_denied",
+                    "transport_unavailable",
+                    "throttled",
                     "unsafe_destination",
                 }:
                     raise
@@ -144,9 +164,7 @@ def collect_vmware(
         from inventory_worker.infrastructure.nsx_security import collect_nsx_policy_rules
 
         nsx = stream["nsx_policy"]
-        nsx_observation = collect_nsx_policy_rules(
-            nsx, nsx["domain_id"], before_request
-        )
+        nsx_observation = collect_nsx_policy_rules(nsx, nsx["domain_id"], before_request)
     return {
         "schema_version": 3,
         "profile_type": "TargetCapabilityProfile",

@@ -4,19 +4,26 @@ Worker collectors still perform each GET and request an authority permit first.
 Inventory owns admission and completion bounds, never allowing a collector to
 invent a count that exceeds the enrolled endpoint budget.
 """
+
 from typing import Any
 
-from inventory.domain.source_profile import source_profile_read_count
 from inventory.domain.discovery import Rejected
+from inventory.domain.source_profile import source_profile_read_count
 
 
-def bounds(platform: str, kind: str, max_pages: int,
-           stream: dict[str, Any], profile: dict[str, Any] | None = None
-           ) -> tuple[int, int]:
+def bounds(
+    platform: str,
+    kind: str,
+    max_pages: int,
+    stream: dict[str, Any],
+    profile: dict[str, Any] | None = None,
+) -> tuple[int, int]:
     if kind == "source_profile":
         if platform == "openstack":
-            return (5, 101) if profile is None else (
-                source_profile_read_count(profile), source_profile_read_count(profile)
+            return (
+                (5, 101)
+                if profile is None
+                else (source_profile_read_count(profile), source_profile_read_count(profile))
             )
         fixed = {"vmware": 8, "ahv": 4}.get(platform)
         if fixed is not None:
@@ -34,8 +41,7 @@ def bounds(platform: str, kind: str, max_pages: int,
                 return 2, maximum
             minimum = 2 + sum(
                 max(1, (len(profile[field]) + 99) // 100)
-                for field in ("storage_containers", "subnets", "vpcs",
-                              "categories", "policies")
+                for field in ("storage_containers", "subnets", "vpcs", "categories", "policies")
             )
             return minimum, maximum
     raise Rejected("profile_read_manifest_unsupported")

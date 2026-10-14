@@ -7,10 +7,10 @@ use App\Application\Qualification\Actions\QualificationAuthorityLedger;
 use App\Application\Qualification\Contracts\ConfirmedInvalidationPublisher;
 use App\Domain\Qualification\NativeQualification;
 use Illuminate\Database\QueryException;
-use PDOException;
-use RuntimeException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use PDOException;
+use RuntimeException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
@@ -156,7 +156,6 @@ it('prevents runtime alteration or deletion of committed authority history', fun
     expect($this->ledger->current($this->scope)['authority_epoch'])->toBe(1);
 });
 
-
 it('delivers immutable invalidations in order and does not clear uncertain acknowledgments', function (): void {
     $this->ledger->mutate(
         $this->scope, 'publish', (string) Str::uuid(), 0, 'reviewed fixture',
@@ -210,7 +209,6 @@ it('delivers immutable invalidations in order and does not clear uncertain ackno
         ->and(DB::table('app.qualification_authority_outbox')
             ->where('scope_sha256', $scopeHash)->whereNotNull('delivered_at')->count())->toBe(2);
 });
-
 
 it('rejects a head-only epoch advance without matching immutable event and outbox', function (): void {
     $this->ledger->mutate(

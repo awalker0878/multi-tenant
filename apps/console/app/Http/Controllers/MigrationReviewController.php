@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Application\Inventory\Contracts\InventoryGateway;
 use App\Application\Catalogue\Contracts\CatalogueGateway;
+use App\Application\Inventory\Contracts\InventoryGateway;
 use App\Domain\Inventory\InventoryFailure;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -83,6 +83,7 @@ final class MigrationReviewController
                 ], $intent['workloads']),
             ];
         }
+
         return response()->json($out)->header('Cache-Control', 'no-store, private');
     }
 

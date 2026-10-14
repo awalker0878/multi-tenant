@@ -1,6 +1,7 @@
 """Planning must reconcile every workload from current independent owners."""
 
 from copy import deepcopy
+from typing import Any
 
 import pytest
 
@@ -8,41 +9,61 @@ from planning.domain.model import Rejected, digest
 from planning.domain.workload_reconciliation import evaluate
 
 
-def specimen() -> tuple[dict, dict, dict, dict, dict, dict]:
-    scope = {"tenant_id": "tenant", "application_id": "app",
-             "environment_id": "environment", "site_id": "site"}
+def specimen() -> tuple[
+    dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any]
+]:
+    scope: dict[str, Any] = {
+        "tenant_id": "tenant",
+        "application_id": "app",
+        "environment_id": "environment",
+        "site_id": "site",
+    }
     disk, nic, workload, dataset = "disk-id", "nic-id", "workload-id", "dataset-id"
-    intent = {
+    intent: dict[str, Any] = {
         "environment": {"id": "environment"},
-        "workloads": [{
-            "id": workload, "compute": {"vcpus": 2, "memory_mib": 4096},
-            "guest": {"firmware": "uefi", "secure_boot": True},
-            "disks": [{"id": disk, "order": 0, "size_gib": 10, "dataset_id": dataset}],
-            "nics": [{"id": nic, "order": 0}],
-        }],
+        "workloads": [
+            {
+                "id": workload,
+                "compute": {"vcpus": 2, "memory_mib": 4096},
+                "guest": {"firmware": "uefi", "secure_boot": True},
+                "disks": [{"id": disk, "order": 0, "size_gib": 10, "dataset_id": dataset}],
+                "nics": [{"id": nic, "order": 0}],
+            }
+        ],
         "datasets": [{"id": dataset, "owner_id": workload}],
         "dependencies": [],
     }
     source = digest("source")
     dest = digest("target")
     review = digest("review")
-    catalogue = {
-        "revision_id": "revision", "intent_sha256": digest(intent), "intent": intent,
+    catalogue: dict[str, Any] = {
+        "revision_id": "revision",
+        "intent_sha256": digest(intent),
+        "intent": intent,
     }
-    link = {
-        "application_id": "app", "environment_id": "environment",
-        "revision_id": "revision", "intent_sha256": digest(intent),
+    link: dict[str, Any] = {
+        "application_id": "app",
+        "environment_id": "environment",
+        "revision_id": "revision",
+        "intent_sha256": digest(intent),
         "workload_id": workload,
         "disk_mappings": [{"logical_device_id": disk, "native_key": 2000}],
         "nic_mappings": [{"logical_device_id": nic, "native_key": 4000}],
     }
-    native = {
-        "source_identity_sha256": digest("native"), "generation_id": "generation",
-        "profile_sha256": source, "installed_tuple_sha256": digest("installed"),
-        "installation_id": "installation", "native_scope": "project",
-        "current": True, "expires_at": 200, "holds": [],
+    native: dict[str, Any] = {
+        "source_identity_sha256": digest("native"),
+        "generation_id": "generation",
+        "profile_sha256": source,
+        "installed_tuple_sha256": digest("installed"),
+        "installation_id": "installation",
+        "native_scope": "project",
+        "current": True,
+        "expires_at": 200,
+        "holds": [],
         "facts": {
-            "cpu": 2, "memory_mb": 4096, "firmware": "efi",
+            "cpu": 2,
+            "memory_mb": 4096,
+            "firmware": "efi",
             "secure_boot": True,
             "disks": [{"key": 2000, "capacity_bytes": 10 * 1024**3}],
             "nics": [{"key": 4000}],
@@ -53,39 +74,66 @@ def specimen() -> tuple[dict, dict, dict, dict, dict, dict]:
         "native_write_authorized": False,
     }
     native["observation_sha256"] = digest(native)
-    association = {
-        "catalogue_binding": link, "source_observation": native,
+    association: dict[str, Any] = {
+        "catalogue_binding": link,
+        "source_observation": native,
         "source_binding": {
             "native_identity_sha256": native["source_identity_sha256"],
-            "profile_sha256": source, "tuple_sha256": native["installed_tuple_sha256"],
+            "profile_sha256": source,
+            "tuple_sha256": native["installed_tuple_sha256"],
         },
         "datasets": [{"id": dataset, "disk_keys": [2000]}],
-        "revision": 1, "digest": review, "confirmed_by": "owner", "current": True,
+        "revision": 1,
+        "digest": review,
+        "confirmed_by": "owner",
+        "current": True,
     }
-    inventory = {
-        "tenant_id": "tenant", "site_id": "site", "revision": 1, "digest": review,
-        "current": True, "confirmed_by": "owner", "catalogue_binding": link,
+    inventory: dict[str, Any] = {
+        "tenant_id": "tenant",
+        "site_id": "site",
+        "revision": 1,
+        "digest": review,
+        "current": True,
+        "confirmed_by": "owner",
+        "catalogue_binding": link,
         "source": {**association["source_binding"]},
         "target": {"profile_sha256": dest},
-        "source_observation": native, "source_associations": [association],
+        "source_observation": native,
+        "source_associations": [association],
     }
-    selected = {"review": {"revision": 1, "digest": review},
-                "source": {"profile_sha256": source},
-                "target": {"profile_sha256": dest}}
-    flow = {
-        "level": "E4", "decision": "accepted", "revoked": False,
-        "intent_sha256": digest(intent), "source_profile_sha256": source,
-        "target_profile_sha256": dest, "expires_at": 160,
+    selected: dict[str, Any] = {
+        "review": {"revision": 1, "digest": review},
+        "source": {"profile_sha256": source},
+        "target": {"profile_sha256": dest},
+    }
+    flow: dict[str, Any] = {
+        "level": "E4",
+        "decision": "accepted",
+        "revoked": False,
+        "intent_sha256": digest(intent),
+        "source_profile_sha256": source,
+        "target_profile_sha256": dest,
+        "expires_at": 160,
         "evidence_sha256": digest("E4"),
-        "workload_interface_cases": [{
-            "workload_id": workload, "source_profile_sha256": source,
-            "target_profile_sha256": dest, "logical_nics_sha256": digest(intent["workloads"][0]["nics"]),
-            "native_path_set_sha256": digest("paths"),
-            "allowed_probe_sha256": digest("allowed"), "denied_probe_sha256": digest("denied"),
-            "return_probe_sha256": digest("return"), "isolation_probe_sha256": digest("isolation"),
-            "evidence_sha256": digest("nic-e4"), "observed_at": 99, "expires_at": 150,
-            "level": "E4", "decision": "accepted", "revoked": False,
-        }],
+        "workload_interface_cases": [
+            {
+                "workload_id": workload,
+                "source_profile_sha256": source,
+                "target_profile_sha256": dest,
+                "logical_nics_sha256": digest(intent["workloads"][0]["nics"]),
+                "native_path_set_sha256": digest("paths"),
+                "allowed_probe_sha256": digest("allowed"),
+                "denied_probe_sha256": digest("denied"),
+                "return_probe_sha256": digest("return"),
+                "isolation_probe_sha256": digest("isolation"),
+                "evidence_sha256": digest("nic-e4"),
+                "observed_at": 99,
+                "expires_at": 150,
+                "level": "E4",
+                "decision": "accepted",
+                "revoked": False,
+            }
+        ],
     }
     return scope, catalogue, inventory, selected, flow, native
 
@@ -97,9 +145,9 @@ def test_qualified_single_vm_reconciles_all_owned_devices_and_datasets() -> None
     assert result["holds"] == []
     assert result["workloads"][0]["status"] == "matched"
     assert result["native_write_authorized"] is False
-    assert result["reconciliation_sha256"] == digest({
-        k: v for k, v in result.items() if k != "reconciliation_sha256"
-    })
+    assert result["reconciliation_sha256"] == digest(
+        {k: v for k, v in result.items() if k != "reconciliation_sha256"}
+    )
 
 
 def test_dataset_accountability_is_not_an_implicit_workload_join() -> None:
@@ -141,9 +189,9 @@ def test_unmapped_second_vm_never_inherits_first_vms_assurance() -> None:
     catalogue["intent"]["workloads"].append(extra)
     catalogue["intent_sha256"] = digest(catalogue["intent"])
     inventory["catalogue_binding"]["intent_sha256"] = catalogue["intent_sha256"]
-    inventory["source_associations"][0]["catalogue_binding"]["intent_sha256"] = (
-        catalogue["intent_sha256"]
-    )
+    inventory["source_associations"][0]["catalogue_binding"]["intent_sha256"] = catalogue[
+        "intent_sha256"
+    ]
     flow["intent_sha256"] = catalogue["intent_sha256"]
     result = evaluate(scope, catalogue, inventory, selected, flow, 100)
     assert result["status"] == "held"
@@ -171,35 +219,42 @@ def test_changed_profile_review_and_untrusted_observation_are_rejected() -> None
         evaluate(scope, catalogue, altered, selected, flow, 100)
 
 
-
 def test_application_flow_receipt_without_per_vm_interface_probes_never_passes() -> None:
     scope, catalogue, inventory, selected, flow, _ = specimen()
     flow["workload_interface_cases"] = []
     result = evaluate(scope, catalogue, inventory, selected, flow, 100)
     assert result["status"] == "held"
     assert any("source_network_semantics_not_verified" in hold for hold in result["holds"])
-    flow["workload_interface_cases"] = [{
-        "workload_id": catalogue["intent"]["workloads"][0]["id"],
-        "source_profile_sha256": digest("wrong-source"),
-    }]
+    flow["workload_interface_cases"] = [
+        {
+            "workload_id": catalogue["intent"]["workloads"][0]["id"],
+            "source_profile_sha256": digest("wrong-source"),
+        }
+    ]
     assert evaluate(scope, catalogue, inventory, selected, flow, 100)["status"] == "held"
 
 
 def test_independent_e4_boot_case_can_reconcile_unobserved_openstack_secure_boot() -> None:
     scope, catalogue, inventory, selected, flow, native = specimen()
     native["facts"]["secure_boot"] = None
-    native["observation_sha256"] = digest({
-        k: v for k, v in native.items() if k != "observation_sha256"
-    })
+    native["observation_sha256"] = digest(
+        {k: v for k, v in native.items() if k != "observation_sha256"}
+    )
     assert evaluate(scope, catalogue, inventory, selected, flow, 100)["status"] == "held"
-    flow["workload_boot_cases"] = [{
-        "workload_id": catalogue["intent"]["workloads"][0]["id"],
-        "source_profile_sha256": native["profile_sha256"],
-        "firmware": "efi", "secure_boot": True,
-        "observed_at": 100, "expires_at": 125,
-        "evidence_sha256": digest("independent-guest-boot"),
-        "level": "E4", "decision": "accepted", "revoked": False,
-    }]
+    flow["workload_boot_cases"] = [
+        {
+            "workload_id": catalogue["intent"]["workloads"][0]["id"],
+            "source_profile_sha256": native["profile_sha256"],
+            "firmware": "efi",
+            "secure_boot": True,
+            "observed_at": 100,
+            "expires_at": 125,
+            "evidence_sha256": digest("independent-guest-boot"),
+            "level": "E4",
+            "decision": "accepted",
+            "revoked": False,
+        }
+    ]
     matched = evaluate(scope, catalogue, inventory, selected, flow, 100)
     assert matched["status"] == "matched"
     assert matched["expires_at"] == 125
@@ -216,21 +271,29 @@ def test_uncatalogued_disk_requires_matching_owner_impact_and_independent_e4() -
     catalogue["intent_sha256"] = digest(catalogue["intent"])
     inventory["catalogue_binding"]["intent_sha256"] = catalogue["intent_sha256"]
     flow["intent_sha256"] = catalogue["intent_sha256"]
-    proof = {
-        "logical_device_id": disk["id"], "native_key": 2000,
+    proof: dict[str, Any] = {
+        "logical_device_id": disk["id"],
+        "native_key": 2000,
         "disposition": "uncatalogued_attested",
-        "owner_approval_sha256": digest("owner"), "impact_sha256": digest("impact"),
+        "owner_approval_sha256": digest("owner"),
+        "impact_sha256": digest("impact"),
     }
     inventory["catalogue_binding"]["disk_dispositions"] = [proof]
     assert evaluate(scope, catalogue, inventory, selected, flow, 100)["status"] == "held"
-    flow["disk_disposition_cases"] = [{
-        **proof, "workload_id": catalogue["intent"]["workloads"][0]["id"],
-        "source_profile_sha256": native["profile_sha256"],
-        "target_profile_sha256": selected["target"]["profile_sha256"],
-        "observed_at": 100, "expires_at": 125,
-        "evidence_sha256": digest("independent-disk"),
-        "level": "E4", "decision": "accepted", "revoked": False,
-    }]
+    flow["disk_disposition_cases"] = [
+        {
+            **proof,
+            "workload_id": catalogue["intent"]["workloads"][0]["id"],
+            "source_profile_sha256": native["profile_sha256"],
+            "target_profile_sha256": selected["target"]["profile_sha256"],
+            "observed_at": 100,
+            "expires_at": 125,
+            "evidence_sha256": digest("independent-disk"),
+            "level": "E4",
+            "decision": "accepted",
+            "revoked": False,
+        }
+    ]
     # Native dataset coverage must still account for every source disk.
     assert evaluate(scope, catalogue, inventory, selected, flow, 100)["status"] == "held"
     inventory["source_associations"][0]["datasets"][0]["id"] = "untracked-native-dataset"

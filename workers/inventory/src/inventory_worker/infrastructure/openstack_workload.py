@@ -103,12 +103,15 @@ def collect_openstack_source(
             ):
                 raise CollectionFailure("permission_denied")
             rule_ids.add(rule["id"])
-        source_security_groups.append({
-            "id": group_id, "project_id": project,
-            "semantics_sha256": security_semantics(group),
-            "rules": rule_choices(group),
-            "native_sha256": fingerprint(group),
-        })
+        source_security_groups.append(
+            {
+                "id": group_id,
+                "project_id": project,
+                "semantics_sha256": security_semantics(group),
+                "rules": rule_choices(group),
+                "native_sha256": fingerprint(group),
+            }
+        )
     holds: list[str] = []
     disks: list[dict[str, Any]] = []
     native_disks: list[dict[str, Any]] = []

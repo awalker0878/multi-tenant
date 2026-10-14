@@ -218,8 +218,11 @@ def source_profile_read_count(profile: dict[str, Any]) -> int:
     if not isinstance(groups, list) or not isinstance(ports, list):
         raise Rejected("source_profile_security_collection_incomplete")
     group_ids = [g.get("id") for g in groups if isinstance(g, dict)]
-    if (len(group_ids) != len(groups) or len(set(group_ids)) != len(groups)
-            or any(not isinstance(g, str) or not g for g in group_ids)):
+    if (
+        len(group_ids) != len(groups)
+        or len(set(group_ids)) != len(groups)
+        or any(not isinstance(g, str) or not g for g in group_ids)
+    ):
         raise Rejected("source_profile_security_collection_incomplete")
     attached: set[str] = set()
     for port in ports:
@@ -228,9 +231,11 @@ def source_profile_read_count(profile: dict[str, Any]) -> int:
         identities = port.get("security_groups")
         if identities is None:
             continue  # Unobserved membership remains an independent hold.
-        if (not isinstance(identities, list)
-                or any(not isinstance(i, str) or not i for i in identities)
-                or len(identities) != len(set(identities))):
+        if (
+            not isinstance(identities, list)
+            or any(not isinstance(i, str) or not i for i in identities)
+            or len(identities) != len(set(identities))
+        ):
             raise Rejected("source_profile_security_collection_incomplete")
         attached.update(identities)
     if attached != set(group_ids):
@@ -287,9 +292,9 @@ def source_observation(profile: dict[str, Any], binding: dict[str, Any]) -> dict
         "facts": {
             "cpu": facts["cpu"],
             "memory_mb": facts["memory_mb"],
-            "observed_at": int(profile["collected_at"]) if isinstance(
-                profile.get("collected_at"), (int, float)
-            ) else None,
+            "observed_at": int(profile["collected_at"])
+            if isinstance(profile.get("collected_at"), (int, float))
+            else None,
             "firmware": facts["firmware"],
             "secure_boot": secure_boot,
             # Guest identifiers are raw platform classifications, not
@@ -298,22 +303,31 @@ def source_observation(profile: dict[str, Any], binding: dict[str, Any]) -> dict
             "architecture": facts.get("architecture"),
             "disks": [
                 {
-                    "key": d["key"], "capacity_bytes": d["capacity_bytes"],
+                    "key": d["key"],
+                    "capacity_bytes": d["capacity_bytes"],
                     "controller_key": d.get("controller_key"),
                     "unit_number": d.get("unit_number"),
                     "native_role": next(
-                        (record.get("role") for record in
-                         native.get("disk_records", []) if record.get("key") == d["key"]),
+                        (
+                            record.get("role")
+                            for record in native.get("disk_records", [])
+                            if record.get("key") == d["key"]
+                        ),
                         None,
-                    ) if isinstance(native, dict)
-                    and isinstance(native.get("disk_records"), list) else None,
+                    )
+                    if isinstance(native, dict) and isinstance(native.get("disk_records"), list)
+                    else None,
                 }
                 for d in facts["disks"]
             ],
             "nics": [{"key": n["key"]} for n in facts["nics"]],
             "controllers": [
-                {"key": c["key"], "model": c.get("model"),
-                 "bus": c.get("bus"), "sharing": c.get("sharing")}
+                {
+                    "key": c["key"],
+                    "model": c.get("model"),
+                    "bus": c.get("bus"),
+                    "sharing": c.get("sharing"),
+                }
                 for c in facts.get("controllers", [])
             ],
             "native": {"identity": identity},

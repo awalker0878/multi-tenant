@@ -8,8 +8,8 @@ from typing import Any
 
 from uvicorn._types import ASGIReceiveCallable, ASGISendCallable, Scope
 
-from planning.application.migration_plans import MigrationPlans
 from planning.application.migration_flows import MigrationFlows
+from planning.application.migration_plans import MigrationPlans
 from planning.application.migration_support import MigrationSupport
 from planning.application.ports import Authority
 from planning.domain.model import Rejected, decode, identifier, integer, sha, shape
@@ -65,10 +65,15 @@ class MigrationPreparationApp:
             flow_save = route[4] == "migration-flow-selections"
             body = shape(
                 decode(bytes(chunks)),
-                ({"site_id", "review"} if route[4] == "migration-workload-readiness"
-                 else {"site_id"} if route[4] in {"migration-support", "migration-flow-choices"}
-                 else {"site_id", "revision", "context_sha256", "selections", "omissions"} if flow_save
-                 else {"site_id", "review", "disks"})
+                (
+                    {"site_id", "review"}
+                    if route[4] == "migration-workload-readiness"
+                    else {"site_id"}
+                    if route[4] in {"migration-support", "migration-flow-choices"}
+                    else {"site_id", "revision", "context_sha256", "selections", "omissions"}
+                    if flow_save
+                    else {"site_id", "review", "disks"}
+                )
                 | ({"base_plan_id", "recipe_id"} if complete else set()),
             )
             review = shape(body["review"], {"revision", "digest"}) if "review" in body else {}
@@ -80,7 +85,10 @@ class MigrationPreparationApp:
                 auth[7:],
                 delegation,
                 tenant,
-                "plan.read" if route[4] in {"migration-support", "migration-flow-choices", "migration-workload-readiness"} else "plan.create",
+                "plan.read"
+                if route[4]
+                in {"migration-support", "migration-flow-choices", "migration-workload-readiness"}
+                else "plan.create",
                 application,
                 environment,
                 site,
@@ -104,7 +112,11 @@ class MigrationPreparationApp:
                     status = 200
                 else:
                     payload = await asyncio.to_thread(
-                        self.flows.save, actor, site, delegation, body,
+                        self.flows.save,
+                        actor,
+                        site,
+                        delegation,
+                        body,
                         identifier(single(headers, b"idempotency-key")),
                     )
                     status = 200

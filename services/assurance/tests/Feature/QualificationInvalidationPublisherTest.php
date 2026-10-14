@@ -92,7 +92,6 @@ it('rejects merely successful HTTP replies and accepts only the exact durable in
     }
 });
 
-
 it('rejects use of reviewer credentials for downstream invalidation publication', function (): void {
     $ca = tempnam(sys_get_temp_dir(), 'authority-ca-');
     $token = tempnam(sys_get_temp_dir(), 'authority-token-');

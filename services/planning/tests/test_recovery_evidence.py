@@ -12,9 +12,20 @@ from planning.domain.recovery_evidence import recovery_checks
 @pytest.mark.parametrize(
     "fault",
     [
-        "none", "failure", "rpo", "rto", "delayed_start", "unit",
-        "bytes", "load", "scope", "missing_keys", "failed_keys",
-        "missing_dependency", "failed_dependency", "missing_application",
+        "none",
+        "failure",
+        "rpo",
+        "rto",
+        "delayed_start",
+        "unit",
+        "bytes",
+        "load",
+        "scope",
+        "missing_keys",
+        "failed_keys",
+        "missing_dependency",
+        "failed_dependency",
+        "missing_application",
         "stale_review",
     ],
 )
@@ -63,9 +74,14 @@ def test_restore_measurements_feed_back_into_the_next_assessment(fault: str) -> 
         "eligible"
         if fault == "none"
         else "blocked"
-        if fault in {
-            "failure", "rpo", "rto", "delayed_start",
-            "failed_keys", "failed_dependency",
+        if fault
+        in {
+            "failure",
+            "rpo",
+            "rto",
+            "delayed_start",
+            "failed_keys",
+            "failed_dependency",
         }
         else "unknown"
     )
@@ -80,8 +96,14 @@ def test_restore_start_delay_counts_against_rto() -> None:
     intent["datasets"][0]["recovery"]["rto_seconds"] = 120
     assert sample["application_ready_at"] - sample["restore_started_at"] < 120
     assert recovery_checks(
-        intent, destination, profile, policy,
-        destination["capability_snapshot"]["data"], NOW,
+        intent,
+        destination,
+        profile,
+        policy,
+        destination["capability_snapshot"]["data"],
+        NOW,
     )[0][1:] == (
-        "blocked", "measured_restore_exceeds_objectives", True,
+        "blocked",
+        "measured_restore_exceeds_objectives",
+        True,
     )

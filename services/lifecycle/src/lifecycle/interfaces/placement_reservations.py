@@ -3,12 +3,11 @@
 import asyncio
 import json
 import re
-from importlib.resources import files
-
-from jsonschema import Draft202012Validator, FormatChecker
 from collections.abc import Callable
+from importlib.resources import files
 from typing import Any
 
+from jsonschema import Draft202012Validator, FormatChecker
 from uvicorn._types import ASGIReceiveCallable, ASGISendCallable, Scope
 
 from lifecycle.application.placement_reservations import PlacementReservations
@@ -52,11 +51,13 @@ class PlacementReservationApp:
             # The same canonical installed contract validates commands and receipts.
             schema = json.loads(
                 files("lifecycle.infrastructure.contracts")
-                .joinpath("placement-reservation-v1.json").read_text()
+                .joinpath("placement-reservation-v1.json")
+                .read_text()
             )
             command = "ReserveCommand" if operation == "reserve" else "DigestCommand"
-            if not Draft202012Validator(schema["$defs"][command],
-                                        format_checker=FormatChecker()).is_valid(body):
+            if not Draft202012Validator(
+                schema["$defs"][command], format_checker=FormatChecker()
+            ).is_valid(body):
                 raise Held("placement_request_invalid")
             if operation == "reserve":
                 payload = await asyncio.to_thread(self.service.reserve, tenant, body)
@@ -70,11 +71,14 @@ class PlacementReservationApp:
             # A malformed receipt must never authorize a capacity decision.
             schema = json.loads(
                 files("lifecycle.infrastructure.contracts")
-                .joinpath("placement-reservation-v1.json").read_text()
+                .joinpath("placement-reservation-v1.json")
+                .read_text()
             )
-            if (not Draft202012Validator(schema, format_checker=FormatChecker()).is_valid(payload)
-                    or payload["tenant_id"] != tenant
-                    or payload["plan_digest"] != body["plan_digest"]):
+            if (
+                not Draft202012Validator(schema, format_checker=FormatChecker()).is_valid(payload)
+                or payload["tenant_id"] != tenant
+                or payload["plan_digest"] != body["plan_digest"]
+            ):
                 raise ValueError("placement_receipt_contract_invalid")
             # A structurally valid receipt for another tenant or another plan
             # is never admissible as this caller's authoritative result.

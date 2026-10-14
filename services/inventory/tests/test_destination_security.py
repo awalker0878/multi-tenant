@@ -1,68 +1,92 @@
 """API-observed network policies are selectable only when source-defined."""
 
+from typing import Any
+
 import pytest
 
 from inventory.domain.destination_security import (
-    require_matching_openstack_rules,
     select_security_mappings,
-    source_security_ids,
     source_rule_choices,
+    source_security_ids,
 )
 from inventory.domain.discovery import Rejected
 from inventory.domain.migration import destination_input
 
 
-def source(groups=("source-g",), *, port_security=True):
+def source(groups: Any = ("source-g",), *, port_security: Any = True) -> Any:
     return {
         "platform": "openstack",
-        "schema_version": 3, "native_scope": "project-1",
+        "schema_version": 3,
+        "native_scope": "project-1",
         "guest_id": "otherLinux64Guest",
         "nics": [{"key": 0}],
-        "native": {"metadata": {
-            "ports": [{"id": "port-1", "project_id": "project-1",
-                       "security_groups": list(groups),
-                       "port_security_enabled": port_security}],
-            "security_groups": [
-                {"id": g, "project_id": "project-1",
-                 "semantics_sha256": "a" * 64,
-                 "rules": [{"id": "rule-" + g, "semantic_sha256": "f" * 64}]}
-                for g in groups
-            ],
-        }},
-    }
-
-
-def destination(semantics="a" * 64):
-    return {
-        "platform": "openstack", "project_id": "project-2",
-        "security_groups": [{"id": "target-g", "project_id": "project-2",
-                             "semantics_sha256": semantics,
-                             "rules": [{"id": "target-rule", "semantic_sha256": "f" * 64}]}],
-    }
-
-
-def review(items=None):
-    return {
-        "destination": {
-            "platform": "openstack", "project_id": "project-2",
-            "security_mappings": items if items is not None else [
-                {"source_id": "source-g", "destination_id": "target-g"}
-            ],
-            "flow_mappings": [{"source_group_id": "source-g",
-                               "source_rule_id": "rule-source-g",
-                               "destination_rule_id": "target-rule"}],
+        "native": {
+            "metadata": {
+                "ports": [
+                    {
+                        "id": "port-1",
+                        "project_id": "project-1",
+                        "security_groups": list(groups),
+                        "port_security_enabled": port_security,
+                    }
+                ],
+                "security_groups": [
+                    {
+                        "id": g,
+                        "project_id": "project-1",
+                        "semantics_sha256": "a" * 64,
+                        "rules": [{"id": "rule-" + g, "semantic_sha256": "f" * 64}],
+                    }
+                    for g in groups
+                ],
+            }
         },
     }
 
 
-def test_missing_source_policy_observation_is_unknown_not_empty():
+def destination(semantics: Any = "a" * 64) -> Any:
+    return {
+        "platform": "openstack",
+        "project_id": "project-2",
+        "security_groups": [
+            {
+                "id": "target-g",
+                "project_id": "project-2",
+                "semantics_sha256": semantics,
+                "rules": [{"id": "target-rule", "semantic_sha256": "f" * 64}],
+            }
+        ],
+    }
+
+
+def review(items: Any = None) -> Any:
+    return {
+        "destination": {
+            "platform": "openstack",
+            "project_id": "project-2",
+            "security_mappings": items
+            if items is not None
+            else [{"source_id": "source-g", "destination_id": "target-g"}],
+            "flow_mappings": [
+                {
+                    "source_group_id": "source-g",
+                    "source_rule_id": "rule-source-g",
+                    "destination_rule_id": "target-rule",
+                }
+            ],
+        },
+    }
+
+
+def test_missing_source_policy_observation_is_unknown_not_empty() -> None:
     for bad in (
         {**source(), "platform": "ahv"},
         {**source(), "native": {"metadata": {}}},
         source(port_security=False),
-        {**source(), "native": {"metadata": {"ports": [
-            {"id": "port-1", "security_groups": ["source-g"]}
-        ]}}},
+        {
+            **source(),
+            "native": {"metadata": {"ports": [{"id": "port-1", "security_groups": ["source-g"]}]}},
+        },
     ):
         assert source_security_ids(bad) is None
         # Owner can save the rest of the review, but confirmation is held.
@@ -71,7 +95,7 @@ def test_missing_source_policy_observation_is_unknown_not_empty():
             destination_input(review(), bad, destination())
 
 
-def test_exact_source_group_must_be_mapped_to_api_observed_target_group():
+def test_exact_source_group_must_be_mapped_to_api_observed_target_group() -> None:
     valid = review()
     assert source_security_ids(source()) == ["source-g"]
     destination_input(valid, source(), destination())
@@ -79,14 +103,16 @@ def test_exact_source_group_must_be_mapped_to_api_observed_target_group():
         [],
         [{"source_id": "made-up", "destination_id": "target-g"}],
         [{"source_id": "source-g", "destination_id": "invented"}],
-        [{"source_id": "source-g", "destination_id": "target-g"},
-         {"source_id": "source-g", "destination_id": "target-g"}],
+        [
+            {"source_id": "source-g", "destination_id": "target-g"},
+            {"source_id": "source-g", "destination_id": "target-g"},
+        ],
     ):
         with pytest.raises(Rejected):
             destination_input(review(invalid), source(), destination())
 
 
-def test_only_matching_native_traffic_semantics_are_eligible_candidates():
+def test_only_matching_native_traffic_semantics_are_eligible_candidates() -> None:
     with pytest.raises(Rejected, match="destination_security_flow_equivalence_unproven"):
         destination_input(review(), source(), destination("b" * 64))
     with pytest.raises(Rejected, match="destination_security_flow_equivalence_unproven"):
@@ -97,7 +123,7 @@ def test_only_matching_native_traffic_semantics_are_eligible_candidates():
         destination_input(review(), incomplete, destination())
 
 
-def test_absent_source_security_is_not_an_invitation_to_select_unneeded_rules():
+def test_absent_source_security_is_not_an_invitation_to_select_unneeded_rules() -> None:
     without = source(groups=())
     assert source_security_ids(without) == []
     destination_input({"destination": None}, without, destination())
@@ -106,27 +132,35 @@ def test_absent_source_security_is_not_an_invitation_to_select_unneeded_rules():
     assert source_security_ids({"nics": [], "platform": "vmware"}) == []
 
 
-def test_security_mapping_requires_one_to_one_existing_target_choices():
+def test_security_mapping_requires_one_to_one_existing_target_choices() -> None:
     ids = ["source-a", "source-b"]
     assert select_security_mappings(
-        [{"source_id": "source-a", "destination_id": "dest-1"},
-         {"source_id": "source-b", "destination_id": "dest-2"}],
-        ids, {"dest-1", "dest-2"}
+        [
+            {"source_id": "source-a", "destination_id": "dest-1"},
+            {"source_id": "source-b", "destination_id": "dest-2"},
+        ],
+        ids,
+        {"dest-1", "dest-2"},
     ) == ["dest-1", "dest-2"]
     with pytest.raises(Rejected):
         select_security_mappings(
-            [{"source_id": "source-a", "destination_id": "dest-1"},
-             {"source_id": "source-b", "destination_id": "dest-1"}],
-            ids, {"dest-1", "dest-2"}
+            [
+                {"source_id": "source-a", "destination_id": "dest-1"},
+                {"source_id": "source-b", "destination_id": "dest-1"},
+            ],
+            ids,
+            {"dest-1", "dest-2"},
         )
 
 
-def test_every_observed_source_acl_rule_requires_existing_equivalent_target_id():
-    assert source_rule_choices(source()) == [{
-        "source_group_id": "source-g",
-        "source_rule_id": "rule-source-g",
-        "semantic_sha256": "f" * 64,
-    }]
+def test_every_observed_source_acl_rule_requires_existing_equivalent_target_id() -> None:
+    assert source_rule_choices(source()) == [
+        {
+            "source_group_id": "source-g",
+            "source_rule_id": "rule-source-g",
+            "semantic_sha256": "f" * 64,
+        }
+    ]
     for fault in ("missing", "invented", "changed_semantics", "duplicate"):
         body = review()
         target = destination()
@@ -142,7 +176,7 @@ def test_every_observed_source_acl_rule_requires_existing_equivalent_target_id()
             destination_input(body, source(), target)
 
 
-def test_missing_native_acl_details_preserve_empty_draft_but_not_invented_rule():
+def test_missing_native_acl_details_preserve_empty_draft_but_not_invented_rule() -> None:
     incomplete = source()
     incomplete["native"]["metadata"]["security_groups"][0]["rules"] = None
     assert source_rule_choices(incomplete) is None
@@ -154,24 +188,27 @@ def test_missing_native_acl_details_preserve_empty_draft_but_not_invented_rule()
         destination_input(review(), incomplete, destination())
 
 
-def test_same_rule_id_on_wrong_destination_group_cannot_be_selected():
+def test_same_rule_id_on_wrong_destination_group_cannot_be_selected() -> None:
     target = destination()
     target["security_groups"][0]["rules"] = []
-    target["security_groups"].append({
-        "id": "unselected-group", "project_id": "project-2",
-        "semantics_sha256": "a" * 64,
-        "rules": [{"id": "target-rule", "semantic_sha256": "f" * 64}],
-    })
+    target["security_groups"].append(
+        {
+            "id": "unselected-group",
+            "project_id": "project-2",
+            "semantics_sha256": "a" * 64,
+            "rules": [{"id": "target-rule", "semantic_sha256": "f" * 64}],
+        }
+    )
     with pytest.raises(Rejected, match="destination_security_rule_choice_unproven"):
         destination_input(review(), source(), target)
 
 
-def test_missing_destination_is_validation_error_not_internal_type_error():
+def test_missing_destination_is_validation_error_not_internal_type_error() -> None:
     with pytest.raises(Rejected):
         destination_input({"destination": None}, source(), destination())
 
 
-def test_truly_empty_native_acl_does_not_require_fabricated_flow():
+def test_truly_empty_native_acl_does_not_require_fabricated_flow() -> None:
     src = source()
     src["native"]["metadata"]["security_groups"][0]["rules"] = []
     tgt = destination()

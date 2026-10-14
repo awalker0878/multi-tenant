@@ -58,10 +58,14 @@ def request(
             "Content-Type": "application/json",
         }
         if owner == "GOVERNANCE":
-            headers["Idempotency-Key"] = hashlib.sha256(json.dumps(
-                {"path": path, "body": body}, sort_keys=True,
-                separators=(",", ":"), allow_nan=False,
-            ).encode()).hexdigest()
+            headers["Idempotency-Key"] = hashlib.sha256(
+                json.dumps(
+                    {"path": path, "body": body},
+                    sort_keys=True,
+                    separators=(",", ":"),
+                    allow_nan=False,
+                ).encode()
+            ).hexdigest()
         if delegation:
             headers["X-Actor-Delegation"] = delegation
         if action:
@@ -94,17 +98,23 @@ def request(
             # Never let an authorized service credential substitute for tenant authority.
             if owner == "LIFECYCLE":
                 tenant = path.split("/")[3]
-                if (result["tenant_id"] != tenant or body is None
-                        or result["plan_digest"] != body["plan_digest"]):
+                if (
+                    result["tenant_id"] != tenant
+                    or body is None
+                    or result["plan_digest"] != body["plan_digest"]
+                ):
                     raise ValueError
             elif owner == "GOVERNANCE":
                 tenant = path.split("/")[3]
-                if (result["tenant_id"] != tenant or body is None
-                        or result["scope"] != body["scope"]
-                        or result["action"] != body["action"]
-                        or result["audience"] != "planning"
-                        or result["delegating_service"] != "console"
-                        or result["authority_use"] != "request_bound"):
+                if (
+                    result["tenant_id"] != tenant
+                    or body is None
+                    or result["scope"] != body["scope"]
+                    or result["action"] != body["action"]
+                    or result["audience"] != "planning"
+                    or result["delegating_service"] != "console"
+                    or result["authority_use"] != "request_bound"
+                ):
                     raise ValueError
             return result
         finally:
@@ -367,8 +377,7 @@ def placement_current(plan: dict[str, Any], current: dict[str, Any]) -> None:
     )
     # Capacity is a mandatory current observation, not an exception to revalidation.
     if any(
-        finding["mandatory"] and finding["status"] != "eligible"
-        for finding in result["findings"]
+        finding["mandatory"] and finding["status"] != "eligible" for finding in result["findings"]
     ):
         raise Rejected("current_native_measurement_required", 423)
     try:
@@ -396,7 +405,8 @@ def placement_current(plan: dict[str, Any], current: dict[str, Any]) -> None:
         raise Rejected("placement_binding_invalid", 423)
     placed = current_placement
     receipt = request(
-        "LIFECYCLE", "POST",
+        "LIFECYCLE",
+        "POST",
         f"/internal/tenants/{scope['tenant_id']}/placement-reservations/checks",
         {"plan_digest": plan["binding"]["digest"]},
     )

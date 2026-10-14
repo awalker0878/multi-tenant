@@ -4,8 +4,8 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any, Never
 
-from planning.domain.model import Actor, Rejected, digest
 from planning.domain.migration_api_selection import pin as pin_api_selection
+from planning.domain.model import Actor, Rejected, digest
 
 
 @dataclass(frozen=True, slots=True)
@@ -68,9 +68,7 @@ class MigrationValidation:
             or readiness.get("native_write_authorized") is not False
         ):
             raise Rejected("migration_readiness_held", 423)
-        if composition.get("api_selection") != pin_api_selection(
-            readiness, self.clock()
-        ):
+        if composition.get("api_selection") != pin_api_selection(readiness, self.clock()):
             raise Rejected("migration_qualified_api_selection_changed", 423)
         recipe = self.recipes(actor, scope["site_id"], composition["recipe_id"])
         if digest(recipe) != composition["recipe_sha256"] or recipe["expires_at"] <= self.clock():

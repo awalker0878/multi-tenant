@@ -3,6 +3,7 @@
 This uses deterministic owned records and placement inputs, not a mocked
 PlanningApp response. A validated read is not a native execution grant.
 """
+
 from __future__ import annotations
 
 import json
@@ -19,7 +20,6 @@ from planning.application.ports import Database, Sources
 from planning.application.validation import PlanValidation
 from planning.domain.model import Rejected, digest
 
-
 ROOT = Path(__file__).resolve().parents[3]
 
 
@@ -27,42 +27,56 @@ def test_real_execution_and_placement_producers_match_lifecycle_wire() -> None:
     fixture = json.loads(
         (ROOT / "contracts/fixtures/planning/synthetic-plan-v1.1.json").read_text()
     )
-    native = json.loads(
-        (ROOT / "contracts/fixtures/planning/synthetic-inputs-v1.json").read_text()
-    )
-    api = json.loads(
-        (ROOT / "contracts/openapi/planning-lifecycle-reads-v1.json").read_text()
-    )
+    native = json.loads((ROOT / "contracts/fixtures/planning/synthetic-inputs-v1.json").read_text())
+    api = json.loads((ROOT / "contracts/openapi/planning-lifecycle-reads-v1.json").read_text())
     content, binding = fixture["content"], fixture["binding"]
     tenant, identity = content["scope"]["tenant_id"], binding["plan_id"]
     policy = {"allowed_zones": ["zone-a", "zone-b"]}
     zero = {
-        "vcpus": 0, "memory_mib": 0, "storage_gib": 0,
-        "addresses": 0, "storage_gib:standard": 0, "addresses:private:ipv4": 0,
+        "vcpus": 0,
+        "memory_mib": 0,
+        "storage_gib": 0,
+        "addresses": 0,
+        "storage_gib:standard": 0,
+        "addresses:private:ipv4": 0,
     }
     capacity = {
-        "vcpus": 8, "memory_mib": 32768, "storage_gib": 200,
-        "addresses": 8, "storage_gib:standard": 200, "addresses:private:ipv4": 8,
+        "vcpus": 8,
+        "memory_mib": 32768,
+        "storage_gib": 200,
+        "addresses": 8,
+        "storage_gib:standard": 200,
+        "addresses:private:ipv4": 8,
     }
     pools = [
         {
-            "id": "pool-" + zone, "native_ref": "native-" + zone,
+            "id": "pool-" + zone,
+            "native_ref": "native-" + zone,
             "failure_domain": "domain-" + zone,
-            "zone": zone, "ledger_revision": 1,
-            "policy_sha256": digest(policy), "architecture": "x86_64",
-            "storage_classes": ["standard"], "network_classes": ["private"],
-            "total": capacity, "used": zero, "pending": zero,
+            "zone": zone,
+            "ledger_revision": 1,
+            "policy_sha256": digest(policy),
+            "architecture": "x86_64",
+            "storage_classes": ["standard"],
+            "network_classes": ["private"],
+            "total": capacity,
+            "used": zero,
+            "pending": zero,
         }
         for zone in policy["allowed_zones"]
     ]
     record = {
-        "id": identity, "assessment_id": content["intent_revision"],
-        "candidate": 0, "content": content, "binding": binding,
+        "id": identity,
+        "assessment_id": content["intent_revision"],
+        "candidate": 0,
+        "content": content,
+        "binding": binding,
     }
     assessment = {
         "intent": {"intent": native["intent"]},
-        "inputs": [{"destination": {"capability_snapshot": {"data": {"pools": pools}}},
-                    "policy": policy}],
+        "inputs": [
+            {"destination": {"capability_snapshot": {"data": {"pools": pools}}}, "policy": policy}
+        ],
     }
     qualification = {"scope_sha256": "a" * 64, "state": "qualified", "invalidated": False}
 
@@ -78,10 +92,14 @@ def test_real_execution_and_placement_producers_match_lifecycle_wire() -> None:
         def transaction(self) -> Any:
             return nullcontext(Transaction())
 
-    now = lambda: 1000
+    def now() -> int:
+        return 1000
+
     planning = Planning(
-        cast(Database, TestDatabase()), cast(Sources, Mock()),
-        now, PlanValidation.unavailable(now),
+        cast(Database, TestDatabase()),
+        cast(Sources, Mock()),
+        now,
+        PlanValidation.unavailable(now),
     )
     response = planning.execution_plan(tenant, identity, 1)
     proposal = planning.placement_proposal(tenant, identity, 1)

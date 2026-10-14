@@ -5,6 +5,7 @@ source in the current workloads. Other hypervisors require a commissioned
 native source-policy observer before a destination security mapping can be
 authorized. Missing observation is UNKNOWN, not an empty required set.
 """
+
 from typing import Any
 
 from inventory.domain.discovery import Rejected
@@ -31,7 +32,8 @@ def source_security_ids(source: dict[str, Any]) -> list[str] | None:
         port_id = port.get("id")
         groups = port.get("security_groups")
         if (
-            not isinstance(port_id, str) or not port_id
+            not isinstance(port_id, str)
+            or not port_id
             or port_id in port_ids
             or port.get("project_id", port.get("tenant_id")) != scope
             or type(port.get("port_security_enabled")) is not bool
@@ -51,7 +53,8 @@ def source_security_ids(source: dict[str, Any]) -> list[str] | None:
 
 
 def select_security_mappings(
-    chosen: Any, source_ids: list[str] | None,
+    chosen: Any,
+    source_ids: list[str] | None,
     destination_ids: set[str],
 ) -> list[str]:
     if source_ids is None:
@@ -79,8 +82,11 @@ def select_security_mappings(
         raise Rejected("required_security_mappings_incomplete")
     return [row["destination_id"] for row in chosen]
 
+
 def require_matching_openstack_rules(
-    source: dict[str, Any], chosen: list[dict[str, str]], target: dict[str, Any],
+    source: dict[str, Any],
+    chosen: list[dict[str, str]],
+    target: dict[str, Any],
 ) -> None:
     """Selection is allowed only where observed rules are behaviorally identical.
 
@@ -142,22 +148,32 @@ def source_rule_choices(source: dict[str, Any]) -> list[dict[str, str]] | None:
                 return None
             identity, semantics = rule.get("id"), rule.get("semantic_sha256")
             if (
-                not isinstance(identity, str) or not identity or identity in rule_ids
-                or not isinstance(semantics, str) or len(semantics) != 64
+                not isinstance(identity, str)
+                or not identity
+                or identity in rule_ids
+                or not isinstance(semantics, str)
+                or len(semantics) != 64
                 or any(c not in "0123456789abcdef" for c in semantics)
             ):
                 return None
             rule_ids.add(identity)
-            rows.append({"source_group_id": group_id, "source_rule_id": identity,
-                         "semantic_sha256": semantics})
+            rows.append(
+                {
+                    "source_group_id": group_id,
+                    "source_rule_id": identity,
+                    "semantic_sha256": semantics,
+                }
+            )
             if len(rows) > 1024:
                 return None
     return rows
 
 
 def validate_security_flow_choices(
-    source: dict[str, Any], destination: dict[str, Any],
-    groups: list[dict[str, str]], selected: Any,
+    source: dict[str, Any],
+    destination: dict[str, Any],
+    groups: list[dict[str, str]],
+    selected: Any,
 ) -> bool:
     """Require API-discovered destination IDs for every source ACL rule.
 
@@ -181,21 +197,35 @@ def validate_security_flow_choices(
     seen_source, seen_target = set(), set()
     for row in selected:
         if not isinstance(row, dict) or set(row) != {
-            "source_group_id", "source_rule_id", "destination_rule_id"
+            "source_group_id",
+            "source_rule_id",
+            "destination_rule_id",
         }:
             raise Rejected("invalid_security_flow_mapping")
         group_id, source_rule = row["source_group_id"], row["source_rule_id"]
         destination_rule = row["destination_rule_id"]
-        original = required.get((group_id, source_rule)) if isinstance(group_id, str) and isinstance(source_rule, str) else None
+        original = (
+            required.get((group_id, source_rule))
+            if isinstance(group_id, str) and isinstance(source_rule, str)
+            else None
+        )
         target_group = observed.get(binding.get(group_id)) if isinstance(group_id, str) else None
         native_rules = target_group.get("rules") if isinstance(target_group, dict) else None
         match = (
-            next((rule for rule in native_rules
-                  if isinstance(rule, dict) and rule.get("id") == destination_rule), None)
-            if isinstance(native_rules, list) and isinstance(destination_rule, str) else None
+            next(
+                (
+                    rule
+                    for rule in native_rules
+                    if isinstance(rule, dict) and rule.get("id") == destination_rule
+                ),
+                None,
+            )
+            if isinstance(native_rules, list) and isinstance(destination_rule, str)
+            else None
         )
         if (
-            original is None or match is None
+            original is None
+            or match is None
             or match.get("semantic_sha256") != original["semantic_sha256"]
             or (group_id, source_rule) in seen_source
             or (binding[group_id], destination_rule) in seen_target

@@ -231,7 +231,8 @@ class PlacementReservations:
                 pool = candidates[0]
                 if (
                     pool["native_ref"] != allocation["native_ref"]
-                    or pool["id"] != digest(
+                    or pool["id"]
+                    != digest(
                         {"provider_id": pool["provider_id"], "native_ref": pool["native_ref"]}
                     )
                     or pool["exclusive_owner"] != "lifecycle-resource-owner"
@@ -263,8 +264,10 @@ class PlacementReservations:
                     for debit in debits:
                         if debit["native_ref"] != pool["native_ref"]:
                             raise Held("placement_pool_identity_collision")
-                        if (debit["state"] == "confirmed"
-                            and str(debit["id"]) in pool["accounted_reservation_ids"]):
+                        if (
+                            debit["state"] == "confirmed"
+                            and str(debit["id"]) in pool["accounted_reservation_ids"]
+                        ):
                             continue
                         for kind, amount in vector(debit["vector"]).items():
                             if kind not in outstanding:

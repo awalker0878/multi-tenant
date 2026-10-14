@@ -27,7 +27,8 @@ class PlanningInputApp:
         collection_read: Callable[
             [str, str, dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any], int],
             list[dict[str, Any]],
-        ] | None = None,
+        ]
+        | None = None,
     ) -> None:
         self.capability_authority = capability_authority
         self.collection_read = collection_read
@@ -48,7 +49,11 @@ class PlanningInputApp:
             # Retired internal planning-input alias had no UUID-scoped reader
             # and used to convert its endpoint UUID to an integer (HTTP 503).
             # Internal callers must use the qualified capability or migration read.
-            if route and scope["path"].startswith("/internal/") and "/planning-inputs/" in scope["path"]:
+            if (
+                route
+                and scope["path"].startswith("/internal/")
+                and "/planning-inputs/" in scope["path"]
+            ):
                 raise Rejected("not_found", 404)
             migration = re.fullmatch(
                 rf"/(?:v1|internal)/tenants/({UUID})/migration-inputs/({UUID})/({UUID})/({UUID})/([1-9][0-9]{{0,8}})/([0-9a-f]{{64}})",
@@ -136,15 +141,25 @@ class PlanningInputApp:
                 assert self.capability_authority is not None
                 await asyncio.to_thread(
                     self.capability_authority,
-                    auth[7:], tenant, application, environment,
-                    site, endpoint, generation,
+                    auth[7:],
+                    tenant,
+                    application,
+                    environment,
+                    site,
+                    endpoint,
+                    generation,
                 )
             elif scope["path"].startswith("/internal/"):
                 assert self.native_authority is not None
                 await asyncio.to_thread(
                     self.native_authority,
-                    auth[7:], tenant, application, environment,
-                    site, int(endpoint), generation,
+                    auth[7:],
+                    tenant,
+                    application,
+                    environment,
+                    site,
+                    int(endpoint),
+                    generation,
                 )
             status = 200
         except Rejected as e:

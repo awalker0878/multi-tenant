@@ -4,8 +4,8 @@ import re
 from typing import Any
 from uuid import UUID
 
-from inventory.domain.discovery import Rejected, number, shape, text
 from inventory.domain.destination_security import source_security_ids
+from inventory.domain.discovery import Rejected, number, shape, text
 
 AHV_FIELDS = {
     "schema_version",
@@ -50,11 +50,15 @@ def validate_profile(p: dict[str, Any], stream: dict[str, Any]) -> None:
         or not isinstance(p["api_versions"], dict)
         or set(p["api_versions"]) != {"vmm", "prism", "clustermgmt", "networking", "microseg"}
         or any(v not in {"v4.2", "v4.3"} for v in p["api_versions"].values())
-        or (stream.get("api_versions_verified") is True
-            and p["api_versions"] != stream.get("api_versions"))
-        or (stream.get("api_versions_verified") is not True
-            and p["api_versions"] != dict.fromkeys(
-                ("vmm", "prism", "clustermgmt", "networking", "microseg"), "v4.3"))
+        or (
+            stream.get("api_versions_verified") is True
+            and p["api_versions"] != stream.get("api_versions")
+        )
+        or (
+            stream.get("api_versions_verified") is not True
+            and p["api_versions"]
+            != dict.fromkeys(("vmm", "prism", "clustermgmt", "networking", "microseg"), "v4.3")
+        )
         or p["inventory_complete"] is not True
         or p["disk_formats"] != ["raw"]
         or p["image_import_methods"] != ["prism-image-url"]
@@ -62,20 +66,24 @@ def validate_profile(p: dict[str, Any], stream: dict[str, Any]) -> None:
         raise Rejected("invalid_ahv_profile")
     references = p["security_references"]
     if not isinstance(references, dict) or set(references) != {
-        "entity_groups", "address_groups", "service_groups"
+        "entity_groups",
+        "address_groups",
+        "service_groups",
     }:
         raise Rejected("invalid_ahv_microseg_reference_catalog")
-    for kind, rows in references.items():
+    for rows in references.values():
         if not isinstance(rows, list) or len(rows) > 100:
             raise Rejected("invalid_ahv_microseg_reference_catalog")
         seen_refs: set[str] = set()
         for item in rows:
             shape(item, {"extId", "native_sha256", "resolution"})
             identifier = native_uuid(item["extId"])
-            if (identifier in seen_refs
-                    or item["resolution"] != "definition_only"
-                    or not isinstance(item["native_sha256"], str)
-                    or re.fullmatch(r"[a-f0-9]{64}", item["native_sha256"]) is None):
+            if (
+                identifier in seen_refs
+                or item["resolution"] != "definition_only"
+                or not isinstance(item["native_sha256"], str)
+                or re.fullmatch(r"[a-f0-9]{64}", item["native_sha256"]) is None
+            ):
                 raise Rejected("invalid_ahv_microseg_reference_catalog")
             seen_refs.add(identifier)
     for field in ("storage_containers", "subnets", "vpcs", "categories", "policies"):
@@ -118,9 +126,14 @@ def validate_profile(p: dict[str, Any], stream: dict[str, Any]) -> None:
                             or not isinstance(rule.get("type"), str)
                             or not isinstance(rule.get("spec_sha256"), str)
                             or re.fullmatch(r"[a-f0-9]{64}", rule["spec_sha256"]) is None
-                            or set(rule) != {
-                                "extId", "type", "spec_sha256", "category_ids",
-                                "address_group_ids", "service_group_ids",
+                            or set(rule)
+                            != {
+                                "extId",
+                                "type",
+                                "spec_sha256",
+                                "category_ids",
+                                "address_group_ids",
+                                "service_group_ids",
                                 "reference_resolution",
                             }
                         ):
@@ -128,15 +141,15 @@ def validate_profile(p: dict[str, Any], stream: dict[str, Any]) -> None:
                         for kind in ("category_ids", "address_group_ids", "service_group_ids"):
                             refs = rule[kind]
                             if (
-                                not isinstance(refs, list) or len(refs) > 64
+                                not isinstance(refs, list)
+                                or len(refs) > 64
                                 or len(set(refs)) != len(refs)
                                 or any(not isinstance(v, str) or not v for v in refs)
                             ):
                                 raise Rejected("invalid_ahv_rule_references")
                         known_categories = {item["extId"] for item in p["categories"]}
-                        unresolved = (
-                            bool(set(rule["category_ids"]) - known_categories)
-                            or bool(rule["address_group_ids"] or rule["service_group_ids"])
+                        unresolved = bool(set(rule["category_ids"]) - known_categories) or bool(
+                            rule["address_group_ids"] or rule["service_group_ids"]
                         )
                         if rule["reference_resolution"] != (
                             "unresolved" if unresolved else "catalogue_ids_only"
@@ -191,8 +204,10 @@ def destination_input(body: dict[str, Any], source: dict[str, Any], target: dict
     metadata = native.get("metadata") if isinstance(native, dict) else None
     vm = metadata.get("vm") if isinstance(metadata, dict) else None
     source_categories = vm.get("categories") if isinstance(vm, dict) else None
-    if not isinstance(d["category_ids"], list) or len(d["category_ids"]) > 32 or (
-        len(d["category_ids"]) != len(set(d["category_ids"]))
+    if (
+        not isinstance(d["category_ids"], list)
+        or len(d["category_ids"]) > 32
+        or (len(d["category_ids"]) != len(set(d["category_ids"])))
     ):
         raise Rejected("ahv_category_selection_invalid")
     if (

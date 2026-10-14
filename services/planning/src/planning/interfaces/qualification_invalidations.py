@@ -16,7 +16,8 @@ from planning.domain.model import Rejected, decode
 
 class QualificationInvalidationApp:
     def __init__(
-        self, inbox: QualificationInvalidations,
+        self,
+        inbox: QualificationInvalidations,
         secret_reader: Callable[[str], str],
     ) -> None:
         self.inbox, self.secret_reader = inbox, secret_reader
@@ -41,9 +42,11 @@ class QualificationInvalidationApp:
             # an authenticated request remains fail-closed when its authority
             # cannot be verified against the separately enrolled secret.
             authorization = [v for k, v in headers if k.lower() == b"authorization"]
-            if (len(authorization) != 1
-                    or not authorization[0].startswith(b"Bearer ")
-                    or len(authorization[0]) == len(b"Bearer ")):
+            if (
+                len(authorization) != 1
+                or not authorization[0].startswith(b"Bearer ")
+                or len(authorization[0]) == len(b"Bearer ")
+            ):
                 raise Rejected("invalidation_unauthorized", 401)
             # The read-only Assurance and outgoing Governance credentials cannot
             # stand in for a separately enrolled inbound invalidation principal.
@@ -57,9 +60,7 @@ class QualificationInvalidationApp:
                     expected, self.secret_reader(other)
                 ):
                     raise Rejected("invalidation_authority_not_independent", 503)
-            if not hmac.compare_digest(
-                authorization[0], b"Bearer " + expected.encode("ascii")
-            ):
+            if not hmac.compare_digest(authorization[0], b"Bearer " + expected.encode("ascii")):
                 raise Rejected("invalidation_unauthorized", 401)
             content_type = [v for k, v in headers if k.lower() == b"content-type"]
             if (

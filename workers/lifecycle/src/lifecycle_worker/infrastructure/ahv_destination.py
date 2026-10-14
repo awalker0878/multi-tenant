@@ -20,7 +20,6 @@ from lifecycle_worker.infrastructure.image_conversion import file_digest
 from lifecycle_worker.infrastructure.migration_custody import ArtifactCustody
 from lifecycle_worker.infrastructure.native_files import protected_read
 
-
 MIGRATION_API_CAPABILITIES = frozenset({"vm.disk.import"})
 
 

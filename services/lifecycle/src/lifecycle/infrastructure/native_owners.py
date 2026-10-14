@@ -17,7 +17,6 @@ from lifecycle.domain.campaign_plan import native_plan_record, plan_requirements
 from lifecycle.domain.execution import Rejected, decode, identity
 from lifecycle.domain.migration import current_profiles
 from lifecycle.domain.migration_readiness import verify_catalogue_membership
-from lifecycle.infrastructure.migration_readiness_contract import verify as verify_migration_readiness
 from lifecycle.domain.native_workflow import (
     checksum,
     current_authority,
@@ -27,6 +26,9 @@ from lifecycle.domain.native_workflow import (
     validate_plan,
 )
 from lifecycle.infrastructure.campaign_observers import protected
+from lifecycle.infrastructure.migration_readiness_contract import (
+    verify as verify_migration_readiness,
+)
 from lifecycle.infrastructure.native_effects import (
     NativeEffectConnection,
     NativeWorkerEndpoint,
@@ -273,7 +275,8 @@ class NativeOwners:
             )
             scope = content["scope"]
             published = self.transport.request(
-                "catalogue", "GET",
+                "catalogue",
+                "GET",
                 f"/internal/tenants/{identity(tenant)}/applications/"
                 f"{identity(scope['resource_id'])}/environments/"
                 f"{identity(scope['environment'])}/current-planning-intent",

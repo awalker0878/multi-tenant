@@ -3,8 +3,8 @@
 import asyncio
 import json
 import re
-from uuid import uuid4
 from typing import Any
+from uuid import uuid4
 
 from uvicorn._types import ASGIReceiveCallable, ASGISendCallable, Scope
 
@@ -261,8 +261,10 @@ class PlanningApp:
             if not re.fullmatch(r"[a-z][a-z0-9_.-]{2,95}", reason):
                 reason = "plan-authority-unavailable"
             payload = {
-                "code": reason, "message": reason.replace("_", " "),
-                "correlation_id": str(uuid4()), "retryable": status >= 500,
+                "code": reason,
+                "message": reason.replace("_", " "),
+                "correlation_id": str(uuid4()),
+                "retryable": status >= 500,
             }
         encoded = json.dumps(payload, allow_nan=False, separators=(",", ":")).encode()
         await send(

@@ -15,9 +15,7 @@ from lifecycle.domain.execution import Rejected, decode, identity, shape
 UUID = r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[89ab][0-9a-f]{3}-[0-9a-f]{12}"
 
 
-def single(
-    headers: list[tuple[bytes, bytes]], key: bytes, optional: bool = False
-) -> str:
+def single(headers: list[tuple[bytes, bytes]], key: bytes, optional: bool = False) -> str:
     values = [v for k, v in headers if k.lower() == key]
     if not values and optional:
         return ""

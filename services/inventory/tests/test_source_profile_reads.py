@@ -1,14 +1,17 @@
 """OpenStack profile completeness includes individually collected Neutron groups."""
 
+from typing import Any
+
 import pytest
 
 from inventory.domain.discovery import Rejected
 from inventory.domain.source_profile import source_profile_read_count
 
 
-def profile(groups: list[str], volumes: int = 0) -> dict:
+def profile(groups: list[str], volumes: int = 0) -> dict[str, Any]:
     return {
-        "platform": "openstack", "schema_version": 3,
+        "platform": "openstack",
+        "schema_version": 3,
         "native": {
             "disk_records": [
                 {"role": "root"},
@@ -27,10 +30,16 @@ def test_security_group_reads_are_counted() -> None:
     assert source_profile_read_count(profile(["sg-a", "sg-b"], 1)) == 8
 
 
-@pytest.mark.parametrize("groups,observed", [
-    (["sg-a"], []), (["sg-a", "sg-a"], [{"id": "sg-a"}]),
-])
-def test_incomplete_group_collection_fails_closed(groups: list[str], observed: list[dict]) -> None:
+@pytest.mark.parametrize(
+    "groups,observed",
+    [
+        (["sg-a"], []),
+        (["sg-a", "sg-a"], [{"id": "sg-a"}]),
+    ],
+)
+def test_incomplete_group_collection_fails_closed(
+    groups: list[str], observed: list[dict[str, Any]]
+) -> None:
     value = profile(groups)
     value["native"]["metadata"]["security_groups"] = observed
     with pytest.raises(Rejected, match="source_profile_security_collection_incomplete"):

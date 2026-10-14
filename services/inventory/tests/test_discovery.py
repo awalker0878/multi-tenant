@@ -543,10 +543,17 @@ def test_retry_exhaustion_emits_original_terminal_fact(campaign: Campaign) -> No
     assert c.resources(job)["completion"] == "partial"
 
 
-@pytest.mark.parametrize("fault", [
-    "none", "shared_credentials", "shared_origin", "invalid_domain",
-    "untrusted_scheme", "missing_pinned_address",
-])
+@pytest.mark.parametrize(
+    "fault",
+    [
+        "none",
+        "shared_credentials",
+        "shared_origin",
+        "invalid_domain",
+        "untrusted_scheme",
+        "missing_pinned_address",
+    ],
+)
 def test_vmware_nsx_policy_requires_separate_enrolled_tls_and_identity(fault: str) -> None:
     base = policy_document()
     base["platform"], base["native_scope"] = "vmware", "datacenter-1"
@@ -557,12 +564,16 @@ def test_vmware_nsx_policy_requires_separate_enrolled_tls_and_identity(fault: st
         "credential_file": "/synthetic/vcenter-token",
         "api_version": "9.1.1.0",
     }
-    base["streams"] = [{"kind": kind, **vcenter}
-                       for kind in ("server", "network", "datastore", "target_profile")]
+    base["streams"] = [
+        {"kind": kind, **vcenter} for kind in ("server", "network", "datastore", "target_profile")
+    ]
     nsx = {
-        "kind": "nsx_policy", "base_url": "https://nsx.example",
-        "addresses": ["127.0.0.2"], "ca_file": "/synthetic/nsx-ca",
-        "credential_file": "/synthetic/nsx-basic", "api_version": "policy-v1",
+        "kind": "nsx_policy",
+        "base_url": "https://nsx.example",
+        "addresses": ["127.0.0.2"],
+        "ca_file": "/synthetic/nsx-ca",
+        "credential_file": "/synthetic/nsx-basic",
+        "api_version": "policy-v1",
         "domain_id": "datacenter-policy",
     }
     if fault == "shared_credentials":

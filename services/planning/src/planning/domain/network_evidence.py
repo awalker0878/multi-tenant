@@ -5,7 +5,6 @@ from typing import Any
 from planning.domain.model import digest
 from planning.domain.placement import PlacementUnknown, fit
 
-
 FLOW_KEYS = ("from", "to", "protocol", "port")
 CONTEXT_KEYS = ("address_family", "vrf_id", "vpc_id", "direction", "return_path_policy")
 
@@ -71,8 +70,7 @@ def traffic(flow: dict[str, Any], network: dict[str, Any], policy: dict[str, Any
     rows = [
         row
         for row in network["measurements"]
-        if all(row.get(k) == flow[k] for k in FLOW_KEYS)
-        and row.get("context") == context
+        if all(row.get(k) == flow[k] for k in FLOW_KEYS) and row.get("context") == context
     ]
     if not rows:
         return "unknown"
@@ -121,10 +119,10 @@ def traffic(flow: dict[str, Any], network: dict[str, Any], policy: dict[str, Any
     return "eligible"
 
 
-
-
 def native_application_flow_choices(
-    intent: dict[str, Any], network: dict[str, Any], policy: dict[str, Any],
+    intent: dict[str, Any],
+    network: dict[str, Any],
+    policy: dict[str, Any],
 ) -> list[dict[str, Any]]:
     """Return source-defined flow selectors from trusted native snapshot only.
 
@@ -145,37 +143,49 @@ def native_application_flow_choices(
         identity = digest({k: flow[k] for k in FLOW_KEYS})
         rules, routes = [], []
         if valid_snapshot and context is not None:
-            rules = sorted({
-                r["native_ref"] for r in network.get("firewall_rules", [])
-                if isinstance(r, dict) and isinstance(r.get("native_ref"), str)
-                and r["native_ref"]
-                and all(r.get(k) == flow[k] for k in FLOW_KEYS)
-                and r.get("context") == context
-                and all(r.get(k) == "allow" for k in
-                        ("action", "egress_action", "ingress_action"))
-            })
-            routes = sorted({
-                r["native_ref"] for r in network["topology"].get("routes", [])
-                if isinstance(r, dict) and isinstance(r.get("native_ref"), str)
-                and r["native_ref"]
-                and r.get("from") == flow["from"]
-                and r.get("to") == flow["to"]
-                and r.get("context") == context
-            })
-        rows.append({
-            "source_flow_id": identity,
-            "source": {k: flow[k] for k in FLOW_KEYS},
-            "required": flow["strength"] == "required",
-            "destination_firewall_rule_ids": rules,
-            "destination_route_ids": routes,
-            "status": "choices_observed" if rules and routes else "held_unobserved",
-            "native_write_authorized": False,
-        })
+            rules = sorted(
+                {
+                    r["native_ref"]
+                    for r in network.get("firewall_rules", [])
+                    if isinstance(r, dict)
+                    and isinstance(r.get("native_ref"), str)
+                    and r["native_ref"]
+                    and all(r.get(k) == flow[k] for k in FLOW_KEYS)
+                    and r.get("context") == context
+                    and all(
+                        r.get(k) == "allow" for k in ("action", "egress_action", "ingress_action")
+                    )
+                }
+            )
+            routes = sorted(
+                {
+                    r["native_ref"]
+                    for r in network["topology"].get("routes", [])
+                    if isinstance(r, dict)
+                    and isinstance(r.get("native_ref"), str)
+                    and r["native_ref"]
+                    and r.get("from") == flow["from"]
+                    and r.get("to") == flow["to"]
+                    and r.get("context") == context
+                }
+            )
+        rows.append(
+            {
+                "source_flow_id": identity,
+                "source": {k: flow[k] for k in FLOW_KEYS},
+                "required": flow["strength"] == "required",
+                "destination_firewall_rule_ids": rules,
+                "destination_route_ids": routes,
+                "status": "choices_observed" if rules and routes else "held_unobserved",
+                "native_write_authorized": False,
+            }
+        )
     return rows
 
 
-def selected_native_flow(flow: dict[str, Any], network: dict[str, Any],
-                         policy: dict[str, Any], now: int) -> str:
+def selected_native_flow(
+    flow: dict[str, Any], network: dict[str, Any], policy: dict[str, Any], now: int
+) -> str:
     """Bind reviewed application intent to existing destination-native controls.
 
     This is a *selection* check, not a traffic-measurement substitute.
@@ -189,15 +199,32 @@ def selected_native_flow(flow: dict[str, Any], network: dict[str, Any],
     flow_id = digest({k: flow[k] for k in FLOW_KEYS})
     chosen = mapping.get(flow_id)
     context = flow_context(flow, policy)
-    if context is None or not isinstance(chosen, dict) or set(chosen) != {
-        "rule_native_ref", "route_native_ref", "observer_principal",
-        "observed_at", "expires_at", "policy_sha256", "topology_sha256",
-    }:
+    if (
+        context is None
+        or not isinstance(chosen, dict)
+        or set(chosen)
+        != {
+            "rule_native_ref",
+            "route_native_ref",
+            "observer_principal",
+            "observed_at",
+            "expires_at",
+            "policy_sha256",
+            "topology_sha256",
+        }
+    ):
         return "unknown"
     if (
-        any(not isinstance(chosen.get(k), str) or not chosen[k] for k in
-            ("rule_native_ref", "route_native_ref", "observer_principal",
-             "policy_sha256", "topology_sha256"))
+        any(
+            not isinstance(chosen.get(k), str) or not chosen[k]
+            for k in (
+                "rule_native_ref",
+                "route_native_ref",
+                "observer_principal",
+                "policy_sha256",
+                "topology_sha256",
+            )
+        )
         or type(chosen.get("observed_at")) is not int
         or type(chosen.get("expires_at")) is not int
         or not 0 <= now - chosen["observed_at"] <= 60
@@ -211,14 +238,16 @@ def selected_native_flow(flow: dict[str, Any], network: dict[str, Any],
     ):
         return "unknown"
     rules = [
-        item for item in network.get("firewall_rules", [])
+        item
+        for item in network.get("firewall_rules", [])
         if isinstance(item, dict)
         and item.get("native_ref") == chosen["rule_native_ref"]
         and all(item.get(k) == flow[k] for k in FLOW_KEYS)
         and item.get("context") == context
     ]
     routes = [
-        item for item in network.get("topology", {}).get("routes", [])
+        item
+        for item in network.get("topology", {}).get("routes", [])
         if isinstance(item, dict)
         and item.get("native_ref") == chosen["route_native_ref"]
         and item.get("from") == flow["from"]
@@ -227,13 +256,11 @@ def selected_native_flow(flow: dict[str, Any], network: dict[str, Any],
     ]
     if len(rules) != 1 or len(routes) != 1:
         return "blocked"
-    if not all(rules[0].get(k) == "allow" for k in
-               ("action", "egress_action", "ingress_action")):
+    if not all(rules[0].get(k) == "allow" for k in ("action", "egress_action", "ingress_action")):
         return "blocked"
     if chosen["observer_principal"] == network.get("writer_principal"):
         return "blocked"
     return "eligible"
-
 
 
 def network_checks(
@@ -248,25 +275,37 @@ def network_checks(
         for flow in intent["dependencies"]
         if flow["kind"] == "communication" and flow["strength"] == "required"
     }
-    if not isinstance(mapping, dict) or not required_keys <= set(mapping) or (
-        set(mapping) - {
-            digest({k: flow[k] for k in FLOW_KEYS})
-            for flow in intent["dependencies"] if flow["kind"] == "communication"
-        }
+    if (
+        not isinstance(mapping, dict)
+        or not required_keys <= set(mapping)
+        or (
+            set(mapping)
+            - {
+                digest({k: flow[k] for k in FLOW_KEYS})
+                for flow in intent["dependencies"]
+                if flow["kind"] == "communication"
+            }
+        )
     ):
-        checks.append((
-            "network.application_flow_coverage",
-            "unknown", "owner_approved_flow_catalogue_incomplete", True,
-        ))
+        checks.append(
+            (
+                "network.application_flow_coverage",
+                "unknown",
+                "owner_approved_flow_catalogue_incomplete",
+                True,
+            )
+        )
     for dependency in intent["dependencies"]:
         if dependency["kind"] == "communication":
             selection = selected_native_flow(dependency, network, policy, now)
-            checks.append((
-                "network.application_flow_selection",
-                selection,
-                "required_destination_native_controls_" + selection,
-                dependency["strength"] == "required",
-            ))
+            checks.append(
+                (
+                    "network.application_flow_selection",
+                    selection,
+                    "required_destination_native_controls_" + selection,
+                    dependency["strength"] == "required",
+                )
+            )
             status = traffic(dependency, network, policy, now)
             checks.append(
                 (
@@ -315,8 +354,7 @@ def isolation_checks(
     ):
         tenant_status = "blocked"
     elif not all(
-        isolation.get(k)
-        for k in ("native_project_id", "observer_principal", "writer_principal")
+        isolation.get(k) for k in ("native_project_id", "observer_principal", "writer_principal")
     ):
         tenant_status = "unknown"
     else:
@@ -347,8 +385,11 @@ def isolation_checks(
                 for flow in negative
             ]
             negative_status = (
-                "blocked" if "blocked" in states else
-                "unknown" if "unknown" in states else "eligible"
+                "blocked"
+                if "blocked" in states
+                else "unknown"
+                if "unknown" in states
+                else "eligible"
             )
 
     def combine(*states: str) -> str:
@@ -379,23 +420,30 @@ def isolation_checks(
     controls = isolation.get("boundary_controls")
     for kind in ("rbac", "storage", "keys"):
         proof = controls.get(kind) if isinstance(controls, dict) else None
-        if not isinstance(proof, dict) or not proof.get("native_ref") or (
-            type(proof.get("observed_at")) is not int
-            or not 0 <= now - proof["observed_at"] <= 60
-            or proof.get("expires_at", 0) <= now
-            or proof.get("policy_sha256") != digest(policy)
-            or proof.get("native_scope") != scope
+        if (
+            not isinstance(proof, dict)
+            or not proof.get("native_ref")
+            or (
+                type(proof.get("observed_at")) is not int
+                or not 0 <= now - proof["observed_at"] <= 60
+                or proof.get("expires_at", 0) <= now
+                or proof.get("policy_sha256") != digest(policy)
+                or proof.get("native_scope") != scope
+            )
         ):
             status = "unknown"
         else:
             status = "eligible" if proof.get("outcome") == "passed" else "blocked"
-        checks.append((
-            "placement.isolation." + kind,
-            status,
-            "measured_" + kind + "_isolation" if status == "eligible"
-            else kind + "_isolation_unverified",
-            True,
-        ))
+        checks.append(
+            (
+                "placement.isolation." + kind,
+                status,
+                "measured_" + kind + "_isolation"
+                if status == "eligible"
+                else kind + "_isolation_unverified",
+                True,
+            )
+        )
 
     hierarchy = isolation.get("fault_hierarchy")
     hierarchy_status = "unknown"
@@ -428,11 +476,14 @@ def isolation_checks(
                             break
         except (PlacementUnknown, KeyError, TypeError, ValueError):
             hierarchy_status = "unknown"
-    checks.append((
-        "placement.fault_hierarchy",
-        hierarchy_status,
-        "verified_native_fault_hierarchy" if hierarchy_status == "eligible"
-        else "native_fault_hierarchy_unverified",
-        True,
-    ))
+    checks.append(
+        (
+            "placement.fault_hierarchy",
+            hierarchy_status,
+            "verified_native_fault_hierarchy"
+            if hierarchy_status == "eligible"
+            else "native_fault_hierarchy_unverified",
+            True,
+        )
+    )
     return checks

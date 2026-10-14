@@ -1,8 +1,8 @@
 """Compose the persistent synthetic diagnostic service without product operations."""
 
 import argparse
-import re
 import os
+import re
 import time
 from collections.abc import Sequence
 from pathlib import Path
@@ -62,6 +62,7 @@ HTTP_OPERATIONS = (
     ("POST", "/v1/tenants/{tenant}/migration-campaigns/{campaign}/commands"),
 )
 
+
 def _parameter_pattern(match: re.Match[str]) -> str:
     name = match.group()[1:-1]
     if name == "revision":
@@ -69,6 +70,7 @@ def _parameter_pattern(match: re.Match[str]) -> str:
     if name == "digest":
         return r"[0-9a-f]{64}"
     return r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+
 
 HTTP_ROUTE_PATTERNS = tuple(
     (verb, re.compile(re.sub(r"\{[a-z_]+\}", _parameter_pattern, path)))
@@ -79,14 +81,23 @@ HTTP_ROUTE_PATTERNS = tuple(
 async def reject_unpublished_route(scope: Scope, send: ASGISendCallable) -> bool:
     if scope["type"] != "http" or not scope["path"].startswith(("/v1/", "/internal/")):
         return False
-    if any(verb == scope["method"] and pat.fullmatch(scope["path"])
-           for verb, pat in HTTP_ROUTE_PATTERNS):
+    if any(
+        verb == scope["method"] and pat.fullmatch(scope["path"])
+        for verb, pat in HTTP_ROUTE_PATTERNS
+    ):
         return False
     body = b'{"error":"not_found"}'
-    await send({"type": "http.response.start", "status": 404,
-                "headers": [(b"content-type", b"application/json"),
-                            (b"cache-control", b"no-store"),
-                            (b"content-length", str(len(body)).encode())]})
+    await send(
+        {
+            "type": "http.response.start",
+            "status": 404,
+            "headers": [
+                (b"content-type", b"application/json"),
+                (b"cache-control", b"no-store"),
+                (b"content-length", str(len(body)).encode()),
+            ],
+        }
+    )
     await send({"type": "http.response.body", "body": body})
     return True
 

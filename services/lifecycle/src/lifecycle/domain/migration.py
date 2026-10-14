@@ -11,10 +11,10 @@ from lifecycle.domain.admission import digest
 from lifecycle.domain.capability_definitions import AFTER as AFTER
 from lifecycle.domain.capability_definitions import BEFORE as BEFORE
 from lifecycle.domain.capability_definitions import (
-    WIRE_METHODS,
     METHOD_DELTA,
     RECOVERY_MODES,
     STAGES,
+    WIRE_METHODS,
 )
 from lifecycle.domain.capability_definitions import MODES as MODES
 from lifecycle.domain.capability_definitions import TERMINALS as TERMINALS

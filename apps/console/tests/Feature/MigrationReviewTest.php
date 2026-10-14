@@ -63,7 +63,6 @@ it('forwards VMware destination mappings intact for authoritative inventory vali
         ->assertRedirect($this->base)->assertSessionHasNoErrors();
 });
 
-
 it('accepts only API-ID application ACL bindings, never inline firewall definitions', function (): void {
     $review = [
         'source_profile_id' => $this->key, 'target_profile_id' => $this->site,

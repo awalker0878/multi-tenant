@@ -264,9 +264,7 @@ class MountedMigrationRuntime:
                 ("vmm", "prism", "clustermgmt", "networking", "microseg", "iam"),
                 "v4.3",
             )
-            if pinned != expected or (
-                kind == "ahv_capture" and plan.get("schema_version") != 3
-            ):
+            if pinned != expected or (kind == "ahv_capture" and plan.get("schema_version") != 3):
                 raise NativeHeld("ahv_source_selected_version_not_pinned")
             source_write_api, source_read_api = (
                 AhvHttp(source_write_endpoint, api_versions=pinned),

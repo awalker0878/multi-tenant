@@ -3,6 +3,7 @@
 The application receives this callable through its constructor. No infrastructure
 or JSON Schema dependency crosses into the application or domain layer.
 """
+
 from __future__ import annotations
 
 import json
@@ -33,5 +34,3 @@ def validate_workload_contract(result: dict[str, Any]) -> None:
     """
     if not _workload_validator().is_valid(result):
         raise Rejected("migration_workload_contract_invalid", 423)
-
-

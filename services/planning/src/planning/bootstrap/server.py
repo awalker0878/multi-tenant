@@ -8,20 +8,19 @@ from collections.abc import Sequence
 import uvicorn
 from uvicorn._types import ASGIReceiveCallable, ASGISendCallable, Scope
 
-from planning.application.migration_plans import MigrationPlans
 from planning.application.migration_flows import MigrationFlows
+from planning.application.migration_plans import MigrationPlans
 from planning.application.migration_support import MigrationSupport
 from planning.application.native_plans import NativePlans
 from planning.application.planning import Planning
 from planning.application.qualification_invalidations import QualificationInvalidations
 from planning.application.validation import MigrationValidation, NativeValidation, PlanValidation
 from planning.infrastructure.foundation import database_ready, mounted_secret
-from planning.infrastructure.migration_readiness_contract import validate_workload_contract
 from planning.infrastructure.migration import prepare_migration
-from planning.infrastructure.migration_collection_manifest import binding as collection_manifest_binding
-from planning.infrastructure.workload_reconciliation import (
-    current_workload_reconciliation, current_review_binding,
+from planning.infrastructure.migration_collection_manifest import (
+    binding as collection_manifest_binding,
 )
+from planning.infrastructure.migration_readiness_contract import validate_workload_contract
 from planning.infrastructure.migration_recipes import recipe_for, visible_recipes
 from planning.infrastructure.migration_support import (
     api_capability_records,
@@ -32,6 +31,10 @@ from planning.infrastructure.migration_support import (
 from planning.infrastructure.owners import GovernanceAuthority, OwnerSources, qualification_current
 from planning.infrastructure.store import Postgres
 from planning.infrastructure.telemetry import BoundedSignalBuffer
+from planning.infrastructure.workload_reconciliation import (
+    current_review_binding,
+    current_workload_reconciliation,
+)
 from planning.interfaces.http import FoundationApp
 from planning.interfaces.migration import MigrationPreparationApp
 from planning.interfaces.native_plans import NativePlansApp
@@ -39,29 +42,76 @@ from planning.interfaces.planning import PlanningApp
 from planning.interfaces.qualification_invalidations import QualificationInvalidationApp
 from planning.interfaces.telemetry import RequestTelemetry
 
-
-MIGRATION_SUFFIXES = ("/migration-preparations", "/migration-plans", "/migration-plan-options", "/migration-support", "/migration-flow-choices", "/migration-flow-selections", "/migration-workload-readiness")
+MIGRATION_SUFFIXES = (
+    "/migration-preparations",
+    "/migration-plans",
+    "/migration-plan-options",
+    "/migration-support",
+    "/migration-flow-choices",
+    "/migration-flow-selections",
+    "/migration-workload-readiness",
+)
 
 HTTP_OPERATIONS = (
     ("POST", "/internal/qualification-events"),
     ("GET", "/internal/tenants/{tenant}/placement-proposals/{plan}/revisions/{revision}"),
     ("GET", "/v1/tenants/{tenant}/plans/{plan}/revisions/{revision}"),
-    ("POST", "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/assessments"),
-    ("GET", "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/assessments/{record}"),
-    ("POST", "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/migration-flow-choices"),
-    ("POST", "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/migration-flow-selections"),
-    ("POST", "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/migration-plan-options"),
-    ("POST", "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/migration-plans"),
-    ("POST", "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/migration-preparations"),
-    ("POST", "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/migration-support"),
-    ("POST", "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/migration-workload-readiness"),
-    ("POST", "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/native-plans"),
+    (
+        "POST",
+        "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/assessments",
+    ),
+    (
+        "GET",
+        "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/assessments/{record}",
+    ),
+    (
+        "POST",
+        "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/migration-flow-choices",
+    ),
+    (
+        "POST",
+        "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/migration-flow-selections",
+    ),
+    (
+        "POST",
+        "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/migration-plan-options",
+    ),
+    (
+        "POST",
+        "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/migration-plans",
+    ),
+    (
+        "POST",
+        "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/migration-preparations",
+    ),
+    (
+        "POST",
+        "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/migration-support",
+    ),
+    (
+        "POST",
+        "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/migration-workload-readiness",
+    ),
+    (
+        "POST",
+        "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/native-plans",
+    ),
     ("POST", "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/plans"),
-    ("GET", "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/plans/{record}"),
-    ("POST", "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/plans/{record}/diff"),
-    ("POST", "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/plans/{record}/validity"),
+    (
+        "GET",
+        "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/plans/{record}",
+    ),
+    (
+        "POST",
+        "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/plans/{record}/diff",
+    ),
+    (
+        "POST",
+        "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/plans/{record}/validity",
+    ),
     ("GET", "/v1/tenants/{tenant}/execution-plans/{plan}/revisions/{revision}"),
 )
+
 
 def _parameter_pattern(match: re.Match[str]) -> str:
     name = match.group()[1:-1]
@@ -70,6 +120,7 @@ def _parameter_pattern(match: re.Match[str]) -> str:
     if name == "digest":
         return r"[0-9a-f]{64}"
     return r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+
 
 HTTP_ROUTE_PATTERNS = tuple(
     (verb, re.compile(re.sub(r"\{[a-z_]+\}", _parameter_pattern, path)))
@@ -80,14 +131,23 @@ HTTP_ROUTE_PATTERNS = tuple(
 async def reject_unpublished_route(scope: Scope, send: ASGISendCallable) -> bool:
     if scope["type"] != "http" or not scope["path"].startswith(("/v1/", "/internal/")):
         return False
-    if any(verb == scope["method"] and pat.fullmatch(scope["path"])
-           for verb, pat in HTTP_ROUTE_PATTERNS):
+    if any(
+        verb == scope["method"] and pat.fullmatch(scope["path"])
+        for verb, pat in HTTP_ROUTE_PATTERNS
+    ):
         return False
     body = b'{"error":"not_found"}'
-    await send({"type": "http.response.start", "status": 404,
-                "headers": [(b"content-type", b"application/json"),
-                            (b"cache-control", b"no-store"),
-                            (b"content-length", str(len(body)).encode())]})
+    await send(
+        {
+            "type": "http.response.start",
+            "status": 404,
+            "headers": [
+                (b"content-type", b"application/json"),
+                (b"cache-control", b"no-store"),
+                (b"content-length", str(len(body)).encode()),
+            ],
+        }
+    )
     await send({"type": "http.response.body", "body": body})
     return True
 
@@ -98,7 +158,10 @@ class PlanningRouter:
             return int(time.time())
 
         self.support = MigrationSupport(
-            selected_tranche, qualification_records, clock, api_capability_records,
+            selected_tranche,
+            qualification_records,
+            clock,
+            api_capability_records,
             validate_readiness=validate_workload_contract,
         )
         validation = PlanValidation(
@@ -120,7 +183,9 @@ class PlanningRouter:
         self.support.workload_review = current_review_binding
         self.support.collection_manifest = collection_manifest_binding
         self.foundation = FoundationApp(database_ready)
-        self.invalidations = QualificationInvalidationApp(QualificationInvalidations(Postgres()), mounted_secret)
+        self.invalidations = QualificationInvalidationApp(
+            QualificationInvalidations(Postgres()), mounted_secret
+        )
         migrations = MigrationPlans(self.planning.planning, validation.migration, visible_recipes)
         self.migration = MigrationPreparationApp(
             self.planning.authority, prepare_migration, migrations, self.support, self.flows
@@ -141,8 +206,10 @@ class PlanningRouter:
             await self.migration(scope, receive, send)
         elif scope["type"] == "http" and (
             scope["path"].startswith("/v1/")
-            or (scope["path"].startswith("/internal/tenants/")
-                and "/placement-proposals/" in scope["path"])
+            or (
+                scope["path"].startswith("/internal/tenants/")
+                and "/placement-proposals/" in scope["path"]
+            )
         ):
             await self.planning(scope, receive, send)
         else:

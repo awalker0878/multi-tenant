@@ -137,8 +137,7 @@ def recovery_checks(
                             key.get("available") is not True
                             or application.get("verified") is not True
                             or any(
-                                dependencies[name].get("verified") is not True
-                                for name in required
+                                dependencies[name].get("verified") is not True for name in required
                             )
                         ):
                             status, reason = "blocked", "recovery_readiness_failed"

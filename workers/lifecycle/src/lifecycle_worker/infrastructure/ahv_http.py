@@ -28,7 +28,9 @@ class AhvTransport(Protocol):
 
 class AhvHttp:
     def __init__(
-        self, endpoint: NativeEndpoint, read_only: bool = False,
+        self,
+        endpoint: NativeEndpoint,
+        read_only: bool = False,
         api_versions: dict[str, str] | None = None,
     ) -> None:
         if urlsplit(endpoint.base_url).path not in {"", "/"}:
@@ -39,11 +41,11 @@ class AhvHttp:
         self.api_versions = api_versions
         if api_versions is not None and (
             not isinstance(api_versions, dict)
-            or set(api_versions) != {"vmm", "prism", "clustermgmt",
-                                     "networking", "microseg", "iam"}
-            or any(not isinstance(v, str)
-                   or re.fullmatch(r"v[0-9]+\.[0-9]+", v) is None
-                   for v in api_versions.values())
+            or set(api_versions) != {"vmm", "prism", "clustermgmt", "networking", "microseg", "iam"}
+            or any(
+                not isinstance(v, str) or re.fullmatch(r"v[0-9]+\.[0-9]+", v) is None
+                for v in api_versions.values()
+            )
         ):
             raise NativeHeld("ahv_qualified_namespace_manifest_invalid")
 
@@ -58,7 +60,8 @@ class AhvHttp:
         if self.api_versions is not None:
             match = re.fullmatch(
                 r"/api/(vmm|prism|clustermgmt|networking|microseg|iam)/"
-                r"(v[0-9]+\.[0-9]+)/.*", path,
+                r"(v[0-9]+\.[0-9]+)/.*",
+                path,
             )
             if match is None or self.api_versions[match[1]] != match[2]:
                 raise NativeHeld("ahv_native_request_version_unqualified")

@@ -3,7 +3,6 @@
 from collections.abc import Callable
 from typing import Any
 
-
 from planning.domain.api_compatibility import evaluate as evaluate_api
 from planning.domain.capability_definitions import METHOD_ALIASES as METHODS
 from planning.domain.expansion import matrix, tranche
@@ -26,13 +25,13 @@ class MigrationSupport:
         self.api_observations = api_observations
         self.validate_readiness = validate_readiness
         self.flow_require: Callable[[Actor, str, dict[str, Any]], dict[str, Any]] | None = None
-        self.workload_current: Callable[[Actor, str, dict[str, Any], dict[str, Any] | None], dict[str, Any]] | None = None
+        self.workload_current: (
+            Callable[[Actor, str, dict[str, Any], dict[str, Any] | None], dict[str, Any]] | None
+        ) = None
         self.workload_review: Callable[[Actor, str, dict[str, Any]], dict[str, Any]] | None = None
         self.collection_manifest: Callable[[str], dict[str, Any] | None] | None = None
 
-    def api_status(
-        self, actor: Actor, site: str, selected: dict[str, Any]
-    ) -> dict[str, Any]:
+    def api_status(self, actor: Actor, site: str, selected: dict[str, Any]) -> dict[str, Any]:
         if "api_usage" not in selected:
             return {
                 "status": "unknown",
@@ -47,8 +46,11 @@ class MigrationSupport:
             else None
         )
         return evaluate_api(
-            selected, evidence, self.clock(),
-            tenant_id=actor.tenant, application_id=actor.application,
+            selected,
+            evidence,
+            self.clock(),
+            tenant_id=actor.tenant,
+            application_id=actor.application,
             environment_id=actor.environment,
         )
 
@@ -61,19 +63,30 @@ class MigrationSupport:
             for row in direction["routes"]:
                 route = by_id[row["route_id"]]
                 api = self.api_status(actor, site, route)
-                row["api_compatibility"] = api
                 resolved = resolve_readiness(
-                    route, row, api,
-                    {"tenant_id": actor.tenant, "application_id": actor.application,
-                     "environment_id": actor.environment, "site_id": site},
-                    digest(selected), selected["release_sha256"], selected["expires_at"],
+                    route,
+                    row,
+                    api,
+                    {
+                        "tenant_id": actor.tenant,
+                        "application_id": actor.application,
+                        "environment_id": actor.environment,
+                        "site_id": site,
+                    },
+                    digest(selected),
+                    selected["release_sha256"],
+                    selected["expires_at"],
                     self.clock(),
                 )
-                row["readiness"] = resolved
                 if resolved["status"] != "eligible":
                     row["blockers"] = sorted(set(row["blockers"] + resolved["holds"]))
                     # Preserve independent E3/E4 decisions even when the composite
                     # route is held for API usage, scope, time or another gate.
+                # The expiry and resolved readiness are internal authority
+                # inputs, not fields in the published MigrationSupport wire.
+                # Full workload readiness has its own contracted read endpoint.
+                # Retain all computed blockers and independent E3/E4 decisions.
+                row.pop("expires_at")
         return {
             "schema_version": 1,
             "tranche_sha256": digest(selected),
@@ -83,7 +96,10 @@ class MigrationSupport:
         }
 
     def preview(
-        self, actor: Actor, site: str, revision: dict[str, Any],
+        self,
+        actor: Actor,
+        site: str,
+        revision: dict[str, Any],
     ) -> dict[str, Any]:
         """One read-only workload readiness contract, never a browser approval.
 
@@ -96,7 +112,8 @@ class MigrationSupport:
         binding = self.workload_review(actor, site, revision)
         selected = tranche(self.scope(actor, site))
         candidates = [
-            route for route in selected["routes"]
+            route
+            for route in selected["routes"]
             if route["source"]["profile_sha256"] == binding["source"]["profile_sha256"]
             and route["target"]["profile_sha256"] == binding["target"]["profile_sha256"]
             and route["method"] == METHODS.get(binding["method"])
@@ -105,56 +122,87 @@ class MigrationSupport:
             raise Rejected("migration_preview_route_not_unique", 423)
         candidate = candidates[0]
         native = [
-            row for direction in matrix(
+            row
+            for direction in matrix(
                 selected, self.observations(actor, site, selected), self.clock()
-            ) for row in direction["routes"] if row["route_id"] == candidate["id"]
+            )
+            for row in direction["routes"]
+            if row["route_id"] == candidate["id"]
         ]
         if len(native) != 1:
             raise Rejected("migration_preview_qualification_ambiguous", 423)
         now = self.clock()
         route = resolve_readiness(
-            candidate, native[0], self.api_status(actor, site, candidate),
-            {"tenant_id": actor.tenant, "application_id": actor.application,
-             "environment_id": actor.environment, "site_id": site},
-            digest(selected), selected["release_sha256"], selected["expires_at"], now,
+            candidate,
+            native[0],
+            self.api_status(actor, site, candidate),
+            {
+                "tenant_id": actor.tenant,
+                "application_id": actor.application,
+                "environment_id": actor.environment,
+                "site_id": site,
+            },
+            digest(selected),
+            selected["release_sha256"],
+            selected["expires_at"],
+            now,
         )
         # Preview and Lifecycle use the same execution-side independent flow
         # proof. Unavailable E4 is represented by null, never a fabricated pass.
         flow_proof = None
         if self.flow_require is not None:
             try:
-                flow_proof = self.flow_require(actor, site, {
-                    **binding,
-                    "source": {**binding["source"],
-                               "platform": candidate["source"]["platform"]},
-                    "target": {**binding["target"],
-                               "platform": candidate["target"]["platform"]},
-                })
+                flow_proof = self.flow_require(
+                    actor,
+                    site,
+                    {
+                        **binding,
+                        "source": {
+                            **binding["source"],
+                            "platform": candidate["source"]["platform"],
+                        },
+                        "target": {
+                            **binding["target"],
+                            "platform": candidate["target"]["platform"],
+                        },
+                    },
+                )
             except Rejected:
                 pass
         proof = self.workload_current(actor, site, binding, flow_proof)
         result = resolve_workload(
-            route, proof["reconciliation"], proof.get("collection_coverages"), now,
+            route,
+            proof["reconciliation"],
+            proof.get("collection_coverages"),
+            now,
             self.collection_manifest(selected["release_sha256"])
-            if self.collection_manifest is not None else None,
+            if self.collection_manifest is not None
+            else None,
             selected_review=binding,
         )
         if self.validate_readiness is None:
             raise Rejected("migration_contract_validator_unavailable", 503)
         self.validate_readiness(result)
-        return {"schema_version": 1, "review": revision, "readiness": result,
-                "native_write_authorized": False, "workload_admission_authorized": False}
+        return {
+            "schema_version": 1,
+            "review": revision,
+            "readiness": result,
+            "native_write_authorized": False,
+            "workload_admission_authorized": False,
+        }
 
     def require(self, actor: Actor, site: str, binding: dict[str, Any]) -> dict[str, Any]:
-        if (self.workload_current is None or self.collection_manifest is None
-                or self.flow_require is None):
+        if (
+            self.workload_current is None
+            or self.collection_manifest is None
+            or self.flow_require is None
+        ):
             raise Rejected("migration_workload_admission_not_commissioned", 503)
         # A native route is not ready merely because a hypervisor capability
         # matrix passed: owner-approved application paths and negative tests
         # have an independent, expiring approval gate.
         flow_proof = (
-            self.flow_require(actor, site, binding)
-            if self.flow_require is not None else None
+            self.flow_require(actor, site, binding) if self.flow_require is not None else None
         )
         selected = tranche(self.scope(actor, site))
         candidates = [
@@ -232,24 +280,36 @@ class MigrationSupport:
             raise Rejected("migration_readiness_route_ambiguous", 423)
         candidate = candidates[0]
         matching = [
-            row for direction in rows for row in direction["routes"]
+            row
+            for direction in rows
+            for row in direction["routes"]
             if row["route_id"] == candidate["id"]
         ]
         if len(matching) != 1:
             raise Rejected("migration_readiness_route_missing", 423)
         readiness = resolve_readiness(
-            candidate, matching[0], self.api_status(actor, site, candidate),
-            {"tenant_id": actor.tenant, "application_id": actor.application,
-             "environment_id": actor.environment, "site_id": site},
-            digest(selected), selected["release_sha256"], selected["expires_at"],
+            candidate,
+            matching[0],
+            self.api_status(actor, site, candidate),
+            {
+                "tenant_id": actor.tenant,
+                "application_id": actor.application,
+                "environment_id": actor.environment,
+                "site_id": site,
+            },
+            digest(selected),
+            selected["release_sha256"],
+            selected["expires_at"],
             self.clock(),
         )
         if readiness["status"] != "eligible":
             raise Rejected("migration_readiness_held", 423)
         evidence = self.workload_current(actor, site, binding, flow_proof)
         readiness = resolve_workload(
-            readiness, evidence["reconciliation"],
-            evidence.get("collection_coverages"), self.clock(),
+            readiness,
+            evidence["reconciliation"],
+            evidence.get("collection_coverages"),
+            self.clock(),
             self.collection_manifest(selected["release_sha256"]),
             selected_review=binding,
         )

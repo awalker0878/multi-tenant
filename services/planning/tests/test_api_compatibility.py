@@ -108,7 +108,9 @@ def test_different_api_releases_do_not_block_qualified_operations() -> None:
     result = evaluate(row, owner_input(row), 100)
     assert result["status"] == "conditional"
     assert [case["status"] for case in result["cases"]] == [
-        "eligible", "eligible", "unknown",
+        "eligible",
+        "eligible",
+        "unknown",
     ]
     assert [case["expires_at"] for case in result["cases"]] == [140, 140, None]
     assert result["administrator_alerts"] == [
@@ -196,8 +198,12 @@ def test_optional_omission_needs_exact_scope_E4_owner_acceptance() -> None:
     }
     evidence["omissions"] = [ack]
     result = evaluate(
-        row, evidence, 100, tenant_id=tenant,
-        application_id=application, environment_id=environment,
+        row,
+        evidence,
+        100,
+        tenant_id=tenant,
+        application_id=application,
+        environment_id=environment,
     )
     assert result["status"] == "eligible"
     assert result["operationally_eligible"] is True
@@ -214,24 +220,36 @@ def test_optional_omission_needs_exact_scope_E4_owner_acceptance() -> None:
         untrusted["omissions"] = [ack | changed]
         assert (
             evaluate(
-                row, untrusted, 100, tenant_id=tenant,
-                application_id=application, environment_id=environment,
-            )["status"] == "conditional"
+                row,
+                untrusted,
+                100,
+                tenant_id=tenant,
+                application_id=application,
+                environment_id=environment,
+            )["status"]
+            == "conditional"
         )
 
 
 def test_safety_requirements_cannot_be_declared_optional() -> None:
     for capability in (
-        "vm.disk.snapshot", "vm.boot.verify", "storage.data.encrypt",
-        "security.isolation.project", "network.required.application_flow",
+        "vm.disk.snapshot",
+        "vm.boot.verify",
+        "storage.data.encrypt",
+        "security.isolation.project",
+        "network.required.application_flow",
     ):
         with pytest.raises(Rejected, match="safety_cannot_be_optional"):
-            usage([{
-                "capability_id": capability,
-                "side": "target",
-                "criticality": "optional",
-                "reason": "Attempted omission.",
-            }])
+            usage(
+                [
+                    {
+                        "capability_id": capability,
+                        "side": "target",
+                        "criticality": "optional",
+                        "reason": "Attempted omission.",
+                    }
+                ]
+            )
 
 
 def test_forged_or_ambiguous_installation_evidence_fails_closed() -> None:
@@ -251,7 +269,8 @@ def test_migration_support_preview_and_execution_recheck_use_same_gate() -> None
         route["source"]["profile_sha256"] = digest([i, "source"])
         route["target"]["profile_sha256"] = digest([i, "target"])
     route = next(
-        row for row in selected_tranche["routes"]
+        row
+        for row in selected_tranche["routes"]
         if row["source"]["platform"] == "vmware" and row["target"]["platform"] == "openstack"
     )
     route["api_usage"] = selected()["api_usage"]
@@ -276,7 +295,8 @@ def test_migration_support_preview_and_execution_recheck_use_same_gate() -> None
         lambda *_: owner,
     )
     preview = next(
-        direction for direction in support.read(actor, site)["directions"]
+        direction
+        for direction in support.read(actor, site)["directions"]
         if direction["direction"] == "vmware->openstack"
     )["routes"][0]
     assert preview["api_compatibility"]["status"] == "conditional"
@@ -290,21 +310,24 @@ def test_migration_support_preview_and_execution_recheck_use_same_gate() -> None
     # commissioned workload evidence is a hold, even before API omissions.
     with pytest.raises(Rejected, match="migration_workload_admission_not_commissioned"):
         support.require(actor, site, binding)
-    owner["omissions"] = [{
-        "capability_id": "network.firewall.cosmetic_rule",
-        "side": "target",
-        "route_sha256": digest(route),
-        "tenant_id": actor.tenant,
-        "application_id": actor.application,
-        "environment_id": actor.environment,
-        "decision": "accepted",
-        "evidence_level": "E4",
-        "expires_at": 150,
-        "approval_sha256": "e" * 64,
-        "effect_suppressed_sha256": "1" * 64,
-    }]
+    owner["omissions"] = [
+        {
+            "capability_id": "network.firewall.cosmetic_rule",
+            "side": "target",
+            "route_sha256": digest(route),
+            "tenant_id": actor.tenant,
+            "application_id": actor.application,
+            "environment_id": actor.environment,
+            "decision": "accepted",
+            "evidence_level": "E4",
+            "expires_at": 150,
+            "approval_sha256": "e" * 64,
+            "effect_suppressed_sha256": "1" * 64,
+        }
+    ]
     upgraded = next(
-        direction for direction in support.read(actor, site)["directions"]
+        direction
+        for direction in support.read(actor, site)["directions"]
         if direction["direction"] == "vmware->openstack"
     )["routes"][0]
     assert upgraded["api_compatibility"]["status"] == "eligible"

@@ -41,22 +41,31 @@ def eligible_field_dispositions(workloads: Any) -> bool:
             seen.add(name)
             if field.get("required") is True and (
                 field.get("disposition") != "matched"
-                or field.get("evidence_source") not in {
-                    "inventory_native_profile", "independent_e4",
+                or field.get("evidence_source")
+                not in {
+                    "inventory_native_profile",
+                    "independent_e4",
                 }
                 or type(field.get("evidence_age_seconds")) is not int
                 or field["evidence_age_seconds"] < 0
-                or (field["evidence_source"] == "independent_e4"
-                    and field["evidence_age_seconds"] >= 30)
+                or (
+                    field["evidence_source"] == "independent_e4"
+                    and field["evidence_age_seconds"] >= 30
+                )
             ):
                 return False
     return True
 
 
 def resolve(
-    route: dict[str, Any], native: dict[str, Any], api: dict[str, Any],
-    scope: dict[str, str], tranche_sha256: str, release_sha256: str,
-    expires_at: int, now: int,
+    route: dict[str, Any],
+    native: dict[str, Any],
+    api: dict[str, Any],
+    scope: dict[str, str],
+    tranche_sha256: str,
+    release_sha256: str,
+    expires_at: int,
+    now: int,
 ) -> dict[str, Any]:
     """Materialize route-wide findings without trusting browser declarations."""
     blockers = list(native.get("blockers", []))
@@ -93,8 +102,10 @@ def resolve(
         blockers.append("distinct_migration_environments_required")
     if native.get("route_sha256") != digest(route):
         blockers.append("route_qualification_binding_changed")
-    if any(case.get("status") != "eligible" and not case.get("omission_accepted", False)
-           for case in api.get("cases", [])):
+    if any(
+        case.get("status") != "eligible" and not case.get("omission_accepted", False)
+        for case in api.get("cases", [])
+    ):
         blockers.append("api_feature_unresolved")
     unique = sorted(set(blockers))
     result: dict[str, Any] = {
@@ -132,8 +143,10 @@ def resolve(
 
 
 def resolve_workload(
-    route: dict[str, Any], reconciliation: dict[str, Any],
-    collection_coverages: list[dict[str, Any]] | None, now: int,
+    route: dict[str, Any],
+    reconciliation: dict[str, Any],
+    collection_coverages: list[dict[str, Any]] | None,
+    now: int,
     collection_manifest: dict[str, Any] | None = None,
     selected_review: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
@@ -143,15 +156,15 @@ def resolve_workload(
     target and owner attributes. Missing records hold every effect.
     """
     holds = list(route["holds"])
-    if (reconciliation.get("status") != "matched"
-            or reconciliation.get("holds") != []
-            or reconciliation.get("native_write_authorized") is not False
-            or reconciliation.get("reconciliation_sha256") != digest({
-                k: v for k, v in reconciliation.items()
-                if k != "reconciliation_sha256"
-            })
-            or type(reconciliation.get("expires_at")) is not int
-            or reconciliation["expires_at"] <= now):
+    if (
+        reconciliation.get("status") != "matched"
+        or reconciliation.get("holds") != []
+        or reconciliation.get("native_write_authorized") is not False
+        or reconciliation.get("reconciliation_sha256")
+        != digest({k: v for k, v in reconciliation.items() if k != "reconciliation_sha256"})
+        or type(reconciliation.get("expires_at")) is not int
+        or reconciliation["expires_at"] <= now
+    ):
         holds.append("catalogue_native_workload_reconciliation_required")
     # A matched parent cannot override held children, regardless of recomputed digests.
     workloads = reconciliation.get("workloads")
@@ -170,10 +183,11 @@ def resolve_workload(
     if not manifest_valid:
         holds.append("collection_manifest_release_binding_required")
     expected_scopes = {"source", "target", "owner"}
-    if (not isinstance(collection_coverages, list)
-            or len(collection_coverages) != 3
-            or {c.get("scope") for c in collection_coverages
-                if isinstance(c, dict)} != expected_scopes):
+    if (
+        not isinstance(collection_coverages, list)
+        or len(collection_coverages) != 3
+        or {c.get("scope") for c in collection_coverages if isinstance(c, dict)} != expected_scopes
+    ):
         holds.append("migration_field_collection_evidence_required")
     else:
         for entry in collection_coverages:
@@ -182,39 +196,48 @@ def resolve_workload(
                 or entry.get("holds") != []
                 or not isinstance(entry.get("attributes"), list)
                 or not entry["attributes"]
-                or len({a.get("attribute_id") for a in entry["attributes"]
-                        if isinstance(a, dict)}) != len(entry["attributes"])
-                or any(not isinstance(a, dict)
-                       or a.get("status") not in {"observed", "not_applicable"}
-                       for a in entry["attributes"])
+                or len({a.get("attribute_id") for a in entry["attributes"] if isinstance(a, dict)})
+                != len(entry["attributes"])
+                or any(
+                    not isinstance(a, dict) or a.get("status") not in {"observed", "not_applicable"}
+                    for a in entry["attributes"]
+                )
                 or entry.get("native_write_authorized") is not False
                 or entry.get("independent_e3_e4_qualification") is not False
                 or type(entry.get("expires_at")) is not int
                 or entry["expires_at"] <= now
                 or type(entry.get("evaluated_at")) is not int
                 or not 0 <= now - entry["evaluated_at"] <= 5
-                or entry.get("coverage_sha256") != digest({
-                    k: v for k, v in entry.items() if k != "coverage_sha256"
-                })
+                or entry.get("coverage_sha256")
+                != digest({k: v for k, v in entry.items() if k != "coverage_sha256"})
             ):
                 holds.append("migration_field_collection_stale_or_incomplete")
             if manifest_valid and isinstance(collection_manifest, dict):
                 side = entry.get("scope")
-                platform = route["target"]["platform"] if side == "target" else route["source"]["platform"]
+                platform = (
+                    route["target"]["platform"] if side == "target" else route["source"]["platform"]
+                )
                 declared = collection_manifest["platforms"].get(platform, {})
                 expected = declared.get(side) if isinstance(declared, dict) else None
-                seen = {a.get("attribute_id") for a in entry.get("attributes", [])
-                        if isinstance(a, dict)}
-                if (not isinstance(expected, list) or not expected
-                        or len(expected) != len(set(expected))
-                        or set(expected) != seen
-                        or entry.get("manifest_sha256") != collection_manifest["manifest_sha256"]):
+                seen = {
+                    a.get("attribute_id")
+                    for a in entry.get("attributes", [])
+                    if isinstance(a, dict)
+                }
+                if (
+                    not isinstance(expected, list)
+                    or not expected
+                    or len(expected) != len(set(expected))
+                    or set(expected) != seen
+                    or entry.get("manifest_sha256") != collection_manifest["manifest_sha256"]
+                ):
                     holds.append("migration_collection_manifest_attributes_changed")
             side = entry.get("scope")
             expected_side = "target" if side == "target" else "source"
-            if (entry.get("platform") != route[expected_side]["platform"]
-                    or entry.get("installation_id")
-                    != route[expected_side]["installation_id"]):
+            if (
+                entry.get("platform") != route[expected_side]["platform"]
+                or entry.get("installation_id") != route[expected_side]["installation_id"]
+            ):
                 holds.append("migration_field_collection_installation_changed")
     # The reviewed Inventory selection is a separate owner assertion from
     # Inventory's coverage summaries. The latter cannot attest their own
@@ -223,28 +246,50 @@ def resolve_workload(
         selection = selected_review
         for side in ("source", "target"):
             native_side = selection.get(side)
-            current = next((row for row in collection_coverages or []
-                            if isinstance(row, dict) and row.get("scope") == side), None)
-            if (not isinstance(native_side, dict)
-                    or not isinstance(current, dict)
-                    or not isinstance(native_side.get("tuple_sha256"), str)
-                    or len(native_side["tuple_sha256"]) != 64
-                    or current.get("installed_tuple_sha256")
-                       != native_side["tuple_sha256"]
-                    or native_side.get("profile_sha256")
-                       != route[side]["profile_sha256"]):
+            current = next(
+                (
+                    row
+                    for row in collection_coverages or []
+                    if isinstance(row, dict) and row.get("scope") == side
+                ),
+                None,
+            )
+            if (
+                not isinstance(native_side, dict)
+                or not isinstance(current, dict)
+                or not isinstance(native_side.get("tuple_sha256"), str)
+                or len(native_side["tuple_sha256"]) != 64
+                or current.get("installed_tuple_sha256") != native_side["tuple_sha256"]
+                or native_side.get("profile_sha256") != route[side]["profile_sha256"]
+            ):
                 holds.append("migration_review_native_tuple_changed")
-        source = next((row for row in collection_coverages or []
-                       if isinstance(row, dict) and row.get("scope") == "source"), None)
-        owner = next((row for row in collection_coverages or []
-                      if isinstance(row, dict) and row.get("scope") == "owner"), None)
-        if (not isinstance(source, dict) or not isinstance(owner, dict)
-                or not isinstance(reconciliation.get("source_generation_id"), str)
-                or any(row.get("generation_id") != reconciliation["source_generation_id"]
-                       for row in (source, owner))
-                or not isinstance(selection.get("review"), dict)
-                or reconciliation.get("native_review_sha256") !=
-                    selection["review"].get("digest")):
+        source = next(
+            (
+                row
+                for row in collection_coverages or []
+                if isinstance(row, dict) and row.get("scope") == "source"
+            ),
+            None,
+        )
+        owner = next(
+            (
+                row
+                for row in collection_coverages or []
+                if isinstance(row, dict) and row.get("scope") == "owner"
+            ),
+            None,
+        )
+        if (
+            not isinstance(source, dict)
+            or not isinstance(owner, dict)
+            or not isinstance(reconciliation.get("source_generation_id"), str)
+            or any(
+                row.get("generation_id") != reconciliation["source_generation_id"]
+                for row in (source, owner)
+            )
+            or not isinstance(selection.get("review"), dict)
+            or reconciliation.get("native_review_sha256") != selection["review"].get("digest")
+        ):
             holds.append("migration_review_generation_or_digest_changed")
     upgraded = {
         **{k: v for k, v in route.items() if k != "readiness_sha256"},
@@ -259,12 +304,12 @@ def resolve_workload(
     }
     nested_expiry = reconciliation.get("expires_at")
     coverage_expiries = [
-        entry["expires_at"] for entry in collection_coverages or []
+        entry["expires_at"]
+        for entry in collection_coverages or []
         if isinstance(entry, dict) and type(entry.get("expires_at")) is int
     ]
     upgraded["expires_at"] = min(
-        [route["expires_at"],
-         nested_expiry if type(nested_expiry) is int else route["expires_at"]]
+        [route["expires_at"], nested_expiry if type(nested_expiry) is int else route["expires_at"]]
         + coverage_expiries
     )
     upgraded["readiness_sha256"] = digest(upgraded)

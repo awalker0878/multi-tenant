@@ -23,7 +23,12 @@ lifecycle-native = "lifecycle.bootstrap.native_server:main"
 lifecycle-expansion = "lifecycle.bootstrap.expansion:main"
 
 [dependency-groups]
-dev = ["mypy==2.4.0", "pytest==9.1.1", "ruff==0.16.10"]
+dev = [
+    "mypy==2.4.0",
+    "pytest==9.1.1",
+    "ruff==0.16.10",
+    "types-jsonschema==4.26.0.20261006",
+]
 build = ["setuptools==84.0.0", "wheel==0.48.0"]
 
 [tool.setuptools.packages.find]

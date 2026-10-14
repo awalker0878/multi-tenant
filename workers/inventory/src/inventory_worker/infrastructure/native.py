@@ -1,5 +1,6 @@
 "Pinned TLS, fixed read routes and bounded normalization for selected native APIs."
 
+import hashlib
 import http.client
 import ipaddress
 import json
@@ -8,14 +9,12 @@ import re
 import socket
 import ssl
 import time
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from contextvars import ContextVar
-import hashlib
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlencode, urlsplit
-
 
 # A scoped, lease-local audit sink. ContextVar prevents evidence escaping a
 # collection job; it never signs or promotes raw GETs to E3/E4 qualification.
@@ -25,7 +24,7 @@ _READ_WITNESS_SINK: ContextVar[Callable[[dict[str, Any]], None] | None] = Contex
 
 
 @contextmanager
-def capture_native_reads(sink: Callable[[dict[str, Any]], None]):
+def capture_native_reads(sink: Callable[[dict[str, Any]], None]) -> Iterator[None]:
     token = _READ_WITNESS_SINK.set(sink)
     try:
         yield
@@ -154,15 +153,18 @@ def exchange(
             # The transport has already checked status, TLS peer, scope, and
             # response encoding. This response digest is an audit witness,
             # NOT proof that every manifest field exists inside the document.
-            witness({
-                "native_operation": "GET " + path,
-                "api_version": str(stream.get("api_version", "")),
-                "response_sha256": hashlib.sha256(
-                    json.dumps(observed, sort_keys=True, separators=(",", ":"),
-                               allow_nan=False).encode()
-                ).hexdigest(),
-                "observed_at": int(time.time()),
-            })
+            witness(
+                {
+                    "native_operation": "GET " + path,
+                    "api_version": str(stream.get("api_version", "")),
+                    "response_sha256": hashlib.sha256(
+                        json.dumps(
+                            observed, sort_keys=True, separators=(",", ":"), allow_nan=False
+                        ).encode()
+                    ).hexdigest(),
+                    "observed_at": int(time.time()),
+                }
+            )
         return observed
     except (OSError, http.client.HTTPException):
         raise CollectionFailure("transport_unavailable") from None

@@ -1,3 +1,4 @@
+from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from copy import deepcopy
 from typing import Any
@@ -99,11 +100,9 @@ def test_plan_persistence_invalidation_duplicate_and_conflict(database: Postgres
             (plan["id"],),
         )
     assert index is not None
-    assert index["scope_sha256"] == digest(
-        assessed["inputs"][0]["qualification"]["scope"]
-    )
+    assert index["scope_sha256"] == digest(assessed["inputs"][0]["qualification"]["scope"])
     assert p.validity(a, saved, {})["current"]
-    event = {
+    event: dict[str, Any] = {
         "event_id": str(uuid4()),
         "tenant_id": TENANT,
         "event_type": "inventory.discovery.completed",
@@ -137,7 +136,7 @@ def test_negative_qualification_arriving_before_plan_save_cannot_be_missed(
     result = p.assessment(actor, str(uuid4()), body, {})
     assessed = p.get(TENANT, APP, ENV, result["id"], "assessment")
     scope_sha256 = digest(assessed["inputs"][0]["qualification"]["scope"])
-    incoming = {
+    incoming: dict[str, Any] = {
         "event_id": str(uuid4()),
         "tenant_id": TENANT,
         "scope_sha256": scope_sha256,
@@ -196,11 +195,12 @@ def test_revocation_blocks_approval_execution_and_placement_boundaries(
     )
     saved = p.get(TENANT, APP, ENV, planned["id"], "plan")
     assert not p.validity(actor, saved, {})["current"]
-    for boundary in (
+    boundaries: tuple[Callable[[], dict[str, Any]], ...] = (
         lambda: p.bound_plan(TENANT, planned["id"], 1),
         lambda: p.execution_plan(TENANT, planned["id"], 1),
         lambda: p.placement_proposal(TENANT, planned["id"], 1),
-    ):
+    )
+    for boundary in boundaries:
         with pytest.raises(Rejected) as denied:
             boundary()
         assert denied.value.status == 423
@@ -222,8 +222,11 @@ def test_missing_scope_binding_fails_closed_before_any_plan_effects(
                 ACTOR,
                 APP,
                 ENV,
-                '{"content":{"scope":{"tenant_id":"' + TENANT
-                + '"}},"binding":{"tenant_id":"' + TENANT + '"}}',
+                '{"content":{"scope":{"tenant_id":"'
+                + TENANT
+                + '"}},"binding":{"tenant_id":"'
+                + TENANT
+                + '"}}',
                 "a" * 64,
                 NOW,
             ),
@@ -235,7 +238,6 @@ def test_missing_scope_binding_fails_closed_before_any_plan_effects(
         p.execution_plan(TENANT, identity, 1)
 
 
-
 def test_concurrent_qualification_revoke_and_new_plan_cannot_leave_an_eligible_plan(
     database: Postgres,
 ) -> None:
@@ -243,7 +245,7 @@ def test_concurrent_qualification_revoke_and_new_plan_cannot_leave_an_eligible_p
     created = p.assessment(actor, str(uuid4()), body, {})
     assessed = p.get(TENANT, APP, ENV, created["id"], "assessment")
     scope_hash = digest(assessed["inputs"][0]["qualification"]["scope"])
-    revoked = {
+    revoked: dict[str, Any] = {
         "event_id": str(uuid4()),
         "tenant_id": TENANT,
         "scope_sha256": scope_hash,
@@ -286,9 +288,14 @@ def test_bound_plan_refuses_payload_scope_of_a_different_tenant(
             "(id,tenant,actor,application,environment,kind,payload,digest,created_at) "
             "VALUES(%s,%s,%s,%s,%s,'plan',%s::jsonb,%s,%s)",
             (
-                identity, TENANT, ACTOR, APP, ENV,
+                identity,
+                TENANT,
+                ACTOR,
+                APP,
+                ENV,
                 '{"content":{"scope":{"tenant_id":"' + wrong_tenant + '"}}}',
-                "a" * 64, NOW,
+                "a" * 64,
+                NOW,
             ),
         )
     p, _, _ = setup(database)

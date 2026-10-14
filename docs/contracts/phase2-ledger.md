@@ -143,3 +143,66 @@ digests, installed registry, executed test verdicts and downloaded CI evidence.
 Phase 1 handoff remains FAIL, so Phase 2 remains FAIL. All observed repository
 defects and absent qualification claims remain explicit. Only the preflight
 evidence and this ledger are committed on the working branch.
+
+
+## Contract remediation checkpoint — 2026-10-14
+
+The current user instruction permits independent remediation while an external
+input is missing. The earlier Phase 2.0 stop condition no longer governs this
+work. Baseline remote HEAD was `37312b3c48538fc48f04f6abf59665c2c34b5c15`;
+main remains unauthorized. Overall qualification remains **INCOMPLETE**.
+
+### Confirmed repository defects corrected
+
+- **P09 / Console producer mismatch (high):** the installed Planning migration
+  v1.6 response is authoritative. `MigrationSupport.read` leaked three internal
+  fields (`expires_at`, `api_compatibility`, `readiness`) into a closed public
+  response. Planning now computes readiness internally, retains its concrete
+  holds in the contracted `blockers`, preserves independent native E3/E4 flags,
+  and leaves full workload readiness on its separately contracted endpoint.
+  No published release, installed copy or schema assertion changed. No new
+  release is needed to restore the already published interface. The original
+  production implementation fails the new producer regression; the corrected
+  implementation and unchanged P09 validator pass.
+- **Malformed collection enrollment accepted (high):** the actual protected-file
+  loader accepted boolean schema versions and silently filtered unknown scopes,
+  missing owner fields, invalid IDs and unknown platform groups. It now rejects
+  these inputs and requires every source/target/owner attribute set. Fifteen real
+  file-loader tests pass; the original loader fails six negative controls.
+  Temporary test enrollment does not prove deployed enrollment or provenance.
+- **Required quality failures (medium):** fixed import, formatting and strict
+  typing defects across the five Python packages and four Laravel components.
+  Added pinned `types-jsonschema` development stubs to Lifecycle's manifest and
+  lock. No lint/type rule or assertion was disabled. Dynamic JSON fixture types
+  are explicit; null database results are asserted before indexing. Guarded
+  native policy checks now use direct raising branches so type narrowing follows
+  the actual fail-closed control flow.
+
+### Executed checkpoint verification and limits
+
+- Existing canonical builder, contract validator, dependency registry,
+  installed-copy registry and runtime-binding discovery pass: 75 releases,
+  166 HTTP operations, 47 canonical dependency edges, 83 consumer relationships,
+  35 installed copies and nine components. No additional canonical retirement
+  is justified by repository evidence.
+- Five Python suites before the final P09/loader additions: 2,046 pass and 180
+  PostgreSQL-dependent cases skip. The 37 focused migration-support and loader
+  cases pass after those additions. These are bounded producer/control tests,
+  not complete authenticated runtime or deployment qualification.
+- PostgreSQL 16.15 binaries were acquired and an actual integration fixture was
+  attempted. The execution sandbox rejects `os.chown(..., 65534, 65534)` with
+  `OSError: [Errno 22] Invalid argument`; it cannot start that unprivileged cluster.
+  No fixture was rewritten or mocked to turn this into integration success.
+- PHP formatting was repaired using the pinned Pint formatter under an extracted
+  PHP 8.3 executable. Supported PHP 8.5.11 runtime and browser qualification must
+  come from executed CI; PHP 8.3 formatting is not that evidence.
+- Baseline CI `38591024838` was independently retrieved for the baseline HEAD;
+  its tested merge revision is `8eb1e6dcf0e5640d8e76a5fe0e1edcb2f1eda5c8`.
+  It confirms formatting/type failures and the strict red assurance aggregation.
+  It also passes nine built-image jobs and installed binding aggregation; those
+  results are baseline artifacts, not artifacts for the remediation checkpoint.
+
+The missing deployment-owned collection registry, authenticated broker/provider
+and custody qualification, complete authenticated operation/consumer evidence,
+and final-head installed artifacts remain unqualified. Continue independent
+verification and record exact CI evidence before claiming any completed phase.

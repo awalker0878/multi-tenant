@@ -27,12 +27,11 @@ from lifecycle_worker.application.native import (
 )
 from lifecycle_worker.infrastructure.image_conversion import file_digest
 from lifecycle_worker.infrastructure.migration_custody import ArtifactCustody
-from lifecycle_worker.infrastructure.native_http import NativeEndpoint, PinnedConnection
 from lifecycle_worker.infrastructure.native_files import protected_read
+from lifecycle_worker.infrastructure.native_http import NativeEndpoint, PinnedConnection
 from lifecycle_worker.infrastructure.native_json import NativeJson
 from lifecycle_worker.infrastructure.vmware_capture import NICS, devices, moref, reference
 from lifecycle_worker.infrastructure.vmware_ovf import descriptor
-
 
 MIGRATION_API_CAPABILITIES = frozenset({"vm.disk.import"})
 
