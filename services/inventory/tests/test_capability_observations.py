@@ -57,7 +57,9 @@ def test_projection_preserves_discovery_holds_and_expiry() -> None:
 @pytest.mark.parametrize(
     "fault",
     ["none", "signature", "expired", "tuple", "suspended", "missing_method",
-     "false_method", "revoked", "missing_revocation", "missing_core_case"],
+     "false_method", "revoked", "missing_revocation", "missing_core_case",
+     "passed_recovery_missing_readback", "passed_recovery_foreign_readback",
+     "passed_recovery_valid"],
 )
 def test_signed_observation_is_not_an_adapter_assertion(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, fault: str
@@ -82,6 +84,7 @@ def test_signed_observation_is_not_an_adapter_assertion(
         "adapter_conformant": True,
         "definition_sha256": DEFINITION_SHA256,
         "scope_sha256": "b" * 64,
+        "runtime_artifacts": {"adapter": "c" * 64},
         "observed_at": now,
         "expires_at": now + 30,
         "dimensions": list(DIMENSIONS),
@@ -104,6 +107,21 @@ def test_signed_observation_is_not_an_adapter_assertion(
         payload["method_modes"][next(iter(method_modes))] = "passed"
     if fault == "missing_core_case":
         payload["cases"].pop("installed_identity")
+    if fault.startswith("passed_recovery_"):
+        method = next(iter(WIRE_METHODS))
+        recovery_key = "method:" + method + ":rollback"
+        payload["method_modes"][recovery_key] = "passed"
+        payload["cases"][recovery_key] = "passed"
+        if fault != "passed_recovery_missing_readback":
+            payload["snapshot"] = {"recovery_measurements": [{
+                "method": (list(WIRE_METHODS)[1]
+                           if fault == "passed_recovery_foreign_readback" else method),
+                "mode": "rollback", "dataset_id": "dataset-1", "sequence": 1,
+                "observed_at": now, "scope_sha256": payload["scope_sha256"],
+                "artifacts": payload["runtime_artifacts"],
+                "readback_sha256": "d" * 64, "outcome": "passed",
+                "consistency_passed": True,
+            }]}
     raw = json.dumps(payload).encode()
     import hashlib
 
@@ -156,7 +174,7 @@ def test_signed_observation_is_not_an_adapter_assertion(
     monkeypatch.setenv("INVENTORY_CAPABILITY_EVIDENCE_FILE", str(evidence))
     monkeypatch.setenv("INVENTORY_CAPABILITY_TRUST_FILE", str(trust))
     owner = MountedCapabilityObservations()
-    if fault == "none":
+    if fault in ("none", "passed_recovery_valid"):
         assert owner.read(base) is not None
     else:
         with pytest.raises(Rejected, match="capability_observation_unavailable"):

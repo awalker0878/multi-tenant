@@ -4,6 +4,7 @@ import base64
 import hashlib
 import json
 import os
+import re
 import stat
 import time
 from pathlib import Path
@@ -26,6 +27,54 @@ def checksum(value: Any) -> str:
     return hashlib.sha256(
         json.dumps(value, sort_keys=True, separators=(",", ":")).encode()
     ).hexdigest()
+
+
+def scoped_recovery_readbacks(observed: dict[str, Any], now: int) -> bool:
+    """A signed generic recovery does not qualify other installed methods."""
+    matrix = observed["method_modes"]
+    snapshot = observed.get("snapshot")
+    if snapshot is None:
+        return not any(
+            status == "passed" and key.rsplit(":", 1)[-1] in {
+                "rollback", "forward_recovery", "reverse_recovery"
+            } for key, status in matrix.items()
+        )
+    if not isinstance(snapshot, dict):
+        return False
+    measurements = snapshot.get("recovery_measurements", [])
+    if not isinstance(measurements, list):
+        return False
+    latest: dict[tuple[str, str, str], dict[str, Any]] = {}
+    for sample in measurements:
+        if (not isinstance(sample, dict)
+                or sample.get("method") not in WIRE_METHODS
+                or sample.get("mode") not in MODES
+                or not isinstance(sample.get("dataset_id"), str)
+                or not 1 <= len(sample["dataset_id"]) <= 160
+                or type(sample.get("sequence")) is not int or sample["sequence"] < 1
+                or type(sample.get("observed_at")) is not int
+                or not 0 <= now - sample["observed_at"] <= 60
+                or sample.get("scope_sha256") != observed.get("scope_sha256")
+                or sample.get("artifacts") != observed.get("runtime_artifacts")
+                or not isinstance(sample.get("readback_sha256"), str)
+                or re.fullmatch(r"[0-9a-f]{64}", sample["readback_sha256"]) is None):
+            return False
+        key = (sample["method"], sample["mode"], sample["dataset_id"])
+        prior = latest.get(key)
+        if prior is not None and prior["sequence"] == sample["sequence"]:
+            return False
+        if prior is None or sample["sequence"] > prior["sequence"]:
+            latest[key] = sample
+    if any(row.get("outcome") != "passed" or row.get("consistency_passed") is not True
+           for row in latest.values()):
+        return False
+    for key, status in matrix.items():
+        _, method, mode = key.split(":")
+        if (status == "passed"
+                and mode in {"rollback", "forward_recovery", "reverse_recovery"}
+                and not any(k[:2] == (method, mode) for k in latest)):
+            return False
+    return True
 
 
 def protected_document(path: Path) -> dict[str, Any]:
@@ -115,6 +164,7 @@ class MountedCapabilityObservations:
                     or any(observed["cases"].get("dimension:" + d) != "passed" for d in DIMENSIONS)
                     or not isinstance(observed.get("method_modes"), dict)
                     or set(observed["method_modes"]) != method_keys
+                    or not scoped_recovery_readbacks(observed, now)
                     or any(
                         observed["method_modes"][name] not in {"passed", "unsupported"}
                         or observed["cases"].get(name) != observed["method_modes"][name]
