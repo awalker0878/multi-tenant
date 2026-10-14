@@ -142,7 +142,7 @@
       "lifecycle",
       "console"
     ],
-    "contracts/openapi/planning-immutable-plan-v1.1.json": [
+    "contracts/openapi/planning-immutable-plan-v2.json": [
       "planning",
       "governance"
     ],
@@ -730,7 +730,7 @@
       "depends_on": []
     },
     {
-      "path": "contracts/openapi/planning-immutable-plan-v1.1.json",
+      "path": "contracts/openapi/planning-immutable-plan-v2.json",
       "owner": "planning",
       "consumers": [
         "governance"

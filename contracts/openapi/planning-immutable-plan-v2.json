@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Immutable planning binding consumed by Governance",
-    "version": "1.1.0",
-    "description": "Current tenant-bound P05 producer binding. Governance reads an immutable plan only through a tenant-scoped endpoint; workload credentials never grant cross-tenant plan lookup."
+    "version": "2.0.0",
+    "description": "Tenant-scoped immutable planning binding consumed only by Governance. Old unscoped endpoint is removed, not aliased. All errors use the current closed Error v2 envelope."
   },
   "security": [
     {
@@ -55,22 +55,74 @@
             }
           },
           "401": {
-            "description": "Invalid workload or user session"
+            "description": "Invalid workload or user session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           },
           "403": {
-            "description": "Current scope/action denied"
+            "description": "Current scope/action denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Unknown resource or no membership"
+            "description": "Unknown resource or no membership",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           },
           "409": {
-            "description": "Revision, retry, binding or transition conflict"
+            "description": "Revision, retry, binding or transition conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           },
           "422": {
-            "description": "Invalid input"
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "Current qualification or plan custody held",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           },
           "503": {
-            "description": "Required authority unavailable"
+            "description": "Required authority unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         }
       }
@@ -169,6 +221,59 @@
               "operational",
               "isolated_campaign"
             ]
+          }
+        }
+      },
+      "Error": {
+        "title": "Contracted API error v2",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "message",
+          "correlation_id",
+          "retryable"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{2,95}$"
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          },
+          "correlation_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "retryable": {
+            "type": "boolean"
+          },
+          "details": {
+            "type": "array",
+            "maxItems": 64,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field",
+                "reason"
+              ],
+              "properties": {
+                "field": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256
+                }
+              }
+            }
           }
         }
       }

@@ -25,7 +25,7 @@ CHECKED = {
         "contracts/openapi/planning-v1.2.json",
         "contracts/openapi/planning-migration-v1.6.json",
         "contracts/openapi/planning-native-v1.json",
-        "contracts/openapi/planning-immutable-plan-v1.1.json",
+        "contracts/openapi/planning-immutable-plan-v2.json",
         "contracts/openapi/planning-lifecycle-reads-v1.json",
         "contracts/openapi/planning-qualification-events-v1.json",
         "contracts/openapi/lifecycle-v1.json",
@@ -35,7 +35,7 @@ CHECKED = {
     "lifecycle-native": {"contracts/openapi/lifecycle-migration-boundary-v2.json"},
     "lifecycle-native-jobs": {"contracts/openapi/lifecycle-native-jobs-v1.1.json"},
     "lifecycle-worker-effects": {"contracts/openapi/worker-migration-effect-v2.1.json"},
-    "planning-immutable": {"contracts/openapi/planning-immutable-plan-v1.1.json"},
+    "planning-immutable": {"contracts/openapi/planning-immutable-plan-v2.json"},
     "planning-lifecycle": {"contracts/openapi/planning-lifecycle-reads-v1.json"},
     "planning-migration": {"contracts/openapi/planning-migration-v1.6.json"},
 }

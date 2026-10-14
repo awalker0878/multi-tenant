@@ -3,6 +3,7 @@
 import asyncio
 import json
 import re
+from uuid import uuid4
 from typing import Any
 
 from uvicorn._types import ASGIReceiveCallable, ASGISendCallable, Scope
@@ -248,6 +249,20 @@ class PlanningApp:
             status, payload = 422, {"error": "invalid_request"}
         except Exception:
             status, payload = 503, {"error": "planning_unavailable"}
+        # The current Governance-only API is the sole Planning operation
+        # published with the closed Error v2 response envelope. Other API
+        # releases retain their own explicitly versioned error contracts.
+        if status >= 400 and re.fullmatch(
+            rf"/v1/tenants/({UUID})/plans/({UUID})/revisions/([1-9][0-9]{{0,8}})",
+            scope["path"],
+        ):
+            reason = payload.get("error", "plan_authority_unavailable")
+            if not isinstance(reason, str) or not re.fullmatch(r"[a-z][a-z0-9_.-]{2,95}", reason):
+                reason = "plan_authority_unavailable"
+            payload = {
+                "code": reason, "message": reason.replace("_", " "),
+                "correlation_id": str(uuid4()), "retryable": status >= 500,
+            }
         encoded = json.dumps(payload, allow_nan=False, separators=(",", ":")).encode()
         await send(
             {

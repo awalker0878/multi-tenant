@@ -121,7 +121,7 @@ def check_implemented_api_contracts():
             "lifecycle",
             {("POST", "/internal/native-grants/checks")},
         ),
-        "contracts/openapi/planning-immutable-plan-v1.1.json": (
+        "contracts/openapi/planning-immutable-plan-v2.json": (
             "planning",
             {("GET", "/v1/tenants/{tenant}/plans/{plan}/revisions/{revision}")},
         ),

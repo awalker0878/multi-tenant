@@ -79,7 +79,7 @@ class HttpRouteConformanceTests(unittest.TestCase):
             compare_inventory_discovery_routes((real, dummy), declared)
 
     def test_immutable_governance_read_has_no_unscoped_route(self):
-        source = (ROOT / "contracts/openapi/planning-immutable-plan-v1.1.json").read_text()
+        source = (ROOT / "contracts/openapi/planning-immutable-plan-v2.json").read_text()
         self.assertIn('"/v1/tenants/{tenant}/plans/{plan}/revisions/{revision}"', source)
         self.assertNotIn('"/v1/plans/{plan}/revisions/{revision}"', source)
         actual = (ROOT / "services/planning/src/planning/bootstrap/server.py").read_text()

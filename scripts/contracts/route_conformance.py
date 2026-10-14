@@ -425,7 +425,7 @@ def verify_planning_immutable(root: Path = ROOT) -> int:
     from jsonschema import Draft202012Validator, FormatChecker
     from planning.interfaces.planning import PlanningApp
 
-    spec = json.loads((root / "contracts/openapi/planning-immutable-plan-v1.1.json").read_text())
+    spec = json.loads((root / "contracts/openapi/planning-immutable-plan-v2.json").read_text())
     if routes_in_openapi(spec) != {("GET", "/v1/tenants/{tenant}/plans/{plan}/revisions/{revision}")}:
         raise ValueError("Planning immutable-plan OpenAPI operation changed")
     bound = {
@@ -461,9 +461,20 @@ def verify_planning_immutable(root: Path = ROOT) -> int:
     Draft202012Validator(schema, format_checker=FormatChecker()).validate(result)
     other = "10000000-0000-4000-8000-000000000002"
     rejected_path = f"/v1/tenants/{other}/plans/{SAMPLE_UUID}/revisions/1"
-    status, _ = asyncio.run(_exchange(app, rejected_path, "GET", headers))
-    if status != 404:
+    status, error = asyncio.run(_exchange(app, rejected_path, "GET", headers))
+    if status != 404 or error.get("code") != "not_found":
         raise ValueError("Planning immutable plan allowed a cross-tenant read")
+    Draft202012Validator(
+        spec["components"]["schemas"]["Error"], format_checker=FormatChecker()
+    ).validate(error)
+    status, error = asyncio.run(_exchange(
+        app, path, "GET", [(b"authorization", b"Bearer bad")]
+    ))
+    if status != 401 or error.get("code") != "invalid_workload":
+        raise ValueError("Planning immutable plan invalid credentials were not denied")
+    Draft202012Validator(
+        spec["components"]["schemas"]["Error"], format_checker=FormatChecker()
+    ).validate(error)
     return 1
 
 
@@ -565,7 +576,7 @@ def compare_composed_routes(owner: str, runtime: set[tuple[str, str]],
 def verify_python_composition(root: Path = ROOT) -> int:
     from planning.bootstrap.server import HTTP_OPERATIONS as planning_routes
     from lifecycle.bootstrap.server import HTTP_OPERATIONS as lifecycle_routes
-    return (compare_composed_routes("Planning", set(planning_routes), tuple(["planning-v1.2.json","planning-migration-v1.6.json","planning-native-v1.json","planning-immutable-plan-v1.1.json","planning-lifecycle-reads-v1.json","planning-qualification-events-v1.json"]), root)
+    return (compare_composed_routes("Planning", set(planning_routes), tuple(["planning-v1.2.json","planning-migration-v1.6.json","planning-native-v1.json","planning-immutable-plan-v2.json","planning-lifecycle-reads-v1.json","planning-qualification-events-v1.json"]), root)
             + compare_composed_routes("Lifecycle", set(lifecycle_routes), tuple(["lifecycle-v1.json","lifecycle-migration-campaigns-v1.json","lifecycle-internal-authority-v1.json"]), root))
 
 
