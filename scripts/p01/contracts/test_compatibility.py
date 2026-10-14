@@ -93,7 +93,7 @@ class ActiveContractTests(unittest.TestCase):
 
     def test_retirement_blocked_by_prior_dependent_release(self):
         self.registry([PATH, NEW], depends_on=[PATH])
-        self.write(NEW, "{}\\n")
+        self.write(NEW, "{}\n")
         self.base = self.commit()
         self.registry([NEW])
         (self.root / PATH).unlink()
@@ -102,7 +102,7 @@ class ActiveContractTests(unittest.TestCase):
 
     def test_retirement_blocked_by_prior_runtime_registration(self):
         self.write("architecture/installed-contract-usage.json",
-                   '{"copies": [{"canonical": "' + PATH + '"}]}\\n')
+                   '{"copies": [{"canonical": "' + PATH + '"}]}\n')
         self.base = self.commit()
         self.registry([])
         (self.root / PATH).unlink()
