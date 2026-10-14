@@ -51,18 +51,18 @@ return Application::configure(basePath: dirname(__DIR__))
             ]);
         });
         $exceptions->render(function (ValidationException $error, Request $request) use ($delegationRequest, $errorBody) {
-            if (! $delegationRequest($request)) {
+            if ($delegationRequest($request) === false) {
                 return null;
             }
             return response()->json($errorBody('delegation_input_invalid', 422), 422,
                 ['Cache-Control' => 'no-store, private']);
         });
         $exceptions->render(function (Throwable $error, Request $request) use ($delegationRequest, $errorBody) {
-            if (! $delegationRequest($request)) {
+            if ($delegationRequest($request) === false) {
                 return null;
             }
             $status = $error instanceof HttpExceptionInterface ? $error->getStatusCode() : 503;
-            if (! in_array($status, [401, 403, 404, 409, 422, 429, 503], true)) {
+            if (in_array($status, [401, 403, 404, 409, 422, 429, 503], true) === false) {
                 $status = 503;
             }
             return response()->json($errorBody('delegation_unavailable', $status), $status,

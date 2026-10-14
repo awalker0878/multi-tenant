@@ -2,8 +2,13 @@
 
 declare(strict_types=1);
 
+use App\Application\Qualification\Actions\DeliverQualificationInvalidation;
 use App\Application\Qualification\Actions\QualificationAuthorityLedger;
+use App\Application\Qualification\Contracts\ConfirmedInvalidationPublisher;
+use App\Domain\Qualification\NativeQualification;
 use Illuminate\Database\QueryException;
+use PDOException;
+use RuntimeException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -60,7 +65,7 @@ it('serializes publication and holds the exact authority epoch with durable outb
     );
     expect($retry)->toEqual($initial);
 
-    $scopeHash = \App\Domain\Qualification\NativeQualification::digest($this->scope);
+    $scopeHash = NativeQualification::digest($this->scope);
     expect(DB::table('app.qualification_authority_events')->where('scope_sha256', $scopeHash)->count())->toBe(1)
         ->and(DB::table('app.qualification_authority_outbox')->where('scope_sha256', $scopeHash)->count())->toBe(1);
 
@@ -108,7 +113,7 @@ it('keeps suspension sticky and requires a distinct superseding signed decision 
     );
     expect($restored['state'])->toBe('qualified')->and($restored['authority_epoch'])->toBe(3);
 
-    $scopeHash = \App\Domain\Qualification\NativeQualification::digest($this->scope);
+    $scopeHash = NativeQualification::digest($this->scope);
     $events = DB::table('app.qualification_authority_events')
         ->where('scope_sha256', $scopeHash)->orderBy('authority_epoch')->get();
     expect($events)->toHaveCount(3)
@@ -131,7 +136,7 @@ it('prevents runtime alteration or deletion of committed authority history', fun
         $this->scope, 'publish', (string) Str::uuid(), 0, 'fixture',
         ['source' => 'e2'], str_repeat('a', 64), 1, 'reviewer-one'
     );
-    $scopeHash = \App\Domain\Qualification\NativeQualification::digest($this->scope);
+    $scopeHash = NativeQualification::digest($this->scope);
 
     try {
         DB::table('app.qualification_authority_heads')
@@ -161,8 +166,8 @@ it('delivers immutable invalidations in order and does not clear uncertain ackno
         $this->scope, 'suspend', (string) Str::uuid(), 1, 'native contradiction',
         null, '', 0, 'native-observer'
     );
-    $scopeHash = \App\Domain\Qualification\NativeQualification::digest($this->scope);
-    $publisher = new class implements \App\Application\Qualification\Contracts\ConfirmedInvalidationPublisher
+    $scopeHash = NativeQualification::digest($this->scope);
+    $publisher = new class implements ConfirmedInvalidationPublisher
     {
         /** @var list<array<string, mixed>> */
         public array $accepted = [];
@@ -172,17 +177,17 @@ it('delivers immutable invalidations in order and does not clear uncertain ackno
         public function publish(array $event): void
         {
             if ($this->unavailable) {
-                throw new \RuntimeException('receiving_inbox_unavailable');
+                throw new RuntimeException('receiving_inbox_unavailable');
             }
             $this->accepted[] = $event;
         }
     };
-    $delivery = new \App\Application\Qualification\Actions\DeliverQualificationInvalidation($publisher);
+    $delivery = new DeliverQualificationInvalidation($publisher);
 
     try {
         $delivery->handle();
         $this->fail('Unconfirmed event cleared the durable outbox.');
-    } catch (\RuntimeException $error) {
+    } catch (RuntimeException $error) {
         expect($error->getMessage())->toBe('receiving_inbox_unavailable');
     }
     expect(DB::table('app.qualification_authority_outbox')
@@ -212,7 +217,7 @@ it('rejects a head-only epoch advance without matching immutable event and outbo
         $this->scope, 'publish', (string) Str::uuid(), 0, 'fixture',
         ['source' => 'e2'], str_repeat('a', 64), 1, 'reviewer-one'
     );
-    $hash = \App\Domain\Qualification\NativeQualification::digest($this->scope);
+    $hash = NativeQualification::digest($this->scope);
     try {
         DB::transaction(function () use ($hash): void {
             // A +1 epoch passes the immediate monotonicity guard, but commit
@@ -224,7 +229,7 @@ it('rejects a head-only epoch advance without matching immutable event and outbo
                 ]);
         });
         $this->fail('Unjournaled authority head was accepted.');
-    } catch (QueryException|\PDOException) {
+    } catch (QueryException|PDOException) {
         // Deferred trigger verifies the event + outbox at commit.
     }
     expect($this->ledger->current($this->scope)['authority_epoch'])->toBe(1);
@@ -235,7 +240,7 @@ it('rejects runtime deletion or alteration of an immutable outbox event payload'
         $this->scope, 'publish', (string) Str::uuid(), 0, 'fixture',
         ['source' => 'e2'], str_repeat('a', 64), 1, 'reviewer-one'
     );
-    $hash = \App\Domain\Qualification\NativeQualification::digest($this->scope);
+    $hash = NativeQualification::digest($this->scope);
     $denied = false;
     try {
         DB::table('app.qualification_authority_outbox')

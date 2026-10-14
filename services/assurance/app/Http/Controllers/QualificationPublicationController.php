@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Application\Foundation\Contracts\SecretReader;
 use App\Application\Qualification\Actions\QualificationAuthorityLedger;
 use App\Application\Qualification\Actions\ResolveQualification;
+use App\Domain\Qualification\NativeQualification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Throwable;
@@ -101,7 +102,7 @@ final class QualificationPublicationController
         );
 
         return response()->json([
-            'scope_sha256' => \App\Domain\Qualification\NativeQualification::digest($scope),
+            'scope_sha256' => NativeQualification::digest($scope),
             'state' => $result['state'],
             'authority_epoch' => $result['authority_epoch'],
             'decision_sha256' => $result['decision_sha256'],

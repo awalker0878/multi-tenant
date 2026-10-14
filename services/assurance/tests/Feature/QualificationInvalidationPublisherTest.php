@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Infrastructure\Foundation\MountedSecret;
 use App\Infrastructure\Qualification\ConfirmedHttpInvalidationPublisher;
 use Illuminate\Support\Facades\Http;
+use RuntimeException;
 
 it('requires a configured HTTPS sink, read-only TLS trust and separate mounted secret', function (): void {
     config([
@@ -116,7 +117,7 @@ it('rejects use of reviewer credentials for downstream invalidation publication'
             'event_sha256' => str_repeat('b', 64),
         ];
         expect(fn () => (new ConfirmedHttpInvalidationPublisher(new MountedSecret))->publish($event))
-            ->toThrow(\RuntimeException::class, 'qualification_invalidation_authority_not_independent');
+            ->toThrow(RuntimeException::class, 'qualification_invalidation_authority_not_independent');
         Http::assertNothingSent();
     } finally {
         unlink($ca);
@@ -137,12 +138,12 @@ it('refuses incomplete wire contracts before the HTTP request', function (): voi
         'event_sha256' => str_repeat('b', 64),
     ];
     expect(fn () => (new ConfirmedHttpInvalidationPublisher(new MountedSecret))->publish($wire))
-        ->toThrow(\RuntimeException::class, 'qualification_invalidation_invalid_wire');
+        ->toThrow(RuntimeException::class, 'qualification_invalidation_invalid_wire');
     Http::assertNothingSent();
 
     $missingTenant = $wire;
     unset($missingTenant['tenant_id']);
     expect(fn () => (new ConfirmedHttpInvalidationPublisher(new MountedSecret))->publish($missingTenant))
-        ->toThrow(\RuntimeException::class, 'qualification_invalidation_invalid_wire');
+        ->toThrow(RuntimeException::class, 'qualification_invalidation_invalid_wire');
     Http::assertNothingSent();
 });
