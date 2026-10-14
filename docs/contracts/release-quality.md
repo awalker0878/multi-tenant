@@ -66,8 +66,10 @@ schema files, unrecognized properties and invalid statuses fail closed.
 
 The admission script resolves the latest previously published version in
 the Git review base. It evaluates removed methods and routes, security
-changes, operation IDs, request constraints and required fields, response
-statuses/media/guarantees, nested arrays and event routing/delivery changes.
+changes, operation IDs, request constraints and required fields across **every declared request media type**,
+response statuses/media/guarantees across **every response media type**,
+media encoding, nested arrays and event routing/delivery changes. New schema
+identifiers are collision-checked against all current canonical schemas.
 A breaking change cannot reuse the same major version. A breaking major
 version must be explicit and is listed in the generated change report for
 consumer migration planning. This is a release-contract gate, *not* a claim
@@ -80,7 +82,9 @@ relations from active releases rather than a hand-maintained dependency DAG.
 `scripts/contracts/artifact_attestation.py` verifies built images and Python
 wheels, installed contract bytes and bounded runtime source identity.
 The Console image is also required to ship its compiled Vite manifest and
-all referenced browser assets. `aggregate_artifacts.py` requires the
+all referenced browser assets. The runtime coverage validator confirms the
+artifact qualification workflow is invoked from pull-request CI and is a
+dependency of the required result; merely defining a manual builder is insufficient. `aggregate_artifacts.py` requires the
 complete release-bound image/wheel matrix; the artifact workflow is invoked
 on pull requests and main-branch pushes.
 

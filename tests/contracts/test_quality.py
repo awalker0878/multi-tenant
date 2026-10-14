@@ -128,6 +128,31 @@ class HttpQualityTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "explicit HTTP status"):
             quality_api("contracts/openapi/things-v2.json", api, ERROR, POLICY)
 
+    def test_all_request_and_response_media_are_checked_for_breakages(self):
+        old = good_api()
+        route = old["paths"]["/v2/things"]["post"]
+        route["requestBody"]["content"]["text/plain"] = {
+            "schema": {"type": "string", "minLength": 1}}
+        route["responses"]["201"]["content"]["application/vnd.thing+json"] = {
+            "schema": {"type": "object", "additionalProperties": False,
+                       "required": ["receipt"], "properties": {"receipt": {"type": "string"}}}}
+        changed = copy.deepcopy(old)
+        changed["paths"]["/v2/things"]["post"]["requestBody"]["content"]["text/plain"]["schema"]["minLength"] = 10
+        changed["paths"]["/v2/things"]["post"]["responses"]["201"]["content"]["application/vnd.thing+json"]["schema"]["required"] = []
+        breakages = api_breakages(old, changed)
+        self.assertTrue(any("text/plain" in item and "minimum narrowed" in item for item in breakages))
+        self.assertTrue(any("application/vnd.thing+json" in item and "became optional" in item
+                            for item in breakages))
+
+    def test_media_encoding_changes_require_new_major(self):
+        old = good_api()
+        old["paths"]["/v2/things"]["post"]["requestBody"]["content"]["application/json"]["encoding"] = {
+            "name": {"contentType": "text/plain"}}
+        changed = copy.deepcopy(old)
+        changed["paths"]["/v2/things"]["post"]["requestBody"]["content"]["application/json"]["encoding"] = {
+            "name": {"contentType": "application/octet-stream"}}
+        self.assertIn("request media encoding changed", repr(api_breakages(old, changed)))
+
     def test_same_major_breaking_paths_requests_and_responses(self):
         old = good_api()
         new = copy.deepcopy(old)

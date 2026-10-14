@@ -199,12 +199,25 @@ def api_breakages(old: dict, new: dict) -> list[str]:
                 failures.append(at + ": request body newly required")
             if set((prior.get("requestBody") or {}).get("content", {})) != set((current.get("requestBody") or {}).get("content", {})):
                 failures.append(at + ": request media types changed")
-            req_before, req_after = body(prior), body(current)
-            if req_before is not None:
-                if req_after is None:
-                    failures.append(at + ": request body/schema removed")
+            # Every declared media schema participates in compatibility, not
+            # merely application/json. Non-JSON payloads can carry authority.
+            before_content = (prior.get("requestBody") or {}).get("content", {})
+            after_content = (current.get("requestBody") or {}).get("content", {})
+            for media_type, previous in before_content.items():
+                replacement = after_content.get(media_type)
+                where = at + "/request/" + media_type
+                if not isinstance(previous, dict) or not isinstance(replacement, dict):
+                    failures.append(where + ": request media definition removed/changed")
+                    continue
+                if {k: v for k, v in previous.items() if k not in ("schema", "example", "examples")} != {
+                        k: v for k, v in replacement.items() if k not in ("schema", "example", "examples")}:
+                    failures.append(where + ": request media encoding changed")
+                former, successor = previous.get("schema"), replacement.get("schema")
+                if not isinstance(former, dict) or not isinstance(successor, dict):
+                    if former != successor:
+                        failures.append(where + ": request schema removed/changed")
                 else:
-                    failures.extend(request_breaks(req_before, req_after, old, new, at))
+                    failures.extend(request_breaks(former, successor, old, new, where))
             old_params = {(p.get("in"), p.get("name")): p
                           for p in parameters(prior, item)}
             new_params = {(p.get("in"), p.get("name")): p
@@ -236,11 +249,23 @@ def api_breakages(old: dict, new: dict) -> list[str]:
                     failures.append(at + ": response media type changed " + status)
                 if response.get("headers", {}) != current["responses"][status].get("headers", {}):
                     failures.append(at + ": response header guarantees changed " + status)
-                oa, na = body(prior, status), body(current, status)
-                if oa is not None and na is None:
-                    failures.append(at + ": response payload removed " + status)
-                elif oa is not None:
-                    failures.extend(response_breaks(oa, na, old, new, at + ":" + status))
+                before_content = response.get("content", {})
+                after_content = current["responses"][status].get("content", {})
+                for media_type, previous in before_content.items():
+                    replacement = after_content.get(media_type)
+                    where = at + ":" + status + "/" + media_type
+                    if not isinstance(previous, dict) or not isinstance(replacement, dict):
+                        failures.append(where + ": response media definition removed/changed")
+                        continue
+                    if {k: v for k, v in previous.items() if k not in ("schema", "example", "examples")} != {
+                            k: v for k, v in replacement.items() if k not in ("schema", "example", "examples")}:
+                        failures.append(where + ": response media encoding changed")
+                    former, successor = previous.get("schema"), replacement.get("schema")
+                    if not isinstance(former, dict) or not isinstance(successor, dict):
+                        if former != successor:
+                            failures.append(where + ": response schema removed/changed")
+                    else:
+                        failures.extend(response_breaks(former, successor, old, new, where))
     return failures
 
 
@@ -492,6 +517,21 @@ def check_new_releases(root: Path, revision: str) -> dict:
     except subprocess.CalledProcessError:
         prior_registry = {"active_releases": []}
     new = sorted(current - before)
+    # New IDs must not collide with any currently enrolled canonical schema.
+    # Existing releases remain immutable; do not mint aliases or rewrite them.
+    identifiers: dict[str, str] = {}
+    for path in sorted(current):
+        if not path.startswith("contracts/schemas/"):
+            continue
+        source = root / path
+        if not source.is_file():
+            raise ValueError("Registered canonical schema missing: " + path)
+        uid = load(source).get("$id")
+        if not isinstance(uid, str):
+            continue
+        previous = identifiers.setdefault(uid, path)
+        if previous != path and (path in new or previous in new):
+            raise ValueError("New canonical JSON Schema $id collides: " + path + " " + previous)
     old_versions = {}
     for filename in sorted(before):
         try:

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import base64
+import copy
 import csv
 import hashlib
 import io
@@ -19,7 +20,7 @@ sys.path.insert(0, str(ROOT / "scripts/contracts"))
 from dependency_graph import derive
 from artifact_attestation import check_image, check_wheel, check_console_frontend, compare_runtime_tree, verify_image_process, verify_composer_production_manifest
 from aggregate_artifacts import aggregate
-from runtime_binding_coverage import verify as verify_runtime_bindings
+from runtime_binding_coverage import verify as verify_runtime_bindings, verify_required_ci_gate
 
 
 class DependencyTests(unittest.TestCase):
@@ -687,6 +688,26 @@ class PhpMigrationArtifactTests(unittest.TestCase):
 
 
 class RuntimeWorkflowTests(unittest.TestCase):
+    def test_contract_artifact_gate_is_required_not_merely_declared(self):
+        import yaml
+        ci = yaml.safe_load((ROOT / ".github/workflows/ci.yml").read_text())
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            target = root / ".github/workflows/ci.yml"
+            target.parent.mkdir(parents=True)
+            target.write_text(yaml.safe_dump(ci))
+            verify_required_ci_gate(root)
+            changed = copy.deepcopy(ci)
+            changed["jobs"]["required"]["needs"].remove("artifact-binding-assurance")
+            target.write_text(yaml.safe_dump(changed))
+            with self.assertRaisesRegex(ValueError, "Required CI does not enforce"):
+                verify_required_ci_gate(root)
+            changed = copy.deepcopy(ci)
+            changed["jobs"]["artifact-binding-assurance"]["with"]["suite"] = "infrastructure"
+            target.write_text(yaml.safe_dump(changed))
+            with self.assertRaisesRegex(ValueError, "does not invoke"):
+                verify_required_ci_gate(root)
+
     def test_real_workflow_runs_builds_attestation_and_aggregation(self):
         result = verify_runtime_bindings(ROOT)
         self.assertGreater(result["bound_http_operations"], 0)

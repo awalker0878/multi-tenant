@@ -13,6 +13,22 @@ from assurance import inventory
 ROOT = Path(__file__).resolve().parents[2]
 
 
+def verify_required_ci_gate(root: Path) -> None:
+    """Reject a disconnected or optional artifact gate, even if the builder exists."""
+    ci = yaml.safe_load((root / ".github/workflows/ci.yml").read_text(encoding="utf-8"))
+    jobs = ci.get("jobs", {}) if isinstance(ci, dict) else {}
+    caller = jobs.get("artifact-binding-assurance", {})
+    if (caller.get("uses") != "./.github/workflows/qualification.yml"
+            or caller.get("with", {}).get("suite") != "contract-artifacts"
+            or "scope" not in caller.get("needs", [])):
+        raise ValueError("CI does not invoke source-pinned contract artifact qualification")
+    required = jobs.get("required", {})
+    if ("artifact-binding-assurance" not in required.get("needs", [])
+            or "contract-assurance" not in required.get("needs", [])
+            or "scripts/ci/check.py" not in str(required.get("steps", []))):
+        raise ValueError("Required CI does not enforce contract and artifact qualification")
+
+
 def verify(root: Path = ROOT) -> dict:
     registry = json.loads((root / "architecture/contract-consumers.json").read_text())
     active = inventory(root)
@@ -48,6 +64,7 @@ def verify(root: Path = ROOT) -> dict:
             raise ValueError("Artifact CI does not execute required build/verification: " + command)
     if not has_command(aggregate, "aggregate_artifacts.py --input-directory"):
         raise ValueError("Artifact CI does not aggregate measured built releases")
+    verify_required_ci_gate(root)
     if not any("actions/download-artifact@" in str(step.get("uses", ""))
                for step in aggregate.get("steps", [])):
         raise ValueError("Artifact aggregation does not download the actual built evidence")
