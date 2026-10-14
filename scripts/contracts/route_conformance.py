@@ -244,7 +244,7 @@ def verify_inventory(root: Path = ROOT) -> int:
             valid = set(operation["responses"])
             request_body = json.dumps(body).encode()
             for label, method, headers, expected in (
-                ("missing-header", "POST", [], 400),
+                ("missing-header", "POST", [], 401),
                 ("malformed-workload", "POST", [(b"authorization", b"Bearer x")], 401),
                 ("unsupported-method", "GET", good_headers, 405),
                 ("missing-content-type", "POST", good_headers[:1], 415),
