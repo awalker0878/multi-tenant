@@ -168,7 +168,7 @@ def test_mismatched_data_method_is_held_before_native_submission(
 @pytest.mark.parametrize(
     "fault",
     [
-        "",
+        pytest.param("", id="fault0"),
         "partial",
         "stale",
         "identity",
