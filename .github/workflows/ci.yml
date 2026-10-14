@@ -169,7 +169,11 @@ jobs:
           python scripts/contracts/runtime_binding_coverage.py
           python scripts/contracts/check.py
           python -m unittest discover -s tests/contracts -p 'test_*.py' -q
-      - name: Probe actual Inventory, Planning and Lifecycle producer/consumer routes
+      # Keep diagnostic observations independent from unrelated test-suite
+      # failures. The failing tests still make CI / Required red; no receipt is
+      # invented or treated as passing without executing its specific probe.
+      - name: Verify actual Python router and producer boundaries
+        if: ${{ !cancelled() }}
         env:
           PYTHONPATH: services/inventory/src:services/planning/src:services/lifecycle/src
         run: |
@@ -179,7 +183,12 @@ jobs:
           python scripts/contracts/route_conformance.py --app lifecycle-native
           python scripts/contracts/route_conformance.py --app planning-immutable
           python scripts/contracts/route_conformance.py --app planning-lifecycle
-          python scripts/contracts/measured_consumers.py --output "$RUNNER_TEMP/measured-consumers.json"
+      - name: Measure executable producer and consumer pairs
+        if: ${{ !cancelled() }}
+        run: python scripts/contracts/measured_consumers.py --output "$RUNNER_TEMP/measured-consumers.json"
+      - name: Record independently checked Python route evidence
+        if: ${{ !cancelled() }}
+        run: |
           python scripts/contracts/assurance_routes.py --app inventory --output "$RUNNER_TEMP/inventory-routes.json"
           python scripts/contracts/assurance_routes.py --app python-composed --output "$RUNNER_TEMP/python-routes.json"
           python scripts/contracts/assurance_routes.py --app lifecycle-native --output "$RUNNER_TEMP/lifecycle-native-routes.json"
@@ -187,6 +196,9 @@ jobs:
           python scripts/contracts/assurance_routes.py --app lifecycle-worker-effects --output "$RUNNER_TEMP/lifecycle-worker-effects-routes.json"
           python scripts/contracts/assurance_routes.py --app planning-immutable --producer-only --output "$RUNNER_TEMP/planning-immutable-producer.json"
           python scripts/contracts/assurance_routes.py --app planning-lifecycle --producer-only --output "$RUNNER_TEMP/planning-lifecycle-producer.json"
+      - name: Measure missing-credential Python owner denials
+        if: ${{ !cancelled() }}
+        run: |
           python scripts/contracts/python_denials.py --owner inventory --output "$RUNNER_TEMP/inventory-denials.json"
           python scripts/contracts/python_denials.py --owner planning --output "$RUNNER_TEMP/planning-denials.json"
           python scripts/contracts/python_denials.py --owner lifecycle --output "$RUNNER_TEMP/lifecycle-denials.json"
