@@ -94,7 +94,13 @@ def test_ahv_destination_roundtrip_binds_profiles_and_revokes_with_enrollment(
     )
     form = review(source, profile_id)
     # Existing source fixture has one boot disk and no NICs.
+    # The observed source has no NICs or category assignments. Do not
+    # promote an AHV policy or category from a catalogue listing alone:
+    # security equivalence requires independently qualified native evidence.
     form["destination"] = fixture["review"]["destination"] | {
+        "category_ids": [],
+        "policy_ids": [],
+        "security_mappings": [],
         "disks": [{"source_key": 2000, "index": 0}],
         "nics": [],
     }
