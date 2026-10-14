@@ -30,8 +30,10 @@ def derive(root: Path = ROOT) -> dict:
     # A declared copy is not executable loader evidence: verify real imports.
     verify_installed_usage(root, registry)
     edges = []
+    release_dependencies = []
     producer_local = []
     installed_seen = set()
+    active_paths = {item["path"] for item in registry["active_releases"]}
     for entry in registry["active_releases"]:
         canonical, owner = entry["path"], entry["owner"]
         kind = canonical.split("/")[1]
@@ -39,6 +41,10 @@ def derive(root: Path = ROOT) -> dict:
             raise ValueError(f"Unknown active contract classification: {canonical}")
         if not (root / canonical).is_file():
             raise ValueError(f"Missing active dependency source: {canonical}")
+        for dependency in entry.get("depends_on", []):
+            if dependency == canonical or dependency not in active_paths:
+                raise ValueError(f"Invalid active dependency: {canonical} -> {dependency}")
+            release_dependencies.append({"release": canonical, "depends_on": dependency})
         declared_consumers = entry["consumers"]
         if len(declared_consumers) != len(set(declared_consumers)):
             raise ValueError(f"Duplicate consumers on: {canonical}")
@@ -74,16 +80,19 @@ def derive(root: Path = ROOT) -> dict:
     if set(copies) != installed_seen:
         raise ValueError("Orphaned installed contract not represented in dependency graph")
     edges.sort(key=lambda e: (e["consumer"], e["provider"], e["release"]))
+    release_dependencies.sort(key=lambda e: (e["release"], e["depends_on"]))
     producer_local.sort(key=lambda e: (e["provider"], e["release"], e["copy"]))
     modules = sorted({e["consumer"] for e in edges} | {e["provider"] for e in edges})
     return {
         "schema_version": 1,
         "nodes": modules,
         "edges": edges,
+        "release_dependencies": release_dependencies,
         "producer_local_copies": producer_local,
         "summary": {
             "producer_local_copies": len(producer_local),
             "declared_relationships": len(edges),
+            "canonical_dependency_edges": len(release_dependencies),
             "with_installed_loader": sum(e["evidence"] == "installed-loader" for e in edges),
             "without_installed_loader": sum(e["evidence"] != "installed-loader" for e in edges),
             "by_kind": {name: sum(e["kind"] == name for e in edges)
