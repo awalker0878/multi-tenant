@@ -23,10 +23,10 @@ applicable native-operation dispatch cases, cold capture, uncertain retry,
 independent readback, commissioning revocation and authorization denials.
 Missing, failing or skipped cases fail the qualification gate.
 
-The gate runs in both `P08 native migration components` and the independent
-`capability-qualification` job of `Contract source and consumer integrity`.
-P08 retains the original full native worker checks; the focused CI gate
-executes the real test modules, not mocked replacements or copied JUnit.
+The E2 gate runs from the consolidated `CI / Native contracts` lane
+and the on-demand native qualification suite. It consumes real worker test
+execution evidence; source declarations and copied JUnit fixtures cannot
+substitute for independently run native-provider E3/E4 measurements.
 
 The qualification report records the exact Git revision, source-definition
 digest and worker JUnit digest, and lists each method/mode result. It always

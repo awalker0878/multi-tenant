@@ -180,6 +180,25 @@ class ExecutedCapabilityEvidenceTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Duplicate JUnit execution identity"):
             qualify(ROOT, self.xml)
 
+    def test_orphan_junit_case_cannot_satisfy_qualification(self):
+        suite = self.valid_suite()
+        orphan = suite.findall("testcase")[0]
+        suite.remove(orphan)
+        root = ET.Element("testsuites")
+        root.append(suite)
+        root.append(orphan)
+        self.write(root)
+        with self.assertRaisesRegex(ValueError, "Unowned JUnit testcase"):
+            qualify(ROOT, self.xml)
+
+    def test_non_junit_root_cannot_claim_qualification(self):
+        suite = self.valid_suite()
+        root = ET.Element("receipt")
+        root.append(suite)
+        self.write(root)
+        with self.assertRaisesRegex(ValueError, "Unexpected JUnit root"):
+            qualify(ROOT, self.xml)
+
     def test_suite_error_count_fails_closed(self):
         suite = self.valid_suite()
         suite.set("errors", "1")

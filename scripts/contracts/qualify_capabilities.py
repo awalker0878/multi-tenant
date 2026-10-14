@@ -41,11 +41,19 @@ def tests_from_xml(path: Path) -> list[dict]:
     if not path.is_file():
         raise ValueError("Worker JUnit execution evidence missing: " + str(path))
     tree = ET.parse(path)
+    root = tree.getroot()
+    if root.tag not in {"testsuite", "testsuites"}:
+        raise ValueError("Unexpected JUnit root element")
     items = []
     seen = set()
-    suites = list(tree.iter("testsuite"))
+    suites = list(root.iter("testsuite"))
     if not suites:
         raise ValueError("JUnit contains no executed test suite")
+    # A testcase outside a testsuite has no execution owner. It must not be
+    # counted as an independently executed qualification, even if its name
+    # matches an otherwise missing positive or denial case.
+    if sum(len(suite.findall("testcase")) for suite in suites) != len(list(root.iter("testcase"))):
+        raise ValueError("Unowned JUnit testcase outside executed suite")
     for suite in suites:
         for status in ("failures", "errors", "skipped"):
             if int(suite.get(status, "0")):

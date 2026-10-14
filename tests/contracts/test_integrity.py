@@ -18,21 +18,26 @@ from check_registry import check_consumer_registry
 from check_http import check_error_policy
 
 class ContractIntegrityTests(unittest.TestCase):
-    def test_retired_contract_history_and_compatibility_snapshots_are_not_shipped(self):
-        absent = (
-            "architecture/retired-contract-releases.json",
-            "architecture/retirement-clearances.json",
-            "scripts/contracts/uuid-legacy-v1.json",
-            "spikes/compatibility/results/contracts/local-20261004/generated-sha256.json",
-            "spikes/compatibility/results/contracts/run-37232194144/retrieval.json",
-            "verification/p02/contracts/restored-compatibility.json",
-            "verification/p07/configuration/original-contract-compatibility.json",
-            "verification/p08/profiles/original-contract-compatibility.json",
-            "verification/p08/runtime/restored-contract-compatibility.json",
-        )
-        for item in absent:
-            with self.subTest(path=item):
-                self.assertFalse((ROOT / item).exists(), item)
+    def test_only_registered_active_canonical_releases_are_shipped(self):
+        active = {row["path"] for row in load("architecture/contract-consumers.json")["active_releases"]}
+        files = {
+            str(path.relative_to(ROOT))
+            for area in ("openapi", "schemas", "capabilities", "platforms", "asyncapi")
+            for pattern in ("*.json", "*.yaml", "*.yml")
+            for path in (ROOT / "contracts" / area).rglob(pattern)
+        }
+        self.assertEqual(files, active)
+
+    def test_owner_operation_regex_widening_is_rejected(self):
+        import runpy
+        from check_registry import check_owner_operation_bindings
+        source = ROOT / "services/planning/src/planning/infrastructure/owner_contracts.py"
+        operations = list(runpy.run_path(str(source))["OWNER_OPERATIONS"])
+        owner, verb, _, schema = operations[1]
+        operations[1] = (owner, verb, r"/internal/tenants/.+/placement-reservations/checks", schema)
+        with patch("runpy.run_path", return_value={"OWNER_OPERATIONS": tuple(operations)}):
+            with self.assertRaisesRegex(ValueError, "Runtime owner-operation routing drift"):
+                check_owner_operation_bindings()
 
     def test_catalogue_embedded_schema_references_rebase_to_active_release(self):
         canonical = load("contracts/openapi/catalogue-internal-v1.json")

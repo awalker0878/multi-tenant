@@ -113,6 +113,22 @@ def check_owner_operation_bindings():
 
     module = ROOT / "services/planning/src/planning/infrastructure/owner_contracts.py"
     operations = runpy.run_path(str(module))["OWNER_OPERATIONS"]
+    # Bind each dynamic response validator to the reviewed *exact* operation.
+    # Checking only (owner, schema) would let a changed or widened regex
+    # silently validate a different endpoint under the same installed schema.
+    expected_bindings = {
+        ("GOVERNANCE", "POST", r"/v1/tenants/[^/]+/delegated-authorizations", "governance-delegation-response-v2"),
+        ("LIFECYCLE", "POST", r"/internal/tenants/[^/]+/placement-reservations/checks", "placement-reservation-v1"),
+        ("CATALOGUE", "GET", r"/v1/tenants/[^/]+/planning-inputs/[^/]+/[^/]+/[^/]+/[^/]+", "catalogue-input-v1"),
+        ("CATALOGUE", "GET", r"/internal/tenants/[^/]+/applications/[^/]+/environments/[^/]+/current-planning-intent", "catalogue-current-v2"),
+        ("INVENTORY", "GET", r"/(?:internal|v1)/tenants/[^/]+/planning-capability-inputs/[^/]+/[^/]+/[^/]+/[^/]+/[^/]+", "inventory-input-v2"),
+        ("INVENTORY", "GET", r"/(?:internal|v1)/tenants/[^/]+/migration-inputs/[^/]+/[^/]+/[^/]+/[1-9][0-9]{0,8}/[0-9a-f]{64}", "migration-input-v4"),
+        ("ASSURANCE", "POST", r"/v1/tenants/[^/]+/planning-qualification-v2", "qualification-v2.1"),
+        ("ASSURANCE", "POST", r"/internal/tenants/[^/]+/qualification-checks", "qualification-v2.1"),
+        ("ASSURANCE", "POST", r"/v1/tenants/[^/]+/migration-qualifications", "migration-support-v2"),
+    }
+    if len(operations) != len(expected_bindings) or set(operations) != expected_bindings:
+        raise ValueError("Runtime owner-operation routing drift")
     registry = load("architecture/contract-consumers.json")
     releases = {entry["path"]: entry for entry in registry["active_releases"]}
     required = {
