@@ -153,7 +153,7 @@ def verify_inventory(root: Path = ROOT) -> int:
             path = next(p for p in paths if p.startswith(f"/{prefix}/") and f"/{resource}/" in p)
             allowed = set(owner_api["paths"][template]["get"]["responses"])
             for label, headers, expected in (
-                ("missing-header", [], 400),
+                ("missing-header", [], 401),
                 ("malformed-identity", [(b"authorization", b"Bearer short")], 401),
                 ("header-bound", [(b"x-header", b"value")] * 41, 413),
             ):
@@ -167,7 +167,7 @@ def verify_inventory(root: Path = ROOT) -> int:
     if asyncio.run(_probe_migration(app, retired, "GET")) != 404:
         raise ValueError("Retired unqualified internal planning-input alias remains exposed")
     for path in paths:
-        if asyncio.run(_probe_migration(app, path, "GET")) != 400:
+        if asyncio.run(_probe_migration(app, path, "GET")) != 401:
             raise ValueError(f"Inventory owner-operation route unavailable: GET {path}")
     # Positive native-reader path belongs to Inventory's installed runtime,
     # not Planning's package. A revoked reader must fail independently of the
