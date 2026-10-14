@@ -1,6 +1,7 @@
-"""Execute Catalogue's PHP event producer through Planning's installed decoder.
+"""Execute Catalogue's PHP wire encoder through Planning's installed decoder.
 
-E2 only: no broker, delivery acknowledgement or E3/E4 custody is claimed.
+E2 only: never award AsyncAPI send/producer evidence without executing the
+publisher; no broker, delivery acknowledgement or E3/E4 custody is claimed.
 """
 from __future__ import annotations
 
@@ -77,6 +78,15 @@ def verify() -> list[dict]:
     else:
         raise ValueError("Planning accepted a duplicate tenant identifier")
 
+    # The PHP encoder + installed Planning decoder qualify their concrete
+    # payload schema. The AsyncAPI channel binding is checked, but the
+    # Catalogue outbox / broker send operation was NOT executed. Therefore
+    # award only channel-side consumer proof, never publisher proof.
+    measured = (
+        (RELEASE, "producer", "live-producer"),
+        (RELEASE, "consumer", "live-consumer"),
+        (ASYNCAPI, "consumer", "live-consumer"),
+    )
     return [{
         "key": path, "claim": claim, "source": source,
         "result": "PASS",
@@ -84,9 +94,7 @@ def verify() -> list[dict]:
         "test": "catalogue_foundation_assurance.py:php_codec_to_planning_decoder",
         "run_id": os.environ.get("GITHUB_RUN_ID"),
         "revision": os.environ.get("GITHUB_SHA"),
-    } for path in (RELEASE, ASYNCAPI) for claim, source in (
-        ("producer", "live-producer"), ("consumer", "live-consumer"),
-    )]
+    } for path, claim, source in measured]
 
 
 def main() -> None:

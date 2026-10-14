@@ -66,9 +66,16 @@ class CatalogueChannelAssuranceTests(unittest.TestCase):
         rows = self.measure()
         self.assertEqual(
             {(row["key"], row["claim"]) for row in rows},
-            {(release, claim) for release in (proof.RELEASE, proof.ASYNCAPI)
-             for claim in ("producer", "consumer")},
+            {
+                (proof.RELEASE, "producer"),
+                (proof.RELEASE, "consumer"),
+                (proof.ASYNCAPI, "consumer"),
+            },
         )
+        # A validated event codec is not evidence that the publisher sent
+        # the message over the declared broker channel.
+        self.assertNotIn((proof.ASYNCAPI, "producer"),
+                         {(row["key"], row["claim"]) for row in rows})
         self.assertTrue(all(row["result"] == "PASS" for row in rows))
 
     def test_wrong_channel_or_payload_binding_cannot_earn_asyncapi_proof(self) -> None:
