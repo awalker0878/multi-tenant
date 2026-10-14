@@ -44,8 +44,10 @@ would require a separately versioned contract; no computation worker is implied.
 | `POST /plans/{id}/validity` | Current direct owner checks and conservative event invalidation holds. |
 | `POST /plans/{id}/diff` | Material paths changed; both plans' destinations are currently authorized. |
 
-Governance alone reads `/v1/plans/{id}/revisions/1` with a distinct workload
-credential. The owner read contract
+Governance alone reads `/v1/tenants/{tenant}/plans/{id}/revisions/1` with a distinct workload
+credential. Planning binds the tenant to its database lookup, verifies
+the persisted and issued plan tenants, and rejects the former unscoped route.
+The owner read contract
 requires each source to recheck the original request-bound delegation. Versioned
 profiles and policies are mounted in Planning custody; qualifications are read
 from Assurance custody. No list, profile mutation or native dispatch route is exposed.

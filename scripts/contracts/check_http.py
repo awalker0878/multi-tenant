@@ -123,7 +123,7 @@ def check_implemented_api_contracts():
         ),
         "contracts/openapi/planning-immutable-plan-v1.1.json": (
             "planning",
-            {("GET", "/v1/plans/{plan}/revisions/{revision}")},
+            {("GET", "/v1/tenants/{tenant}/plans/{plan}/revisions/{revision}")},
         ),
         "contracts/openapi/planning-lifecycle-reads-v1.json": (
             "planning",
