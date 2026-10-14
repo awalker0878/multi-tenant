@@ -19,6 +19,12 @@ from pathlib import Path
 from xml.etree import ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[2]
+READBACK_VARIANTS = frozenset({
+    "fault0", "partial", "stale", "identity", "lag", "loss",
+    "integrity", "metadata", "source_writer", "target_writer",
+    "deadline", "boundary",
+})
+
 MANDATORY = (
     "test_current_definition_has_no_unqualified_method_mode_and_no_unknown_stage",
     "test_data_loss_budget_applies_to_all_datasets_together",
@@ -44,6 +50,12 @@ def tests_from_xml(path: Path) -> list[dict]:
         for status in ("failures", "errors", "skipped"):
             if int(suite.get(status, "0")):
                 raise ValueError("E2 qualification JUnit suite reports " + status)
+        # Reported totals are evidence too: a truncated or edited report must
+        # not qualify the tests that happen to remain in its testcase elements.
+        if suite.get("tests") is not None:
+            actual_count = len(list(suite.iter("testcase")))
+            if int(suite.get("tests")) != actual_count:
+                raise ValueError("JUnit suite test total differs from executed testcases")
     for testcase in tree.iter("testcase"):
         name = testcase.get("name")
         classname = testcase.get("classname")
@@ -58,8 +70,9 @@ def tests_from_xml(path: Path) -> list[dict]:
         items.append({"name": name, "classname": classname})
     if not items:
         raise ValueError("JUnit has no actual executed tests")
-    if sum(int(suite.get("tests", len(items))) for suite in suites) < len(items):
-        raise ValueError("JUnit test totals do not match actual testcases")
+    if tree.getroot().tag == "testsuites" and tree.getroot().get("tests") is not None:
+        if int(tree.getroot().get("tests")) != len(items):
+            raise ValueError("JUnit root test total differs from executed testcases")
     return items
 
 
@@ -67,7 +80,6 @@ def qualify(root: Path, xml: Path) -> dict:
     source = root / "contracts/capabilities/definitions-v1.json"
     data = json.loads(source.read_text(encoding="utf-8"))
     observed = tests_from_xml(xml)
-    names = [case["name"] for case in observed]
     methods = data["methods"]
     modes = data["modes"]
     expected = [(method, mode) for method in methods for mode in modes]
@@ -105,12 +117,15 @@ def qualify(root: Path, xml: Path) -> dict:
         }
         if actual != expected_faults:
             raise ValueError("Incomplete native negative cases: " + test)
+    readback_prefix = "test_independent_dataset_readback_enforces_every_limit["
     readback = [
-        case for case in observed
-        if case["name"].startswith("test_independent_dataset_readback_enforces_every_limit[")
+        case["name"][len(readback_prefix):-1]
+        for case in observed
+        if case["name"].startswith(readback_prefix)
+        and case["name"].endswith("]")
         and "test_method_protocol" in case["classname"]
     ]
-    if len(readback) != 12:
+    if len(readback) != len(READBACK_VARIANTS) or set(readback) != READBACK_VARIANTS:
         raise ValueError("Incomplete independent readback denial matrix")
     native_methods = {
         row["v1_alias"] for row in methods.values()
