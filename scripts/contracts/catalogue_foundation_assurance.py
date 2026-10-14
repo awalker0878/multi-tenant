@@ -93,6 +93,7 @@ def verify() -> list[dict]:
         "release_sha256": hashlib.sha256((ROOT / path).read_bytes()).hexdigest(),
         "test": "catalogue_foundation_assurance.py:php_codec_to_planning_decoder",
         "run_id": os.environ.get("GITHUB_RUN_ID"),
+        "run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT"),
         "revision": os.environ.get("GITHUB_SHA"),
     } for path, claim, source in measured]
 

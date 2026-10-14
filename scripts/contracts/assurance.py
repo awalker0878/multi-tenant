@@ -154,8 +154,12 @@ def assess(root: Path = ROOT, observations: list[dict] | None = None,
             raise ValueError(f"Stale operation evidence: {key}")
         if require_provenance:
             run_id, revision = os.environ.get("GITHUB_RUN_ID"), os.environ.get("GITHUB_SHA")
-            if (not run_id or not revision or observation.get("run_id") != run_id
-                    or observation.get("revision") != revision):
+            attempt = os.environ.get("GITHUB_RUN_ATTEMPT")
+            if (not run_id or not revision or not attempt
+                    or re.fullmatch(r"[1-9][0-9]*", attempt) is None
+                    or observation.get("run_id") != run_id
+                    or observation.get("revision") != revision
+                    or observation.get("run_attempt") != attempt):
                 raise ValueError(f"Unattested operation evidence for current CI run: {key}")
         if observation.get("source") not in {"live-router", "live-producer", "live-consumer", "live-denial"}:
             raise ValueError(f"Non-executable evidence is inadmissible: {key}")

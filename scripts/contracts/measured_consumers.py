@@ -252,6 +252,7 @@ def verified_consumers(root: Path = ROOT) -> list[dict]:
             })
     for observation in evidence:
         observation["run_id"] = os.environ.get("GITHUB_RUN_ID")
+        observation["run_attempt"] = os.environ.get("GITHUB_RUN_ATTEMPT")
         observation["revision"] = os.environ.get("GITHUB_SHA")
     return evidence
 

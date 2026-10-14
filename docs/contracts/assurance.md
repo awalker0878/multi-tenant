@@ -39,8 +39,9 @@ structural schema checks alone do not constitute runtime qualification.
 
 Evidence is accepted only for an active operation or release, with the exact
 SHA-256 fingerprint, evidence kind, executable test identity and PASS result.
-Release-grade qualification also requires matching `GITHUB_RUN_ID` and
-`GITHUB_SHA` from the current workflow. Empty, mismatched, duplicated or
+Release-grade qualification also requires matching `GITHUB_RUN_ID`,
+`GITHUB_RUN_ATTEMPT` and `GITHUB_SHA` from the current workflow. A rerun
+must never reuse evidence emitted by a previous attempt of the same run. Empty, mismatched, duplicated or
 stale evidence fails closed; no wildcard/alias or historical compatibility
 exception grants coverage.
 

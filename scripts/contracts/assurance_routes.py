@@ -118,6 +118,7 @@ def prove(app: str, route_list: Path | None = None, root: Path = ROOT,
             # never publish a duplicate claim for the same operation.
     for observation in rows:
         observation["run_id"] = os.environ.get("GITHUB_RUN_ID")
+        observation["run_attempt"] = os.environ.get("GITHUB_RUN_ATTEMPT")
         observation["revision"] = os.environ.get("GITHUB_SHA")
     return rows
 

@@ -140,6 +140,7 @@ async def _probe_with_router(owner: str) -> tuple[list[dict], list[str]]:
         unresolved.append(owner + " no-secured-runtime-operations-exercised")
     for observation in measured:
         observation["run_id"] = os.environ.get("GITHUB_RUN_ID")
+        observation["run_attempt"] = os.environ.get("GITHUB_RUN_ATTEMPT")
         observation["revision"] = os.environ.get("GITHUB_SHA")
     return measured, unresolved
 

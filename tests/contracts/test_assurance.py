@@ -107,15 +107,21 @@ class AssuranceCoverageTests(unittest.TestCase):
         claims = ["route", "producer", "consumer", "authorization", "tenant_isolation"]
         rows = [self.evidence(claim) for claim in claims]
         with patch.dict(os.environ, {
-            "GITHUB_RUN_ID": "123", "GITHUB_SHA": "a" * 40
+            "GITHUB_RUN_ID": "123", "GITHUB_RUN_ATTEMPT": "2",
+            "GITHUB_SHA": "a" * 40
         }):
             with self.assertRaisesRegex(ValueError, "Unattested operation evidence"):
                 assess(self.root, rows, require_provenance=True)
             for row in rows:
                 row["run_id"] = "123"
+                row["run_attempt"] = "2"
                 row["revision"] = "a" * 40
             self.assertEqual(assess(self.root, rows, require_provenance=True)
                              ["summary"]["qualified_http_operations"], 1)
+            rows[0]["run_attempt"] = "1"
+            with self.assertRaisesRegex(ValueError, "Unattested operation evidence"):
+                assess(self.root, rows, require_provenance=True)
+            rows[0]["run_attempt"] = "2"
             rows[0]["revision"] = "b" * 40
             with self.assertRaisesRegex(ValueError, "Unattested operation evidence"):
                 assess(self.root, rows, require_provenance=True)
