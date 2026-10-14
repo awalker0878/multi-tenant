@@ -144,6 +144,18 @@ class HttpQualityTests(unittest.TestCase):
         self.assertTrue(any("application/vnd.thing+json" in item and "became optional" in item
                             for item in breakages))
 
+    def test_new_request_property_cannot_narrow_previously_open_input(self):
+        old = {"type": "object", "additionalProperties": True,
+               "properties": {"stable": {"type": "string"}}}
+        changed = copy.deepcopy(old)
+        changed["properties"]["new"] = {"type": "integer"}
+        self.assertIn("previously untyped request fields now constrained",
+                      repr(schema_breakages(old, changed, "request")))
+        changed = copy.deepcopy(old)
+        changed["additionalProperties"] = {"type": "string"}
+        self.assertIn("request additional-property constraint changed",
+                      repr(schema_breakages(old, changed, "request")))
+
     def test_media_encoding_changes_require_new_major(self):
         old = good_api()
         old["paths"]["/v2/things"]["post"]["requestBody"]["content"]["application/json"]["encoding"] = {

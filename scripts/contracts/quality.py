@@ -97,8 +97,17 @@ def request_breaks(old: dict, new: dict, before: dict, after: dict, at: str) -> 
             failures.append(at + ": request minimum narrowed")
         if hi in b and (hi not in a or b[hi] < a[hi]):
             failures.append(at + ": request maximum narrowed")
-    if b.get("additionalProperties") is False and a.get("additionalProperties") is not False:
+    previous_extra = a.get("additionalProperties", True)
+    next_extra = b.get("additionalProperties", True)
+    if next_extra is False and previous_extra is not False:
         failures.append(at + ": request unknown fields newly rejected")
+    elif isinstance(next_extra, dict) and next_extra != previous_extra:
+        failures.append(at + ": request additional-property constraint changed")
+    if previous_extra is not False:
+        introduced = set(b.get("properties", {})) - set(a.get("properties", {}))
+        if introduced:
+            failures.append(at + ": previously untyped request fields now constrained "
+                            + repr(sorted(introduced)))
     ra, rb = set(a.get("required", [])), set(b.get("required", []))
     if rb - ra:
         failures.append(at + ": new required request properties " + repr(sorted(rb - ra)))
@@ -132,8 +141,12 @@ def response_breaks(old: dict, new: dict, before: dict, after: dict, at: str) ->
         failures.append(at + ": response enum widened")
     if set(a.get("required", [])) - set(b.get("required", [])):
         failures.append(at + ": previously required response properties became optional")
-    if a.get("additionalProperties") is False and b.get("additionalProperties") is not False:
+    previous_extra = a.get("additionalProperties", True)
+    next_extra = b.get("additionalProperties", True)
+    if previous_extra is False and next_extra is not False:
         failures.append(at + ": response allows unknown fields")
+    elif isinstance(previous_extra, dict) and next_extra != previous_extra:
+        failures.append(at + ": response additional-property guarantees changed")
     if a.get("additionalProperties") is False:
         added = set(b.get("properties", {})) - set(a.get("properties", {}))
         if added:
