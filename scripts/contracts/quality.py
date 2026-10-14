@@ -322,8 +322,23 @@ def quality_api(path: str, doc: dict, error: dict, policy: dict) -> None:
                 if any(not set(s).issubset(declared) for s in sec):
                     raise ValueError("Undefined security scheme: " + label)
             codes = op.get("responses", {})
-            if not isinstance(codes, dict) or not any(str(c).startswith("2") for c in codes):
+            if not isinstance(codes, dict) or not any(re.fullmatch(r"2[0-9]{2}", str(c)) for c in codes):
                 raise ValueError("Operation missing successful response: " + label)
+            for status, response in codes.items():
+                if status != "default" and not re.fullmatch(r"[1-5][0-9]{2}", str(status)):
+                    raise ValueError("Response must have an explicit HTTP status: " + label)
+                if not isinstance(response, dict):
+                    raise ValueError("Malformed HTTP response: " + label + " " + str(status))
+                if str(status) in {"200", "201"} and (
+                    not isinstance(response.get("content"), dict)
+                    or not isinstance(body(op, str(status)), dict)
+                ):
+                    raise ValueError("Successful 200/201 responses require a typed JSON schema: " + label)
+                if response.get("content") and any(
+                    not isinstance(media, dict) or not isinstance(media.get("schema"), dict)
+                    for media in response["content"].values()
+                ):
+                    raise ValueError("Response body media type lacks a schema: " + label)
             required_errors = [] if sec == [] else policy["required_error_responses"]
             if body(op) is not None:
                 required_errors = [*required_errors, policy["body_validation_status"]]
@@ -387,8 +402,13 @@ def quality_event(path: str, doc: dict, policy: dict, root: Path) -> None:
                 or delivery["dead_letter_address"] == channel.get("address") or
                 type(delivery.get("max_attempts")) is not int or not 1 <= delivery["max_attempts"] <= 100):
             raise ValueError("Channel missing bounded ordering, retry and DLQ rules: " + key)
-        if not channel.get("address") or not channel.get("messages"):
+        bindings = channel.get("messages")
+        if not isinstance(bindings, dict) or not bindings:
             raise ValueError("Channel has no executable address/message binding: " + key)
+        for binding in bindings.values():
+            reference = binding.get("$ref") if isinstance(binding, dict) else None
+            if reference not in {"#/components/messages/" + name for name in messages}:
+                raise ValueError("Unknown AsyncAPI message binding: " + key)
     for name, msg in messages.items():
         if msg.get("contentType") != "application/json":
             raise ValueError("New message must use application/json: " + name)
@@ -403,12 +423,17 @@ def quality_event(path: str, doc: dict, policy: dict, root: Path) -> None:
         fields = set(payload.get("required", []))
         if not set(policy["event_required_fields"]) <= fields or payload.get("additionalProperties") is not False:
             raise ValueError("Event message lacks mandatory immutable envelope: " + name)
+    covered_channels = set()
     for key, operation in operations.items():
         if operation.get("action") not in ("send", "receive"):
             raise ValueError("Event operation lacks explicit direction: " + key)
         if operation.get("channel", {}).get("$ref") not in {
                 "#/channels/" + item for item in channels}:
             raise ValueError("Event operation references unbound channel: " + key)
+        covered_channels.add(operation["channel"]["$ref"].removeprefix("#/channels/"))
+    if covered_channels != set(channels):
+        raise ValueError("AsyncAPI channels without operations: "
+                         + repr(sorted(set(channels) - covered_channels)))
 
 
 def git_base_paths(root: Path, revision: str) -> set[str]:

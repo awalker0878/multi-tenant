@@ -180,7 +180,16 @@ jobs:
           TAG: contract-assurance/${{ matrix.name }}:${{ github.sha }}
         run: |
           set -euo pipefail
-          docker build --build-arg SOURCE_REVISION="$GITHUB_SHA" -t "$TAG" "$COMPONENT"
+          # Retry only external registry DNS/network failures, not source defects.
+          for attempt in 1 2 3; do
+            if docker build --build-arg SOURCE_REVISION="$GITHUB_SHA" -t "$TAG" "$COMPONENT" 2>&1 | tee "$RUNNER_TEMP/contract-image-build.log"; then
+              break
+            fi
+            if [[ "$attempt" -eq 3 ]] || ! grep -Eqi 'dial tcp|i/o timeout|temporary failure|TLS handshake timeout|502 Bad Gateway|503 Service Unavailable' "$RUNNER_TEMP/contract-image-build.log"; then
+              exit 1
+            fi
+            sleep "$((attempt * 10))"
+          done
       - name: Verify packaged JSON and bind owned operations to image digest
         env:
           COMPONENT: ${{ matrix.component }}

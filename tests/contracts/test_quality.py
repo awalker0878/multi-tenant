@@ -102,6 +102,16 @@ class HttpQualityTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "reject unknown"):
             quality_api("contracts/openapi/things-v2.json", api, ERROR, POLICY)
 
+    def test_success_responses_cannot_be_opaque_or_wildcard(self):
+        api = good_api()
+        api["paths"]["/v2/things"]["post"]["responses"]["201"] = {"description": "Created"}
+        with self.assertRaisesRegex(ValueError, "typed JSON schema"):
+            quality_api("contracts/openapi/things-v2.json", api, ERROR, POLICY)
+        api = good_api()
+        api["paths"]["/v2/things"]["post"]["responses"]["2XX"] = {"description": "Wildcard"}
+        with self.assertRaisesRegex(ValueError, "explicit HTTP status"):
+            quality_api("contracts/openapi/things-v2.json", api, ERROR, POLICY)
+
     def test_same_major_breaking_paths_requests_and_responses(self):
         old = good_api()
         new = copy.deepcopy(old)
@@ -204,6 +214,14 @@ class SchemaAndEvents(unittest.TestCase):
             broken = copy.deepcopy(event)
             broken["channels"]["changed"]["x-delivery"]["max_attempts"] = 0
             with self.assertRaisesRegex(ValueError, "bounded ordering"):
+                quality_event("contracts/asyncapi/pulse-v2.yaml", broken, POLICY, root)
+            broken = copy.deepcopy(event)
+            broken["channels"]["changed"]["messages"]["changed"]["$ref"] = "#/components/messages/Unknown"
+            with self.assertRaisesRegex(ValueError, "Unknown AsyncAPI message binding"):
+                quality_event("contracts/asyncapi/pulse-v2.yaml", broken, POLICY, root)
+            broken = copy.deepcopy(event)
+            broken["operations"]["publish"]["channel"]["$ref"] = "#/channels/unknown"
+            with self.assertRaisesRegex(ValueError, "unbound channel"):
                 quality_event("contracts/asyncapi/pulse-v2.yaml", broken, POLICY, root)
             broken = copy.deepcopy(event)
             broken["channels"]["changed"]["address"] = "pulse.secret.v2"

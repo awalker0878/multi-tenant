@@ -149,6 +149,7 @@ jobs:
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
+          fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
         with:
@@ -159,6 +160,16 @@ jobs:
         run: |
           python -m pip install --disable-pip-version-check -r scripts/contracts/requirements.txt
           python -m pip install --disable-pip-version-check -e services/planning -e services/lifecycle -e services/inventory -e workers/lifecycle pytest==9.1.1
+      - name: Enforce strict new-publication quality against the trusted review base
+        env:
+          REVIEW_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$REVIEW_BASE" =~ ^[0-9a-f]{40}$ ]] || [[ "$REVIEW_BASE" =~ ^0{40}$ ]]; then
+            REVIEW_BASE="$(git rev-parse HEAD^)"
+          fi
+          git cat-file -e "$REVIEW_BASE^{commit}"
+          python scripts/contracts/quality.py --base "$REVIEW_BASE" --output "$RUNNER_TEMP/contract-quality.json"
       - name: Validate active canonicals, generated consumers, ownership and negative canaries
         run: |
           python scripts/contracts/generate_authority_releases.py --check
