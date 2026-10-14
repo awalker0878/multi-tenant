@@ -358,6 +358,21 @@ def check_console_frontend(browser: Path) -> int:
             assets.add(name)
     if not assets:
         raise ValueError("Console image has no compiled browser assets")
+    # Every served build artifact must be traceable to this exact manifest.
+    # An unreferenced JavaScript/CSS file remains remotely accessible even
+    # though manifest-based entrypoint validation would never inspect it.
+    packaged = set()
+    for item in browser.rglob("*"):
+        if item.is_symlink():
+            raise ValueError("Console build contains an unreviewed symlink")
+        if item.is_file():
+            packaged.add(item.relative_to(browser).as_posix())
+    unreviewed = packaged - assets - {"manifest.json"}
+    if unreviewed:
+        raise ValueError(
+            "Console build contains unregistered compiled assets: "
+            + repr(sorted(unreviewed))
+        )
     return len(assets)
 
 

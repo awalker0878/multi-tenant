@@ -301,6 +301,26 @@ class ArtifactTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "lacks compiled Vite manifest"):
                 check_console_frontend(root)
 
+    def test_console_image_rejects_unreferenced_or_symlinked_build_assets(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            assets = root / "assets"
+            assets.mkdir()
+            (assets / "app.js").write_text("entry")
+            (root / "manifest.json").write_text(json.dumps({
+                "resources/js/app.ts": {"file": "assets/app.js"}
+            }))
+            self.assertEqual(check_console_frontend(root), 1)
+            rogue = assets / "unreviewed.js"
+            rogue.write_text("unreviewed")
+            with self.assertRaisesRegex(ValueError, "unregistered compiled assets"):
+                check_console_frontend(root)
+            rogue.unlink()
+            alias = assets / "alias.js"
+            alias.symlink_to("app.js")
+            with self.assertRaisesRegex(ValueError, "unreviewed symlink"):
+                check_console_frontend(root)
+
     def test_console_manifest_checks_lazy_chunks_and_rejects_untrusted_paths(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
