@@ -17,7 +17,7 @@ requires executable producer and consumer evidence. Examples, registry entries,
 and test filenames do not count as execution.
 
 Evidence records are bound to the canonical file's SHA-256. Release-grade runs
-also require the invoking GitHub Actions run ID and exact commit SHA. Executed
+also require the invoking GitHub Actions run ID, run attempt and exact commit SHA. Executed
 claims may be emitted by `assurance_routes.py`, `python_denials.py`,
 `measured_consumers.py` and `laravel_denials.php`. Tests verify stale and
 duplicate evidence is rejected. The aggregate

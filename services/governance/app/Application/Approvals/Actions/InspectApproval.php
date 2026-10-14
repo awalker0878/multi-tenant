@@ -47,7 +47,7 @@ final class InspectApproval
             if (! hash_equals(GovernanceLedger::digest($expected), GovernanceLedger::digest($binding)) || ! in_array($actor->subject, $plan->binding['executor_ids'], true)) {
                 return new IdentityDenied('approval_binding_mismatch', 403);
             }
-            $current = BoundPlan::fromArray($this->plans->fetch($approval->plan_id, $approval->plan_revision));
+            $current = BoundPlan::fromArray($this->plans->fetch($tenant, $approval->plan_id, $approval->plan_revision));
             if (! hash_equals($current->digest, $plan->digest)) {
                 return new IdentityDenied('plan_binding_changed', 409);
             }
