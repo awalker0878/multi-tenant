@@ -162,6 +162,54 @@ final class NativeQualification
             }
         }
         $this->require(count($matrix) === count($expected), 'installed_method_mode_matrix_incomplete');
+
+        // A generic successful restoration cannot qualify another method or
+        // mode. Verify current, exact-scope dataset readbacks independently of
+        // the producer-supplied overall adapter_conformant flag.
+        $measurements = $receipt['snapshot']['recovery_measurements'] ?? [];
+        $this->require(is_array($measurements) && array_is_list($measurements), 'native_recovery_readback_invalid');
+        $latest = [];
+        foreach ($measurements as $sample) {
+            $this->require(is_array($sample)
+                && in_array($sample['method'] ?? null, CapabilityDefinitions::WIRE_METHODS, true)
+                && in_array($sample['mode'] ?? null, CapabilityDefinitions::MODES, true)
+                && is_string($sample['dataset_id'] ?? null)
+                && strlen($sample['dataset_id']) >= 1 && strlen($sample['dataset_id']) <= 160
+                && is_int($sample['sequence'] ?? null) && $sample['sequence'] >= 1
+                && is_int($sample['observed_at'] ?? null)
+                && $sample['observed_at'] <= ($receipt['observed_at'] ?? -1)
+                && ($receipt['observed_at'] - $sample['observed_at']) <= 30
+                && ($sample['scope_sha256'] ?? null) === self::digest($scope)
+                && self::canonical($sample['artifacts'] ?? null) === self::canonical($scope['artifacts'] ?? null)
+                && is_string($sample['readback_sha256'] ?? null)
+                && preg_match('/^[0-9a-f]{64}$/D', $sample['readback_sha256']) === 1,
+                'native_recovery_readback_invalid');
+            $slot = $sample['method'].':'.$sample['mode'].':'.$sample['dataset_id'];
+            $this->require(! isset($latest[$slot]) || $sample['sequence'] !== $latest[$slot]['sequence'],
+                'native_recovery_sequence_conflict');
+            if (! isset($latest[$slot]) || $sample['sequence'] > $latest[$slot]['sequence']) {
+                $latest[$slot] = $sample;
+            }
+        }
+        foreach ($latest as $sample) {
+            $this->require(($sample['outcome'] ?? null) === 'passed'
+                && ($sample['consistency_passed'] ?? null) === true, 'native_latest_recovery_failed');
+        }
+        foreach (CapabilityDefinitions::WIRE_METHODS as $method) {
+            foreach (['rollback', 'forward_recovery', 'reverse_recovery'] as $mode) {
+                if (($matrix['method:'.$method.':'.$mode] ?? null) !== 'passed') {
+                    continue;
+                }
+                $covered = false;
+                foreach ($latest as $sample) {
+                    if ($sample['method'] === $method && $sample['mode'] === $mode) {
+                        $covered = true;
+                        break;
+                    }
+                }
+                $this->require($covered, 'native_recovery_readback_missing');
+            }
+        }
     }
 
     public static function digest(mixed $value): string

@@ -54,3 +54,51 @@ it('derives enrolled-key identity itself and refuses signed fingerprint imperson
     expect(fn () => $method->invoke($resolver, $sign($forged), $keys, 'observer', $scope, $now))
         ->toThrow(RuntimeException::class, 'evidence_reserved_field');
 });
+
+it('requires distinct readback evidence for each passed installed recovery method and mode', function (): void {
+    $now = time();
+    $scope = ['artifacts' => ['adapter' => str_repeat('a', 64)]];
+    $matrix = [];
+    $cases = ['adapter_behavior' => 'passed', 'installed_identity' => 'passed', 'runtime_artifacts' => 'passed'];
+    foreach (\App\Domain\Qualification\CapabilityDefinitions::WIRE_METHODS as $name) {
+        foreach (\App\Domain\Qualification\CapabilityDefinitions::MODES as $mode) {
+            $key = 'method:'.$name.':'.$mode;
+            $matrix[$key] = 'unsupported';
+            $cases[$key] = 'unsupported';
+        }
+    }
+    $method = \App\Domain\Qualification\CapabilityDefinitions::WIRE_METHODS[0];
+    $other = \App\Domain\Qualification\CapabilityDefinitions::WIRE_METHODS[1];
+    foreach ([$method, $other] as $name) {
+        $key = 'method:'.$name.':rollback';
+        $matrix[$key] = 'passed';
+        $cases[$key] = 'passed';
+    }
+    $proof = [
+        'kind' => 'native_conformance', 'simulation' => false, 'finalized' => true,
+        'definition_sha256' => \App\Domain\Qualification\CapabilityDefinitions::SHA256,
+        'runtime_artifacts' => $scope['artifacts'], 'observed_at' => $now,
+        'cases' => $cases, 'method_modes' => $matrix,
+        'snapshot' => ['recovery_measurements' => []],
+    ];
+    $check = new ReflectionMethod(NativeQualification::class, 'native');
+    $resolver = new NativeQualification;
+    expect(fn () => $check->invoke($resolver, $proof, $scope))
+        ->toThrow(RuntimeException::class, 'native_recovery_readback_missing');
+
+    $receipt = static fn (string $name, string $dataset): array => [
+        'method' => $name, 'mode' => 'rollback', 'dataset_id' => $dataset,
+        'sequence' => 1, 'observed_at' => $now,
+        'scope_sha256' => NativeQualification::digest($scope),
+        'artifacts' => $scope['artifacts'], 'readback_sha256' => str_repeat('d', 64),
+        'outcome' => 'passed', 'consistency_passed' => true,
+    ];
+    $proof['snapshot']['recovery_measurements'] = [$receipt($method, 'dataset-one')];
+    expect(fn () => $check->invoke($resolver, $proof, $scope))
+        ->toThrow(RuntimeException::class, 'native_recovery_readback_missing');
+    $proof['snapshot']['recovery_measurements'][] = $receipt($other, 'dataset-two');
+    $check->invoke($resolver, $proof, $scope);
+    $proof['snapshot']['recovery_measurements'][1]['scope_sha256'] = str_repeat('e', 64);
+    expect(fn () => $check->invoke($resolver, $proof, $scope))
+        ->toThrow(RuntimeException::class, 'native_recovery_readback_invalid');
+});
