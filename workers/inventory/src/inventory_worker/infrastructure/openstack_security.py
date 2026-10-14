@@ -63,7 +63,7 @@ def rule_choices(group: dict[str, Any]) -> list[dict[str, Any]] | None:
             except ValueError:
                 raise CollectionFailure("invalid_response") from None
         minimum, maximum = obj["port_range_min"], obj["port_range_max"]
-        if minimum is not None and maximum is not None and minimum > maximum:
+        if isinstance(minimum, int) and isinstance(maximum, int) and minimum > maximum:
             raise CollectionFailure("invalid_response")
         if obj["remote_ip_prefix"] is not None:
             observed_family = ip_network(obj["remote_ip_prefix"]).version

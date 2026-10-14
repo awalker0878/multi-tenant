@@ -36,8 +36,14 @@ def qualify(document: dict[str, Any]) -> bool:
     profile = document.get("api_profile")
     if not isinstance(profile, dict):
         return False
-    platform = document.get("platform")
-    key = (platform, profile.get("namespace"), profile.get("api_version"))
+    key = (
+        document.get("platform"),
+        profile.get("namespace"),
+        profile.get("api_version"),
+    )
+    if not all(isinstance(value, str) and value for value in key):
+        return False
+    platform, _, _ = key
     needed = FEATURES.get(key)
     installed = profile.get("installed")
     features = profile.get("qualified_features")
@@ -70,4 +76,4 @@ def qualify(document: dict[str, Any]) -> bool:
         "profile_sha256": profile["profile_sha256"],
         "native_origin_id": profile.get("native_origin_id"),
     })
-    return expected == profile["evidence_sha256"]
+    return bool(expected == profile["evidence_sha256"])

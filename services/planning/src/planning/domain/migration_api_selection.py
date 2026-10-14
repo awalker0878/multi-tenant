@@ -34,8 +34,12 @@ def pin(readiness: dict[str, Any], now: int) -> dict[str, Any]:
             continue
         if case.get("status") != "eligible":
             raise Rejected("migration_api_selection_qualification_required", 423)
-        key = (case.get("capability_id"), case.get("side"))
-        if key in identities or not all(isinstance(x, str) and x for x in key):
+        capability = case.get("capability_id")
+        side = case.get("side")
+        if not isinstance(capability, str) or not capability or not isinstance(side, str) or not side:
+            raise Rejected("migration_api_selection_duplicate", 423)
+        key = (capability, side)
+        if key in identities:
             raise Rejected("migration_api_selection_duplicate", 423)
         identities.add(key)
         if (case.get("side") not in {"source", "target"}

@@ -124,7 +124,8 @@ def extended_intent_fields(
     mappings = {m.get("logical_device_id"): m.get("native_key")
                 for m in disk_mappings or [] if isinstance(m, dict)}
     for disk in declared_disks:
-        actual = by_key.get(mappings.get(disk["id"]), {})
+        native_key = mappings.get(disk["id"])
+        actual = by_key.get(native_key, {}) if isinstance(native_key, str) else {}
         for key in ("boot", "storage_class", "encryption"):
             if key in disk:
                 compare("disks." + disk["id"] + "." + key,

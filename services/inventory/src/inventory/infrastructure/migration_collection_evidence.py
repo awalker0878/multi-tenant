@@ -27,6 +27,8 @@ def installed_namespaces(facts: dict[str, Any]) -> dict[str, list[str] | dict[st
     native API family names without inferring unobserved services.
     """
     platform = facts.get("platform")
+    if not isinstance(platform, str):
+        return {}
     raw = facts.get("versions") or facts.get("api_versions") or {}
     if not isinstance(raw, dict):
         raw = {}
