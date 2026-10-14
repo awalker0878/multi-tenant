@@ -125,6 +125,37 @@ class ExecutedCapabilityEvidenceTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Incomplete native negative cases"):
             qualify(ROOT, self.xml)
 
+    def test_junit_suite_total_mismatch_fails_closed(self):
+        suite = self.valid_suite()
+        suite.set("tests", "1")
+        self.write(suite)
+        with self.assertRaisesRegex(ValueError, "suite test total"):
+            qualify(ROOT, self.xml)
+
+    def test_readback_variant_substitution_fails_closed(self):
+        suite = self.valid_suite()
+        for case in suite.findall("testcase"):
+            if case.get("name", "").endswith("[stale]") and (
+                "test_independent_dataset_readback" in case.get("name", "")
+            ):
+                case.set("name", case.get("name")[:-7] + "[invented]")
+                break
+        self.write(suite)
+        with self.assertRaisesRegex(ValueError, "Incomplete independent readback"):
+            qualify(ROOT, self.xml)
+
+    def test_missing_readback_positive_control_fails_closed(self):
+        suite = self.valid_suite()
+        for case in suite.findall("testcase"):
+            if case.get("name", "").endswith("[fault0]") and (
+                "test_independent_dataset_readback" in case.get("name", "")
+            ):
+                suite.remove(case)
+                break
+        self.write(suite)
+        with self.assertRaisesRegex(ValueError, "Incomplete independent readback"):
+            qualify(ROOT, self.xml)
+
     def test_missing_readback_denial_fails_closed(self):
         suite = self.valid_suite()
         missing = next(item for item in suite.findall("testcase")
