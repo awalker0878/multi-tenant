@@ -412,12 +412,16 @@ def test_changed_native_approval_assignment_or_proposal_never_resolves(
 def test_caller_rotation_duplicates_and_foreign_plan_are_denied(tmp_path: Path) -> None:
     owners, ref, state, config = fixture(tmp_path)
     auth = owners.configuration
-    assert auth.authorize_worker("g" * 64) == (ref["tenant_id"], ref["executor_id"])
+    # Worker endpoint credentials cannot authenticate as a caller. The
+    # independently enrolled caller file belongs to the next principal.
+    with pytest.raises(Rejected, match="native_worker_denied"):
+        auth.authorize_worker("g" * 64)
+    assert auth.authorize_worker("h" * 64) == (ref["tenant_id"], ref["executor_id"])
     with pytest.raises(Rejected):
         auth.assignment(str(uuid4()), ref)
     Path(config["workers"][0]["caller_file"]).write_text("z" * 64)
-    with pytest.raises(Rejected):
-        auth.authorize_worker("g" * 64)
+    with pytest.raises(Rejected, match="native_worker_denied"):
+        auth.authorize_worker("h" * 64)
     assert auth.authorize_worker("z" * 64)
     config["owners"]["observer"]["credential_file"] = config["owners"]["custody"]["credential_file"]
     state["path"].write_text(json.dumps(config))
