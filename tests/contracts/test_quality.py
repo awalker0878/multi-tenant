@@ -237,6 +237,29 @@ class HttpQualityTests(unittest.TestCase):
         self.assertIn("request additional-property constraint changed",
                       repr(schema_breakages(old, changed, "request")))
 
+    def test_ref_sibling_assertions_cannot_bypass_semantic_major_gate(self):
+        old = good_api()
+        old["components"]["schemas"]["Thing"] = {
+            "type": "object", "additionalProperties": False,
+            "properties": {"name": {"type": "string"}}
+        }
+        operation = old["paths"]["/v2/things"]["post"]
+        operation["requestBody"]["content"]["application/json"]["schema"] = {
+            "$ref": "#/components/schemas/Thing"
+        }
+        operation["responses"]["201"] = response({
+            "$ref": "#/components/schemas/Thing"
+        })
+        newer = copy.deepcopy(old)
+        newer["paths"]["/v2/things"]["post"]["requestBody"]["content"]["application/json"]["schema"]["minProperties"] = 2
+        newer["paths"]["/v2/things"]["post"]["responses"]["201"]["content"]["application/json"]["schema"]["unevaluatedProperties"] = True
+        issues = api_breakages(old, newer)
+        self.assertGreaterEqual(sum("$ref target or sibling" in issue for issue in issues), 2)
+        # Pure annotations still do not change the accepted wire language.
+        annotated = copy.deepcopy(old)
+        annotated["paths"]["/v2/things"]["post"]["requestBody"]["content"]["application/json"]["schema"]["description"] = "clarification"
+        self.assertEqual(api_breakages(old, annotated), [])
+
     def test_media_encoding_changes_require_new_major(self):
         old = good_api()
         old["paths"]["/v2/things"]["post"]["requestBody"]["content"]["application/json"]["encoding"] = {

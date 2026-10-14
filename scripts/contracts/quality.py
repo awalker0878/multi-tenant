@@ -87,10 +87,28 @@ def unknown_assertion_changes(old: dict, new: dict, at: str) -> list[str]:
     ]
 
 
+def ref_sibling_breakages(old: dict, new: dict, at: str) -> list[str]:
+    """Draft 2020-12 evaluates sibling assertions alongside $ref.
+
+    Dereferencing is still needed for the target schema, but discarding
+    changed sibling restrictions would wrongly classify a narrowing request
+    or weakened response promise as compatible with the same major version.
+    Annotations alone do not change the admitted wire language.
+    """
+    if "$ref" not in old and "$ref" not in new:
+        return []
+    assertions = lambda value: {key: item for key, item in value.items()
+                                if key not in ANNOTATIONS and key != "$ref"}
+    if old.get("$ref") != new.get("$ref") or assertions(old) != assertions(new):
+        return [at + ": changed $ref target or sibling assertions"]
+    return []
+
+
 def request_breaks(old: dict, new: dict, before: dict, after: dict, at: str) -> list[str]:
     """Is every request admissible by old still admissible by new?"""
+    siblings = ref_sibling_breakages(old, new, at)
     a, b = ref(old, before), ref(new, after)
-    failures = unknown_assertion_changes(a, b, at)
+    failures = siblings + unknown_assertion_changes(a, b, at)
     if type_set(b) and (not type_set(a) or not type_set(a) <= type_set(b)):
         failures.append(at + ": request type narrowed")
     if "const" in b and ("const" not in a or enum_members([a["const"]]) != enum_members([b["const"]])):
@@ -137,8 +155,9 @@ def request_breaks(old: dict, new: dict, before: dict, after: dict, at: str) -> 
 
 def response_breaks(old: dict, new: dict, before: dict, after: dict, at: str) -> list[str]:
     """Does new producer still guarantee the properties previously promised?"""
+    siblings = ref_sibling_breakages(old, new, at)
     a, b = ref(old, before), ref(new, after)
-    failures = unknown_assertion_changes(a, b, at)
+    failures = siblings + unknown_assertion_changes(a, b, at)
     if type_set(a) and (not type_set(b) or not type_set(b) <= type_set(a)):
         failures.append(at + ": response type widened")
     if "const" in a and ("const" not in b or enum_members([a["const"]]) != enum_members([b["const"]])):
