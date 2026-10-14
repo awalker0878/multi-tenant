@@ -118,7 +118,7 @@ To reproduce the negative Laravel gate without changing runtime behavior permane
 - `check.py` reports **more than 138 operations**.
 - Every active owner endpoint is present in the concrete runtime; no uncovered `/v1/` or `/internal/` endpoints exist, including Python routers and Inventory worker-only handlers.
 - A dummy undocumented Governance route fails route conformance, without adding an exception.
-- No historical published OpenAPI/schema bytes change. Superseded versions are retained in the repository, not duplicated as active releases.
+- No historical published OpenAPI/schema bytes change. Superseded versions are removed after dependency discovery proves their consumers have migrated; only current releases remain in the checkout.
 - Every documented non-2xx status is independently exercised against its actual producer; every emitted status appears in the active release.
 - Source operation fixtures validate against exact installed Planning, Inventory and Lifecycle consumer contracts. Negative assertions reject native write authority and unauthorized evidence promotion.
 - Exact-head passing CI run URL and `git rev-parse HEAD` are saved in the ledger before promotion from **Implemented, unverified** to **Verified**.

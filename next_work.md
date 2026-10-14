@@ -70,7 +70,7 @@ Required `X-Actor-Delegation`/`X-Planning-Action` headers and actual Governance 
 
 **Current branch work committed, not yet end-to-end verified.** See
 [resolved migration-readiness commissioning ledger](docs/implementation/resolved-migration-readiness-rollout.md)
-and the closed contract at `contracts/schemas/planning/migration-readiness-v1.json`.
+and the closed contract at `contracts/schemas/planning/migration-readiness-v2.2.json`.
 This work deliberately preserves Catalogue desired intent, Inventory native facts,
 Assurance qualification/receiving decisions, Planning composition and Lifecycle
 native authority. **Do not merge or promote PR #64 on these changes alone.**
@@ -339,8 +339,7 @@ current route preview and admission using separately reviewed Assurance
 `migration.api_records` evidence. Existing Planning native validation
 rechecks this on plan create and execution. Console displays **critical
 blockers**, **optional warnings** and a per-feature selected API version.
-`contracts/schemas/capabilities/api-version-record-v1.json` provides
-immutable vendor documentation metadata. Native disk source and target
+The active Assurance qualification API carries the implemented API-evidence projection; a separate vendor-documentation record schema has not been published. Native disk source and target
 adapters for VMware/OpenStack/AHV have code-level usage tags with a
 static test. This is still a **partial rollout**: historical routes lacking
 `api_usage` are visibly labelled unassessed rather than falsely claiming

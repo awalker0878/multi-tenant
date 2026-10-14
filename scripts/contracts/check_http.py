@@ -335,7 +335,7 @@ def check_uuid_policy():
 def check_error_policy():
     """New authority releases must use the exact common error envelope.
 
-    Existing published APIs are historical and are not mutated retroactively.
+    Surviving active published APIs remain byte-immutable.
     The schema allows the already-emitted {"error": "..."} and Laravel
     {"message": "...", "errors": {...}} forms until a future reviewed version.
     """

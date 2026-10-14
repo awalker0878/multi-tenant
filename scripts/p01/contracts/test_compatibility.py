@@ -163,6 +163,30 @@ class ActiveContractTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "explicit existing base"):
             check(self.root, "0" * 40)
 
+    def test_generic_resource_path_can_migrate_to_exact_new_canonical(self):
+        copy = "services/planning/src/planning/infrastructure/facts/owner.json"
+        self.registry([PATH], consumers=["planning"], copies=[copy])
+        self.write(copy, "{}\n")
+        self.write("services/planning/src/planning/reader.py", 'NAME = "owner.json"\n')
+        self.base = self.commit()
+        self.registry([NEW], consumers=["planning"], copies=[copy])
+        self.write(NEW, '{"current":2}\n')
+        self.write(copy, '{"current":2}\n')
+        (self.root / PATH).unlink()
+        self.assertEqual(check(self.root, self.base)["removed"], [PATH])
+
+    def test_versioned_retired_copy_cannot_alias_replacement_bytes(self):
+        copy = "services/planning/src/planning/infrastructure/inputs/current-v1.json"
+        self.registry([PATH], consumers=["planning"], copies=[copy])
+        self.write(copy, "{}\n")
+        self.base = self.commit()
+        self.registry([NEW], consumers=["planning"], copies=[copy])
+        self.write(NEW, '{"current":2}\n')
+        self.write(copy, '{"current":2}\n')
+        (self.root / PATH).unlink()
+        with self.assertRaisesRegex(ValueError, "installed copies"):
+            check(self.root, self.base)
+
 
 if __name__ == "__main__":
     unittest.main()

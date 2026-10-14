@@ -4,7 +4,19 @@ The active source registry is `architecture/contract-consumers.json`. No compati
 aliases, retired API copies, or historical runtime shims participate in these
 assurance flows.
 
-## Phase 1: source and executable operation conformance
+## Phase 1: contract integrity, dependency closure and release rationalization
+
+`check.py`, `discovery.py`, `build.py`, `generate_authority_releases.py`,
+`runtime_inventory.py`, `installed_usage.py` and the Git review-base publication
+check independently enforce current canonical ownership, complete locally
+resolvable references, manifests, generated projections, installed copies and
+safe repository retirement. `dependency_graph.py` and `release_inventory.py`
+produce checked reports from those inputs. Built wheel/image source parity is
+part of this integrity baseline; passing it does not qualify runtime behavior.
+The [implementation ledger](phase1-ledger.md) records execution and the unresolved
+external collection-manifest evidence. Phase 1 is not marked complete.
+
+## Phase 2: runtime producer/consumer and security conformance
 
 `scripts/contracts/assurance.py` enumerates every active canonical release
 and every declared HTTP operation directly from the current OpenAPI documents.
@@ -32,7 +44,7 @@ non-HTTP release. No manual bypass or compatibility exception qualifies it. Wher
 probe does not exist, write the actual test; never substitute a route match,
 static fixture or blanket allowlist.
 
-## Phase 2: runtime dependency truth and packaged release identity
+## Phase 1 artifact integrity and Phase 2 measured runtime binding
 
 `scripts/contracts/dependency_graph.py` derives typed HTTP, event, schema,
 capability and platform consumption edges from the current registry. It
@@ -75,7 +87,7 @@ on the participating service images, not independent HTTP execution results.
 The **Contract artifact and runtime binding assurance** workflow must pass
 before these images can be treated as packaged-contract verified. Do not
 advertise this attestation as proof of tenant authorization or business response
-behavior; those belong to Phase 1's separately measured probes.
+behavior; those belong to Phase 2's separately measured probes.
 
 ## Commands
 
@@ -93,7 +105,7 @@ python scripts/contracts/assurance.py --output /tmp/contract-inventory.json
 The active worktree keeps no historical contract copies, retirement rosters or
 compatibility loaders. Git retains its normal commit provenance.
 
-## Phase 3: new-publication quality admission
+## Existing new-publication quality admission
 
 `architecture/contract-quality-policy.json` and `scripts/contracts/quality.py`
 enforce current security, error, idempotency, JSON Schema identity and event
@@ -103,7 +115,7 @@ schemas, consumer parameters, authorization, idempotency scope/retention,
 public exposure, and channel/message bindings. See
 `docs/contracts/release-quality.md`.
 
-## Phase 4: method/mode executable qualification
+## Existing synthetic method/mode qualification
 
 `scripts/contracts/qualify_capabilities.py` requires a passing native-worker
 JUnit receipt for **every** defined method/mode, every implemented native

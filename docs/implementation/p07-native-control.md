@@ -46,7 +46,7 @@ Native JSON transports also reject truncated bodies, conflicting length/chunk
 framing and incomplete chunks; a valid JSON prefix cannot establish acceptance.
 
 Published additive interfaces are in `contracts/openapi/planning-native-v1.json`
-and `contracts/openapi/lifecycle-native-jobs-v1.json`. The compiler/resolver
+and `contracts/openapi/lifecycle-native-jobs-v1.1.json`. The compiler/resolver
 composition check is `scripts/p07/check_composition.py`; PostgreSQL persistence,
 revocation, HTTP authority and owner-adapter regressions run in component CI.
 

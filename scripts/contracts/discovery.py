@@ -369,6 +369,12 @@ def retirement_references(
     rows = {row["path"]: row for row in prior.get("active_releases", [])}
     texts = list(repository_texts(root))
     current_docs = {path: read(root / path) for path in canonical_paths(root)}
+    current_registry = read(root / "architecture/contract-consumers.json")
+    current_copies = {
+        copy: release["path"]
+        for release in current_registry["active_releases"]
+        for copy in release.get("copies", [])
+    }
     current_addresses = sorted(
         {
             address
@@ -389,6 +395,19 @@ def retirement_references(
             if item.get("canonical") == path and item.get("copy")
         }
         for copy in copies:
+            replacement = current_copies.get(copy)
+            # A generic package resource may retain its path after its contents
+            # migrate to a new active canonical. A versioned retired filename
+            # must never become an alias for the replacement release.
+            if (
+                replacement
+                and replacement not in removed
+                and not re.search(r"-v[0-9]", Path(copy).name)
+                and (root / replacement).is_file()
+                and (root / copy).is_file()
+                and (root / copy).read_bytes() == (root / replacement).read_bytes()
+            ):
+                continue
             tokens.update({copy, Path(copy).name, Path(copy).stem})
             if (root / copy).exists():
                 blockers[path].append("installed copies " + copy)

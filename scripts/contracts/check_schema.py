@@ -69,7 +69,7 @@ def current_api(name):
 
 def check_schema_dialects():
     """Validate all current schema releases; document the few pre-ID active formats."""
-    archival_without_id = {
+    active_without_id = {
         "capabilities/migration-collection-manifest-v1.json",
         "capabilities/migration-feature-policy-v1.json",
         "capabilities/migration-field-crosswalk-v1.json",
@@ -86,8 +86,8 @@ def check_schema_dialects():
         if schema.get("$schema") != "https://json-schema.org/draft/2020-12/schema":
             raise ValueError(f"Unsupported JSON Schema dialect: {path}")
         identifier = schema.get("$id")
-        if (identifier is None) != (relative in archival_without_id):
-            raise ValueError(f"Schema identity required or archival exception changed: {path}")
+        if (identifier is None) != (relative in active_without_id):
+            raise ValueError(f"Schema identity required for this active release: {path}")
         if identifier is not None and (
             not isinstance(identifier, str) or not identifier.strip()
         ):

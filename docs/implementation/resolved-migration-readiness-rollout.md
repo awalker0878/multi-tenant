@@ -15,7 +15,7 @@
 
 ### Contract
 
-`contracts/schemas/planning/migration-readiness-v1.json` defines the closed, read-only **route-level** projection. The `readiness_sha256` covers all contract fields except itself. The current route projection requires exact source/target installation/profile/version, E3, E4 and operation-qualified API observations. No browser or route declaration establishes these conditions. `workload_admission_authorized=false` and `native_write_authorized=false` are unconditional in this contract; Lifecycle retains the independent authority to admit or deny an actual native effect.
+`contracts/schemas/planning/migration-readiness-v2.2.json` defines the closed, read-only **route and workload validation** projection. The `readiness_sha256` covers all contract fields except itself. The current route projection requires exact source/target installation/profile/version, E3, E4 and operation-qualified API observations. No browser or route declaration establishes these conditions. `workload_admission_authorized=false` and `native_write_authorized=false` are unconditional in this contract; Lifecycle retains the independent authority to admit or deny an actual native effect.
 
 **Important:** A route being `eligible` does not prove a **particular VM** matches Catalogue intent, that every field in the 278-row manifest was gathered, or that a receiving platform passed its actual migration rehearsal. These are separate, mandatory native commissioning requirements. Do not call the overall migration readiness feature production-complete on the strength of a route-only E2 test.
 
