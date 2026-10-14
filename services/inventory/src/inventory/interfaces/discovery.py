@@ -242,7 +242,9 @@ class InventoryApp:
         try:
             if len(scope["query_string"]) > 200 or len(headers) > 40:
                 raise Rejected("request_bound", 413)
-            header = single(headers, b"authorization")
+            # Missing credentials are an authentication denial, not malformed
+            # request syntax. Duplicated/non-ASCII headers still fail closed.
+            header = single(headers, b"authorization", optional=True)
             if not re.fullmatch(r"Bearer [A-Za-z0-9_-]{32,4096}", header):
                 raise Rejected("invalid_workload", 401)
             credential = header[7:]

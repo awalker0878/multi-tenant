@@ -31,6 +31,23 @@ class PythonDenialExecutionTests(unittest.TestCase):
         self.assertEqual(evidence, [])
         self.assertTrue(any("router-unavailable" in item for item in unresolved))
 
+    def test_inventory_composed_router_rejects_missing_credential_as_401(self):
+        # Exercise the production ASGI composition, not a mocked auth helper.
+        # Missing bearer must never fall through to request-shape errors.
+        app = python_denials.get_app("inventory")
+        for method, template in (
+            ("GET", "/v1/tenants/{tenant}/sites"),
+            ("POST", "/v1/tenants/{tenant}/sites/{site}/endpoints"),
+            ("POST", "/internal/collections/claim"),
+            ("GET", "/internal/tenants/{tenant}/planning-capability-inputs/{application}/{environment}/{site}/{endpoint}/{generation}"),
+            ("GET", "/internal/tenants/{tenant}/migration-inputs/{application}/{environment}/{site}/{revision}/{digest}"),
+        ):
+            with self.subTest(method=method, route=template):
+                status = asyncio.run(python_denials.exchange(
+                    app, method, python_denials.actual_path(template)
+                ))
+                self.assertEqual(status, 401)
+
     def test_wrong_status_is_unresolved_not_a_pass(self):
         operation = {
             "owner": "inventory", "security_required": True,

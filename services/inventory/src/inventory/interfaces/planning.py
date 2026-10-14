@@ -58,7 +58,9 @@ class PlanningInputApp:
             headers = list(scope["headers"])
             if len(headers) > 40 or any(k.lower() == b"content-encoding" for k, _ in headers):
                 raise Rejected("request_bound", 413)
-            auth = single(headers, b"authorization")
+            # Absence of a bearer is an authentication denial (401), while
+            # duplicate or undecodable Authorization headers remain 400.
+            auth = single(headers, b"authorization", optional=True)
             if not re.fullmatch(r"Bearer [A-Za-z0-9_-]{32,4096}", auth):
                 raise Rejected("invalid_workload", 401)
             capability_internal = (
