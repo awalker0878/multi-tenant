@@ -249,3 +249,27 @@ reapplying current owner privileges. The actual replay journey is the regression
 entry point, and the original implementation fails it. The source evidence
 inventory also requires regeneration after modifying its bound P02 harness;
 the strict stale-inventory rejection is preserved and the report is regenerated.
+
+Run `38644920007` tested `43f4d94be999d7ff2afe9d87fd302bc66d84b3f8` as merge
+revision `9203a7d427543162645aaf266c2d4050c3a1d066`. P02 passes in all three
+browsers, including real owner relay/Console inbox, PostgreSQL TLS, bootstrap and
+recovery, and actual migration replay. All nine images, five wheels and complete
+release-binding aggregation pass; downloaded artifact `11932821183` binds exact
+canonical digests, source revision, CI attempt and image identities. These are
+disposable packaged artifacts, not operated deployments.
+
+| Finding | Severity | Root cause and remediation |
+| --- | --- | --- |
+| Root version-discovery witness rejected | High | P04 stops at configuration page 7. Worker legitimately records `GET /`; Inventory's witness pattern requires another character after `/`. Permit that valid root path within the existing 404-character bound while retaining GET-only and CR/LF rejection. Add a real PostgreSQL regression proving root witness commit and no page mutation for malformed, non-GET or oversized witnesses. Required CI must execute it; local database absence remains a skip. |
+| Nested API expiry can exceed effective authority | High | The exact installed Lifecycle readiness consumer accepts an expired nested API case after the whole receipt digest is recomputed, despite a future aggregate expiry. Require each eligible/accepted-omission case's integer expiry to be current and bound the aggregate lifetime. Deliberately restoring the original runtime makes four new controls fail; the corrected installed consumer passes all five. Canonical bytes are unchanged. |
+| Stale P05/P06 policy fixture | Medium | The live E2 snapshot constructor raises `KeyError: network_flow_contexts`. Rebind current explicit network contexts and the existing reviewed recovery fixture to the simulated intent. This only repairs the bounded E2 campaign; fixture signatures or successes do not establish real provider, reviewer or receiving identity. |
+| P09 route proof mistaken for workload admission | Medium | Required native command 20 assumes synthetic route evidence can pass `MigrationSupport.require` without collection/workload enrollment. Assert the actual uncommissioned denial and challenge route revocation/expiry separately. Preserve the real Lifecycle resolver's positive composition check using the existing explicit E2 readiness specimen, with current Catalogue membership. The directional campaign passes 270 scenarios, 3,348 stage boundaries and 1,800 rejection controls locally; no native authority is qualified. |
+
+The existing `route_conformance.py` now records actual received HTTP traffic in
+the P02–P06 live journeys, validates exact active response status/schema and valid
+request parameters/body, and preserves operation/source/CI and canonical byte
+digests. Installed source-copy equality does not assert installed image identity.
+Returned data and credentials are not retained. Five admission-control regressions
+reject unknown methods/statuses, invalid requests/payloads and copy drift; denied
+traffic is never credited as positive conformance or complete security assurance.
+The existing full assurance gate is not replaced or relaxed.

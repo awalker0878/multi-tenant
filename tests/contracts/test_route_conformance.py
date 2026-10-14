@@ -1,4 +1,6 @@
 """Synthetic canaries for actual HTTP router vs immutable published OpenAPI."""
+from copy import deepcopy
+import hashlib
 import json
 import tempfile
 from pathlib import Path
@@ -7,7 +9,84 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts/contracts"))
-from route_conformance import compare_declared, compare_inventory_discovery_routes, compare_inventory_worker_routes, routes_in_laravel, routes_in_openapi, verify_app, verify_lifecycle_native, verify_lifecycle_native_jobs, verify_lifecycle_worker_effect_routes
+from route_conformance import HttpConformance, compare_declared, compare_inventory_discovery_routes, compare_inventory_worker_routes, routes_in_laravel, routes_in_openapi, verify_app, verify_lifecycle_native, verify_lifecycle_native_jobs, verify_lifecycle_worker_effect_routes
+
+
+class HttpWireMeasurementTests(unittest.TestCase):
+    """Admission negative controls, never service qualification receipts."""
+
+    def setUp(self):
+        folder = tempfile.TemporaryDirectory()
+        self.addCleanup(folder.cleanup)
+        self.root = Path(folder.name)
+        path = self.root/'contracts/openapi/probe.json'
+        path.parent.mkdir(parents=True)
+        self.api = {'openapi': '3.1.0', 'paths': {'/v1/tenants/{tenant}/records': {'post': {
+            'operationId': 'createRecord',
+            'parameters': [
+                {'in': 'path', 'name': 'tenant', 'required': True, 'schema': {'type': 'string', 'format': 'uuid'}},
+                {'in': 'header', 'name': 'Idempotency-Key', 'required': True, 'schema': {'type': 'string', 'pattern': '^[a-f0-9]{32}$'}},
+            ],
+            'requestBody': {'required': True, 'content': {'application/json': {'schema': {
+                'type': 'object', 'additionalProperties': False, 'properties': {'name': {'type': 'string'}}, 'required': ['name']}}}},
+            'responses': {str(status): {'content': {'application/json': {'schema': {
+                '$ref': '#/components/schemas/Result'}}}} for status in (201, 422)},
+        }}}, 'components': {'schemas': {'Result': {'type': 'object', 'additionalProperties': False,
+            'properties': {'value': {'type': 'integer', 'minimum': 1}}, 'required': ['value']}}}}
+        path.write_text(json.dumps(self.api, indent=2)+'\n')
+        registry = self.root/'architecture/contract-consumers.json'
+        registry.parent.mkdir()
+        registry.write_text(json.dumps({'active_releases': [{'path': 'contracts/openapi/probe.json', 'owner': 'probe', 'consumers': []}]}))
+        self.output = self.root/'observed.json'
+        self.probe = HttpConformance(self.root, self.output, {'https://probe.invalid': 'probe'}, 'unit:measurement-controls')
+
+    def observe(self, **changed):
+        fields = {'origin': 'https://probe.invalid', 'path': '/v1/tenants/10000000-0000-4000-8000-000000000001/records',
+                  'method': 'POST', 'body': {'name': 'Valid'}, 'headers': {'Idempotency-Key': 'a'*32, 'Authorization': 'Bearer NEVER_RETAIN_ME'},
+                  'status': 201, 'response': {'value': 1}, 'response_headers': {'Content-Type': 'application/json; charset=utf-8'}}
+        self.probe.observe(**(fields | changed))
+
+    def test_measured_success_has_exact_release_bytes_and_no_authority_or_secrets(self):
+        self.observe()
+        row = json.loads(self.output.read_text())[0]
+        self.assertEqual(row['release_sha256'], hashlib.sha256((self.root/'contracts/openapi/probe.json').read_bytes()).hexdigest())
+        self.assertTrue(row['positive_conformance'])
+        self.assertFalse(row['security_qualified'])
+        self.assertFalse(row['installed_runtime_identity_verified'])
+        self.assertNotIn('NEVER_RETAIN_ME', self.output.read_text())
+        self.assertNotIn('Valid', self.output.read_text())
+
+    def test_unknown_operation_method_and_status_cannot_earn_evidence(self):
+        for fields in ({'method': 'GET'}, {'path': '/v1/unknown'}, {'status': 202}):
+            with self.subTest(fields=fields), self.assertRaises(ValueError):
+                self.observe(**fields)
+
+    def test_success_with_invalid_request_or_payload_fails_closed(self):
+        for fields in ({'headers': {}}, {'body': {'name': 'x', 'unexpected': True}},
+                       {'response': {'value': 0}}, {'response': {'value': 1, 'grant': True}},
+                       {'response_headers': {'Content-Type': 'text/html'}},
+                       {'path': '/v1/tenants/foreign/records'}):
+            with self.subTest(fields=fields), self.assertRaisesRegex(ValueError, 'contract mismatch'):
+                self.observe(**fields)
+            self.assertFalse(json.loads(self.output.read_text())[-1]['positive_conformance'])
+
+    def test_contract_valid_denial_is_not_positive_or_security_qualification(self):
+        self.observe(status=422, body={'unexpected': True}, response={'value': 1})
+        row = json.loads(self.output.read_text())[0]
+        self.assertTrue(row['response_valid'])
+        self.assertFalse(row['positive_conformance'])
+        self.assertFalse(row['security_qualified'])
+
+    def test_installed_contract_drift_prevents_measurement(self):
+        registry = self.root/'architecture/contract-consumers.json'
+        value = json.loads(registry.read_text())
+        value['active_releases'][0]['copies'] = ['private/probe.json']
+        registry.write_text(json.dumps(value))
+        copy = self.root/'private/probe.json'
+        copy.parent.mkdir()
+        copy.write_text(json.dumps(deepcopy(self.api)))
+        with self.assertRaisesRegex(ValueError, 'Installed contract differs'):
+            HttpConformance(self.root, self.output, {}, 'unit:drift')
 
 
 class HttpRouteConformanceTests(unittest.TestCase):

@@ -24,7 +24,7 @@ def main():
     prefixes = ('services/lifecycle/', 'services/inventory/', 'services/planning/', 'services/governance/', 'workers/lifecycle/', 'workers/inventory/', 'apps/console/',
                 'scripts/p08/', 'scripts/p04/generate_clients.py', 'contracts/schemas/inventory/', 'contracts/schemas/planning/migration-', 'contracts/openapi/inventory-v1.', 'contracts/openapi/inventory-native-', 'contracts/openapi/governance-native-', 'contracts/openapi/lifecycle-migration-', 'contracts/openapi/lifecycle-native-jobs-', 'contracts/platforms/',
                 'contracts/openapi/worker-migration-', 'contracts/openapi/planning-migration-', 'contracts/openapi/planning-v1.', 'contracts/fixtures/lifecycle/migration-', 'contracts/fixtures/inventory/migration-', 'contracts/fixtures/inventory/ahv-', 'contracts/fixtures/inventory/vmware-', 'contracts/fixtures/inventory/operator-',
-                '.github/workflows/qualification.yml', '.github/workflows/qualification.yml')
+                'tests/contracts/native_qualification_fixture.py', '.github/workflows/qualification.yml')
     report = {
         'source_revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
         'observed_at': datetime.now(timezone.utc).isoformat(), 'environment': platform.platform(),

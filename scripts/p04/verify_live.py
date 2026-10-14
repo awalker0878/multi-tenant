@@ -15,6 +15,7 @@ import secrets
 import signal
 import ssl
 import subprocess
+import sys
 import tempfile
 import time
 import urllib.error
@@ -41,6 +42,11 @@ def main():
     root = Path(__file__).resolve().parents[2]
     out = args.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
+    sys.path.insert(0, str(root/'scripts/contracts'))
+    from route_conformance import HttpConformance
+    conformance = HttpConformance(root, out/'http-conformance.json', {
+        'https://127.0.0.1:8442': 'governance', 'https://127.0.0.1:8444': 'inventory',
+    }, 'scripts/p04/verify_live.py:wire')
     report = {'result': 'RUNNING', 'source_revision': os.environ['GITHUB_SHA'], 'run_id': os.environ['GITHUB_RUN_ID'],
         'run_attempt': os.environ['GITHUB_RUN_ATTEMPT'], 'browser_engine': engine, 'observed_at': datetime.datetime.now(datetime.UTC).isoformat(),
         'checks': [], 'commands': [], 'limitations': ['Synthetic OIDC transport used only by the separate principal bootstrap process; live requests use real Governance current authority.',
@@ -50,6 +56,7 @@ def main():
             'Automated browser checks do not establish representative operator, screen-reader or independent G04 receiving acceptance.']}
     paths = subprocess.check_output(['git', 'ls-files'], cwd=root, text=True).splitlines()
     report['source_sha256'] = {n: hashlib.sha256((root/n).read_bytes()).hexdigest() for n in paths if n.startswith(('services/inventory/', 'workers/inventory/', 'services/governance/', 'services/catalogue/', 'apps/console/', 'contracts/', 'scripts/p03/seed_', 'scripts/p04/', '.github/workflows/qualification.yml', 'deploy/dependencies/stateful/inventory-facts.json'))}
+    report['source_sha256']['scripts/contracts/route_conformance.py'] = hashlib.sha256((root/'scripts/contracts/route_conformance.py').read_bytes()).hexdigest()
     private_values = [os.environ['P04_ADMIN_PASSWORD']]
     processes, handles, proxies = {}, [], []
     broker = None
@@ -238,7 +245,9 @@ def main():
                     payload = response.read(310001)
                     if len(payload) > 310000:
                         raise RuntimeError('unbounded_wire_response')
-                    return response.status, json.loads(payload), response.headers, len(payload)
+                    value = json.loads(payload)
+                    conformance.observe(base, path, method, body, headers or {}, response.status, value, response.headers)
+                    return response.status, value, response.headers, len(payload)
 
             def gov(path, body, token=None, expected=201):
                 status, value, _, _ = wire('https://127.0.0.1:8442', path, 'POST', body, {'Authorization': 'Bearer '+credentials['console-governance'][0], 'X-Console-Session': token or fixture['admin_token'], 'Idempotency-Key': secrets.token_hex(32)})

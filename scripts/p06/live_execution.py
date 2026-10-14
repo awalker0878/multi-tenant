@@ -20,6 +20,8 @@ def _campaign(c,p):
     run,sql,gov,wire,check=c['run'],c['sql'],c['gov'],c['wire'],c['check']
     fixture,credentials,envs=c['fixture'],c['credentials'],c['envs'];tenant=fixture['tenant']
     report=c['report'];report['phase']='P06';report['evidence_level']='E2'
+    c['conformance'].register_origin('https://127.0.0.1:8450', 'lifecycle')
+    c['conformance'].register_origin('https://127.0.0.1:8449', 'lifecycle-workers')
     report['limitations'].append('P06 uses the shipped simulation adapter and separate PostgreSQL effect owner. No native execution, E3 qualification, operated dependency acceptance or human G06 receiving is claimed.')
     links=['lifecycle-governance','console-lifecycle','lifecycle-planning','lifecycle-assurance','assurance-lifecycle','console-assurance','lifecycle-simulator','assurance-simulator','simulator-lifecycle','lifecycle-alerts']
     for name in links:

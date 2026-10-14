@@ -200,6 +200,15 @@ def test_route_only_v1_contract_is_never_effect_admissible() -> None:
         verify(value, content, "10000000-0000-4000-8000-000000000001", 101)
 
 
+@pytest.mark.parametrize("expiry", [100, 101, 150, None, True])
+def test_aggregate_expiry_cannot_extend_nested_api_authority(expiry: Any) -> None:
+    value, content = specimen()
+    value["api_compatibility"]["cases"][0]["expires_at"] = expiry
+    value["readiness_sha256"] = digest({k: v for k, v in value.items() if k != "readiness_sha256"})
+    with pytest.raises(Rejected):
+        verify(value, content, value["scope"]["tenant_id"], 101)
+
+
 def test_empty_collection_cannot_be_attested_by_matching_checksums() -> None:
     value, content = specimen()
     value["collection_coverages"][0]["attributes"] = []

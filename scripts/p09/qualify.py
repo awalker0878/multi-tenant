@@ -23,6 +23,7 @@ def main():
     files = subprocess.check_output(['git', 'ls-files', '--cached', '--others', '--exclude-standard'], cwd=ROOT, text=True).splitlines()
     prefixes = ('services/planning/', 'services/lifecycle/', 'workers/lifecycle/',
                 'scripts/p09/', 'scripts/generate_capabilities.py', 'tests/contracts/test_capabilities.py',
+                'tests/contracts/native_qualification_fixture.py',
                 'contracts/capabilities/', 'contracts/schemas/capabilities/', 'contracts/schemas/expansion/', 'contracts/fixtures/expansion/',
                 'contracts/openapi/expansion-', '.github/workflows/ci.yml')
     report = {

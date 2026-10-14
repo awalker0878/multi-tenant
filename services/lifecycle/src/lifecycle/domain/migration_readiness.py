@@ -223,6 +223,9 @@ def verify(value: Any, content: dict[str, Any], tenant: str, now: int) -> None:
         or any(
             not isinstance(case, dict)
             or (case.get("status") != "eligible" and case.get("omission_accepted") is not True)
+            or type(case.get("expires_at")) is not int
+            or case["expires_at"] <= now
+            or case["expires_at"] < value["expires_at"]
             for case in cases
         )
     ):

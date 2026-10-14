@@ -19,6 +19,7 @@ import secrets
 import select
 import signal
 import subprocess
+import sys
 import tempfile
 import time
 import urllib.request
@@ -45,6 +46,11 @@ def main() -> int:
     root = Path(__file__).resolve().parents[2]
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
+    sys.path.insert(0, str(root/'scripts/contracts'))
+    from route_conformance import HttpConformance
+    conformance = HttpConformance(root, output/'http-conformance.json', {
+        'http://127.0.0.1:8032': 'governance',
+    }, 'scripts/p02/verify_identity.py:wire')
     report = {'schema_version': 1, 'result': 'RUNNING', 'scope': 'P02 identity, tenancy and plan-bound approval increments',
               'source_sha': os.environ['GITHUB_SHA'], 'run_id': os.environ['GITHUB_RUN_ID'],
               'run_attempt': os.environ['GITHUB_RUN_ATTEMPT'], 'browser_engine': browser, 'observed_at': dt.datetime.now(dt.UTC).isoformat(),
@@ -53,6 +59,7 @@ def main() -> int:
     for name in tracked:
         if name and name.startswith(('services/governance/', 'apps/console/', 'scripts/p02/', 'scripts/recovery/', '.github/workflows/qualification.yml', 'contracts/openapi/governance-', 'contracts/openapi/planning-', 'contracts/schemas/events/governance-', 'contracts/schemas/events/identity-', 'contracts/schemas/events/support-', 'contracts/asyncapi/identity.', 'contracts/asyncapi/support.', 'deploy/dependencies/stateful/')):
             report['source_sha256'][name] = hashlib.sha256((root / name).read_bytes()).hexdigest()
+    report['source_sha256']['scripts/contracts/route_conformance.py'] = hashlib.sha256((root/'scripts/contracts/route_conformance.py').read_bytes()).hexdigest()
     private_values = [os.environ['P02_TEST_PASSWORD']]
     processes: list[subprocess.Popen] = []
     handles = []
@@ -316,6 +323,8 @@ def main() -> int:
                     check('wire-' + path + '-' + str(expected), response.status == expected)
                     validator = {'$ref': '#/components/schemas/' + schema, 'components': api['components']} if isinstance(schema, str) else schema
                     OAS31Validator(validator).validate(value)
+                    conformance.observe('http://127.0.0.1:8032', path, request.get_method(), body,
+                                        dict(request.header_items()), response.status, value, response.headers)
                     check('wire-' + path + '-no-store', 'no-store' in response.headers.get('Cache-Control', ''))
                     return value
             initial_session = wire('/identity/local-sessions', 'Session', body={'username': 'admin', 'password': temporary})['session_token']

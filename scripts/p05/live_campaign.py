@@ -78,6 +78,17 @@ def campaign(c, extension=None):
         'from': 'foreign-tenant', 'to': model['intent']['workloads'][0]['id'],
         'protocol': 'tcp', 'port': 22,
     }]
+    # Current controlled E2 network and recovery policy inputs. These are
+    # simulation specimens, not enrolled reviewer/observer or provider evidence.
+    _, _, _, current_policy, _ = capability_fixture.inputs()
+    policy['recovery_profile'] = copy.deepcopy(current_policy['recovery_profile'])
+    flows = [d for d in model['intent']['dependencies'] if d['kind'] == 'communication'] + policy['forbidden_flows']
+    flows += [{'from': 'foreign-domain-'+str(i), 'to': w['id'], 'protocol': 'tcp', 'port': 22}
+              for i,w in enumerate(model['intent']['workloads'])]
+    policy['network_flow_contexts'] = {canonical_digest({k: flow[k] for k in ['from','to','protocol','port']}): {
+        'address_family': 'ipv4', 'vrf_id': 'p05-fixture-vrf-'+c['site'], 'vpc_id': 'p05-fixture-vpc-'+c['site'],
+        'direction': 'source_to_destination', 'return_path_policy': 'stateful_allow',
+    } for flow in flows}
     # Rewrite the independently mounted policy after adding the explicit assessment controls.
     registry_file.write_text(json.dumps(registry))
     quals={'schema_version':2,'records':[]}

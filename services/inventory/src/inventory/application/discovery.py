@@ -627,7 +627,7 @@ class Discovery:
                     or set(witness)
                     != {"native_operation", "api_version", "response_sha256", "observed_at"}
                     or not isinstance(witness["native_operation"], str)
-                    or not re.fullmatch(r"GET /[^\r\n]{1,400}", witness["native_operation"])
+                    or not re.fullmatch(r"GET /[^\r\n]{0,399}", witness["native_operation"])
                     or not isinstance(witness["api_version"], str)
                     or len(witness["api_version"]) > 160
                     or not isinstance(witness["response_sha256"], str)

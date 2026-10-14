@@ -4,52 +4,21 @@ All owner replies here are explicitly synthetic. No platform effect is authorize
 """
 import sys
 from copy import deepcopy
-from importlib.util import module_from_spec, spec_from_file_location
 from pathlib import Path
 from unittest.mock import Mock
 from uuid import uuid4
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path[:0] = [str(ROOT / 'services/planning/src'), str(ROOT / 'services/planning/tests'),
-               str(ROOT / 'services/lifecycle/src')]
+               str(ROOT / 'services/lifecycle/src'), str(ROOT / 'tests/contracts')]
 from test_migration_plans import values
 from planning.domain.compilation import bind
 from planning.domain.migration_plan import DELTA, compose_migration
 from planning.domain.model import digest
 from lifecycle.infrastructure.native_owners import NativeOwners
 from lifecycle.domain.native_workflow import validate_plan
-from lifecycle.domain.capability_definitions import METHOD_ALIASES
 from lifecycle.domain.execution import Rejected
-
-locator = spec_from_file_location('_composition_readiness', ROOT / 'services/lifecycle/tests/test_migration_readiness.py')
-if locator is None or locator.loader is None:
-    raise RuntimeError('Current Lifecycle readiness test specimen unavailable')
-readiness_fixture = module_from_spec(locator)
-locator.loader.exec_module(readiness_fixture)
-
-
-def readiness(content, tenant):
-    # Explicit synthetic E2 data: exercise every current resolver check. This
-    # is neither enrollment nor E3/E4 evidence and cannot authorize an effect.
-    value, _ = readiness_fixture.specimen()
-    migration = content['native_migration']['migration']
-    value.update(scope={'tenant_id': tenant, 'application_id': content['scope']['resource_id'],
-                        'environment_id': content['scope']['environment'], 'site_id': content['scope']['site_id']},
-                 route_sha256=content['migration_campaign']['route_sha256'],
-                 method=METHOD_ALIASES[migration['method']], evaluated_at=1000, expires_at=1100)
-    for side in ('source', 'target'):
-        value[side].update(profile_sha256=migration[side]['profile_sha256'])
-    recon = value['workload_reconciliation']
-    recon.update(source_profile_sha256=migration['source']['profile_sha256'],
-                 native_review_sha256=migration['review']['digest'], expires_at=1100)
-    recon['reconciliation_sha256'] = digest({k:v for k,v in recon.items() if k != 'reconciliation_sha256'})
-    for coverage in value['collection_coverages']:
-        side = 'target' if coverage['scope'] == 'target' else 'source'
-        coverage.update(platform=value[side]['platform'], installed_tuple_sha256=migration[side]['tuple_sha256'],
-                        evaluated_at=1000, expires_at=1100)
-        coverage['coverage_sha256'] = digest({k:v for k,v in coverage.items() if k != 'coverage_sha256'})
-    value['readiness_sha256'] = digest({k:v for k,v in value.items() if k != 'readiness_sha256'})
-    return value
+from native_qualification_fixture import composition_readiness
 
 for method in DELTA:
     for mode in ('rehearsal', 'cutover', 'rollback', 'forward_recovery', 'reverse_recovery', 'cleanup'):
@@ -61,7 +30,7 @@ for method in DELTA:
         content['native_migration'].update(recipe_id=str(uuid4()), base_plan_id=str(uuid4()))
         binding = bind(content, str(uuid4()), requester)
         record = {'content':content, 'binding':binding, 'invalidated':False,
-                  'migration_readiness':readiness(content, binding['tenant_id'])}
+                  'migration_readiness':composition_readiness(content, binding['tenant_id'], 1000)}
         assignment = {'tenant_id':binding['tenant_id'], 'plan_id':binding['plan_id'],
                       'plan_revision':1, 'plan_digest':binding['digest'], 'actor_id':actor,
                       **{k:str(uuid4()) for k in ('approval_id','executor_id','campaign_id','epoch')}}

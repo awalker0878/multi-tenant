@@ -8,13 +8,140 @@ run in each producer's product CI.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+import os
 import re
+import threading
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 VERBS = {"get", "post", "put", "patch", "delete", "options", "head"}
 PARAMETER = re.compile(r"\{([^}]+)\}")
+
+
+class HttpConformance:
+    """Validate observed HTTP traffic; preserve gaps without inventing authority.
+
+    The live journey invokes this only after receiving the service response.
+    Evidence retains schema/parameter verdicts and digests, never credentials
+    or request/response bodies. A valid response is not security qualification.
+    """
+
+    def __init__(self, root: Path, output: Path, origins: dict[str, str], test: str):
+        self.output, self.origins, self.test = output, dict(origins), test
+        self.rows: list[dict] = []
+        self.lock = threading.Lock()
+        self.operations = []
+        registry = json.loads((root / "architecture/contract-consumers.json").read_text())
+        for release in registry["active_releases"]:
+            if not release["path"].startswith("contracts/openapi/"):
+                continue
+            raw = (root / release["path"]).read_bytes()
+            release["canonical_sha256"] = hashlib.sha256(raw).hexdigest()
+            api = json.loads(raw)
+            installed = []
+            for path in release.get("copies", []):
+                if (root / path).read_bytes() != raw:
+                    raise ValueError("Installed contract differs: " + path)
+                installed.append(path)
+            for path, item in api["paths"].items():
+                names = PARAMETER.findall(path)
+                pattern = re.compile("^" + PARAMETER.sub("([^/]+)", re.escape(path).replace(r"\{", "{").replace(r"\}", "}")) + "$")
+                for method, spec in item.items():
+                    if method in {"get", "post", "put", "patch", "delete"}:
+                        self.operations.append((release, api, path, names, pattern, method.upper(), spec, installed))
+
+    def register_origin(self, origin: str, owner: str) -> None:
+        if origin in self.origins and self.origins[origin] != owner:
+            raise ValueError("HTTP origin has multiple owners")
+        self.origins[origin] = owner
+
+    def observe(self, origin: str, path: str, method: str, body, headers: dict,
+                status: int, response, response_headers) -> None:
+        from urllib.parse import parse_qs, urlsplit
+        from jsonschema import Draft202012Validator, FormatChecker
+
+        owner = self.origins.get(origin)
+        if owner is None:
+            return
+        uri = urlsplit(path)
+        matched = [(row, row[4].fullmatch(uri.path)) for row in self.operations
+                   if row[0]["owner"] == owner and row[5] == method]
+        matched = [(row, match) for row, match in matched if match is not None]
+        if not matched:
+            if uri.path.startswith(("/v1/", "/internal/", "/identity/")):
+                raise ValueError("Unregistered observed HTTP operation: " + owner + " " + method + " " + uri.path)
+            return
+        if len(matched) != 1:
+            raise ValueError("Ambiguous observed HTTP operation")
+        (release, api, template, names, _, _, spec, installed), match = matched[0]
+        parameters = dict(zip(names, match.groups(), strict=True))
+        supplied_headers = {key.lower(): value for key, value in headers.items()}
+        query = parse_qs(uri.query)
+
+        def definition(node):
+            seen = set()
+            while "$ref" in node:
+                reference = node["$ref"]
+                if not reference.startswith("#/") or reference in seen:
+                    raise ValueError("Unresolved HTTP reference: " + release["path"])
+                seen.add(reference)
+                target = api
+                for part in reference[2:].split("/"):
+                    target = target[part.replace("~1", "/").replace("~0", "~")]
+                node = target | {key: value for key, value in node.items() if key != "$ref"}
+            return node
+
+        def valid(value, schema):
+            return Draft202012Validator({"allOf": [schema], "components": api.get("components", {})},
+                                        format_checker=FormatChecker()).is_valid(value)
+
+        request_valid = True
+        item = api["paths"][template]
+        for parameter in [*item.get("parameters", []), *spec.get("parameters", [])]:
+            parameter = definition(parameter)
+            values = {"path": parameters, "header": supplied_headers, "query": query}.get(parameter["in"], {})
+            name = parameter["name"].lower() if parameter["in"] == "header" else parameter["name"]
+            value = values.get(name)
+            if isinstance(value, list):
+                value = value[0] if len(value) == 1 else value
+            if value is None:
+                request_valid &= not parameter.get("required", False)
+            else:
+                schema = parameter.get("schema", {})
+                if schema.get("type") == "integer" and isinstance(value, str) and re.fullmatch(r"-?[0-9]+", value):
+                    value = int(value)
+                request_valid &= valid(value, schema)
+        request = spec.get("requestBody")
+        if request:
+            request = definition(request)
+            request_valid &= (body is not None or not request.get("required", False))
+            if body is not None:
+                request_valid &= valid(body, request["content"]["application/json"]["schema"])
+        elif body is not None:
+            request_valid = False
+        contracted = spec["responses"].get(str(status), spec["responses"].get("default"))
+        response_valid = contracted is not None
+        if contracted is not None:
+            contracted = definition(contracted)
+        if contracted is not None and "application/json" in contracted.get("content", {}):
+            response_valid &= valid(response, contracted["content"]["application/json"]["schema"])
+            response_valid &= response_headers.get("Content-Type", "").split(";", 1)[0].strip() == "application/json"
+        row = {"release": release["path"], "release_sha256": release["canonical_sha256"],
+               "owner": owner, "method": method, "path": template, "operation_id": spec["operationId"],
+               "status_code": status, "request_valid": bool(request_valid), "response_valid": bool(response_valid),
+               "positive_conformance": bool(request_valid and response_valid and 200 <= status < 300),
+               "installed_source_copies": installed, "installed_runtime_identity_verified": False,
+               "response_sha256": hashlib.sha256(json.dumps(response, sort_keys=True, separators=(",", ":")).encode()).hexdigest(),
+               "test": self.test, "revision": os.environ.get("GITHUB_SHA"),
+               "run_id": os.environ.get("GITHUB_RUN_ID"), "run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT"),
+               "security_qualified": False}
+        with self.lock:
+            self.rows.append(row)
+            self.output.write_text(json.dumps(self.rows, indent=2) + "\n")
+        if not response_valid or (200 <= status < 300 and not request_valid):
+            raise ValueError("Observed HTTP contract mismatch: " + owner + " " + spec["operationId"] + " " + str(status))
 
 
 def routes_in_openapi(spec: dict) -> set[tuple[str, str]]:

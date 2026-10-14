@@ -137,3 +137,12 @@ consumer is the actual validator or projection identified by dependency discover
 Missing executable validation evidence remains unverified. Local owner fixtures,
 route declarations and generated copies cannot qualify an external deployment,
 TLS broker or native E3/E4 environment.
+
+P02–P06 live journeys retain `http-conformance.json` from the existing
+`route_conformance.HttpConformance` probe. Each row identifies an actually received
+response, exact canonical digest, method/path/operation, request and response
+validation, status, source revision and CI run/attempt. It retains a response
+digest rather than bodies or credentials. Unknown protected routes and observed
+schema/status mismatches fail the journey. A successful response remains separate
+from authenticated revocation/isolation evidence and installed-image identity;
+these records alone cannot qualify an operation or native effect.
