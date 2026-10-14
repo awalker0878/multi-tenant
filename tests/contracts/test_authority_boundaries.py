@@ -113,6 +113,11 @@ class OwnerBoundaryContracts(unittest.TestCase):
         with self.assertRaises(ValueError):
             contract_for_operation("GOVERNANCE", "POST",
                 f"/v1/tenants/{TENANT}/undocumented-authority")
+        # Lifecycle owns placement reservations. A retired logical CAPACITY
+        # identity cannot silently authorize the same operation.
+        with self.assertRaises(ValueError):
+            contract_for_operation("CAPACITY", "POST",
+                f"/internal/tenants/{TENANT}/placement-reservations/checks")
 
 
     def test_all_placement_owner_operations_use_strict_openapi(self):
