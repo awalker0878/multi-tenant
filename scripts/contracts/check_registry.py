@@ -22,6 +22,26 @@ def check_consumer_registry():
     if set(names) != set(inventory):
         raise ValueError("Active contract registry does not cover every declared consumer")
     active = set(names)
+    # Registry ownership is authoritative only when all independent indexes
+    # agree. A second editable list must not silently contradict the release.
+    for entry in releases:
+        path = entry["path"]
+        owner = entry["owner"]
+        consumers = entry["consumers"]
+        if not isinstance(consumers, list) or len(consumers) != len(set(consumers)):
+            raise ValueError(f"Duplicate or invalid release consumers: {path}")
+        if owner in consumers:
+            raise ValueError(f"Owner listed as its own external consumer: {path}")
+        if set(inventory[path]) != {owner, *consumers}:
+            raise ValueError(f"Release ownership and consumer index disagree: {path}")
+        dependencies = entry.get("depends_on", [])
+        if not isinstance(dependencies, list) or len(dependencies) != len(set(dependencies)):
+            raise ValueError(f"Duplicate or invalid release dependencies: {path}")
+        for dependency in dependencies:
+            if dependency not in names:
+                raise ValueError(f"Dependency not registered as active release: {path} -> {dependency}")
+            if dependency == path:
+                raise ValueError(f"Self-referential contract dependency: {path}")
     # Only current canonical releases are shipped. Every installed consumer
     # and generated loader must target the active release set directly.
     # Each live service operation belongs to exactly one active versioned owner
