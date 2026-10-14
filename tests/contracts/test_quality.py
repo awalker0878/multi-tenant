@@ -384,6 +384,75 @@ class SchemaAndEvents(unittest.TestCase):
 
 
 class GitPublicationTests(unittest.TestCase):
+    def test_new_capability_replaces_old_without_retaining_history_or_bypassing_semver(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for name in ("architecture", "contracts/capabilities",
+                         "contracts/schemas/capabilities", "contracts/schemas/common"):
+                (root / name).mkdir(parents=True, exist_ok=True)
+            (root / POLICY["error_schema"]).write_text(json.dumps(ERROR))
+            (root / "architecture/contract-quality-policy.json").write_text(json.dumps(POLICY))
+            old_path = "contracts/capabilities/methods-v1.json"
+            new_path = "contracts/capabilities/methods-v1.1.json"
+            prior = {"schema_version": 1, "definition_version": "1.0.0",
+                     "methods": {"cold": {"stages": ["capture", "verify"]},
+                                 "rebuild": {"stages": ["restore"]}}}
+            (root / old_path).write_text(json.dumps(prior))
+            registry = root / "architecture/contract-consumers.json"
+            registry.write_text(json.dumps({
+                "active_releases": [{"path": old_path, "consumers": ["planning"]}]
+            }))
+            subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+            subprocess.run(["git", "config", "user.email", "quality@example.invalid"],
+                           cwd=root, check=True)
+            subprocess.run(["git", "config", "user.name", "Quality fixture"],
+                           cwd=root, check=True)
+            subprocess.run(["git", "add", "."], cwd=root, check=True)
+            subprocess.run(["git", "commit", "-qm", "Current capability"], cwd=root, check=True)
+            base = subprocess.check_output(["git", "rev-parse", "HEAD"],
+                                           cwd=root, text=True).strip()
+            # The checkout carries ONLY the new release; prior bytes exist
+            # exclusively in Git provenance. No alias or runtime compatibility.
+            (root / old_path).unlink()
+            schema = {
+                "$schema": POLICY["schema_dialect"], "type": "object",
+                "additionalProperties": False,
+                "required": ["schema_version", "definition_version", "methods"],
+                "properties": {
+                    "schema_version": {"const": 1},
+                    "definition_version": {"type": "string"},
+                    "methods": {"type": "object", "additionalProperties": {
+                        "type": "object", "required": ["stages"],
+                        "properties": {"stages": {"type": "array",
+                                                   "items": {"type": "string"}}},
+                        "additionalProperties": False,
+                    }},
+                },
+            }
+            (root / "contracts/schemas/capabilities/methods-v1.1.json").write_text(
+                json.dumps(schema))
+            changed = {"schema_version": 1, "definition_version": "1.1.0",
+                       "methods": {"cold": {"stages": ["capture", "verify"]}}}
+            (root / new_path).write_text(json.dumps(changed))
+            registry.write_text(json.dumps({"active_releases": [
+                {"path": new_path, "consumers": ["planning"]}
+            ]}))
+            with self.assertRaisesRegex(ValueError, "Breaking change requires a NEW MAJOR"):
+                check_new_releases(root, base)
+            new_major = "contracts/capabilities/methods-v2.json"
+            major_schema = "contracts/schemas/capabilities/methods-v2.json"
+            (root / new_path).unlink()
+            (root / "contracts/schemas/capabilities/methods-v1.1.json").unlink()
+            (root / new_major).write_text(json.dumps(changed))
+            (root / major_schema).write_text(json.dumps(schema))
+            registry.write_text(json.dumps({"active_releases": [
+                {"path": new_major, "consumers": ["planning"]}
+            ]}))
+            admitted = check_new_releases(root, base)
+            self.assertEqual(admitted["validated"], 1)
+            self.assertTrue(admitted["new_releases"][0]["breaking_changes"])
+            self.assertFalse((root / old_path).exists())
+
     def test_new_minor_version_cannot_hide_a_deleted_operation(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
