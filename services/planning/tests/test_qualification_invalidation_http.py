@@ -93,6 +93,21 @@ def test_wrong_or_missing_authority_denied_without_touching_inbox(
     inbox.accept.assert_not_called()
 
 
+def test_anonymous_invalidation_is_denied_even_without_mounted_secret() -> None:
+    # CI and cold-start services must never depend on a configured secret
+    # before refusing a request with no bearer credential.
+    inbox = Mock()
+    missing_secret = Mock(side_effect=OSError("credential not mounted"))
+    app = QualificationInvalidationApp(
+        cast(QualificationInvalidations, inbox), missing_secret
+    )
+    status, reply = exchange(app, b"{}", credential=None)
+    assert status == 401
+    assert reply == {"error": "invalidation_unauthorized"}
+    missing_secret.assert_not_called()
+    inbox.accept.assert_not_called()
+
+
 @pytest.mark.parametrize(
     ("body", "method", "content_type", "status"),
     [

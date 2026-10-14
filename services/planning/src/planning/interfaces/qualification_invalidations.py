@@ -36,6 +36,15 @@ class QualificationInvalidationApp:
             headers = list(scope["headers"])
             if len(headers) > 40 or scope.get("query_string"):
                 raise Rejected("request_bound", 413)
+            # Reject an absent or malformed bearer before credential-file IO.
+            # An unconfigured receiver still denies anonymous traffic as 401;
+            # an authenticated request remains fail-closed when its authority
+            # cannot be verified against the separately enrolled secret.
+            authorization = [v for k, v in headers if k.lower() == b"authorization"]
+            if (len(authorization) != 1
+                    or not authorization[0].startswith(b"Bearer ")
+                    or len(authorization[0]) == len(b"Bearer ")):
+                raise Rejected("invalidation_unauthorized", 401)
             # The read-only Assurance and outgoing Governance credentials cannot
             # stand in for a separately enrolled inbound invalidation principal.
             expected = self.secret_reader("PLANNING_ASSURANCE_INVALIDATION_CREDENTIAL_FILE")
@@ -48,12 +57,8 @@ class QualificationInvalidationApp:
                     expected, self.secret_reader(other)
                 ):
                     raise Rejected("invalidation_authority_not_independent", 503)
-            authorization = [v for k, v in headers if k.lower() == b"authorization"]
-            if (
-                len(authorization) != 1
-                or not hmac.compare_digest(
-                    authorization[0], b"Bearer " + expected.encode("ascii")
-                )
+            if not hmac.compare_digest(
+                authorization[0], b"Bearer " + expected.encode("ascii")
             ):
                 raise Rejected("invalidation_unauthorized", 401)
             content_type = [v for k, v in headers if k.lower() == b"content-type"]
