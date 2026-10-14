@@ -69,7 +69,7 @@ class PythonDenialExecutionTests(unittest.TestCase):
                     status = asyncio.run(python_denials.exchange(
                         app, method, python_denials.actual_path(template)
                     ))
-                    self.assertEqual(status, 401 if owner == "planning" or "placement-reservations" not in template else 423)
+                    self.assertEqual(status, 401)
 
     def test_wrong_status_is_unresolved_not_a_pass(self):
         operation = {

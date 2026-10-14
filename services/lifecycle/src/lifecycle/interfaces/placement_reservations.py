@@ -80,7 +80,10 @@ class PlacementReservationApp:
             # is never admissible as this caller's authoritative result.
             status = 200
         except Held as error:
-            status, payload = 423, {"error": str(error)}
+            # Authentication denials must not be disguised as reservation
+            # holds. No unauthenticated request can reach a reservation read.
+            status = 401 if str(error) == "placement_caller_denied" else 423
+            payload = {"error": str(error)}
         except Exception:
             status, payload = 503, {"error": "placement_owner_unavailable"}
         raw_response = json.dumps(payload, separators=(",", ":")).encode()

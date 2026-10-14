@@ -94,7 +94,7 @@ class OwnerBoundaryContracts(unittest.TestCase):
         self.assertEqual(status, 423)
         self.assertEqual(body, {"error": "placement_reservation_missing"})
         status, body = invoke(Service(), bearer="invalid")
-        self.assertNotEqual(status, 200)
+        self.assertEqual(status, 401)
         self.assertEqual(body, {"error": "placement_caller_denied"})
 
     def test_actual_owner_denies_invalid_and_unbounded_commands(self):

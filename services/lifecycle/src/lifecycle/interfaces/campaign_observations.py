@@ -35,7 +35,7 @@ class CampaignObservationApp:
             headers = list(scope["headers"])
             if len(headers) > 40 or any(k.lower() == b"content-encoding" for k, _ in headers):
                 raise Rejected("request_bound", 413)
-            token = single(headers, b"authorization")
+            token = single(headers, b"authorization", optional=True)
             if not re.fullmatch(r"Bearer [A-Za-z0-9_-]{32,4096}", token):
                 raise Rejected("observation_caller_denied", 401)
             if single(headers, b"content-type").split(";")[0] != "application/json":
