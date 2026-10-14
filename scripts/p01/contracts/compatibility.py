@@ -66,6 +66,41 @@ def check(root: Path, base_revision: str) -> dict:
         raise ValueError("Active published contract removed or changed: "
                          + ", ".join(modified))
 
+    # Retirement must be justified against the *previous* consumer graph, not
+    # merely by deleting both a release and its declarations in this change.
+    removed = previous - active
+    if removed:
+        try:
+            old_registry = json.loads(git("show", base_revision + ":architecture/contract-consumers.json"))
+        except (ValueError, json.JSONDecodeError) as error:
+            raise ValueError("Cannot establish previous contract consumers for retirement") from error
+        old_releases = {item["path"]: item for item in old_registry.get("active_releases", [])}
+        old_usage = {}
+        try:
+            old_usage = json.loads(git("show", base_revision + ":architecture/installed-contract-usage.json"))
+        except ValueError as error:
+            raise ValueError("Cannot establish previous installed contract usage for retirement") from error
+        references = {}
+        for item in old_registry.get("active_releases", []):
+            for dependency in item.get("depends_on", []):
+                references.setdefault(dependency, []).append(item["path"])
+        for path in sorted(removed):
+            item = old_releases.get(path)
+            if item is None:
+                raise ValueError("Unregistered prior canonical release cannot be retired: " + path)
+            blockers = []
+            if item.get("consumers"):
+                blockers.append("declared consumers " + repr(item["consumers"]))
+            if item.get("copies"):
+                blockers.append("installed copies " + repr(item["copies"]))
+            if references.get(path):
+                blockers.append("dependent releases " + repr(references[path]))
+            if any(row.get("canonical") == path for row in old_usage.get("copies", [])):
+                blockers.append("runtime loader registrations")
+            if blockers:
+                raise ValueError("Contract retirement requires verified consumer removal: "
+                                 + path + ": " + "; ".join(blockers))
+
     # A canonical deletion is permitted only as an actual worktree removal:
     # check_registry and runtime_inventory separately prohibit stale shipped
     # copies, undeclared source files, and dynamically loaded alias contracts.
