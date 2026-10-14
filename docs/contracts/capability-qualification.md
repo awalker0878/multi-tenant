@@ -71,6 +71,8 @@ provider support must remain held until those current, independently
 authenticated records exist; neither this matrix nor generated definitions
 grant runtime authority.
 
+Assurance derives the enrolled public-key fingerprint after cryptographic verification and rejects verifier-reserved identity fields within signed observer, reviewer, or receiving-owner claims. Mounted E3/E4 dossiers accept only the current V2 registry shape; removed V1 registry records cannot be read or silently downgraded to `unknown`.
+
 There are no version aliases, dual-running fallback handlers or migration
 compatibility shims in this implementation. The old `LEGACY_METHODS`
 generated symbol was replaced with `WIRE_METHODS` to describe the **active**

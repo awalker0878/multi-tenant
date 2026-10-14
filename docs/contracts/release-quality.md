@@ -48,7 +48,7 @@ cannot accept uncontrolled extra top-level input properties.
 ### JSON Schemas
 
 New schemas must declare JSON Schema 2020-12 and a unique HTTPS `$id` tied
-to the canonical filename/version. New top-level object schemas reject
+to the canonical filename/version. The `$id` must equal `https://schemas.multi-tenant.local/` followed by the exact canonical file path; foreign hosts, shadow directories, fragments, query aliases and alternate spelling are rejected. New top-level object schemas reject
 additional undeclared properties. An `$id` query or fragment cannot act as a shadow canonical identity. Event payload references must resolve to a valid draft-2020-12 schema, not just a plausible field list. Existing published schemas lacking IDs are
 not rewritten in place.
 

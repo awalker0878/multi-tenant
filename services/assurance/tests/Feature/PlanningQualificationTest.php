@@ -30,15 +30,38 @@ it('keeps exact tuple values typed and fails closed on ambiguous custody records
     config(['planning.qualification_registry_file' => $file]);
     $record = ['scope' => $this->body['qualification_scope'], 'status' => 'qualified'];
     try {
+        // Retired V1 wire records cannot be silently treated as unknown.
         file_put_contents($file, json_encode(['schema_version' => 1, 'records' => [$record]], JSON_THROW_ON_ERROR));
+        $this->postJson($this->path, $this->body)->assertStatus(503);
+        $current = ['record' => $record];
+        file_put_contents($file, json_encode(['schema_version' => 2, 'records' => [$current]], JSON_THROW_ON_ERROR));
         $body = $this->body;
         $body['qualification_scope']['installed_tuple']['api'] = true;
         $this->postJson($this->path, $body)->assertOk()->assertJsonPath('status', 'unknown');
-        $this->postJson($this->path, $this->body)->assertOk()->assertJsonPath('status', 'unknown');
-        file_put_contents($file, json_encode(['schema_version' => 1, 'records' => [$record, $record]], JSON_THROW_ON_ERROR));
+        // Exact-scope but unsigned V2 records require trust; never qualify.
+        $this->postJson($this->path, $this->body)->assertStatus(503);
+        file_put_contents($file, json_encode(['schema_version' => 2, 'records' => [$current, $current]], JSON_THROW_ON_ERROR));
         $this->postJson($this->path, $this->body)->assertStatus(503);
         file_put_contents($file, '{broken');
         $this->postJson($this->path, $this->body)->assertStatus(503);
+    } finally {
+        unlink($file);
+    }
+});
+
+it('rejects malformed current dossiers without interpreting partial or historical records', function (): void {
+    $file = tempnam(sys_get_temp_dir(), 'p05-invalid-v2-');
+    config(['planning.qualification_registry_file' => $file]);
+    try {
+        foreach ([
+            ['schema_version' => 1, 'records' => []],
+            ['schema_version' => 2, 'records' => ['non-list' => []]],
+            ['schema_version' => 2, 'records' => ['invalid']],
+            ['schema_version' => 2, 'records' => [['record' => ['scope' => 'untyped']]]],
+        ] as $invalid) {
+            file_put_contents($file, json_encode($invalid, JSON_THROW_ON_ERROR));
+            $this->postJson($this->path, $this->body)->assertStatus(503);
+        }
     } finally {
         unlink($file);
     }

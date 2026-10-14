@@ -25,20 +25,22 @@ final class ResolveQualification
             }
             $records = [$authorityHead['bundle']];
         } else {
-            // Mounted registries are explicitly a read-only legacy admission path.
+            // Mounted V2 dossiers are current, read-only evidence; retired
+            // registry formats are never accepted or interpreted.
             $path = config('planning.qualification_registry_file');
             if ($path === null) {
                 return $unknown;
             }
             $registry = $this->read($path);
-            if (($registry['schema_version'] ?? null) === 1) {
-                $legacy = array_filter($registry['records'] ?? [], fn (array $row): bool => NativeQualification::canonical($row['scope'] ?? null) === NativeQualification::canonical($scope));
-                abort_if(count($legacy) > 1, 503, 'qualification_conflict');
-
-                return $unknown;
+            abort_unless(($registry['schema_version'] ?? null) === 2
+                && is_array($registry['records'] ?? null)
+                && array_is_list($registry['records']), 503);
+            foreach ($registry['records'] as $entry) {
+                abort_unless(is_array($entry)
+                    && is_array($entry['record'] ?? null)
+                    && is_array($entry['record']['scope'] ?? null), 503);
             }
-            abort_unless(($registry['schema_version'] ?? null) === 2 && is_array($registry['records'] ?? null), 503);
-            $records = array_values(array_filter($registry['records'], fn (array $row): bool => NativeQualification::canonical($row['record']['scope'] ?? null) === NativeQualification::canonical($scope)));
+            $records = array_values(array_filter($registry['records'], fn (array $row): bool => NativeQualification::canonical($row['record']['scope']) === NativeQualification::canonical($scope)));
         }
         abort_if(count($records) > 1, 503, 'qualification_conflict');
         if ($records === []) {
