@@ -135,6 +135,16 @@ class ConformancePublisher:
                 prior = latest_restores.get(sample["dataset_id"])
                 if prior is None or sample["sequence"] > prior["sequence"]:
                     latest_restores[sample["dataset_id"]] = sample
+            # A qualified rollback/recovery outcome must include at least
+            # one fresh independent restoration/readback measurement. An
+            # empty recovery report must never qualify a recovery mode.
+            if not latest_restores and any(
+                outcome == "passed" and name.rsplit(":", 1)[-1] in {
+                    "rollback", "forward_recovery", "reverse_recovery"
+                }
+                for name, outcome in method_modes.items()
+            ):
+                raise NativeHeld("conformance_recovery_readback_required")
             if any(
                 r["outcome"] != "passed" or r["consistency_passed"] is not True
                 for r in latest_restores.values()

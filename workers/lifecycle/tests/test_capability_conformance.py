@@ -111,6 +111,25 @@ def test_failure_suspends_review_until_a_new_decision(tmp_path: Path) -> None:
     denied = json.loads(base64.b64decode(state["records"]["c" * 64]["content_base64"]))
     assert denied["adapter_conformant"] is False
     observed["cases"][missing] = original_method_case
+    # A native observer cannot sign a passing installed recovery method while
+    # returning an empty readback dataset. This must suspend that decision.
+    recovery = "method:" + next(iter(WIRE_METHODS)) + ":rollback"
+    observed["method_modes"][recovery] = "passed"
+    observed["cases"][recovery]["outcome"] = "passed"
+    observed["cases"][recovery].pop("reason", None)
+    publisher.publish(assignment | {"decision_sha256": "d" * 64})
+    state = json.loads(output.read_text())
+    denied = json.loads(base64.b64decode(state["records"]["d" * 64]["content_base64"]))
+    assert denied["adapter_conformant"] is False
+    assert state["suspended"]["d" * 64] == "conformance_recovery_readback_required"
+    observed["snapshot"] = {"recovery_measurements": [
+        {"dataset_id": "observed-dataset", "sequence": 1, "outcome": "passed",
+         "consistency_passed": True},
+    ]}
+    publisher.publish(assignment | {"decision_sha256": "e" * 64})
+    state = json.loads(output.read_text())
+    accepted = json.loads(base64.b64decode(state["records"]["e" * 64]["content_base64"]))
+    assert accepted["adapter_conformant"] is True
     artifact.write_text("drift")
     publisher.publish(assignment | {"decision_sha256": "b" * 64})
     assert "b" * 64 in json.loads(output.read_text())["suspended"]

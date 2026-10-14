@@ -49,6 +49,8 @@ fresh, scope-bound native case receipt. Missing results, contradictory states,
 stale observations and partial matrices fail closed in the worker signer,
 Inventory reader and Assurance reviewer.
 
+Passing installed rollback and recovery method/mode outcomes additionally require a nonempty, successful independent restoration/readback measurement; empty recovery evidence cannot silently qualify a method. Unsupported combinations remain explicit holds.
+
 Signed records and runtime observations are compared canonically: JSON
 object property ordering is not authority. E3/E4 approval remains tied to
 the exact installed tuple, reviewed inventory and provider evidence; no
