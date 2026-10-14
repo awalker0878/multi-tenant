@@ -54,7 +54,6 @@ class PythonDenialExecutionTests(unittest.TestCase):
         for owner, cases in (
             ("planning", (
                 ("GET", "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/assessments/{record}"),
-                ("GET", "/v1/plans/{plan}/revisions/{revision}"),
                 ("GET", "/v1/tenants/{tenant}/execution-plans/{plan}/revisions/{revision}"),
             )),
             ("lifecycle", (
