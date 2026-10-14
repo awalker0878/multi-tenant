@@ -145,64 +145,73 @@ defects and absent qualification claims remain explicit. Only the preflight
 evidence and this ledger are committed on the working branch.
 
 
-## Contract remediation checkpoint — 2026-10-14
+## Current remediation — 2026-10-14
 
-The current user instruction permits independent remediation while an external
-input is missing. The earlier Phase 2.0 stop condition no longer governs this
-work. Baseline remote HEAD was `37312b3c48538fc48f04f6abf59665c2c34b5c15`;
-main remains unauthorized. Overall qualification remains **INCOMPLETE**.
+The current user instruction authorizes independent remediation while deployment
+inputs remain unavailable. The earlier Phase 2.0 stop condition no longer governs
+this work. Initial remote HEAD was `37312b3c48538fc48f04f6abf59665c2c34b5c15`;
+first durable remediation checkpoint is `c90394c2df162a5f5cc38667636b2a20751e4ca0`.
+Main remains unauthorized. Overall qualification remains **INCOMPLETE**.
 
-### Confirmed repository defects corrected
+### Confirmed defects and resolutions
 
-- **P09 / Console producer mismatch (high):** the installed Planning migration
-  v1.6 response is authoritative. `MigrationSupport.read` leaked three internal
-  fields (`expires_at`, `api_compatibility`, `readiness`) into a closed public
-  response. Planning now computes readiness internally, retains its concrete
-  holds in the contracted `blockers`, preserves independent native E3/E4 flags,
-  and leaves full workload readiness on its separately contracted endpoint.
-  No published release, installed copy or schema assertion changed. No new
-  release is needed to restore the already published interface. The original
-  production implementation fails the new producer regression; the corrected
-  implementation and unchanged P09 validator pass.
-- **Malformed collection enrollment accepted (high):** the actual protected-file
-  loader accepted boolean schema versions and silently filtered unknown scopes,
-  missing owner fields, invalid IDs and unknown platform groups. It now rejects
-  these inputs and requires every source/target/owner attribute set. Fifteen real
-  file-loader tests pass; the original loader fails six negative controls.
-  Temporary test enrollment does not prove deployed enrollment or provenance.
-- **Required quality failures (medium):** fixed import, formatting and strict
-  typing defects across the five Python packages and four Laravel components.
-  Added pinned `types-jsonschema` development stubs to Lifecycle's manifest and
-  lock. No lint/type rule or assertion was disabled. Dynamic JSON fixture types
-  are explicit; null database results are asserted before indexing. Guarded
-  native policy checks now use direct raising branches so type narrowing follows
-  the actual fail-closed control flow.
+| Finding | Severity | Root cause and current correction |
+| --- | --- | --- |
+| P09 producer/Console mismatch | High | The old response omitted route expiry, API compatibility and route readiness from a closed schema. Publish `planning-migration-v2` with explicit required fields and closed readiness/compatibility schemas. Migrate the sole registered Console consumer, generators, source manifest and installed copy. The major release satisfies the unchanged strict publication policy, including Error v2 and scoped idempotency. No surviving published canonical bytes change. |
+| Malformed collection enrollment | High | The actual protected-file loader accepted boolean schema versions and silently filtered unknown scopes, missing owner fields, invalid IDs and extra platforms. Reject these inputs and require every source/target/owner attribute set. Fifteen real file-loader controls pass; original implementation fails six negative controls. Temporary enrollment is not deployed identity or provenance. |
+| Authentication counted as authorization | High | Missing-token denials could satisfy the report's authorization category. Separate authentication from current effective authority. Authorization receipts require authenticated current-authority denial and absence of unauthorized disclosure/mutation. Original proof admission accepts a forged missing-token authorization receipt; the corrected gate rejects it. |
+| Required source quality | Medium | Fixed import, formatting and strict typing defects across five Python and four Laravel components. Add pinned Lifecycle development stubs. No check or assertion is disabled. |
+| Relevant integration omitted | High | The existing PostgreSQL/TLS broker integration suite was on demand and absent from PR admission. Reuse it for relevant contract/runtime changes and require its outcome. Separate reusable concurrency groups by suite so integration cannot cancel artifact verification. |
+| Transient package download | External failure | First checkpoint's Assurance image failed on a GitHub archive HTTP/2 500. Extend the existing bounded network retry recognition to HTTP 50x; source failures remain non-retryable. No absent artifact earns a passing attestation. |
 
-### Executed checkpoint verification and limits
+The first checkpoint's narrower support projection was rejected by the existing
+API-compatibility acceptance test. The final correction preserves the richer
+public behavior in a deliberately versioned release. The cross-service wire
+regression reads the canonical test input in isolated Planning tests; independent
+installed-copy and Console adapter tests cover the consuming resource.
 
-- Existing canonical builder, contract validator, dependency registry,
-  installed-copy registry and runtime-binding discovery pass: 75 releases,
-  166 HTTP operations, 47 canonical dependency edges, 83 consumer relationships,
-  35 installed copies and nine components. No additional canonical retirement
-  is justified by repository evidence.
-- Five Python suites before the final P09/loader additions: 2,046 pass and 180
-  PostgreSQL-dependent cases skip. The 37 focused migration-support and loader
-  cases pass after those additions. These are bounded producer/control tests,
-  not complete authenticated runtime or deployment qualification.
-- PostgreSQL 16.15 binaries were acquired and an actual integration fixture was
-  attempted. The execution sandbox rejects `os.chown(..., 65534, 65534)` with
-  `OSError: [Errno 22] Invalid argument`; it cannot start that unprivileged cluster.
-  No fixture was rewritten or mocked to turn this into integration success.
-- PHP formatting was repaired using the pinned Pint formatter under an extracted
-  PHP 8.3 executable. Supported PHP 8.5.11 runtime and browser qualification must
-  come from executed CI; PHP 8.3 formatting is not that evidence.
-- Baseline CI `38591024838` was independently retrieved for the baseline HEAD;
-  its tested merge revision is `8eb1e6dcf0e5640d8e76a5fe0e1edcb2f1eda5c8`.
-  It confirms formatting/type failures and the strict red assurance aggregation.
-  It also passes nine built-image jobs and installed binding aggregation; those
-  results are baseline artifacts, not artifacts for the remediation checkpoint.
+### Query replay and release behavior
 
-The missing deployment-owned collection registry, authenticated broker/provider
-and custody qualification, complete authenticated operation/consumer evidence,
-and final-head installed artifacts remain unqualified. Continue independent
-verification and record exact CI evidence before claiming any completed phase.
+- Planning requires an Idempotency-Key after authenticating current workload and
+  actor authority. Mutation commands use the existing immutable command ledger.
+- Query receipts store only a request fingerprint and a read-only marker in that
+  same Planning-owned ledger. They cannot replay returned data or grant authority.
+  Every retry re-authenticates, re-authorizes and recomputes current readiness.
+- Changed payload/operation reuse and expired keys fail closed. The new release's
+  seven-day lifetime is applied explicitly to its migration commands; other
+  active APIs retain their own idempotency contracts.
+- Console sends query keys, requires mutation keys, validates the installed v2
+  response and Error v2 wire, and rejects incompatible error envelopes.
+
+### Current verification and limits
+
+The current canonical tree contains 75 releases and 166 HTTP operations. The
+replacement adds one real Error v2 dependency: 48 canonical edges, 83 registered
+consumer relationships, 35 installed copies and nine deployable components.
+The previous release/source/copy is removed after all registered call sites and
+projections migrate. No additional release has a proven safe retirement.
+
+Local Planning verification: 603 passed / 22 PostgreSQL-dependent cases skipped.
+New query-key concurrency, scope, changed-payload and expiry tests require real
+PostgreSQL and are included in required CI. Skips are not integration evidence.
+
+PostgreSQL 16.15 acquisition and an actual local integration fixture were attempted;
+the sandbox rejects `os.chown(..., 65534, 65534)` with `OSError: [Errno 22]`.
+Do not rewrite the fixture or mock the database to report qualification. CI's
+supported unprivileged PostgreSQL environment executes those requirements.
+PHP formatting uses extracted PHP 8.3/Pint; supported PHP 8.5.11 runtime, real
+broker/persistence and browser evidence must be independently retrieved from CI.
+
+First checkpoint CI `38595120026` tested merge revision
+`bfe7460d95f12f37faf2763baf3c8861869c470e`. Four Python components, all four Laravel
+quality jobs, all three live Laravel route jobs, E2 authority transactions and
+eight of nine built-image jobs pass. Planning and native failures identified the
+response and isolated-test issues corrected above; the missing Assurance image
+prevents artifact aggregation. Complete operation qualification remains red.
+These results do not qualify the replacement release's final commit.
+
+The missing deployment-owned collection registry and enrolled manifest provenance
+remain a Phase 1 blocker. Installed native provider/custody E3/E4 evidence remains
+unavailable. Complete authenticated per-operation/consumer and event recovery
+qualification must still be established from applicable executed integration
+results. Do not describe this ledger, a source build or E2 fixtures as completion.

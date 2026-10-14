@@ -5,6 +5,7 @@ import json
 import re
 from collections.abc import Callable
 from typing import Any
+from uuid import uuid4
 
 from uvicorn._types import ASGIReceiveCallable, ASGISendCallable, Scope
 
@@ -12,7 +13,7 @@ from planning.application.migration_flows import MigrationFlows
 from planning.application.migration_plans import MigrationPlans
 from planning.application.migration_support import MigrationSupport
 from planning.application.ports import Authority
-from planning.domain.model import Rejected, decode, identifier, integer, sha, shape
+from planning.domain.model import Actor, Rejected, decode, identifier, integer, sha, shape
 from planning.interfaces.planning import UUID, single
 
 
@@ -24,9 +25,11 @@ class MigrationPreparationApp:
         plans: MigrationPlans | None = None,
         support: MigrationSupport | None = None,
         flows: MigrationFlows | None = None,
+        register_query: Callable[[Actor, str, str, dict[str, Any]], None] | None = None,
     ) -> None:
         self.authority, self.prepare = authority, prepare
         self.plans, self.support, self.flows = plans, support, flows
+        self.register_query = register_query
 
     async def __call__(
         self, scope: Scope, receive: ASGIReceiveCallable, send: ASGISendCallable
@@ -93,6 +96,7 @@ class MigrationPreparationApp:
                 environment,
                 site,
             )
+            key = identifier(single(headers, b"idempotency-key"))
             if route[4] == "migration-support":
                 if self.support is None:
                     raise Rejected("migration_support_unavailable", 503)
@@ -117,7 +121,7 @@ class MigrationPreparationApp:
                         site,
                         delegation,
                         body,
-                        identifier(single(headers, b"idempotency-key")),
+                        key,
                     )
                     status = 200
             elif route[4] == "migration-plan-options":
@@ -132,7 +136,7 @@ class MigrationPreparationApp:
                     self.plans.create,
                     actor,
                     body,
-                    identifier(single(headers, b"idempotency-key")),
+                    key,
                     delegation,
                 )
                 status = 201
@@ -150,10 +154,24 @@ class MigrationPreparationApp:
                 )
                 payload = {"binding": binding, "native_write_authorized": False}
                 status = 200
+            if not complete and not flow_save:
+                if self.register_query is None:
+                    raise Rejected("migration_query_idempotency_unavailable", 503)
+                await asyncio.to_thread(self.register_query, actor, key, route[4], body)
         except Rejected as e:
             status, payload = e.status, {"error": e.reason}
         except Exception:
             status, payload = 503, {"error": "migration_preparation_unavailable"}
+        if status >= 400:
+            reason = payload["error"]
+            if not isinstance(reason, str) or not re.fullmatch(r"[a-z][a-z0-9_.-]{2,95}", reason):
+                reason = "migration_preparation_unavailable"
+            payload = {
+                "code": reason,
+                "message": reason.replace("_", " "),
+                "correlation_id": str(uuid4()),
+                "retryable": status >= 500,
+            }
         raw = json.dumps(payload, separators=(",", ":"), allow_nan=False).encode()
         await send(
             {

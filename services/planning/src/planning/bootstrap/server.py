@@ -188,7 +188,12 @@ class PlanningRouter:
         )
         migrations = MigrationPlans(self.planning.planning, validation.migration, visible_recipes)
         self.migration = MigrationPreparationApp(
-            self.planning.authority, prepare_migration, migrations, self.support, self.flows
+            self.planning.authority,
+            prepare_migration,
+            migrations,
+            self.support,
+            self.flows,
+            register_query=self.planning.planning.register_query,
         )
         native = NativePlans(self.planning.planning, validation.native)
         self.native = NativePlansApp(self.planning.authority, native)

@@ -155,7 +155,7 @@ class ContractIntegrityTests(unittest.TestCase):
         for name, count in (
             ("catalogue-v1.0.1.json", 18),
             ("inventory-v1.9.json", 29),
-            ("planning-migration-v1.6.json", 7),
+            ("planning-migration-v2.json", 7),
         ):
             with self.subTest(name=name):
                 paths, operations = current_api(name)
@@ -163,7 +163,7 @@ class ContractIntegrityTests(unittest.TestCase):
                 self.assertEqual(operations, count)
 
     def test_missing_path_parameter_is_rejected(self):
-        name = "planning-migration-v1.6.json"
+        name = "planning-migration-v2.json"
         spec = load("contracts/openapi/" + name)
         path = next(iter(spec["paths"]))
         operation = spec["paths"][path]["post"]

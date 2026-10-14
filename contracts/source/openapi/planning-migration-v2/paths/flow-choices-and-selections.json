@@ -39,6 +39,18 @@
             "type": "string",
             "minLength": 1
           }
+        },
+        {
+          "in": "header",
+          "name": "Idempotency-Key",
+          "required": true,
+          "description": "UUID scoped to the authenticated tenant/actor, operation and request digest. Changed-payload reuse is rejected. Query retries re-evaluate current authority and freshness.",
+          "schema": {
+            "type": "string",
+            "format": "uuid",
+            "minLength": 36,
+            "maxLength": 36
+          }
         }
       ],
       "requestBody": {
@@ -67,7 +79,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Problem"
+                "$ref": "#/components/schemas/Error"
               }
             }
           }
@@ -77,7 +89,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Problem"
+                "$ref": "#/components/schemas/Error"
               }
             }
           }
@@ -87,7 +99,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Problem"
+                "$ref": "#/components/schemas/Error"
               }
             }
           }
@@ -97,7 +109,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Problem"
+                "$ref": "#/components/schemas/Error"
               }
             }
           }
@@ -107,7 +119,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Problem"
+                "$ref": "#/components/schemas/Error"
               }
             }
           }
@@ -117,7 +129,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Problem"
+                "$ref": "#/components/schemas/Error"
               }
             }
           }
@@ -127,7 +139,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Problem"
+                "$ref": "#/components/schemas/Error"
               }
             }
           }
@@ -137,7 +149,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Problem"
+                "$ref": "#/components/schemas/Error"
               }
             }
           }
@@ -147,7 +159,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Problem"
+                "$ref": "#/components/schemas/Error"
               }
             }
           }
@@ -157,11 +169,22 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Problem"
+                "$ref": "#/components/schemas/Error"
               }
             }
           }
         }
+      },
+      "x-idempotency": {
+        "scope": [
+          "tenant_id",
+          "actor_id",
+          "operation_id",
+          "request_digest"
+        ],
+        "ttl_seconds": 604800,
+        "conflict_status": 409,
+        "revalidate_on_retry": true
       }
     }
   },
@@ -207,12 +230,15 @@
           }
         },
         {
-          "name": "Idempotency-Key",
           "in": "header",
+          "name": "Idempotency-Key",
           "required": true,
+          "description": "UUID scoped to the authenticated tenant/actor, operation and request digest. Changed-payload reuse is rejected. Query retries re-evaluate current authority and freshness.",
           "schema": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "minLength": 36,
+            "maxLength": 36
           }
         }
       ],
@@ -242,7 +268,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Problem"
+                "$ref": "#/components/schemas/Error"
               }
             }
           }
@@ -252,7 +278,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Problem"
+                "$ref": "#/components/schemas/Error"
               }
             }
           }
@@ -262,7 +288,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Problem"
+                "$ref": "#/components/schemas/Error"
               }
             }
           }
@@ -272,7 +298,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Problem"
+                "$ref": "#/components/schemas/Error"
               }
             }
           }
@@ -282,7 +308,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Problem"
+                "$ref": "#/components/schemas/Error"
               }
             }
           }
@@ -292,7 +318,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Problem"
+                "$ref": "#/components/schemas/Error"
               }
             }
           }
@@ -302,7 +328,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Problem"
+                "$ref": "#/components/schemas/Error"
               }
             }
           }
@@ -312,7 +338,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Problem"
+                "$ref": "#/components/schemas/Error"
               }
             }
           }
@@ -322,7 +348,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Problem"
+                "$ref": "#/components/schemas/Error"
               }
             }
           }
@@ -332,11 +358,22 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Problem"
+                "$ref": "#/components/schemas/Error"
               }
             }
           }
         }
+      },
+      "x-idempotency": {
+        "scope": [
+          "tenant_id",
+          "actor_id",
+          "operation_id",
+          "request_digest"
+        ],
+        "ttl_seconds": 604800,
+        "conflict_status": 409,
+        "revalidate_on_retry": true
       }
     }
   }

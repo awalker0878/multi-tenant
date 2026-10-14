@@ -405,6 +405,55 @@
                   "guest_outcomes_sha256": {
                     "type": "string",
                     "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "expires_at": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "api_compatibility": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "status": {
+                        "enum": [
+                          "eligible",
+                          "blocked",
+                          "conditional",
+                          "unknown"
+                        ]
+                      },
+                      "operationally_eligible": {
+                        "type": "boolean"
+                      },
+                      "cases": {
+                        "type": "array",
+                        "maxItems": 256,
+                        "items": {
+                          "$ref": "#/components/schemas/MigrationReadinessPayload/$defs/case"
+                        }
+                      },
+                      "administrator_alerts": {
+                        "type": "array",
+                        "maxItems": 256,
+                        "items": {
+                          "type": "object"
+                        }
+                      },
+                      "native_write_authorized": {
+                        "const": false
+                      }
+                    },
+                    "required": [
+                      "status",
+                      "operationally_eligible",
+                      "cases",
+                      "administrator_alerts",
+                      "native_write_authorized"
+                    ]
+                  },
+                  "readiness": {
+                    "$ref": "#/components/schemas/MigrationRouteReadiness"
                   }
                 },
                 "required": [
@@ -423,7 +472,10 @@
                   "exclusions",
                   "blockers",
                   "native_qualified",
-                  "operationally_accepted"
+                  "operationally_accepted",
+                  "expires_at",
+                  "api_compatibility",
+                  "readiness"
                 ]
               }
             }

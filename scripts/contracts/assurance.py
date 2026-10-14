@@ -20,7 +20,7 @@ from openapi_spec_validator import validate_spec
 ROOT = Path(__file__).resolve().parents[2]
 METHODS = frozenset({"get", "post", "put", "patch", "delete"})
 KINDS = ("openapi", "asyncapi", "schemas", "capabilities", "platforms")
-CLAIMS = ("route", "producer", "consumer", "authorization", "tenant_isolation")
+CLAIMS = ("route", "producer", "consumer", "authentication", "authorization", "tenant_isolation")
 PROVIDER = {
     "contracts/capabilities/definitions-v1.json":
         "contracts/schemas/capabilities/definitions-v1.json",
@@ -165,7 +165,8 @@ def assess(root: Path = ROOT, observations: list[dict] | None = None,
             raise ValueError(f"Non-executable evidence is inadmissible: {key}")
         appropriate = {
             "route": "live-router", "producer": "live-producer",
-            "consumer": "live-consumer", "authorization": "live-denial",
+            "consumer": "live-consumer", "authentication": "live-denial",
+            "authorization": "live-denial",
             "tenant_isolation": "live-denial",
         }[claim]
         if observation["source"] != appropriate or observation.get("result") != "PASS":
@@ -173,11 +174,23 @@ def assess(root: Path = ROOT, observations: list[dict] | None = None,
         if not isinstance(observation.get("test"), str) or not observation["test"].strip():
             raise ValueError(f"Missing executable test identity: {key} {claim}")
         # Missing or invalid credentials cannot prove authenticated tenant isolation.
-        if claim == "authorization" and (
+        if claim == "authentication" and (
             observation.get("denial_kind") not in {"missing-credential", "invalid-credential"}
             or observation.get("status_code") not in (401, 403)
         ):
-            raise ValueError(f"Authorization evidence lacks a real credential denial: {key}")
+            raise ValueError(f"Authentication evidence lacks a real credential denial: {key}")
+        if claim == "authorization" and (
+            observation.get("authenticated") is not True
+            or observation.get("authority_checked") != "current-effective-authority"
+            or observation.get("denial_kind") not in {
+                "revoked-membership", "revoked-role", "revoked-delegation",
+                "wrong-scope", "unauthorized-service", "insufficient-authority",
+            }
+            or observation.get("status_code") not in (403, 404)
+            or observation.get("unauthorized_disclosure") is not False
+            or observation.get("unauthorized_mutation") is not False
+        ):
+            raise ValueError(f"Authorization evidence requires an authenticated current-authority denial without effects: {key}")
         if claim == "tenant_isolation" and (
             observation.get("denial_kind") != "cross-tenant"
             or observation.get("authenticated") is not True
@@ -197,7 +210,7 @@ def assess(root: Path = ROOT, observations: list[dict] | None = None,
     for key, operation in operations.items():
         required = ["route", "producer", "consumer"]
         if operation["security_required"]:
-            required.append("authorization")
+            required.extend(("authentication", "authorization"))
             if operation["tenant_isolation_required"]:
                 required.append("tenant_isolation")
         missing = [claim for claim in required if claim not in proofs[key]]

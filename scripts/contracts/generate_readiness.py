@@ -13,7 +13,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / "contracts/schemas/planning/migration-readiness-v2.2.json"
-FRAGMENT = (ROOT / "contracts/source/openapi/planning-migration-v1.6/"
+FRAGMENT = (ROOT / "contracts/source/openapi/planning-migration-v2/"
             "components-schemas/workload-readiness.json")
 
 

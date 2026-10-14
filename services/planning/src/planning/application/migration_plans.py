@@ -119,7 +119,7 @@ class MigrationPlans:
             }
         )
         with self.planning.database.transaction() as tx:
-            prior = self.planning.retry(tx, actor, key, fingerprint)
+            prior = self.planning.retry(tx, actor, key, fingerprint, max_age=604800)
             if prior:
                 return prior
         base = self.planning.get(

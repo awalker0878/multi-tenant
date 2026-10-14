@@ -1,7 +1,7 @@
 {
-  "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/migration-preparations": {
+  "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/migration-plan-options": {
     "post": {
-      "operationId": "prepareCurrentMigration",
+      "operationId": "migrationPlanOptions",
       "parameters": [
         {
           "name": "tenant",
@@ -38,6 +38,18 @@
           "schema": {
             "type": "string",
             "minLength": 1
+          }
+        },
+        {
+          "in": "header",
+          "name": "Idempotency-Key",
+          "required": true,
+          "description": "UUID scoped to the authenticated tenant/actor, operation and request digest. Changed-payload reuse is rejected. Query retries re-evaluate current authority and freshness.",
+          "schema": {
+            "type": "string",
+            "format": "uuid",
+            "minLength": 36,
+            "maxLength": 36
           }
         }
       ],
@@ -57,7 +69,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Preparation"
+                "$ref": "#/components/schemas/MigrationOptions"
               }
             }
           }
@@ -67,7 +79,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Problem"
+                "$ref": "#/components/schemas/Error"
               }
             }
           }
@@ -77,7 +89,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Problem"
+                "$ref": "#/components/schemas/Error"
               }
             }
           }
@@ -87,7 +99,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Problem"
+                "$ref": "#/components/schemas/Error"
               }
             }
           }
@@ -97,7 +109,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Problem"
+                "$ref": "#/components/schemas/Error"
               }
             }
           }
@@ -107,7 +119,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Problem"
+                "$ref": "#/components/schemas/Error"
               }
             }
           }
@@ -117,7 +129,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Problem"
+                "$ref": "#/components/schemas/Error"
               }
             }
           }
@@ -127,7 +139,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Problem"
+                "$ref": "#/components/schemas/Error"
               }
             }
           }
@@ -137,7 +149,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Problem"
+                "$ref": "#/components/schemas/Error"
+              }
+            }
+          }
+        },
+        "423": {
+          "description": "Current commissioning, qualified base plan or migration inputs are held",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Error"
               }
             }
           }
@@ -147,17 +169,29 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Problem"
+                "$ref": "#/components/schemas/Error"
               }
             }
           }
         }
+      },
+      "summary": "Find currently composable migration recipes for a reviewed VM",
+      "x-idempotency": {
+        "scope": [
+          "tenant_id",
+          "actor_id",
+          "operation_id",
+          "request_digest"
+        ],
+        "ttl_seconds": 604800,
+        "conflict_status": 409,
+        "revalidate_on_retry": true
       }
     }
   },
-  "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/migration-plans": {
+  "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/migration-support": {
     "post": {
-      "operationId": "composeCurrentMigrationPlan",
+      "operationId": "readMigrationSupport",
       "parameters": [
         {
           "name": "tenant",
@@ -197,12 +231,15 @@
           }
         },
         {
-          "name": "Idempotency-Key",
           "in": "header",
+          "name": "Idempotency-Key",
           "required": true,
+          "description": "UUID scoped to the authenticated tenant/actor, operation and request digest. Changed-payload reuse is rejected. Query retries re-evaluate current authority and freshness.",
           "schema": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "minLength": 36,
+            "maxLength": 36
           }
         }
       ],
@@ -211,18 +248,28 @@
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/components/schemas/ComposeMigration"
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "site_id": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "required": [
+                "site_id"
+              ]
             }
           }
         }
       },
       "responses": {
-        "201": {
-          "description": "Immutable complete plan proposal. Independent approval and native admission remain required.",
+        "200": {
+          "description": "Exact current review binding. This preparation is not a persisted, approved or executable MigrationPlan. Cache-Control: no-store, private.",
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Receipt"
+                "$ref": "#/components/schemas/MigrationSupport"
               }
             }
           }
@@ -232,7 +279,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Problem"
+                "$ref": "#/components/schemas/Error"
               }
             }
           }
@@ -242,7 +289,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Problem"
+                "$ref": "#/components/schemas/Error"
               }
             }
           }
@@ -252,7 +299,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Problem"
+                "$ref": "#/components/schemas/Error"
               }
             }
           }
@@ -262,7 +309,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Problem"
+                "$ref": "#/components/schemas/Error"
               }
             }
           }
@@ -272,7 +319,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Problem"
+                "$ref": "#/components/schemas/Error"
               }
             }
           }
@@ -282,7 +329,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Problem"
+                "$ref": "#/components/schemas/Error"
               }
             }
           }
@@ -292,7 +339,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Problem"
+                "$ref": "#/components/schemas/Error"
               }
             }
           }
@@ -302,7 +349,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Problem"
+                "$ref": "#/components/schemas/Error"
               }
             }
           }
@@ -312,7 +359,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Problem"
+                "$ref": "#/components/schemas/Error"
               }
             }
           }
@@ -322,11 +369,23 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Problem"
+                "$ref": "#/components/schemas/Error"
               }
             }
           }
         }
+      },
+      "summary": "Read all nine directed support states for this scope",
+      "x-idempotency": {
+        "scope": [
+          "tenant_id",
+          "actor_id",
+          "operation_id",
+          "request_digest"
+        ],
+        "ttl_seconds": 604800,
+        "conflict_status": 409,
+        "revalidate_on_retry": true
       }
     }
   }

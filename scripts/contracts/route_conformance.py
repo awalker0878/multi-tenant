@@ -320,7 +320,7 @@ def verify_planning_migration(root: Path = ROOT) -> int:
     import asyncio
     from planning.interfaces.migration import MigrationPreparationApp
     app = MigrationPreparationApp(authority=None, prepare=lambda *args: {})
-    spec = json.loads((root / "contracts/openapi/planning-migration-v1.6.json").read_text())
+    spec = json.loads((root / "contracts/openapi/planning-migration-v2.json").read_text())
     declared = routes_in_openapi(spec)
     from planning.bootstrap.server import MIGRATION_SUFFIXES
     contracted = {"/" + path.rsplit("/", 1)[-1] for method, path in declared if method == "POST"}
@@ -584,7 +584,7 @@ def compare_composed_routes(owner: str, runtime: set[tuple[str, str]],
 def verify_python_composition(root: Path = ROOT) -> int:
     from planning.bootstrap.server import HTTP_OPERATIONS as planning_routes
     from lifecycle.bootstrap.server import HTTP_OPERATIONS as lifecycle_routes
-    return (compare_composed_routes("Planning", set(planning_routes), tuple(["planning-v1.2.json","planning-migration-v1.6.json","planning-native-v1.json","planning-immutable-plan-v2.json","planning-lifecycle-reads-v1.json","planning-qualification-events-v1.json"]), root)
+    return (compare_composed_routes("Planning", set(planning_routes), tuple(["planning-v1.2.json","planning-migration-v2.json","planning-native-v1.json","planning-immutable-plan-v2.json","planning-lifecycle-reads-v1.json","planning-qualification-events-v1.json"]), root)
             + compare_composed_routes("Lifecycle", set(lifecycle_routes), tuple(["lifecycle-v1.json","lifecycle-migration-campaigns-v1.json","lifecycle-internal-authority-v1.json"]), root))
 
 

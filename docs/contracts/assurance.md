@@ -11,21 +11,24 @@ Schema, capability and platform contracts.
 A syntactically valid contract, byte-identical installed schema, generated type,
 existing route or named test is **not qualified producer/consumer behavior**.
 
-Every HTTP operation must have five independently measurable categories, with
-authorization and tenant-isolation cases required when the operation declares
-security:
+Every HTTP operation must have independently measurable categories, with
+authentication, effective authorization and tenant-isolation cases required when
+the operation declares security:
 
 - `route`: a real service router/route:list check matched its exact method/path
 - `producer`: the actual application returned an accepted payload validated
   against the active operation response schema
 - `consumer`: the actual installed consumer accepted the producer-shaped
   payload and rejected invalid or stale input
-- `authorization`: an executable boundary rejected a missing/invalid caller
+- `authentication`: an executable boundary rejected a missing/invalid caller
+- `authorization`: an authenticated caller was denied by current effective
+  authority (revoked membership/role/delegation, wrong scope or unauthorized
+  service identity), with no unauthorized disclosure or mutation
 - `tenant_isolation`: an authenticated cross-tenant request was independently
   denied, not merely rejected for missing headers; receipts require different
   credential and requested tenant scopes, authentication, and a real 403/404
   (shared contract-platform health diagnostics are not tenant-authority calls;
-  protected health checks still require independent authorization proof)
+  protected health checks still require authentication and authority proof)
 
 A policy hold (423) is not proof of tenant isolation: it may be caused by missing
 capacity, stale qualification, or another policy failure. A qualifying test must
@@ -111,3 +114,26 @@ python scripts/contracts/combine_assurance.py \
 No new canonical compatibility layer, alias, runtime shim or legacy test is
 introduced by this phase. Removed versions are not retained as additional worktree artifacts. Git commit
 history remains the source of prior source revisions.
+
+
+## Remediation qualification limits
+
+Authentication rejection cannot qualify effective authorization. A credential
+probe emits only `authentication`; `authorization` admission requires an
+independently authenticated current-authority denial without unauthorized effects.
+The gate rejects a missing-token receipt relabelled as authorization. This minimum
+boundary model does not by itself prove every token lifecycle, cache, worker,
+replay, recovery or installed provider requirement in the remediation ledger.
+
+Runtime integration now reuses the existing integration jobs in
+`qualification.yml` for relevant contract/runtime changes and is required by
+`CI / Required`. Integration and artifact calls have separate concurrency keys;
+otherwise one reusable invocation could cancel the other. No fourth workflow
+or parallel validation framework was added.
+
+Source-only canonical validation definitions have no invented remote service
+consumer. Their producer is the owning definition/generation pipeline and their
+consumer is the actual validator or projection identified by dependency discovery.
+Missing executable validation evidence remains unverified. Local owner fixtures,
+route declarations and generated copies cannot qualify an external deployment,
+TLS broker or native E3/E4 environment.

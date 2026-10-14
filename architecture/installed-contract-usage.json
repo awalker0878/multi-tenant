@@ -107,15 +107,15 @@
       "ci": ".github/workflows/ci.yml"
     },
     {
-      "copy": "apps/console/resources/contracts/planning-migration-v1.6.json",
-      "canonical": "contracts/openapi/planning-migration-v1.6.json",
+      "copy": "apps/console/resources/contracts/planning-migration-v2.json",
+      "canonical": "contracts/openapi/planning-migration-v2.json",
       "loader": "apps/console/app/Infrastructure/Planning/PlanningClient.php",
       "load_kind": "literal",
       "packaging": "apps/console/Dockerfile",
       "packaging_marker": "COPY --from=dependencies /app/resources/contracts/ ./resources/contracts/",
       "package_data": null,
       "package_data_marker": null,
-      "generator": "contracts/source/openapi/planning-migration-v1.6/manifest.json",
+      "generator": "contracts/source/openapi/planning-migration-v2/manifest.json",
       "generation_mode": "generated_or_source_assembled",
       "ci": ".github/workflows/ci.yml"
     },

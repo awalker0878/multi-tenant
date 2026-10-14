@@ -66,6 +66,7 @@ class AssuranceCoverageTests(unittest.TestCase):
                 "route": "live-router",
                 "producer": "live-producer",
                 "consumer": "live-consumer",
+                "authentication": "live-denial",
                 "authorization": "live-denial",
                 "tenant_isolation": "live-denial",
             }[claim],
@@ -74,6 +75,10 @@ class AssuranceCoverageTests(unittest.TestCase):
             "test": "service-owned-executable-test",
             **({
                 "denial_kind": "missing-credential", "status_code": 401,
+            } if claim == "authentication" else {
+                "denial_kind": "insufficient-authority", "authenticated": True,
+                "authority_checked": "current-effective-authority", "status_code": 403,
+                "unauthorized_disclosure": False, "unauthorized_mutation": False,
             } if claim == "authorization" else {
                 "denial_kind": "cross-tenant", "authenticated": True,
                 "credential_tenant": "10000000-0000-4000-8000-000000000001",
@@ -95,16 +100,16 @@ class AssuranceCoverageTests(unittest.TestCase):
         first = assess(self.root, [self.evidence("route")])
         self.assertEqual(first["summary"]["qualified_http_operations"], 0)
         self.assertEqual(first["coverage"][0]["missing"],
-                         ["producer", "consumer", "authorization", "tenant_isolation"])
+                         ["producer", "consumer", "authentication", "authorization", "tenant_isolation"])
 
     def test_all_measured_claims_required_for_qualification(self):
-        claims = ["route", "producer", "consumer", "authorization", "tenant_isolation"]
+        claims = ["route", "producer", "consumer", "authentication", "authorization", "tenant_isolation"]
         data = assess(self.root, [self.evidence(claim) for claim in claims])
         self.assertEqual(data["summary"]["qualified_http_operations"], 1)
-        self.assertEqual(data["summary"]["verified_claims"], 5)
+        self.assertEqual(data["summary"]["verified_claims"], 6)
 
     def test_release_gate_rejects_unattested_evidence(self):
-        claims = ["route", "producer", "consumer", "authorization", "tenant_isolation"]
+        claims = ["route", "producer", "consumer", "authentication", "authorization", "tenant_isolation"]
         rows = [self.evidence(claim) for claim in claims]
         with patch.dict(os.environ, {
             "GITHUB_RUN_ID": "123", "GITHUB_RUN_ATTEMPT": "2",
@@ -156,14 +161,29 @@ class AssuranceCoverageTests(unittest.TestCase):
         spoofed["status_code"] = 423
         with self.assertRaisesRegex(ValueError, "authenticated cross-tenant denial"):
             assess(self.root, [spoofed])
-        spoofed = self.evidence("authorization")
+        spoofed = self.evidence("authentication")
         spoofed["status_code"] = 404
         with self.assertRaisesRegex(ValueError, "real credential denial"):
             assess(self.root, [spoofed])
 
+    def test_missing_credentials_cannot_qualify_effective_authorization(self):
+        forged = self.evidence("authentication")
+        forged["claim"] = "authorization"
+        with self.assertRaisesRegex(ValueError, "authenticated current-authority"):
+            assess(self.root, [forged])
+        for field, value in (
+            ("authenticated", False), ("authority_checked", "cached"),
+            ("denial_kind", "missing-credential"), ("status_code", 503),
+            ("unauthorized_mutation", True), ("unauthorized_disclosure", True),
+        ):
+            forged = self.evidence("authorization")
+            forged[field] = value
+            with self.assertRaisesRegex(ValueError, "authenticated current-authority"):
+                assess(self.root, [forged])
+
     def test_new_owner_operation_is_not_silently_qualified(self):
         all_claims = [self.evidence(x) for x in (
-            "route", "producer", "consumer", "authorization", "tenant_isolation"
+            "route", "producer", "consumer", "authentication", "authorization", "tenant_isolation"
         )]
         doc = json.loads((self.root / self.api).read_text())
         doc["paths"]["/v1/hidden"] = {"post": {
@@ -219,7 +239,7 @@ class AssuranceCoverageTests(unittest.TestCase):
         result = assess(self.root)
         self.assertEqual(
             result["coverage"][0]["required"],
-            ["route", "producer", "consumer", "authorization"],
+            ["route", "producer", "consumer", "authentication", "authorization"],
         )
         self.assertNotIn("tenant_isolation", result["coverage"][0]["missing"])
 

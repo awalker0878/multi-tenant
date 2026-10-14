@@ -100,7 +100,7 @@ class HttpRouteConformanceTests(unittest.TestCase):
                         if isinstance(assignment, ast.Assign)
                         and any(isinstance(t, ast.Name) and t.id == "MIGRATION_SUFFIXES"
                                 for t in assignment.targets))
-        api = json.loads((ROOT / "contracts/openapi/planning-migration-v1.6.json").read_text())
+        api = json.loads((ROOT / "contracts/openapi/planning-migration-v2.json").read_text())
         contracted = {"/" + path.rsplit("/", 1)[-1]
                       for method, path in routes_in_openapi(api) if method == "POST"}
         self.assertEqual(set(variants), contracted)
@@ -129,7 +129,7 @@ class HttpRouteConformanceTests(unittest.TestCase):
                               ("lifecycle-native-jobs", 4),
                               ("lifecycle-worker-effects", 2)):
             observations = prove(app, root=ROOT)
-            denials = [row for row in observations if row["claim"] == "authorization"]
+            denials = [row for row in observations if row["claim"] == "authentication"]
             self.assertEqual(len(denials), expected)
             self.assertEqual(len([row for row in observations if row["claim"] == "route"]),
                              expected)

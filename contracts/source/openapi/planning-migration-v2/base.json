@@ -1,0 +1,21 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Planning migration preparation and immutable composition",
+    "version": "2.0.0",
+    "description": "Current Inventory bindings, immutable composition, owner network choices and strictly typed route/workload readiness. Every request requires current scoped authority and a UUID Idempotency-Key; queries recompute current readiness on retry rather than reuse cached authority. Errors use the canonical Error v2 envelope. No response grants native execution."
+  },
+  "security": [
+    {
+      "Workload": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "Workload": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  }
+}

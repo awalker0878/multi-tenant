@@ -30,7 +30,7 @@ installed release before interpreting an authority or business decision.
 | Catalogue HTTP | `openapi/catalogue-v1.0.1.json` | Console |
 | Inventory HTTP | `openapi/inventory-v1.9.json` | Console |
 | Planning HTTP | `openapi/planning-v1.2.json` | Console |
-| Planning migration | `openapi/planning-migration-v1.6.json` | Console |
+| Planning migration | `openapi/planning-migration-v2.json` | Console |
 | Lifecycle native jobs | `openapi/lifecycle-native-jobs-v1.1.json` | Console |
 | Inventory planning input | `schemas/planning/inventory-input-v2.json` | Planning |
 | Inventory migration input | `schemas/planning/migration-input-v4.json` | Planning |

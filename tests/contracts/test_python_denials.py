@@ -94,7 +94,7 @@ class PythonDenialExecutionTests(unittest.TestCase):
         self.assertEqual(unresolved, ["planning no-secured-runtime-operations-exercised"])
 
     def test_cli_returns_failure_and_preserves_diagnostics_on_partial_proof(self):
-        qualified = {"key": "verified", "claim": "authorization"}
+        qualified = {"key": "verified", "claim": "authentication"}
         with tempfile.TemporaryDirectory() as temporary:
             output = Path(temporary) / "denials.json"
             for observations, unresolved, expected_exit in (

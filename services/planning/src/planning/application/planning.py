@@ -49,11 +49,11 @@ class Planning:
             return dict(row["payload"])
 
     def retry(
-        self, tx: Transaction, actor: Actor, key: str, fingerprint: str
+        self, tx: Transaction, actor: Actor, key: str, fingerprint: str, max_age: int | None = None
     ) -> dict[str, Any] | None:
         row = tx.one(
             (
-                "SELECT fingerprint,response FROM app.planning_commands WHERE "
+                "SELECT fingerprint,response,created_at FROM app.planning_commands WHERE "
                 "tenant=%s AND actor=%s AND command_key=%s"
             ),
             (actor.tenant, actor.actor, identifier(key)),
@@ -61,8 +61,56 @@ class Planning:
         if row:
             if row["fingerprint"] != fingerprint:
                 raise Rejected("command_key_conflict", 409)
+            if max_age is not None and not 0 <= self.clock() - row["created_at"] < max_age:
+                raise Rejected("command_key_expired", 409)
             return dict(row["response"])
         return None
+
+    def register_query(self, actor: Actor, key: str, operation: str, body: dict[str, Any]) -> None:
+        """Bind query retries without caching owner authority or readiness.
+
+        The existing command ledger owns all key conflicts. Query receipt bytes
+        contain no returned data and cannot grant permission. Every HTTP retry
+        authenticates, authorizes and recomputes the query before this check.
+        """
+        if operation not in {
+            "migration-preparations",
+            "migration-plan-options",
+            "migration-support",
+            "migration-flow-choices",
+            "migration-workload-readiness",
+        }:
+            raise Rejected("migration_query_operation_invalid", 422)
+        fingerprint = digest(
+            {
+                "operation": operation,
+                "application": actor.application,
+                "environment": actor.environment,
+                "body": body,
+            }
+        )
+        now = int(self.clock())
+        with self.database.transaction() as tx:
+            tx.execute("SELECT pg_advisory_xact_lock(7504001)")
+            row = tx.one(
+                "SELECT fingerprint,response,created_at FROM app.planning_commands "
+                "WHERE tenant=%s AND actor=%s AND command_key=%s",
+                (actor.tenant, actor.actor, identifier(key)),
+            )
+            if row is not None:
+                if (
+                    row["fingerprint"] != fingerprint
+                    or row["response"].get("read_only") is not True
+                ):
+                    raise Rejected("command_key_conflict", 409)
+                if not 0 <= now - row["created_at"] < 604800:
+                    raise Rejected("command_key_expired", 409)
+                return
+            tx.execute(
+                "INSERT INTO app.planning_commands(tenant,actor,command_key,fingerprint,"
+                "response,created_at) VALUES(%s,%s,%s,%s,%s::jsonb,%s)",
+                (actor.tenant, actor.actor, key, fingerprint, canonical({"read_only": True}), now),
+            )
 
     def save(
         self, actor: Actor, key: str, fingerprint: str, kind: str, payload: dict[str, Any]
@@ -76,7 +124,8 @@ class Planning:
             if prior:
                 return prior
             count = tx.one(
-                "SELECT count(*) AS n FROM app.planning_commands WHERE tenant=%s AND created_at>%s",
+                "SELECT count(*) AS n FROM app.planning_commands WHERE tenant=%s "
+                "AND created_at>%s AND NOT (response ? 'read_only')",
                 (actor.tenant, self.clock() - 60),
             )
             if count and count["n"] >= 30:

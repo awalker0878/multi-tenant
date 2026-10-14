@@ -1,9 +1,10 @@
-# Conditional Phase 2 handoff
+# Current contract remediation handoff
 
-Phase 2 implementation has not started. Phase 1 remains **FAIL** until Planning's
-externally provisioned collection-manifest registry and manifest identity are
-independently verified. The generated release inventory marks that release as
-requiring correction. Do not promote the branch as a completed Phase 1 baseline.
+Runtime remediation is underway under the current instruction to continue
+independent work despite external blockers. Phase 1's deployment-owned collection
+manifest enrollment remains **BLOCKED**; it does not prevent repository fixes.
+The current result is **INCOMPLETE**, not a qualified release. Follow
+[the current ledger](phase2-ledger.md) and freshly executed CI evidence.
 
 ## Entry points and acceptance
 
@@ -17,22 +18,18 @@ requiring correction. Do not promote the branch as a completed Phase 1 baseline.
 | Native authority and effects | Lifecycle `native_owners.py`, worker `owner_protocol.py`, `qualify_capabilities.py`, `scripts/p08/` | Externally owned custody/observer/provider boundaries and every installed method/mode require independent E3/E4 identity, custody and effect evidence. E2 fixtures grant no native support. |
 | Release evidence | `combine_assurance.py`, `aggregate_artifacts.py`, `.github/workflows/ci.yml`, `qualification.yml` | Current commit/run/attempt/file digests, complete measured claims, exact image/wheel identity and required CI results all agree. Keep existing strict gates. |
 
-## Known runtime findings to resolve in Phase 2
+## Current runtime correction
 
-- Baseline CI run `38577108733` reports 204 missing measured boundaries,
-  0/166 qualified HTTP operations and only 4/75 qualified canonical releases.
-  This is runtime qualification, not evidence that canonical syntax failed.
-- Executed `scripts/p09/check_contract.py` fails when validating actual
-  `MigrationSupport.read` output against Planning migration v1.6: route records
-  include `api_compatibility`, `expires_at` and `readiness`, which its closed
-  response schema rejects. Publish and integrate an appropriate current release
-  without rewriting surviving published bytes or introducing a compatibility
-  loader. Do not weaken that test.
-- `scripts/p08/check_any_to_any.py` passed its nine-direction outcome checks,
-  144 partial-service rejection probes and 126 typed native method checks.
-  These are synthetic source/runtime checks, not installed native qualification.
-- Source-only validation schemas and producer-owned definitions must not require
-  invented remote consumers merely to satisfy the measured assurance model.
+Planning migration v2 preserves the route expiry, API compatibility and readiness
+fields that caused the P09 mismatch. Its strict closed schemas, Error v2 responses,
+query-key binding and migrated private Console copy replace the prior release.
+Surviving canonical bytes remain immutable. The producer and consumer regression
+checks must pass against the final commit before the mismatch is closed.
+
+Authentication-only receipts no longer count as effective authorization. The
+required aggregation stays red until current-authority and cross-tenant boundaries
+have real evidence. Source schemas have their actual definition/validator roles;
+no remote consumer is invented to fill a reporting gap.
 
 ## Infrastructure and dependencies
 

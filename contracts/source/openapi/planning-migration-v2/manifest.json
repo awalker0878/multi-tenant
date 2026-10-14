@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "target": "contracts/openapi/planning-migration-v1.6.json",
+  "target": "contracts/openapi/planning-migration-v2.json",
   "base": "base.json",
   "parts": {
     "paths": {
@@ -25,6 +25,6 @@
     }
   },
   "copies": [
-    "apps/console/resources/contracts/planning-migration-v1.6.json"
+    "apps/console/resources/contracts/planning-migration-v2.json"
   ]
 }

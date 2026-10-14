@@ -30,7 +30,7 @@ discover. Save and confirm the exact revision. API facts cannot be overridden.
 A lost response offers the same command key/payload; a changed or expired profile
 requires a fresh collection and review. A confirmation is not migration approval.
 
-The [Planning preparation contract](../../../contracts/openapi/planning-migration-v1.6.json)
+The [Planning preparation contract](../../../contracts/openapi/planning-migration-v2.json)
 requires current scoped `plan.create` delegation. It re-reads the confirmed Inventory
 revision and validates each target disk key/format against observed source disks and
 target formats. Preserve the returned review and owner-input digests in the complete

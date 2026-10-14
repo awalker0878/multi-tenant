@@ -31,7 +31,7 @@ def test_app_flow_choices_require_current_site_authorization() -> None:
         "status": "held",
         "native_write_authorized": False,
     }
-    app = MigrationPreparationApp(authority, Mock(), flows=flows)
+    app = MigrationPreparationApp(authority, Mock(), flows=flows, register_query=Mock())
     status, result = exchange(
         app, "/migration-flow-choices", json.dumps({"site_id": SITE}).encode(), HEADERS
     )
@@ -51,7 +51,7 @@ def test_app_flow_save_has_idempotency_key_and_does_not_accept_untrusted_evidenc
         "holds": ["required_native_flow_unknown"],
         "native_write_authorized": False,
     }
-    app = MigrationPreparationApp(authority, Mock(), flows=flows)
+    app = MigrationPreparationApp(authority, Mock(), flows=flows, register_query=Mock())
     body: dict[str, Any] = {
         "site_id": SITE,
         "revision": 0,

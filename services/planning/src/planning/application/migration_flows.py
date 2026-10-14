@@ -632,7 +632,7 @@ class MigrationFlows:
         )
         with self.planning.database.transaction() as tx:
             tx.execute("SELECT pg_advisory_xact_lock(7504001)")
-            prior = self.planning.retry(tx, actor, key, fingerprint)
+            prior = self.planning.retry(tx, actor, key, fingerprint, max_age=604800)
             if prior:
                 return prior
             old = tx.one(

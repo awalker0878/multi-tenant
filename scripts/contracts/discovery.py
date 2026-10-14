@@ -185,7 +185,7 @@ def canonical_dependencies(root: Path) -> dict[str, set[str]]:
         sources = REFERENCE.findall(readiness.read_text())
         if len(set(sources)) != 1:
             raise ValueError("Ambiguous readiness projection source")
-        target = "contracts/openapi/planning-migration-v1.6.json"
+        target = "contracts/openapi/planning-migration-v2.json"
         if target not in edges:
             raise ValueError(f"Orphaned readiness generator: {target}")
         edges[target].update(sources)

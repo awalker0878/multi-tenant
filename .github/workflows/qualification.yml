@@ -16,7 +16,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: qualification-${{ github.ref }}
+  group: qualification-${{ inputs.suite }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   infrastructure:
@@ -185,7 +185,7 @@ jobs:
             if docker build --build-arg SOURCE_REVISION="$GITHUB_SHA" -t "$TAG" "$COMPONENT" 2>&1 | tee "$RUNNER_TEMP/contract-image-build.log"; then
               break
             fi
-            if [[ "$attempt" -eq 3 ]] || ! grep -Eqi 'dial tcp|i/o timeout|temporary failure|TLS handshake timeout|502 Bad Gateway|503 Service Unavailable' "$RUNNER_TEMP/contract-image-build.log"; then
+            if [[ "$attempt" -eq 3 ]] || ! grep -Eqi 'dial tcp|i/o timeout|temporary failure|TLS handshake timeout|502 Bad Gateway|503 Service Unavailable|HTTP/[0-9.]+ 50[0-9]' "$RUNNER_TEMP/contract-image-build.log"; then
               exit 1
             fi
             sleep "$((attempt * 10))"

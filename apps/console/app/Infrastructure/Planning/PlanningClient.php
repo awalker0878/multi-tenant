@@ -10,6 +10,7 @@ use App\Domain\Planning\PlanningFailure;
 use App\Infrastructure\Foundation\MountedSecret;
 use App\Infrastructure\Governance\GovernanceClient;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 use Opis\JsonSchema\Validator;
 use Throwable;
 
@@ -23,6 +24,12 @@ final class PlanningClient implements PlanningGateway
         if (($migration && ($method !== 'POST' || count($sites) !== 1)) || count($sites) < 1 || count($sites) > 3 || ! in_array($method, ['GET', 'POST'], true)
             || (! $migration && ! preg_match('/\A(?:assessments|plans)(?:\/[0-9a-f-]{36})?(?:\/(?:validity|diff))?\z/', $tail))) {
             throw new PlanningFailure(422, 'invalid_scope');
+        }
+        if ($migration && $key === null) {
+            if (! in_array($tail, ['migration-preparations', 'migration-plan-options', 'migration-support', 'migration-flow-choices', 'migration-workload-readiness'], true)) {
+                throw new PlanningFailure(422, 'idempotency_key_required');
+            }
+            $key = (string) Str::uuid();
         }
         foreach ([$tenant, $application, $environment, ...$sites] as $id) {
             if (! preg_match('/\A[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\z/', $id)) {
@@ -66,16 +73,22 @@ final class PlanningClient implements PlanningGateway
                 throw new PlanningFailure;
             }
             $result = json_decode($raw, true, 64, JSON_THROW_ON_ERROR);
+            $api = json_decode(file_get_contents(resource_path($migration ? 'contracts/planning-migration-v2.json' : 'contracts/planning-v1.2.json')) ?: '', true, 64, JSON_THROW_ON_ERROR);
             if (! in_array($response->status(), [200, 201], true)) {
-                $reason = is_array($result) ? ($result['error'] ?? '') : '';
+                if ($migration) {
+                    $errorSchema = ['$ref' => '#/components/schemas/Error', 'components' => $api['components']];
+                    if (! (new Validator)->validate(json_decode($raw), json_decode(json_encode($errorSchema, JSON_THROW_ON_ERROR)))->isValid()) {
+                        throw new PlanningFailure;
+                    }
+                }
+                $reason = is_array($result) ? ($result[$migration ? 'code' : 'error'] ?? '') : '';
                 throw new PlanningFailure(in_array($response->status(), [401, 403, 404, 409, 412, 422, 423, 429], true) ? $response->status() : 503,
-                    is_string($reason) && preg_match('/\A[a-z_]{1,80}\z/', $reason) ? $reason : 'planning_unavailable');
+                    is_string($reason) && preg_match($migration ? '/\A[a-z][a-z0-9_.-]{2,95}\z/' : '/\A[a-z_]{1,80}\z/', $reason) ? $reason : 'planning_unavailable');
             }
             if (! is_array($result) || array_is_list($result)) {
                 throw new PlanningFailure;
             }
 
-            $api = json_decode(file_get_contents(resource_path($migration ? 'contracts/planning-migration-v1.6.json' : 'contracts/planning-v1.2.json')) ?: '', true, 64, JSON_THROW_ON_ERROR);
             $schemaName = $migration ? match ($tail) {
                 'migration-plans' => 'Receipt',
                 'migration-plan-options' => 'MigrationOptions',

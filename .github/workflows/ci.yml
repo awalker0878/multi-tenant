@@ -515,10 +515,20 @@ jobs:
     with:
       suite: contract-artifacts
 
+  runtime-integration:
+    name: CI / Runtime integration
+    needs: scope
+    if: needs.scope.outputs.contracts == 'true'
+    permissions:
+      contents: read
+    uses: ./.github/workflows/qualification.yml
+    with:
+      suite: integration
+
   required:
     name: CI / Required
     if: always()
-    needs: [scope, architecture, python, php, contracts, contract-assurance, artifact-binding-assurance, security, native, authority, laravel-routes]
+    needs: [scope, architecture, python, php, contracts, contract-assurance, artifact-binding-assurance, runtime-integration, security, native, authority, laravel-routes]
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:

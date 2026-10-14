@@ -107,9 +107,9 @@ def check_readiness_projection():
     from generate_readiness import embedded_payload
 
     expected = embedded_payload()
-    api = load("contracts/openapi/planning-migration-v1.6.json")
+    api = load("contracts/openapi/planning-migration-v2.json")
     fragment = load(
-        "contracts/source/openapi/planning-migration-v1.6/"
+        "contracts/source/openapi/planning-migration-v2/"
         "components-schemas/workload-readiness.json"
     )
     if (api["components"]["schemas"]["MigrationReadinessPayload"] != expected

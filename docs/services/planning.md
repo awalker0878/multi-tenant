@@ -54,7 +54,7 @@ from Assurance custody. No list, profile mutation or native dispatch route is ex
 
 ## Authorization and bootstrap
 
-P08's [migration preparation API](../../contracts/openapi/planning-migration-v1.6.json)
+P08's [migration preparation API](../../contracts/openapi/planning-migration-v2.json)
 re-reads an exact current confirmed Inventory review under the request's `plan.create`
 delegation. It derives native identities, profile digests, capacities, method,
 owner-input digest and complete datasets, and accepts only explicit target keys and

@@ -19,7 +19,7 @@ schema adds optional guest-outcome digests and maximum data-loss bytes while
 retaining the v1 envelope; existing v1 records remain valid. Consumers needing
 those fields must use v1.1. This corrects their earlier in-place addition to v1.
 The corresponding Planning support response is published as
-`contracts/openapi/planning-migration-v1.6.json`; the Console validates against
+`contracts/openapi/planning-migration-v2.json`; the Console validates against
 that version. Only active canonical and installed releases are retained; Git supplies prior publication provenance.
 
 The matrix consumes current Assurance-owner records. Do not promote caller-submitted

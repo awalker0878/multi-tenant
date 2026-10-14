@@ -23,7 +23,7 @@ CHECKED = {
     },
     "python-composed": {
         "contracts/openapi/planning-v1.2.json",
-        "contracts/openapi/planning-migration-v1.6.json",
+        "contracts/openapi/planning-migration-v2.json",
         "contracts/openapi/planning-native-v1.json",
         "contracts/openapi/planning-immutable-plan-v2.json",
         "contracts/openapi/planning-lifecycle-reads-v1.json",
@@ -37,7 +37,7 @@ CHECKED = {
     "lifecycle-worker-effects": {"contracts/openapi/worker-migration-effect-v2.1.json"},
     "planning-immutable": {"contracts/openapi/planning-immutable-plan-v2.json"},
     "planning-lifecycle": {"contracts/openapi/planning-lifecycle-reads-v1.json"},
-    "planning-migration": {"contracts/openapi/planning-migration-v1.6.json"},
+    "planning-migration": {"contracts/openapi/planning-migration-v2.json"},
 }
 CHECKS = {
     "inventory": verify_inventory,
@@ -93,17 +93,17 @@ def prove(app: str, route_list: Path | None = None, root: Path = ROOT,
             })
         # These verifiers independently execute every native job/worker route
         # with an invalid bearer and assert the real ASGI handler returns 401.
-        # This is authorization-denial evidence, never tenant-isolation proof.
+        # This is authentication-denial evidence, never tenant-isolation proof.
         if not producer_only and app == "lifecycle-native" and op["security_required"]:
             rows.append({
-                "key": key, "claim": "authorization", "source": "live-denial",
+                "key": key, "claim": "authentication", "source": "live-denial",
                 "result": "PASS", "release_sha256": op["release_sha256"],
                 "test": check_name + ":missing_bearer_asgi_401",
                 "denial_kind": "missing-credential", "status_code": 401,
             })
         if not producer_only and app in {"lifecycle-native-jobs", "lifecycle-worker-effects"} and op["security_required"]:
             rows.append({
-                "key": key, "claim": "authorization", "source": "live-denial",
+                "key": key, "claim": "authentication", "source": "live-denial",
                 "result": "PASS", "release_sha256": op["release_sha256"],
                 "test": check_name + ":invalid_bearer_asgi_401",
                 "denial_kind": "invalid-credential", "status_code": 401,

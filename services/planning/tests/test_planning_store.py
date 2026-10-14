@@ -301,3 +301,55 @@ def test_bound_plan_refuses_payload_scope_of_a_different_tenant(
     p, _, _ = setup(database)
     with pytest.raises(Rejected, match="plan_tenant_mismatch"):
         p.bound_plan(TENANT, identity, 1)
+
+
+def test_query_keys_bind_scope_and_payload_without_replaying_authority(database: Postgres) -> None:
+    planning, actor, _ = setup(database)
+    key = str(uuid4())
+    body = {"site_id": SITE}
+    with ThreadPoolExecutor(2) as pool:
+        list(
+            pool.map(
+                lambda _: planning.register_query(actor, key, "migration-support", body), range(2)
+            )
+        )
+    with database.transaction() as tx:
+        row = tx.one(
+            "SELECT response FROM app.planning_commands WHERE tenant=%s "
+            "AND actor=%s AND command_key=%s",
+            (actor.tenant, actor.actor, key),
+        )
+    assert row is not None and row["response"] == {"read_only": True}
+    for operation, changed in (
+        ("migration-support", {"site_id": str(uuid4())}),
+        ("migration-flow-choices", body),
+    ):
+        with pytest.raises(Rejected, match="command_key_conflict"):
+            planning.register_query(actor, key, operation, changed)
+    other = Actor(str(uuid4()), str(uuid4()), actor.action, APP, ENV)
+    planning.register_query(other, key, "migration-support", body)
+    late = Planning(
+        database, Sources(), lambda: NOW + 604800, PlanValidation.unavailable(lambda: NOW + 604800)
+    )
+    with pytest.raises(Rejected, match="command_key_expired"):
+        late.register_query(actor, key, "migration-support", body)
+    with pytest.raises(Rejected, match="migration_query_operation_invalid"):
+        planning.register_query(actor, str(uuid4()), "migration-plans", body)
+
+
+def test_persisted_command_retry_expires_without_reusing_stale_result(database: Postgres) -> None:
+    planning, actor, request = setup(database)
+    key = str(uuid4())
+    planning.assessment(actor, key, request, {})
+    late = Planning(
+        database, Sources(), lambda: NOW + 604800, PlanValidation.unavailable(lambda: NOW + 604800)
+    )
+    with database.transaction() as tx:
+        row = tx.one(
+            "SELECT fingerprint FROM app.planning_commands WHERE tenant=%s "
+            "AND actor=%s AND command_key=%s",
+            (actor.tenant, actor.actor, key),
+        )
+        assert row is not None
+        with pytest.raises(Rejected, match="command_key_expired"):
+            late.retry(tx, actor, key, row["fingerprint"], max_age=604800)

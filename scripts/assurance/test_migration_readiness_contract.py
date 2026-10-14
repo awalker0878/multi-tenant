@@ -11,7 +11,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 SCHEMA = ROOT / "contracts/schemas/planning/migration-readiness-v2.2.json"
-ROUTE_SCHEMA = ROOT / "contracts/openapi/planning-migration-v1.6.json"
+ROUTE_SCHEMA = ROOT / "contracts/openapi/planning-migration-v2.json"
 PLANNING = ROOT / "services/planning/src/planning/domain/migration_readiness.py"
 LIFECYCLE = ROOT / "services/lifecycle/src/lifecycle/domain/migration_readiness.py"
 CONSOLE = ROOT / "apps/console/resources/js/pages/planning/MigrationSupport.vue"

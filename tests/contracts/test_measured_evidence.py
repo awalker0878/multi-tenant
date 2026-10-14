@@ -68,7 +68,7 @@ class MeasuredProofTests(unittest.TestCase):
         self.assertTrue(proofs)
         self.assertEqual(len(proofs), len({(p["key"], p["claim"]) for p in proofs}))
         for proof in proofs:
-            if proof["claim"] == "authorization":
+            if proof["claim"] == "authentication":
                 self.assertEqual(proof["source"], "live-denial")
                 self.assertEqual(proof["status_code"], 403)
                 self.assertEqual(proof["denial_kind"], "invalid-credential")

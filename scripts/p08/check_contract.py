@@ -32,10 +32,10 @@ from lifecycle.domain.migration import stages
 for method in DELTA:
     for mode in ('rehearsal', 'cutover', 'rollback', 'forward_recovery', 'reverse_recovery', 'cleanup'):
         assert stage_order(mode, method) == stages({'mode': mode, 'method': method})
-for name in ("planning-v1.2.json", "planning-migration-v1.6.json"):
+for name in ("planning-v1.2.json", "planning-migration-v2.json"):
     spec = ROOT / "contracts/openapi" / name
     validate_spec(json.loads(spec.read_text()))
-    if name == "planning-migration-v1.6.json":
+    if name == "planning-migration-v2.json":
         assert spec.read_bytes() == (ROOT / "apps/console/resources/contracts" / name).read_bytes()
 print("Current Planning method/mode contracts validate; stage ordering matches Lifecycle.")
 

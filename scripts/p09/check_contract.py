@@ -30,7 +30,7 @@ extended['routes'][0]['guest_outcomes_sha256'] = 'a' * 64
 extended['routes'][0]['constraints']['maximum_data_loss_bytes'] = 0
 validator.validate(extended)
 tranche(extended)
-current_api = json.loads((ROOT / 'contracts/openapi/planning-migration-v1.6.json').read_text())
+current_api = json.loads((ROOT / 'contracts/openapi/planning-migration-v2.json').read_text())
 current_support_wire = Draft202012Validator(
     {'$ref': '#/components/schemas/MigrationSupport', 'components': current_api['components']},
     format_checker=FormatChecker(),

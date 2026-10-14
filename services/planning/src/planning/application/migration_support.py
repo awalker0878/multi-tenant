@@ -63,6 +63,7 @@ class MigrationSupport:
             for row in direction["routes"]:
                 route = by_id[row["route_id"]]
                 api = self.api_status(actor, site, route)
+                row["api_compatibility"] = api
                 resolved = resolve_readiness(
                     route,
                     row,
@@ -78,15 +79,11 @@ class MigrationSupport:
                     selected["expires_at"],
                     self.clock(),
                 )
+                row["readiness"] = resolved
                 if resolved["status"] != "eligible":
                     row["blockers"] = sorted(set(row["blockers"] + resolved["holds"]))
                     # Preserve independent E3/E4 decisions even when the composite
                     # route is held for API usage, scope, time or another gate.
-                # The expiry and resolved readiness are internal authority
-                # inputs, not fields in the published MigrationSupport wire.
-                # Full workload readiness has its own contracted read endpoint.
-                # Retain all computed blockers and independent E3/E4 decisions.
-                row.pop("expires_at")
         return {
             "schema_version": 1,
             "tranche_sha256": digest(selected),

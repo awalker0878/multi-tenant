@@ -29,6 +29,7 @@ def verify(needs: dict) -> list[str]:
     for job, flag in (("architecture", "docs"), ("contracts", "contracts"),
                       ("contract-assurance", "contracts"),
                       ("artifact-binding-assurance", "contracts"),
+                      ("runtime-integration", "contracts"),
                       ("security", "security"), ("native", "native"),
                       ("authority", "authority"), ("laravel-routes", "routes")):
         if flags.get(flag) not in ("true", "false"):

@@ -189,11 +189,12 @@ def test_protected_registry_cannot_cross_scope_or_be_writable(
 def test_support_http_uses_read_delegation_and_cannot_accept_browser_evidence() -> None:
     authority, support = Mock(), Mock()
     support.read.return_value = {"directions": [], "native_write_authorized": False}
-    app: Any = MigrationPreparationApp(authority, Mock(), support=support)
+    app: Any = MigrationPreparationApp(authority, Mock(), support=support, register_query=Mock())
     headers = [
         (b"authorization", b"Bearer " + b"a" * 64),
         (b"content-type", b"application/json"),
         (b"x-actor-delegation", b"b" * 64),
+        (b"idempotency-key", b"00000000-0000-4000-8000-000000000001"),
     ]
     assert (
         exchange(app, "/migration-support", json.dumps({"site_id": SITE}).encode(), headers)[0]
@@ -395,7 +396,7 @@ def test_workload_readiness_http_is_read_only_and_denies_browser_evidence() -> N
         "native_write_authorized": False,
         "workload_admission_authorized": False,
     }
-    app = MigrationPreparationApp(authority, Mock(), support=support)
+    app = MigrationPreparationApp(authority, Mock(), support=support, register_query=Mock())
     path = (
         f"/v1/tenants/{session.tenant}/applications/{session.application}"
         f"/environments/{session.environment}/migration-workload-readiness"
@@ -404,6 +405,7 @@ def test_workload_readiness_http_is_read_only_and_denies_browser_evidence() -> N
         (b"authorization", b"Bearer " + b"a" * 64),
         (b"content-type", b"application/json"),
         (b"x-actor-delegation", b"b" * 64),
+        (b"idempotency-key", b"00000000-0000-4000-8000-000000000001"),
     ]
     locator = {"site_id": SITE, "review": {"revision": 1, "digest": "a" * 64}}
     assert migration_http_exchange(app, path, json.dumps(locator).encode(), headers)[0] == 200
@@ -422,7 +424,7 @@ def test_workload_readiness_http_is_read_only_and_denies_browser_evidence() -> N
         support.preview.assert_not_called()
 
 
-def test_support_wire_excludes_internal_readiness_and_rejects_original_leak() -> None:
+def test_support_wire_preserves_readiness_and_rejects_invalid_fields() -> None:
     """The real producer agrees with the exact installed Console contract.
 
     This is producer regression evidence; controlled owner inputs do not qualify
@@ -431,7 +433,7 @@ def test_support_wire_excludes_internal_readiness_and_rejects_original_leak() ->
     from jsonschema import Draft202012Validator, FormatChecker, ValidationError
 
     api_path = Path(__file__).resolve().parents[3] / (
-        "apps/console/resources/contracts/planning-migration-v1.6.json"
+        "contracts/openapi/planning-migration-v2.json"
     )
     api = json.loads(api_path.read_text())
     validator = Draft202012Validator(
@@ -447,12 +449,50 @@ def test_support_wire_excludes_internal_readiness_and_rejects_original_leak() ->
     assert "api_capabilities_unresolved" in record["blockers"]
     assert record["native_qualified"] is False
     assert record["operationally_accepted"] is False
-    for name, leaked in (
-        ("expires_at", 100),
-        ("api_compatibility", service.api_status(session, SITE, selected["routes"][0])),
-        ("readiness", {"status": "held"}),
+    assert record["api_compatibility"]["operationally_eligible"] is False
+    assert record["readiness"]["native_write_authorized"] is False
+    assert record["readiness"]["workload_admission_authorized"] is False
+    for name, malformed in (
+        ("unknown_field", True),
+        ("expires_at", "100"),
+        ("api_compatibility", {"status": "eligible"}),
+        ("readiness", {"status": "eligible", "native_write_authorized": True}),
     ):
         original = deepcopy(result)
-        original["directions"][0]["routes"][0][name] = leaked
-        with pytest.raises(ValidationError, match="Additional properties"):
+        original["directions"][0]["routes"][0][name] = malformed
+        with pytest.raises(ValidationError):
             validator.validate(original)
+
+
+def test_query_http_requires_receipt_wiring_and_rechecks_current_authority() -> None:
+    authority, support, receipt = Mock(), Mock(), Mock()
+    authority.actor.return_value = Actor(
+        str(uuid4()), str(uuid4()), "plan.read", str(uuid4()), str(uuid4())
+    )
+    support.read.return_value = {"native_write_authorized": False}
+    headers = [
+        (b"authorization", b"Bearer " + b"a" * 64),
+        (b"content-type", b"application/json"),
+        (b"x-actor-delegation", b"b" * 64),
+        (b"idempotency-key", b"00000000-0000-4000-8000-000000000001"),
+    ]
+    body = json.dumps({"site_id": SITE}).encode()
+    app = MigrationPreparationApp(authority, Mock(), support=support, register_query=receipt)
+    assert exchange(app, "/migration-support", body, headers)[0] == 200
+    assert exchange(app, "/migration-support", body, headers)[0] == 200
+    assert authority.actor.call_count == 2 and support.read.call_count == 2
+    assert receipt.call_count == 2
+    support.reset_mock()
+    receipt.reset_mock()
+    assert exchange(app, "/migration-support", body, headers[:-1])[0] == 400
+    support.read.assert_not_called()
+    receipt.assert_not_called()
+    authority.actor.side_effect = Rejected("revoked_membership", 403)
+    assert exchange(app, "/migration-support", body, headers)[0] == 403
+    support.read.assert_not_called()
+    receipt.assert_not_called()
+    authority.actor.side_effect = None
+    app = MigrationPreparationApp(authority, Mock(), support=support)
+    status, error = exchange(app, "/migration-support", body, headers)
+    assert status == 503 and error["code"] == "migration_query_idempotency_unavailable"
+    assert error["retryable"] is True

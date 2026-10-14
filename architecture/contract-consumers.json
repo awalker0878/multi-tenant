@@ -146,7 +146,7 @@
       "lifecycle",
       "planning"
     ],
-    "contracts/openapi/planning-migration-v1.6.json": [
+    "contracts/openapi/planning-migration-v2.json": [
       "planning",
       "console"
     ],
@@ -765,16 +765,17 @@
       ]
     },
     {
-      "path": "contracts/openapi/planning-migration-v1.6.json",
+      "path": "contracts/openapi/planning-migration-v2.json",
       "owner": "planning",
       "consumers": [
         "console"
       ],
       "copies": [
-        "apps/console/resources/contracts/planning-migration-v1.6.json"
+        "apps/console/resources/contracts/planning-migration-v2.json"
       ],
-      "source_manifest": "contracts/source/openapi/planning-migration-v1.6/manifest.json",
+      "source_manifest": "contracts/source/openapi/planning-migration-v2/manifest.json",
       "depends_on": [
+        "contracts/schemas/common/error-v2.json",
         "contracts/schemas/planning/migration-readiness-v2.2.json"
       ]
     },

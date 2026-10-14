@@ -72,12 +72,12 @@ TESTS = {
     ),
     "tests/contracts/test_simulation_owner.py::"
     "SimulationOwnerContracts::test_authenticated_worker_and_lifecycle_consumer": (
-        ("lifecycle-workers", "POST", "/v1/effects", ("route", "producer", "consumer", "authorization")),
-        ("lifecycle-workers", "POST", "/v1/reconciliations", ("route", "producer", "consumer", "authorization")),
+        ("lifecycle-workers", "POST", "/v1/effects", ("route", "producer", "consumer", "authentication")),
+        ("lifecycle-workers", "POST", "/v1/reconciliations", ("route", "producer", "consumer", "authentication")),
     ),
     "tests/contracts/test_simulation_owner.py::"
     "SimulationOwnerContracts::test_independent_observation_audience_and_payload": (
-        ("lifecycle-workers", "POST", "/v1/observations", ("route", "producer", "authorization")),
+        ("lifecycle-workers", "POST", "/v1/observations", ("route", "producer", "authentication")),
     ),
 }
 
@@ -234,11 +234,11 @@ def verified_consumers(root: Path = ROOT) -> list[dict]:
                     "claim": claim,
                     "source": {"route": "live-router", "producer": "live-producer",
                                "consumer": "live-consumer",
-                               "authorization": "live-denial"}[claim],
+                               "authentication": "live-denial"}[claim],
                     "result": "PASS", "release_sha256": current[key]["release_sha256"],
                     "test": test,
                     **({"denial_kind": "invalid-credential", "status_code": 403}
-                       if claim == "authorization" else {}),
+                       if claim == "authentication" else {}),
                 })
     releases = {release["path"]: release for release in inventory(root)["releases"]}
     for test, (path, claims) in RELEASE_TESTS.items():

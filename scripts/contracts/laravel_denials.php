@@ -67,7 +67,7 @@ foreach ($registry['active_releases'] as $entry) {
             $key = json_encode([$owner, strtoupper($verb), $template], JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
             $evidence[] = [
                 'key' => $key,
-                'claim' => 'authorization',
+                'claim' => 'authentication',
                 'source' => 'live-denial',
                 'result' => 'PASS',
                 'release_sha256' => $fingerprint,

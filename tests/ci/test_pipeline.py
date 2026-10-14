@@ -38,7 +38,7 @@ class GateTests(unittest.TestCase):
     def test_skip_only_for_unaffected(self):
         flags = {x: "false" for x in ("docs", "contracts", "security", "native", "authority", "routes")}
         good = {"scope": {"result": "success", "outputs": dict(flags, python="[]", php="[]")}}
-        good.update({name: {"result": "skipped"} for name in ("architecture", "contracts", "contract-assurance", "artifact-binding-assurance", "security", "native", "authority", "laravel-routes", "python", "php")})
+        good.update({name: {"result": "skipped"} for name in ("architecture", "contracts", "contract-assurance", "artifact-binding-assurance", "runtime-integration", "security", "native", "authority", "laravel-routes", "python", "php")})
         check = module("check")
         self.assertEqual(check.verify(good), [])
         good["scope"]["outputs"]["contracts"] = "true"
@@ -48,10 +48,17 @@ class GateTests(unittest.TestCase):
         good["contract-assurance"]["result"] = "success"
         self.assertTrue(check.verify(good))
         good["artifact-binding-assurance"]["result"] = "success"
+        good["runtime-integration"]["result"] = "success"
         self.assertEqual(check.verify(good), [])
         good["artifact-binding-assurance"]["result"] = "failure"
         self.assertTrue(check.verify(good))
         good["artifact-binding-assurance"]["result"] = "success"
+        good["runtime-integration"]["result"] = "success"
+        good["runtime-integration"]["result"] = "skipped"
+        self.assertTrue(check.verify(good))
+        good["runtime-integration"]["result"] = "failure"
+        self.assertTrue(check.verify(good))
+        good["runtime-integration"]["result"] = "success"
         good["contracts"]["result"] = "failure"
         self.assertTrue(check.verify(good))
 

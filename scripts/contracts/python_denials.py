@@ -1,6 +1,6 @@
 """Exercise unauthenticated requests against the *real* composed Python ASGI routers.
 
-A missing token is not considered an authorization denial if the runtime
+A missing token is not considered an authentication denial if the runtime
 instead returns a routing error, dependency failure, timeout or success.
 """
 from __future__ import annotations
@@ -79,7 +79,7 @@ async def probe(owner: str) -> tuple[list[dict], list[str]]:
 
     The service's real credential loader must succeed before a missing token
     can prove 401. A missing test mount is a 503 dependency failure, not an
-    authorization observation. Never add a production credential fallback.
+    authentication observation. Never add a production credential fallback.
     """
     if owner != "planning" or os.environ.get(
         "PLANNING_ASSURANCE_INVALIDATION_CREDENTIAL_FILE"
@@ -130,7 +130,7 @@ async def _probe_with_router(owner: str) -> tuple[list[dict], list[str]]:
             unresolved.append(op["key"] + " unsupported-denial:" + str(code))
             continue
         measured.append({
-            "key": op["key"], "claim": "authorization",
+            "key": op["key"], "claim": "authentication",
             "source": "live-denial", "result": "PASS",
             "release_sha256": op["release_sha256"],
             "test": "python_denials.py:unauthenticated_" + str(code),

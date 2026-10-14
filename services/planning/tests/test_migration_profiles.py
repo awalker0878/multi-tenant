@@ -101,7 +101,7 @@ def test_migration_preparation_requires_scoped_actor_before_owner_read() -> None
     from planning_fixture import SITE
 
     authority, prepare = Mock(), Mock(return_value={"review": "bound"})
-    app: Any = MigrationPreparationApp(authority, prepare)
+    app: Any = MigrationPreparationApp(authority, prepare, register_query=Mock())
     body = {
         "site_id": SITE,
         "review": {"revision": 1, "digest": digest("review")},
@@ -111,6 +111,7 @@ def test_migration_preparation_requires_scoped_actor_before_owner_read() -> None
         (b"authorization", b"Bearer " + b"a" * 64),
         (b"content-type", b"application/json"),
         (b"x-actor-delegation", b"b" * 64),
+        (b"idempotency-key", b"00000000-0000-4000-8000-000000000001"),
     ]
     status, result = exchange(app, "/migration-preparations", json.dumps(body).encode(), headers)
     assert status == 200 and result["native_write_authorized"] is False
