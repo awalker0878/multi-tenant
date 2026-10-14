@@ -169,6 +169,19 @@ jobs:
             REVIEW_BASE="$(git rev-parse HEAD^)"
           fi
           git cat-file -e "$REVIEW_BASE^{commit}"
+          # On first adoption of the quality policy, releases that predate
+          # the policy are the baseline, not newly published strict versions.
+          # Derive the cutover from Git provenance; do not keep historical
+          # contracts, aliases, snapshots or an editable exclusion list.
+          if ! git cat-file -e "$REVIEW_BASE:architecture/contract-quality-policy.json" 2>/dev/null; then
+            POLICY_BASE="$(git log --diff-filter=A --format=%H -- architecture/contract-quality-policy.json | tail -1)"
+            if [[ ! "$POLICY_BASE" =~ ^[0-9a-f]{40}$ ]]; then
+              echo "Missing verifiable quality-policy adoption commit" >&2
+              exit 1
+            fi
+            git merge-base --is-ancestor "$POLICY_BASE" HEAD
+            REVIEW_BASE="$POLICY_BASE"
+          fi
           python scripts/contracts/quality.py --base "$REVIEW_BASE" --output "$RUNNER_TEMP/contract-quality.json"
       - name: Validate active canonicals, generated consumers, ownership and negative canaries
         run: |

@@ -495,7 +495,7 @@ def check_new_releases(root: Path, revision: str) -> dict:
         affected = sorted({
             consumer
             for snapshot in (prior_registry, registry)
-            for release in snapshot["active_releases"]
+            for release in snapshot.get("active_releases", [])
             if release["path"] == path or (predecessor is not None and release["path"] == predecessor[1])
             for consumer in release.get("consumers", [])
         })
