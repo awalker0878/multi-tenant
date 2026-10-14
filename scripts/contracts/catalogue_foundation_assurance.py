@@ -12,19 +12,38 @@ import subprocess
 from pathlib import Path
 
 from jsonschema.exceptions import ValidationError
+import yaml
 from planning.infrastructure.messaging.codec import canonical, decode
 
 ROOT = Path(__file__).resolve().parents[2]
 RELEASE = "contracts/schemas/events/catalogue-foundation-recorded-v1.json"
+ASYNCAPI = "contracts/asyncapi/catalogue.yaml"
 
 
 def verify() -> list[dict]:
     registry = json.loads((ROOT / "architecture/contract-consumers.json").read_text())
     registered = [item for item in registry["active_releases"]
-                  if item["path"] == RELEASE and item["owner"] == "catalogue"
+                  if item["path"] in {RELEASE, ASYNCAPI}
+                  and item["owner"] == "catalogue"
                   and "planning" in item["consumers"]]
-    if len(registered) != 1:
-        raise ValueError("Current Catalogue/Planning event release is not registered")
+    if {item["path"] for item in registered} != {RELEASE, ASYNCAPI}:
+        raise ValueError("Current Catalogue/Planning event and channel are not registered")
+    # The executed PHP publisher must match the *active* AsyncAPI address,
+    # event message and referenced payload schema. Static channel discovery
+    # alone cannot prove that the producer or installed consumer works.
+    api = yaml.safe_load((ROOT / ASYNCAPI).read_text(encoding="utf-8"))
+    channel = api["channels"]["foundationFacts"]
+    operation = api["operations"]["publishRecorded"]
+    message = api["components"]["messages"]["Recorded"]
+    schema_ref = message["payload"]["schema"]["$ref"]
+    if (api["asyncapi"] != "3.0.0"
+            or channel["address"] != "catalogue.foundation.recorded.v1"
+            or channel["messages"] != {"recorded": {"$ref": "#/components/messages/Recorded"}}
+            or operation != {"action": "send", "channel": {"$ref": "#/channels/foundationFacts"}}
+            or message["contentType"] != "application/json"
+            or (ROOT / "contracts/asyncapi" / schema_ref).resolve()
+            != (ROOT / RELEASE).resolve()):
+        raise ValueError("Catalogue AsyncAPI release differs from executable producer/consumer wire")
     producer = subprocess.run(
         ["php", str(ROOT / "scripts/contracts/catalogue_foundation_wire.php")],
         cwd=ROOT, capture_output=True, check=True, timeout=30,
@@ -58,14 +77,14 @@ def verify() -> list[dict]:
     else:
         raise ValueError("Planning accepted a duplicate tenant identifier")
 
-    fingerprint = hashlib.sha256((ROOT / RELEASE).read_bytes()).hexdigest()
     return [{
-        "key": RELEASE, "claim": claim, "source": source,
-        "result": "PASS", "release_sha256": fingerprint,
+        "key": path, "claim": claim, "source": source,
+        "result": "PASS",
+        "release_sha256": hashlib.sha256((ROOT / path).read_bytes()).hexdigest(),
         "test": "catalogue_foundation_assurance.py:php_codec_to_planning_decoder",
         "run_id": os.environ.get("GITHUB_RUN_ID"),
         "revision": os.environ.get("GITHUB_SHA"),
-    } for claim, source in (
+    } for path in (RELEASE, ASYNCAPI) for claim, source in (
         ("producer", "live-producer"), ("consumer", "live-consumer"),
     )]
 
