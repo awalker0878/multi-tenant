@@ -17,7 +17,7 @@ from unittest.mock import patch
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts/contracts"))
 from dependency_graph import derive
-from artifact_attestation import check_image, check_wheel, check_console_frontend, compare_runtime_tree, verify_image_process
+from artifact_attestation import check_image, check_wheel, check_console_frontend, compare_runtime_tree, verify_image_process, verify_composer_production_manifest
 from aggregate_artifacts import aggregate
 from runtime_binding_coverage import verify as verify_runtime_bindings
 
@@ -308,6 +308,26 @@ class ArtifactTests(unittest.TestCase):
         (image / "rogue.php").write_text("<?php execute();")
         with self.assertRaisesRegex(ValueError, "differs from reviewed runtime source"):
             compare_runtime_tree(source, image, "public", skip_generated_build=True)
+
+    def test_packaged_php_composer_inventory_matches_only_locked_production_packages(self):
+        locked = self.root / "composer.lock"
+        installed = self.root / "installed.json"
+        prod = {"name": "vendor/runtime", "version": "1.2.3",
+                "source": {"reference": "abc123"}}
+        dev = {"name": "vendor/debug", "version": "2.0.0"}
+        locked.write_text(json.dumps({"packages": [prod], "packages-dev": [dev]}))
+        installed.write_text(json.dumps({"packages": [prod], "dev": False}))
+        self.assertEqual(verify_composer_production_manifest(locked, installed), 1)
+        for poison in (
+            {"packages": [prod, dev], "dev": True},
+            {"packages": [{**prod, "version": "1.2.4"}], "dev": False},
+            {"packages": [{**prod, "source": {"reference": "wrong"}}], "dev": False},
+            {"packages": [prod, prod], "dev": False},
+            {"packages": [], "dev": False},
+        ):
+            installed.write_text(json.dumps(poison))
+            with self.assertRaises(ValueError):
+                verify_composer_production_manifest(locked, installed)
 
     def test_runtime_extra_symlink_cannot_hide_unreviewed_code(self):
         source = self.root / "source"

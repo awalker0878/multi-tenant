@@ -175,6 +175,43 @@ def verify_wheel_record(archive: zipfile.ZipFile, component: str, package: str,
             raise ValueError("Wheel RECORD digest/size differs from packaged bytes")
 
 
+def verify_composer_production_manifest(locked: Path, installed: Path) -> int:
+    """Reject a packaged PHP dependency set that differs from the reviewed lock.
+
+    This is installed-package identity evidence, not a claim that third-party
+    vendor source bytes are independently reproduced or signed.
+    """
+    source = json.loads(locked.read_text(encoding="utf-8"))
+    observed = json.loads(installed.read_text(encoding="utf-8"))
+    declared = source.get("packages")
+    packages = observed.get("packages") if isinstance(observed, dict) else None
+    if (not isinstance(declared, list) or not declared
+            or not isinstance(packages, list) or not packages
+            or observed.get("dev") is True):
+        raise ValueError("Built Composer production dependency inventory is missing or invalid")
+    expected = {}
+    for item in declared:
+        name, version = item.get("name"), item.get("version")
+        if not isinstance(name, str) or not isinstance(version, str) or name in expected:
+            raise ValueError("Reviewed Composer lock contains ambiguous packages")
+        expected[name] = (version, item.get("source", {}).get("reference"))
+    actual = {}
+    for item in packages:
+        if not isinstance(item, dict):
+            raise ValueError("Malformed installed Composer package metadata")
+        name, version = item.get("name"), item.get("version")
+        if not isinstance(name, str) or not isinstance(version, str) or name in actual:
+            raise ValueError("Built Composer package inventory contains duplicate/invalid names")
+        actual[name] = (version, item.get("source", {}).get("reference"))
+    if set(expected) != set(actual):
+        raise ValueError("Built Composer package names differ from reviewed production lock")
+    for name, (version, reference) in expected.items():
+        packaged_version, packaged_reference = actual[name]
+        if version != packaged_version or (reference is not None and reference != packaged_reference):
+            raise ValueError("Built Composer package identity differs from reviewed lock: " + name)
+    return len(expected)
+
+
 def check_wheel(component: str, wheel: Path, root: Path = ROOT) -> dict:
     if COMPONENTS[component][1] != "python":
         raise ValueError("Only a Python component may be bound to a wheel")
@@ -438,6 +475,11 @@ def check_image(component: str, tag: str, root: Path = ROOT) -> dict:
                         raise ValueError(
                             f"Image PHP root manifest differs from reviewed source: {component}/{name}"
                         )
+                installed = destination / "composer-installed.json"
+                run("docker", "cp", cid + ":/app/vendor/composer/installed.json", str(installed))
+                verify_composer_production_manifest(
+                    root / component / "composer.lock", installed
+                )
             else:
                 if not local_root.is_dir():
                     run("docker", "cp", cid + ":" + app_root, str(local_root))
