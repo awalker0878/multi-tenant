@@ -136,7 +136,8 @@ def test_bounded_strict_request_precedes_source_reads(payload: bytes, expected: 
 
 def test_missing_workload_cannot_lookup_record() -> None:
     app, planning, _ = setup()
-    assert exchange(app, "/plans/" + str(uuid4()), headers=[])[0] == 400
+    # Missing bearer is an authentication failure, not a request-shape error.
+    assert exchange(app, "/plans/" + str(uuid4()), headers=[])[0] == 401
     planning.get.assert_not_called()
 
 
