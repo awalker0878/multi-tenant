@@ -50,19 +50,20 @@ def test_failure_suspends_review_until_a_new_decision(tmp_path: Path) -> None:
         )
     }
     method_modes = {
-        "method:" + method + ":" + mode: "unsupported"
-        for method in WIRE_METHODS for mode in MODES
+        "method:" + method + ":" + mode: "unsupported" for method in WIRE_METHODS for mode in MODES
     }
-    cases.update({
-        key: {
-            "outcome": "unsupported",
-            "reason": "not_qualified_on_synthetic_installation",
-            "scope_sha256": digest(scope),
-            "artifacts": artifacts,
-            "observed_at": 1000,
+    cases.update(
+        {
+            key: {
+                "outcome": "unsupported",
+                "reason": "not_qualified_on_synthetic_installation",
+                "scope_sha256": digest(scope),
+                "artifacts": artifacts,
+                "observed_at": 1000,
+            }
+            for key in method_modes
         }
-        for key in method_modes
-    })
+    )
     observed: dict[str, Any] = {
         "scope_sha256": digest(scope),
         "definition_sha256": DEFINITION_SHA256,
@@ -122,12 +123,22 @@ def test_failure_suspends_review_until_a_new_decision(tmp_path: Path) -> None:
     denied = json.loads(base64.b64decode(state["records"]["d" * 64]["content_base64"]))
     assert denied["adapter_conformant"] is False
     assert state["suspended"]["d" * 64] == "conformance_recovery_readback_required"
-    observed["snapshot"] = {"recovery_measurements": [
-        {"dataset_id": "observed-dataset", "sequence": 1, "outcome": "passed",
-         "consistency_passed": True, "method": recovery.split(":")[1],
-         "mode": "rollback", "scope_sha256": digest(scope), "artifacts": artifacts,
-         "observed_at": 1000, "readback_sha256": "d" * 64},
-    ]}
+    observed["snapshot"] = {
+        "recovery_measurements": [
+            {
+                "dataset_id": "observed-dataset",
+                "sequence": 1,
+                "outcome": "passed",
+                "consistency_passed": True,
+                "method": recovery.split(":")[1],
+                "mode": "rollback",
+                "scope_sha256": digest(scope),
+                "artifacts": artifacts,
+                "observed_at": 1000,
+                "readback_sha256": "d" * 64,
+            },
+        ]
+    }
     publisher.publish(assignment | {"decision_sha256": "e" * 64})
     state = json.loads(output.read_text())
     accepted = json.loads(base64.b64decode(state["records"]["e" * 64]["content_base64"]))

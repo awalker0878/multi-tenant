@@ -44,9 +44,13 @@ def test_projection_preserves_discovery_holds_and_expiry() -> None:
     assert result["holds"] == ["ownership_collision"]
     assert result["expires_at"] == 900
     assert "inventory" in observed
-    with patch("inventory.application.capability_observations.planning_input", return_value={
-        "holds": ["ownership_collision"], "expires_at": 1000,
-    }):
+    with patch(
+        "inventory.application.capability_observations.planning_input",
+        return_value={
+            "holds": ["ownership_collision"],
+            "expires_at": 1000,
+        },
+    ):
         repeated = capability_input(
             Mock(), "t", "s", "e", "g", Mock(read=Mock(return_value=observed))
         )
@@ -56,10 +60,21 @@ def test_projection_preserves_discovery_holds_and_expiry() -> None:
 
 @pytest.mark.parametrize(
     "fault",
-    ["none", "signature", "expired", "tuple", "suspended", "missing_method",
-     "false_method", "revoked", "missing_revocation", "missing_core_case",
-     "passed_recovery_missing_readback", "passed_recovery_foreign_readback",
-     "passed_recovery_valid"],
+    [
+        "none",
+        "signature",
+        "expired",
+        "tuple",
+        "suspended",
+        "missing_method",
+        "false_method",
+        "revoked",
+        "missing_revocation",
+        "missing_core_case",
+        "passed_recovery_missing_readback",
+        "passed_recovery_foreign_readback",
+        "passed_recovery_valid",
+    ],
 )
 def test_signed_observation_is_not_an_adapter_assertion(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, fault: str
@@ -71,8 +86,7 @@ def test_signed_observation_is_not_an_adapter_assertion(
     }
     base["installed_tuple"] = {"platform": "synthetic"}
     method_modes = {
-        "method:" + method + ":" + mode: "unsupported"
-        for method in WIRE_METHODS for mode in MODES
+        "method:" + method + ":" + mode: "unsupported" for method in WIRE_METHODS for mode in MODES
     }
     payload: dict[str, Any] = {
         "inventory": base,
@@ -89,8 +103,10 @@ def test_signed_observation_is_not_an_adapter_assertion(
         "expires_at": now + 30,
         "dimensions": list(DIMENSIONS),
         "cases": {
-            **{name: "passed" for name in
-               ("adapter_behavior", "installed_identity", "runtime_artifacts")},
+            **{
+                name: "passed"
+                for name in ("adapter_behavior", "installed_identity", "runtime_artifacts")
+            },
             **{"dimension:" + d: "passed" for d in DIMENSIONS},
             **method_modes,
         },
@@ -113,15 +129,26 @@ def test_signed_observation_is_not_an_adapter_assertion(
         payload["method_modes"][recovery_key] = "passed"
         payload["cases"][recovery_key] = "passed"
         if fault != "passed_recovery_missing_readback":
-            payload["snapshot"] = {"recovery_measurements": [{
-                "method": (list(WIRE_METHODS)[1]
-                           if fault == "passed_recovery_foreign_readback" else method),
-                "mode": "rollback", "dataset_id": "dataset-1", "sequence": 1,
-                "observed_at": now, "scope_sha256": payload["scope_sha256"],
-                "artifacts": payload["runtime_artifacts"],
-                "readback_sha256": "d" * 64, "outcome": "passed",
-                "consistency_passed": True,
-            }]}
+            payload["snapshot"] = {
+                "recovery_measurements": [
+                    {
+                        "method": (
+                            list(WIRE_METHODS)[1]
+                            if fault == "passed_recovery_foreign_readback"
+                            else method
+                        ),
+                        "mode": "rollback",
+                        "dataset_id": "dataset-1",
+                        "sequence": 1,
+                        "observed_at": now,
+                        "scope_sha256": payload["scope_sha256"],
+                        "artifacts": payload["runtime_artifacts"],
+                        "readback_sha256": "d" * 64,
+                        "outcome": "passed",
+                        "consistency_passed": True,
+                    }
+                ]
+            }
     raw = json.dumps(payload).encode()
     import hashlib
 
@@ -154,8 +181,9 @@ def test_signed_observation_is_not_an_adapter_assertion(
                     "observer-key": {
                         "role": "observer",
                         "subject_id": "observer",
-                        **({} if fault == "missing_revocation" else
-                           {"revoked": fault == "revoked"}),
+                        **(
+                            {} if fault == "missing_revocation" else {"revoked": fault == "revoked"}
+                        ),
                         "public_key_pem": key.public_key()
                         .public_bytes(
                             serialization.Encoding.PEM,
@@ -163,9 +191,7 @@ def test_signed_observation_is_not_an_adapter_assertion(
                         )
                         .decode(),
                         "expires_at": now + 600,
-                        "scope": {
-                            k: base[k] for k in ("tenant_id", "site_id", "endpoint_id")
-                        },
+                        "scope": {k: base[k] for k in ("tenant_id", "site_id", "endpoint_id")},
                     }
                 },
             }

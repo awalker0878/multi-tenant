@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Domain\Qualification\CapabilityDefinitions;
 use App\Domain\Qualification\NativeQualification;
 
 it('derives enrolled-key identity itself and refuses signed fingerprint impersonation', function (): void {
@@ -60,15 +61,15 @@ it('requires distinct readback evidence for each passed installed recovery metho
     $scope = ['artifacts' => ['adapter' => str_repeat('a', 64)]];
     $matrix = [];
     $cases = ['adapter_behavior' => 'passed', 'installed_identity' => 'passed', 'runtime_artifacts' => 'passed'];
-    foreach (\App\Domain\Qualification\CapabilityDefinitions::WIRE_METHODS as $name) {
-        foreach (\App\Domain\Qualification\CapabilityDefinitions::MODES as $mode) {
+    foreach (CapabilityDefinitions::WIRE_METHODS as $name) {
+        foreach (CapabilityDefinitions::MODES as $mode) {
             $key = 'method:'.$name.':'.$mode;
             $matrix[$key] = 'unsupported';
             $cases[$key] = 'unsupported';
         }
     }
-    $method = \App\Domain\Qualification\CapabilityDefinitions::WIRE_METHODS[0];
-    $other = \App\Domain\Qualification\CapabilityDefinitions::WIRE_METHODS[1];
+    $method = CapabilityDefinitions::WIRE_METHODS[0];
+    $other = CapabilityDefinitions::WIRE_METHODS[1];
     foreach ([$method, $other] as $name) {
         $key = 'method:'.$name.':rollback';
         $matrix[$key] = 'passed';
@@ -76,7 +77,7 @@ it('requires distinct readback evidence for each passed installed recovery metho
     }
     $proof = [
         'kind' => 'native_conformance', 'simulation' => false, 'finalized' => true,
-        'definition_sha256' => \App\Domain\Qualification\CapabilityDefinitions::SHA256,
+        'definition_sha256' => CapabilityDefinitions::SHA256,
         'runtime_artifacts' => $scope['artifacts'], 'observed_at' => $now,
         'cases' => $cases, 'method_modes' => $matrix,
         'snapshot' => ['recovery_measurements' => []],
