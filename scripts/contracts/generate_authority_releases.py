@@ -62,6 +62,11 @@ RELEASES = {
         "Qualification": "contracts/schemas/planning/qualification-v2.1.json",
         "MigrationSupport": "contracts/schemas/planning/migration-support-v2.json",
     },
+    "planning-lifecycle-reads-v1.json": {
+        "BoundPlan": "contracts/openapi/planning-v1.2.json",
+        "Content": "contracts/openapi/planning-v1.2.json",
+        "MigrationReadiness": "contracts/schemas/planning/migration-readiness-v2.2.json",
+    },
 }
 
 
@@ -71,6 +76,31 @@ def assemble(name: str, root: Path = ROOT) -> dict:
     output = copy.deepcopy(read("contracts/openapi/" + name, root))
     for component, source in RELEASES[name].items():
         value = read(source, root)
+        if name == "planning-lifecycle-reads-v1.json":
+            if component in {"BoundPlan", "Content"}:
+                value = value["components"]["schemas"][component]
+                if component == "Content":
+                    current = output["components"]["schemas"][component]
+                    extras = set(current["properties"]) - set(value["properties"])
+                    if extras != {"native_provisioning", "native_migration", "migration_campaign"}:
+                        raise ValueError("Planning Lifecycle content extension list drift")
+                    value = copy.deepcopy(value)
+                    value["properties"].update({key: current["properties"][key] for key in extras})
+            else:
+                value.pop("$id", None)
+                value.pop("$schema", None)
+                def relocate(node):
+                    if isinstance(node, dict):
+                        if isinstance(node.get("$ref"), str) and node["$ref"].startswith("#/$defs/"):
+                            node["$ref"] = "#/components/schemas/MigrationReadiness/" + node["$ref"][2:]
+                        for child in node.values():
+                            relocate(child)
+                    elif isinstance(node, list):
+                        for child in node:
+                            relocate(child)
+                relocate(value)
+            output["components"]["schemas"][component] = value
+            continue
         if name == "lifecycle-internal-authority-v1.json":
             if component == "PlacementReserveCommand":
                 value = value["$defs"]["ReserveCommand"]

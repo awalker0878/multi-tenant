@@ -77,14 +77,17 @@ class ActiveContractTests(unittest.TestCase):
 
     def test_retirement_blocked_by_prior_declared_consumer(self):
         self.registry([PATH], consumers=["planning"])
+        self.write("services/planning/src/planning/reader.py",
+                   'CONTRACT = "' + PATH + '"\n')
         self.base = self.commit()
         self.registry([])
         (self.root / PATH).unlink()
-        with self.assertRaisesRegex(ValueError, "declared consumers"):
+        with self.assertRaisesRegex(ValueError, "current reference services/planning"):
             check(self.root, self.base)
 
     def test_retirement_blocked_by_prior_installed_copy(self):
         self.registry([PATH], copies=["services/inventory/resources/contracts/current-v1.json"])
+        self.write("services/inventory/resources/contracts/current-v1.json", "{}\n")
         self.base = self.commit()
         self.registry([])
         (self.root / PATH).unlink()
@@ -93,7 +96,7 @@ class ActiveContractTests(unittest.TestCase):
 
     def test_retirement_blocked_by_prior_dependent_release(self):
         self.registry([PATH, NEW], depends_on=[PATH])
-        self.write(NEW, "{}\n")
+        self.write(NEW, '{"$ref":"current-v1.json"}\n')
         self.base = self.commit()
         self.registry([NEW])
         (self.root / PATH).unlink()
@@ -106,7 +109,54 @@ class ActiveContractTests(unittest.TestCase):
         self.base = self.commit()
         self.registry([])
         (self.root / PATH).unlink()
-        with self.assertRaisesRegex(ValueError, "runtime loader registrations"):
+        with self.assertRaisesRegex(ValueError, "current reference architecture/installed-contract-usage"):
+            check(self.root, self.base)
+
+    def test_retirement_allowed_after_real_consumer_copy_and_loader_removal(self):
+        copy = "services/planning/src/planning/infrastructure/inputs/current-v1.json"
+        loader = "services/planning/src/planning/reader.py"
+        self.registry([PATH], consumers=["planning"], copies=[copy])
+        self.write(copy, "{}\n")
+        self.write(loader, 'NAME = "current-v1"\n')
+        self.write("architecture/installed-contract-usage.json",
+                   '{"copies": [{"canonical": "' + PATH + '", "copy": "' + copy + '"}]}\n')
+        self.base = self.commit()
+        self.registry([])
+        self.write("architecture/installed-contract-usage.json", '{"copies": []}\n')
+        for path in (PATH, copy, loader):
+            (self.root / path).unlink()
+        self.assertEqual(check(self.root, self.base)["removed"], [PATH])
+
+    def test_simultaneous_deletion_does_not_hide_surviving_typed_loader(self):
+        copy = "services/planning/src/planning/infrastructure/inputs/current-v1.json"
+        self.registry([PATH], consumers=["planning"], copies=[copy])
+        self.write(copy, "{}\n")
+        self.write("services/planning/src/planning/reader.py", 'NAME = "current-v1"\n')
+        self.base = self.commit()
+        self.registry([])
+        (self.root / PATH).unlink()
+        (self.root / copy).unlink()
+        with self.assertRaisesRegex(ValueError, "current reference services/planning"):
+            check(self.root, self.base)
+
+    def test_removal_allowed_with_prior_consumer_after_verified_migration(self):
+        self.registry([PATH], consumers=["planning"])
+        self.write("services/planning/src/planning/reader.py", 'CONTRACT = "' + PATH + '"\n')
+        self.base = self.commit()
+        self.registry([NEW], consumers=["planning"])
+        self.write(NEW, "{}\n")
+        self.write("services/planning/src/planning/reader.py", 'CONTRACT = "' + NEW + '"\n')
+        (self.root / PATH).unlink()
+        self.assertEqual(check(self.root, self.base)["removed"], [PATH])
+
+    def test_unregistered_prior_uri_reference_survives_registry_deletion(self):
+        self.write(PATH, '{"$id":"urn:current:v1","type":"object"}\n')
+        self.write(NEW, '{"$ref":"urn:current:v1"}\n')
+        self.registry([PATH, NEW])
+        self.base = self.commit()
+        self.registry([NEW])
+        (self.root / PATH).unlink()
+        with self.assertRaisesRegex(ValueError, "dependent canonical identity"):
             check(self.root, self.base)
 
     def test_base_revision_must_exist(self):

@@ -215,7 +215,7 @@ def test_real_inventory_planning_response_validates_installed_strict_schema(
     assert owners.request("INVENTORY", "GET", uri, schema_name="migration-input-v4") == produced
     from planning.domain.model import Rejected
     with pytest.raises(Rejected) as outdated:
-        owners.request("INVENTORY", "GET", uri, schema_name="migration-input-v3")
+        owners.request("INVENTORY", "GET", uri, schema_name="unsupported-input-v99")
     assert outdated.value.status == 503
 
     # Validate the current v1.3 API response against the canonical and installed

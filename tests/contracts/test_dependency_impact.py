@@ -60,6 +60,24 @@ class ContractImpactTests(unittest.TestCase):
             affected(["services/inventory/a.py"], self.components, self.components,
                      broken, broken)
 
+    def test_embedded_schema_change_reaches_generated_release_consumers(self):
+        schema = "contracts/schemas/common/current-v1.json"
+        api = "contracts/openapi/current-v1.json"
+        graph = {"contracts": {schema: ["contract-platform"], api: ["planning", "lifecycle"]},
+                 "active_releases": [{"path": schema, "owner": "contract-platform", "consumers": []},
+                                     {"path": api, "owner": "planning", "consumers": ["lifecycle"], "depends_on": [schema]}]}
+        result = affected([schema], self.components, self.components, graph, graph)
+        self.assertEqual(result["components"], ["lifecycle", "planning"])
+
+    def test_deleted_dependency_still_selects_prior_consumers(self):
+        schema = "contracts/schemas/common/current-v1.json"
+        api = "contracts/openapi/current-v1.json"
+        base = {"contracts": {schema: ["assurance"], api: ["planning"]},
+                "active_releases": [{"path": api, "owner": "planning", "consumers": [], "depends_on": [schema]}]}
+        head = {"contracts": {schema: ["assurance"]}, "active_releases": []}
+        result = affected([schema], self.components, self.components, base, head)
+        self.assertEqual(result["components"], ["assurance", "planning"])
+
 
 if __name__ == "__main__":
     unittest.main()

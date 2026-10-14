@@ -36,7 +36,7 @@ def test_runtime_operation_has_one_immutable_schema(owner, method, path, expecte
     assert contract_for_operation(owner, method, path) == expected
     assert contract_for_operation(owner, method, path, expected) == expected
     with pytest.raises(ValueError, match="owner_contract_operation_unavailable"):
-        contract_for_operation(owner, method, path, "migration-input-v3")
+        contract_for_operation(owner, method, path, "unsupported-input-v99")
     with pytest.raises(ValueError, match="owner_contract_operation_unavailable"):
         contract_for_operation(owner, "DELETE", path, expected)
 
@@ -96,7 +96,7 @@ def test_real_owner_transport_validates_qualified_assurance_response(monkeypatch
             owners.request("ASSURANCE", "POST", path, {}, schema_name="migration-support-v2")
         assert error.value.status == 503
     with pytest.raises(Rejected) as error:
-        owners.request("ASSURANCE", "POST", path, {}, schema_name="migration-support-v1")
+        owners.request("ASSURANCE", "POST", path, {}, schema_name="unsupported-response-v99")
     assert error.value.status == 503
 
 

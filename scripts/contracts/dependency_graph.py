@@ -12,6 +12,7 @@ from pathlib import Path
 
 from artifact_attestation import COMPONENTS
 from installed_usage import verify_installed_usage
+from discovery import verify_dependencies, verify_manifests
 
 ROOT = Path(__file__).resolve().parents[2]
 TYPE = {
@@ -29,6 +30,8 @@ def derive(root: Path = ROOT) -> dict:
     copies = {item["copy"]: item for item in usage["copies"]}
     # A declared copy is not executable loader evidence: verify real imports.
     verify_installed_usage(root, registry)
+    discovered = verify_dependencies(root, registry)
+    verify_manifests(root, registry)
     edges = []
     release_dependencies = []
     producer_local = []
@@ -41,10 +44,11 @@ def derive(root: Path = ROOT) -> dict:
             raise ValueError(f"Unknown active contract classification: {canonical}")
         if not (root / canonical).is_file():
             raise ValueError(f"Missing active dependency source: {canonical}")
-        for dependency in entry.get("depends_on", []):
+        for dependency in sorted(discovered[canonical]):
             if dependency == canonical or dependency not in active_paths:
                 raise ValueError(f"Invalid active dependency: {canonical} -> {dependency}")
-            release_dependencies.append({"release": canonical, "depends_on": dependency})
+            release_dependencies.append({"release": canonical, "depends_on": dependency,
+                                         "evidence": "independently-discovered"})
         declared_consumers = entry["consumers"]
         if len(declared_consumers) != len(set(declared_consumers)):
             raise ValueError(f"Duplicate consumers on: {canonical}")
@@ -104,11 +108,17 @@ def derive(root: Path = ROOT) -> dict:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", type=Path)
+    parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
     graph = derive()
     if args.output:
-        args.output.parent.mkdir(parents=True, exist_ok=True)
-        args.output.write_text(json.dumps(graph, indent=2) + "\n", encoding="utf-8")
+        rendered = json.dumps(graph, indent=2) + "\n"
+        if args.check:
+            if args.output.read_text() != rendered:
+                raise ValueError("Derived contract dependency report is stale")
+        else:
+            args.output.parent.mkdir(parents=True, exist_ok=True)
+            args.output.write_text(rendered, encoding="utf-8")
     print(json.dumps(graph["summary"], sort_keys=True))
 
 

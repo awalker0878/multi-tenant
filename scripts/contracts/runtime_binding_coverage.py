@@ -13,6 +13,15 @@ from assurance import inventory
 ROOT = Path(__file__).resolve().parents[2]
 
 
+def verify_deployable_inventory(root: Path) -> None:
+    actual = {str(path.parent.relative_to(root))
+              for family in ("apps", "services", "workers")
+              for path in (root / family).glob("*/Dockerfile")}
+    if actual != set(COMPONENTS):
+        raise ValueError("Deployable components and artifact ownership disagree: "
+                         + repr(sorted(actual ^ set(COMPONENTS))))
+
+
 def verify_required_ci_gate(root: Path) -> None:
     """Reject a disconnected or optional artifact gate, even if the builder exists."""
     ci = yaml.safe_load((root / ".github/workflows/ci.yml").read_text(encoding="utf-8"))
@@ -40,6 +49,7 @@ def verify_required_ci_gate(root: Path) -> None:
 
 
 def verify(root: Path = ROOT) -> dict:
+    verify_deployable_inventory(root)
     registry = json.loads((root / "architecture/contract-consumers.json").read_text())
     active = inventory(root)
     verify_installed_usage(root, registry)

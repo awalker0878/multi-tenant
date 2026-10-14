@@ -30,10 +30,28 @@ def affected(paths, base_components, head_components, base_graph, head_graph):
         if path.startswith(('scripts/', '.github/', 'deploy/', 'release/', 'architecture/')):
             selected.update(ids)
         elif path.startswith('contracts/'):
-            found = set(base_graph.get('contracts', {}).get(path, [])) | set(head_graph.get('contracts', {}).get(path, []))
+            impacted = {path}
+            reverse = {}
+            for graph in (base_graph, head_graph):
+                for release in graph.get('active_releases', []):
+                    dependencies = release.get('depends_on', [])
+                    need(isinstance(dependencies, list) and all(isinstance(d, str) for d in dependencies),
+                         'invalid_contract_dependency_record')
+                    for dependency in dependencies:
+                        reverse.setdefault(dependency, set()).add(release['path'])
+            pending = [path]
+            while pending:
+                for dependent in reverse.get(pending.pop(), set()) - impacted:
+                    impacted.add(dependent)
+                    pending.append(dependent)
+            found = {context for graph in (base_graph, head_graph) for canonical in impacted
+                     for context in graph.get('contracts', {}).get(canonical, [])}
+            found.update(context for graph in (base_graph, head_graph)
+                         for release in graph.get('active_releases', []) if release.get('path') in impacted
+                         for context in [release.get('owner'), *release.get('consumers', [])])
             if not found:
                 unknown.append(path)
-            selected.update(found or ids)
+            selected.update(found & ids or ids)
         elif path.startswith(('apps/', 'services/', 'workers/', 'packages/')):
             owners = {name for graph in (base_components, head_components) for name, item in graph.items()
                       if path == item['path'] or path.startswith(item['path'] + '/')}

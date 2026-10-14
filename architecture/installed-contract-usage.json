@@ -50,7 +50,7 @@
       "packaging_marker": "COPY --from=dependencies /app/resources/contracts/ ./resources/contracts/",
       "package_data": null,
       "package_data_marker": null,
-      "generator": "scripts/p04/generate_clients.py",
+      "generator": "contracts/source/openapi/inventory-v1.9/manifest.json",
       "generation_mode": "generated_or_source_assembled",
       "ci": ".github/workflows/ci.yml"
     },
@@ -198,6 +198,19 @@
       "ci": ".github/workflows/ci.yml"
     },
     {
+      "copy": "services/lifecycle/src/lifecycle/infrastructure/contracts/alert-delivery-v1.json",
+      "canonical": "contracts/schemas/lifecycle/alert-delivery-v1.json",
+      "loader": "services/lifecycle/src/lifecycle/infrastructure/execution_owners.py",
+      "load_kind": "literal",
+      "packaging": "services/lifecycle/Dockerfile",
+      "packaging_marker": "COPY src/ ./src/",
+      "package_data": "services/lifecycle/pyproject.toml",
+      "package_data_marker": "\"lifecycle.infrastructure.contracts\" = [\"*.json\"]",
+      "generator": null,
+      "generation_mode": "canonical_snapshot",
+      "ci": ".github/workflows/ci.yml"
+    },
+    {
       "copy": "services/lifecycle/src/lifecycle/infrastructure/contracts/assurance-evidence-v1.json",
       "canonical": "contracts/openapi/assurance-evidence-v1.json",
       "loader": "services/lifecycle/src/lifecycle/infrastructure/execution_owners.py",
@@ -271,6 +284,45 @@
       "packaging_marker": "COPY src/ ./src/",
       "package_data": "services/lifecycle/pyproject.toml",
       "package_data_marker": "\"lifecycle.infrastructure.contracts\" = [\"*.json\"]",
+      "generator": null,
+      "generation_mode": "canonical_snapshot",
+      "ci": ".github/workflows/ci.yml"
+    },
+    {
+      "copy": "services/lifecycle/src/lifecycle/infrastructure/contracts/worker-simulation-v1.json",
+      "canonical": "contracts/openapi/worker-simulation-v1.json",
+      "loader": "services/lifecycle/src/lifecycle/infrastructure/execution_owners.py",
+      "load_kind": "literal",
+      "packaging": "services/lifecycle/Dockerfile",
+      "packaging_marker": "COPY src/ ./src/",
+      "package_data": "services/lifecycle/pyproject.toml",
+      "package_data_marker": "\"lifecycle.infrastructure.contracts\" = [\"*.json\"]",
+      "generator": null,
+      "generation_mode": "canonical_snapshot",
+      "ci": ".github/workflows/ci.yml"
+    },
+    {
+      "copy": "services/planning/src/planning/infrastructure/facts/catalogue.json",
+      "canonical": "contracts/schemas/events/catalogue-intent-v1.json",
+      "loader": "services/planning/src/planning/infrastructure/facts/broker.py",
+      "load_kind": "literal",
+      "packaging": "services/planning/Dockerfile",
+      "packaging_marker": "COPY src/ ./src/",
+      "package_data": "services/planning/pyproject.toml",
+      "package_data_marker": "\"planning.infrastructure.facts\" = [\"*.json\"]",
+      "generator": null,
+      "generation_mode": "canonical_snapshot",
+      "ci": ".github/workflows/ci.yml"
+    },
+    {
+      "copy": "services/planning/src/planning/infrastructure/facts/inventory.json",
+      "canonical": "contracts/schemas/inventory/fact-v1.1.json",
+      "loader": "services/planning/src/planning/infrastructure/facts/broker.py",
+      "load_kind": "literal",
+      "packaging": "services/planning/Dockerfile",
+      "packaging_marker": "COPY src/ ./src/",
+      "package_data": "services/planning/pyproject.toml",
+      "package_data_marker": "\"planning.infrastructure.facts\" = [\"*.json\"]",
       "generator": null,
       "generation_mode": "canonical_snapshot",
       "ci": ".github/workflows/ci.yml"
@@ -401,32 +453,6 @@
       "packaging_marker": "COPY src/ ./src/",
       "package_data": "services/planning/pyproject.toml",
       "package_data_marker": "\"planning.infrastructure.messaging\" = [\"*.json\"]",
-      "generator": null,
-      "generation_mode": "canonical_snapshot",
-      "ci": ".github/workflows/ci.yml"
-    },
-    {
-      "copy": "services/lifecycle/src/lifecycle/infrastructure/contracts/worker-simulation-v1.json",
-      "canonical": "contracts/openapi/worker-simulation-v1.json",
-      "loader": "services/lifecycle/src/lifecycle/infrastructure/execution_owners.py",
-      "load_kind": "literal",
-      "packaging": "services/lifecycle/Dockerfile",
-      "packaging_marker": "COPY src/ ./src/",
-      "package_data": "services/lifecycle/pyproject.toml",
-      "package_data_marker": "\"lifecycle.infrastructure.contracts\" = [\"*.json\"]",
-      "generator": null,
-      "generation_mode": "canonical_snapshot",
-      "ci": ".github/workflows/ci.yml"
-    },
-    {
-      "copy": "services/lifecycle/src/lifecycle/infrastructure/contracts/alert-delivery-v1.json",
-      "canonical": "contracts/schemas/lifecycle/alert-delivery-v1.json",
-      "loader": "services/lifecycle/src/lifecycle/infrastructure/execution_owners.py",
-      "load_kind": "literal",
-      "packaging": "services/lifecycle/Dockerfile",
-      "packaging_marker": "COPY src/ ./src/",
-      "package_data": "services/lifecycle/pyproject.toml",
-      "package_data_marker": "\"lifecycle.infrastructure.contracts\" = [\"*.json\"]",
       "generator": null,
       "generation_mode": "canonical_snapshot",
       "ci": ".github/workflows/ci.yml"

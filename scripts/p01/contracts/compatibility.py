@@ -12,7 +12,11 @@ import hashlib
 import json
 import re
 import subprocess
+import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "contracts"))
+from discovery import canonical_dependencies, retirement_references
 
 AREAS = ("openapi", "schemas", "capabilities", "platforms", "asyncapi")
 
@@ -66,40 +70,67 @@ def check(root: Path, base_revision: str) -> dict:
         raise ValueError("Active published contract removed or changed: "
                          + ", ".join(modified))
 
-    # Retirement must be justified against the *previous* consumer graph, not
-    # merely by deleting both a release and its declarations in this change.
+    # Use prior binding identities to discover current use. Prior consumers are
+    # evidence to investigate, not a permanent prohibition after real migration.
     removed = previous - active
     if removed:
         try:
             old_registry = json.loads(git("show", base_revision + ":architecture/contract-consumers.json"))
         except (ValueError, json.JSONDecodeError) as error:
             raise ValueError("Cannot establish previous contract consumers for retirement") from error
+        # The trusted main revision may predate active-release enrollment. Its
+        # actual canonical tree and packaged bytes still establish prior names;
+        # never move the integrity baseline forward to hide deletions/mutations.
         old_releases = {item["path"]: item for item in old_registry.get("active_releases", [])}
+        prior_files = git("ls-tree", "-r", "--name-only", base_revision).decode().splitlines()
+        old_copies = {}
+        for candidate in prior_files:
+            if candidate.endswith(".json") and (
+                    "/resources/contracts/" in candidate
+                    or re.search(r"/src/[^/]+/infrastructure/(inputs|contracts|messaging)/", candidate)):
+                old_copies[candidate] = git("show", base_revision + ":" + candidate)
+        for path in removed:
+            if path not in old_releases:
+                if "active_releases" in old_registry:
+                    raise ValueError("Unregistered prior canonical release cannot be retired: " + path)
+                original = git("show", base_revision + ":" + path)
+                old_releases[path] = {"path": path,
+                                      "consumers": old_registry.get("contracts", {}).get(path, []),
+                                      "copies": [copy for copy, content in old_copies.items() if content == original]}
+        old_registry = dict(old_registry, active_releases=list(old_releases.values()))
         old_usage = {}
         try:
             old_usage = json.loads(git("show", base_revision + ":architecture/installed-contract-usage.json"))
-        except ValueError as error:
-            raise ValueError("Cannot establish previous installed contract usage for retirement") from error
-        references = {}
-        for item in old_registry.get("active_releases", []):
-            for dependency in item.get("depends_on", []):
-                references.setdefault(dependency, []).append(item["path"])
+        except ValueError:
+            old_usage = {"copies": [{"copy": copy, "canonical": row["path"]}
+                                    for row in old_releases.values() for copy in row.get("copies", [])]}
+        references = retirement_references(root, removed, old_registry, old_usage)
         for path in sorted(removed):
             item = old_releases.get(path)
             if item is None:
                 raise ValueError("Unregistered prior canonical release cannot be retired: " + path)
-            blockers = []
-            if item.get("consumers"):
-                blockers.append("declared consumers " + repr(item["consumers"]))
-            if item.get("copies"):
-                blockers.append("installed copies " + repr(item["copies"]))
-            if references.get(path):
-                blockers.append("dependent releases " + repr(references[path]))
-            if any(row.get("canonical") == path for row in old_usage.get("copies", [])):
-                blockers.append("runtime loader registrations")
+            blockers = references[path]
+            # Scan canonical URI references and producer boundary identities
+            # independently from both editable registry declarations.
+            old_document = json.loads(git("show", base_revision + ":" + path)) if path.endswith(".json") else __import__("yaml").safe_load(git("show", base_revision + ":" + path))
+            identifier = old_document.get("$id") if isinstance(old_document, dict) else None
+            if identifier:
+                from discovery import repository_texts
+                for source, body in repository_texts(root):
+                    if re.search(r"(?<![A-Za-z0-9_.:-])" + re.escape(identifier)
+                                 + r"(?![A-Za-z0-9_.:-])", body):
+                        blockers.append("canonical identity reference " + source)
+                for source, body in current.items():
+                    if re.search(r"(?<![A-Za-z0-9_.:-])" + re.escape(identifier)
+                                 + r"(?![A-Za-z0-9_.:-])", body.decode()):
+                        blockers.append("dependent canonical identity " + source)
             if blockers:
                 raise ValueError("Contract retirement requires verified consumer removal: "
                                  + path + ": " + "; ".join(blockers))
+
+    # Do not rely on check.py being invoked separately: a direct publication
+    # gate must reject unresolved current executable references too.
+    canonical_dependencies(root)
 
     # A canonical deletion is permitted only as an actual worktree removal:
     # check_registry and runtime_inventory separately prohibit stale shipped
@@ -111,6 +142,7 @@ def check(root: Path, base_revision: str) -> dict:
         "modified_existing": modified,
         "added": sorted(active - previous),
         "removed": sorted(previous - active),
+        "external_commitments": "Not established by repository evidence; owner must verify supported external deployments before retirement",
         "baseline_sha256": {p: hashlib.sha256(v).hexdigest() for p, v in baseline.items()},
     }
 

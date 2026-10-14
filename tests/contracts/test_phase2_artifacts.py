@@ -149,7 +149,8 @@ class ArtifactTests(unittest.TestCase):
         current.parent.mkdir(parents=True)
         current.write_bytes(self.contract)
 
-    def wheel_contents(self, schema=None, extra=None, code=None, tamper_record=False, tamper_scripts=False):
+    def wheel_contents(self, schema=None, extra=None, code=None, tamper_record=False, tamper_scripts=False,
+                       extra_name="planning/infrastructure/inputs/orphan.json"):
         # A real wheel must carry a complete, correct RECORD and distribution
         # identity; the tests must never pass using a plain zip-shaped fixture.
         dist = "product_planning-0.1.0.dev0.dist-info"
@@ -171,7 +172,7 @@ class ArtifactTests(unittest.TestCase):
             ),
         }
         if extra is not None:
-            payloads["planning/infrastructure/inputs/orphan.json"] = extra
+            payloads[extra_name] = extra
         record_rows = []
         with zipfile.ZipFile(self.wheel, "w") as archive:
             for name, value in payloads.items():
@@ -212,6 +213,7 @@ class ArtifactTests(unittest.TestCase):
                 patch("artifact_attestation.consumed_bindings", return_value=[]):
             wrong_name = self.wheel.with_name("wrong_name-0.1.0.dev0-py3-none-any.whl")
             self.wheel_contents()
+
             self.wheel.rename(wrong_name)
             with self.assertRaisesRegex(ValueError, "Wheel filename identity"):
                 check_wheel("services/planning", wrong_name, self.root)
@@ -232,6 +234,22 @@ class ArtifactTests(unittest.TestCase):
             project.write_text('[project]\nname = "product-other"\nversion = "0.1.0.dev0"\n')
             with self.assertRaisesRegex(ValueError, "identity differs"):
                 check_wheel("services/planning", self.wheel, self.root)
+
+    def test_reviewed_fact_and_unknown_namespace_schemas_still_require_registration(self):
+        with patch.dict(os.environ, {"GITHUB_SHA": "a" * 40}), \
+                patch("artifact_attestation.expected", return_value=([self.copy], [])), \
+                patch("artifact_attestation.consumed_bindings", return_value=[]):
+            for name, raw in (
+                ("planning/infrastructure/facts/catalogue.json", b'{"type":"object"}'),
+                ("planning/domain/hidden/schema.json", b'{"$schema":"https://json-schema.org/draft/2020-12/schema"}'),
+            ):
+                reviewed = self.root / "services/planning/src" / name
+                reviewed.parent.mkdir(parents=True, exist_ok=True)
+                reviewed.write_bytes(raw)
+                self.wheel_contents(extra=raw, extra_name=name)
+                with self.assertRaisesRegex(ValueError, "unregistered contract copies"):
+                    check_wheel("services/planning", self.wheel, self.root)
+                reviewed.unlink()
 
     def test_wheel_code_is_identical_to_reviewed_python_source(self):
         with patch.dict(os.environ, {"GITHUB_SHA": "a" * 40}), \

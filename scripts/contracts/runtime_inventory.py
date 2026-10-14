@@ -6,6 +6,7 @@ This catches stale packaged copies even when no executable source references the
 from __future__ import annotations
 
 import ast
+import json
 import re
 from pathlib import Path
 
@@ -34,19 +35,33 @@ def runtime_sources(root: Path):
 
 
 def deployed_copies(root: Path):
+    observed = set()
     for family in ("services", "apps", "workers"):
         for component in (root / family).glob("*"):
             directory = component / "resources/contracts"
             if directory.is_dir():
-                yield from directory.glob("*.json")
+                observed.update(directory.rglob("*.json"))
     # Python packages use importlib.resources instead of PHP-style resources.
     for family in ("services", "workers"):
         for component in (root / family).glob("*"):
             for infrastructure in (component / "src").glob("*/infrastructure"):
-                for subdir in ("inputs", "contracts", "messaging"):
+                for subdir in ("inputs", "contracts", "messaging", "facts"):
                     folder = infrastructure / subdir
                     if folder.is_dir():
-                        yield from folder.glob("*.json")
+                        observed.update(folder.rglob("*.json"))
+            for path in (component / "src").rglob("*.json"):
+                if contract_payload(path.read_bytes()):
+                    observed.add(path)
+    yield from sorted(observed)
+
+
+def contract_payload(raw: bytes) -> bool:
+    """Self-identifying specs/schemas remain contracts outside known folders."""
+    try:
+        value = json.loads(raw)
+    except (ValueError, UnicodeError):
+        return False
+    return isinstance(value, dict) and bool({"$schema", "$id", "openapi", "asyncapi"} & value.keys())
 
 
 def executable_contract_loads(source: Path) -> set[str]:
@@ -54,6 +69,21 @@ def executable_contract_loads(source: Path) -> set[str]:
     body = source.read_text(encoding="utf-8")
     if source.suffix == ".py":
         tree = ast.parse(body, filename=str(source))
+        tables = {}
+        for node in tree.body:
+            if isinstance(node, (ast.Assign, ast.AnnAssign)):
+                names = node.targets if isinstance(node, ast.Assign) else [node.target]
+                value = node.value
+                if isinstance(value, ast.Call) and isinstance(value.func, ast.Name) and value.func.id == "MappingProxyType" and len(value.args) == 1:
+                    value = value.args[0]
+                if isinstance(value, ast.Dict):
+                    try:
+                        table = ast.literal_eval(value)
+                    except (ValueError, TypeError):
+                        continue
+                    for name in names:
+                        if isinstance(name, ast.Name):
+                            tables[name.id] = table
         loaded = set()
         for call in ast.walk(tree):
             if (not isinstance(call, ast.Call)
@@ -70,6 +100,10 @@ def executable_contract_loads(source: Path) -> set[str]:
                         if isinstance(value, ast.Constant) and isinstance(value.value, str)
                         and value.value.endswith(".json")
                     )
+                    for arg in child.args:
+                        if isinstance(arg, ast.Subscript) and isinstance(arg.value, ast.Name):
+                            loaded.update(value for value in tables.get(arg.value.id, {}).values()
+                                          if isinstance(value, str) and value.endswith(".json"))
         return loaded
     if source.suffix == ".php":
         return {
@@ -121,6 +155,16 @@ def verify_runtime_inventory(registry: dict, root: Path = ROOT) -> dict[str, lis
     missing = {path: sources for path, sources in observed.items() if path not in indexed}
     if missing:
         raise ValueError("Runtime contract copies missing from active releases: " + repr(missing))
+    # Discovery must survive simultaneous removal of copy and registry records.
+    # Otherwise a surviving literal loader disappears from the by-name join.
+    for source in runtime_sources(root):
+        component = source.relative_to(root).parts[:2]
+        shipped_names = {Path(path).name for path in shipped
+                         if Path(path).parts[:2] == component}
+        unresolved = executable_contract_loads(source) - shipped_names - {".json"}
+        if unresolved:
+            raise ValueError("Undeclared executable contract loader: "
+                             + str(source.relative_to(root)) + ": " + repr(sorted(unresolved)))
 
     # Installed copies must have executable consumers. Planning resolves schema
     # names through its typed operation map, rather than literal filenames.

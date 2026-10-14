@@ -169,6 +169,8 @@ jobs:
             REVIEW_BASE="$(git rev-parse HEAD^)"
           fi
           git cat-file -e "$REVIEW_BASE^{commit}"
+          python scripts/p01/contracts/compatibility.py --base "$REVIEW_BASE" > "$RUNNER_TEMP/contract-integrity.json"
+          python scripts/p01/contracts/test_compatibility.py
           # On first adoption of the quality policy, releases that predate
           # the policy are the baseline, not newly published strict versions.
           # Derive the cutover from Git provenance; do not keep historical
@@ -192,6 +194,9 @@ jobs:
           python scripts/p06/generate_contracts.py --check
           python scripts/contracts/runtime_binding_coverage.py
           python scripts/contracts/check.py
+          python scripts/contracts/dependency_graph.py --output "$RUNNER_TEMP/contract-dependencies.json"
+          python scripts/contracts/dependency_graph.py --output architecture/contract-dependencies.json --check
+          python scripts/contracts/release_inventory.py --output architecture/contract-release-inventory.json --check
           python -m unittest discover -s tests/contracts -p 'test_*.py' -q
       # Keep diagnostic observations independent from unrelated test-suite
       # failures. The failing tests still make CI / Required red; no receipt is

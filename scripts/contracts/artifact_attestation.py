@@ -250,6 +250,7 @@ def check_wheel(component: str, wheel: Path, root: Path = ROOT) -> dict:
         expected_sources = {
             str(file.relative_to(source_root)): sha(file.read_bytes())
             for file in source_root.rglob("*") if file.is_file()
+            and "__pycache__" not in file.parts and file.suffix not in {".pyc", ".pyo"}
         }
         packaged_sources = {
             name[len(package) + 1:]: sha(archive.read(name))
@@ -271,7 +272,9 @@ def check_wheel(component: str, wheel: Path, root: Path = ROOT) -> dict:
         for name in members:
             if not name.startswith(package + "/") or not name.endswith(".json"):
                 continue
-            if any("/" + d + "/" in name for d in ("inputs", "contracts", "messaging")):
+            from runtime_inventory import contract_payload
+            if (any("/" + d + "/" in name for d in ("inputs", "contracts", "messaging", "facts"))
+                    or contract_payload(archive.read(name))):
                 deployed.add(name)
         registered = {item["path"].split("/src/", 1)[1] for item in copies}
         # Some components bundle application fixture JSON unrelated to contract
@@ -299,16 +302,17 @@ def compare_runtime_tree(source_root: Path, image_root: Path, component: str,
            for file in folder.rglob("*")):
         raise ValueError(f"Runtime source contains an unreviewed symlink: {component}")
 
-    def files(folder: Path) -> dict[str, str]:
+    def files(folder: Path, *, reviewed: bool = False) -> dict[str, str]:
         return {
             str(file.relative_to(folder)): sha(file.read_bytes())
             for file in folder.rglob("*")
             if file.is_file()
+            and not (reviewed and ("__pycache__" in file.parts or file.suffix in {".pyc", ".pyo"}))
             and not (skip_cache and file.relative_to(folder).parts[0] == "cache")
             and not (skip_generated_build and file.relative_to(folder).parts[0] == "build")
         }
 
-    expected = files(source_root)
+    expected = files(source_root, reviewed=True)
     actual = files(image_root)
     if not expected or expected != actual:
         raise ValueError(f"Image differs from reviewed runtime source tree: {component}")
@@ -520,11 +524,14 @@ def check_image(component: str, tag: str, root: Path = ROOT) -> dict:
                 compare_runtime_tree(source_root, local_root, component)
             if COMPONENTS[component][1] == "python":
                 found = set()
-                for namespace in ("inputs", "contracts", "messaging"):
+                for namespace in ("inputs", "contracts", "messaging", "facts"):
                     folder = local_root / "infrastructure" / namespace
                     found.update(
-                        str(p.relative_to(local_root)) for p in folder.glob("*.json")
+                        str(p.relative_to(local_root)) for p in folder.rglob("*.json")
                     )
+                from runtime_inventory import contract_payload
+                found.update(str(p.relative_to(local_root)) for p in local_root.rglob("*.json")
+                             if contract_payload(p.read_bytes()))
                 expected_names = {
                     "/".join(Path(x["path"].split("/src/", 1)[1]).parts[1:])
                     for x in copies

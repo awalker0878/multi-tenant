@@ -8,6 +8,7 @@ from jsonschema import Draft202012Validator, FormatChecker
 from check_schema import load
 from runtime_inventory import verify_runtime_inventory
 from installed_usage import verify_installed_usage
+from discovery import verify_dependencies, verify_manifests
 ROOT = Path(__file__).resolve().parents[2]
 
 def check_consumer_registry():
@@ -22,33 +23,6 @@ def check_consumer_registry():
     if set(names) != set(inventory):
         raise ValueError("Active contract registry does not cover every declared consumer")
     active = set(names)
-    # Reject undeclared canonical cross-release references. Local JSON Schema
-    # anchors (#/$defs/...) stay within their own release; references to a
-    # different canonical file must appear in the reviewed dependency graph.
-    for entry in releases:
-        path = entry["path"]
-        if not path.endswith(".json"):
-            continue
-        document = load(path)
-        declared = set(entry.get("depends_on", []))
-        refs = []
-        def walk(value):
-            if isinstance(value, dict):
-                reference = value.get("$ref")
-                if isinstance(reference, str) and not reference.startswith("#"):
-                    refs.append(reference)
-                for child in value.values():
-                    walk(child)
-            elif isinstance(value, list):
-                for child in value:
-                    walk(child)
-        walk(document)
-        for reference in refs:
-            if reference.startswith(("https://", "http://", "urn:")):
-                continue
-            dependency = str((ROOT / path).parent.joinpath(reference.split("#", 1)[0]).resolve().relative_to(ROOT.resolve()))
-            if dependency not in active or dependency not in declared:
-                raise ValueError(f"Undeclared active canonical reference: {path} -> {dependency}")
     # Registry ownership is authoritative only when all independent indexes
     # agree. A second editable list must not silently contradict the release.
     for entry in releases:
@@ -151,6 +125,8 @@ def check_consumer_registry():
     if canonical != set(names):
         raise ValueError("Canonical contracts outside active releases: " + repr(sorted(canonical - set(names)))
                          + "; active releases without canonical files: " + repr(sorted(set(names) - canonical)))
+    verify_dependencies(ROOT, registry)
+    verify_manifests(ROOT, registry)
     verify_runtime_inventory(registry, ROOT)
     verify_installed_usage(ROOT, registry)
 

@@ -35,7 +35,7 @@ class ActiveReleaseAcceptance(unittest.TestCase):
 
     def test_current_source_generated_authority_releases_are_byte_semantically_equal(self):
         from generate_authority_releases import verify
-        self.assertEqual(verify(ROOT), 4)
+        self.assertEqual(verify(ROOT), 5)
 
     def test_root_level_passthrough_field_matches_current_published_crosswalk_schema(self):
         from jsonschema import Draft202012Validator
