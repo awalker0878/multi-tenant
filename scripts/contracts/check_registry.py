@@ -32,6 +32,11 @@ def check_consumer_registry():
             raise ValueError(f"Duplicate or invalid release consumers: {path}")
         if owner in consumers:
             raise ValueError(f"Owner listed as its own external consumer: {path}")
+        if len(inventory[path]) != len(set(inventory[path])):
+            raise ValueError(f"Duplicate owner/consumer index entries: {path}")
+        copies = entry.get("copies", [])
+        if not isinstance(copies, list) or len(copies) != len(set(copies)):
+            raise ValueError(f"Duplicate or invalid installed copies: {path}")
         if set(inventory[path]) != {owner, *consumers}:
             raise ValueError(f"Release ownership and consumer index disagree: {path}")
         dependencies = entry.get("depends_on", [])
