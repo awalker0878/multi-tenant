@@ -72,7 +72,7 @@ def test_signed_observation_is_not_an_adapter_assertion(
         "method:" + method + ":" + mode: "unsupported"
         for method in WIRE_METHODS for mode in MODES
     }
-    payload = {
+    payload: dict[str, Any] = {
         "inventory": base,
         "subject_id": "observer",
         "decision_sha256": "a" * 64,
