@@ -273,6 +273,46 @@ class ArtifactTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "lacks compiled Vite manifest"):
                 check_console_frontend(root)
 
+    def test_console_manifest_checks_lazy_chunks_and_rejects_untrusted_paths(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            assets = root / "assets"
+            assets.mkdir()
+            (assets / "app.js").write_text("entry")
+            (assets / "lazy.js").write_text("chunk")
+            manifest = root / "manifest.json"
+            entry = {"file": "assets/app.js",
+                     "dynamicImports": ["resources/js/lazy.ts"]}
+            lazy = {"file": "assets/lazy.js"}
+            manifest.write_text(json.dumps({
+                "resources/js/app.ts": entry,
+                "resources/js/lazy.ts": lazy,
+            }))
+            self.assertEqual(check_console_frontend(root), 2)
+            for poison in (
+                {**entry, "dynamicImports": ["resources/js/missing.ts"]},
+                {**entry, "imports": "resources/js/lazy.ts"},
+                {**entry, "css": "../../outside.css"},
+                {**entry, "assets": ["assets\\app.js"]},
+                {**entry, "file": None},
+            ):
+                manifest.write_text(json.dumps({
+                    "resources/js/app.ts": poison,
+                    "resources/js/lazy.ts": lazy,
+                }))
+                with self.assertRaises(ValueError):
+                    check_console_frontend(root)
+            manifest.write_text(json.dumps({
+                "resources/js/app.ts": entry,
+                "resources/js/lazy.ts": lazy,
+            }))
+            (assets / "lazy.js").unlink()
+            with self.assertRaisesRegex(ValueError, "not present"):
+                check_console_frontend(root)
+            (assets / "lazy.js").symlink_to("app.js")
+            with self.assertRaisesRegex(ValueError, "not present"):
+                check_console_frontend(root)
+
     def test_all_shipped_runtime_files_must_match_the_reviewed_source(self):
         source = self.root / "source"
         image = self.root / "image"

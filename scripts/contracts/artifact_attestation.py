@@ -316,26 +316,44 @@ def compare_runtime_tree(source_root: Path, image_root: Path, component: str,
 
 
 def check_console_frontend(browser: Path) -> int:
+    """Validate shipped Vite entrypoints, lazy chunks and every referenced asset.
+
+    A missing lazy chunk must fail artifact qualification just like a missing
+    entrypoint; do not accept a manifest with undeclared imports or unsafe
+    paths. This proves built-file presence, not browser behavior or source
+    reproducibility.
+    """
     manifest = browser / "manifest.json"
-    if not manifest.is_file():
+    if not manifest.is_file() or manifest.is_symlink():
         raise ValueError("Console runtime image lacks compiled Vite manifest")
     contents = json.loads(manifest.read_text(encoding="utf-8"))
     if not isinstance(contents, dict) or not contents:
         raise ValueError("Console runtime has an empty/invalid Vite manifest")
     assets = set()
-    for row in contents.values():
-        if not isinstance(row, dict):
+    for entry, row in contents.items():
+        if not isinstance(entry, str) or not entry or not isinstance(row, dict):
             raise ValueError("Invalid compiled frontend entry")
-        for name in [row.get("file"), *row.get("css", []), *row.get("assets", [])]:
-            if name is None:
-                continue
-            if not isinstance(name, str):
+        chunks = row.get("imports", [])
+        lazy_chunks = row.get("dynamicImports", [])
+        if not isinstance(chunks, list) or not isinstance(lazy_chunks, list):
+            raise ValueError("Invalid compiled frontend imports")
+        for imported in [*chunks, *lazy_chunks]:
+            if not isinstance(imported, str) or imported not in contents:
+                raise ValueError("Console Vite manifest refers to an unknown imported chunk")
+        css = row.get("css", [])
+        dependencies = row.get("assets", [])
+        if not isinstance(css, list) or not isinstance(dependencies, list):
+            raise ValueError("Invalid compiled frontend asset list")
+        if not isinstance(row.get("file"), str):
+            raise ValueError("Console Vite manifest entry lacks output file")
+        for name in [row["file"], *css, *dependencies]:
+            if not isinstance(name, str) or not name or "\\" in name:
                 raise ValueError("Invalid frontend asset path")
             source = Path(name)
-            target = (browser / source)
+            target = browser / source
             if (source.is_absolute() or ".." in source.parts
                     or not target.resolve().is_relative_to(browser.resolve())
-                    or not target.is_file()):
+                    or not target.is_file() or target.is_symlink()):
                 raise ValueError("Compiled frontend asset not present in runtime image: " + name)
             assets.add(name)
     if not assets:
