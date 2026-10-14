@@ -14,7 +14,7 @@ sys.path.insert(0, str(ROOT / "scripts/contracts"))
 from quality import (
     quality_api, quality_schema, quality_event,
     api_breakages, schema_breakages, event_breakages, check_new_releases,
-    quality_catalogue,
+    quality_catalogue, declaration_breakages,
 )
 
 POLICY = json.loads((ROOT / "architecture/contract-quality-policy.json").read_text())
@@ -283,6 +283,41 @@ class SchemaAndEvents(unittest.TestCase):
             (schema_dir / "candidate-v2.json").unlink()
             with self.assertRaisesRegex(ValueError, "lacks its canonical schema"):
                 quality_catalogue(path, {"status": "proposed_not_qualified"}, root)
+
+    def test_capability_and_platform_semantics_require_major_for_removals(self):
+        old = {
+            "schema_version": 1, "version": "1.0.0", "status": "proposed_not_qualified",
+            "platforms": ["vmware", "ahv"],
+            "features": [{"id": "network", "mapping": "observe"},
+                         {"id": "storage", "mapping": "verify"}],
+            "methods": {"cold_export": {"stages": ["capture", "verify"]}},
+        }
+        additive = copy.deepcopy(old)
+        additive["version"] = "1.1.0"
+        additive["platforms"].append("openstack")
+        additive["features"].append({"id": "guest", "mapping": "observe"})
+        additive["methods"]["new_method"] = {"stages": ["rehearsal"]}
+        self.assertEqual(declaration_breakages(old, additive, "declaration"), [])
+        changed = copy.deepcopy(additive)
+        changed["status"] = "qualified"
+        self.assertIn("existing declaration semantics changed",
+                      repr(declaration_breakages(old, changed, "declaration")))
+        changed = copy.deepcopy(additive)
+        changed["platforms"].remove("vmware")
+        self.assertIn("declared values removed",
+                      repr(declaration_breakages(old, changed, "declaration")))
+        changed = copy.deepcopy(additive)
+        del changed["methods"]["cold_export"]
+        self.assertIn("existing declaration removed",
+                      repr(declaration_breakages(old, changed, "declaration")))
+        changed = copy.deepcopy(additive)
+        changed["features"][0]["mapping"] = "qualified"
+        self.assertIn("existing declaration semantics changed",
+                      repr(declaration_breakages(old, changed, "declaration")))
+        # Ordered migration stages are safety semantics: order must be retained.
+        changed = copy.deepcopy(additive)
+        changed["methods"]["cold_export"]["stages"] = ["verify", "capture"]
+        self.assertTrue(declaration_breakages(old, changed, "declaration"))
 
     def test_new_event_requires_delivery_ordering_dedupe_dlq_and_schema_envelope(self):
         with tempfile.TemporaryDirectory() as directory:

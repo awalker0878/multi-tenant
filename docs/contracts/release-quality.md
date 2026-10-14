@@ -69,7 +69,7 @@ The admission script resolves the latest previously published version in
 the Git review base. It evaluates removed methods and routes, security
 changes, operation IDs, request constraints and required fields across **every declared request media type**,
 response statuses/media/guarantees across **every response media type**,
-media encoding, nested arrays and event routing/delivery changes. New schema
+media encoding, nested arrays, event routing/delivery, and capability/platform declaration changes. Existing method semantics, ordered migration stages, qualified statuses and field inventories cannot be removed or changed in a minor release. New schema
 identifiers are collision-checked against all current canonical schemas.
 A breaking change cannot reuse the same major version. A breaking major
 version must be explicit and is listed in the generated change report for

@@ -320,6 +320,56 @@ def event_breakages(old: dict, new: dict) -> list[str]:
     return failures
 
 
+def declaration_breakages(old: object, new: object, at: str, *, root: bool = True) -> list[str]:
+    """Conservative semantic compatibility for new capability/platform releases.
+
+    Additive keys, new named records and new source-field enumerations can be
+    minor releases; removing or changing existing qualified definitions cannot.
+    Nothing is loaded from archived copies or a compatibility catalogue.
+    """
+    if type(old) is not type(new):
+        return [at + ": declaration value type changed"]
+    if isinstance(old, dict):
+        issues = []
+        for key, value in old.items():
+            if root and key in {"schema_version", "version", "definition_version"}:
+                # Version identity changes with the canonical filename.
+                continue
+            where = at + "/" + key
+            if key not in new:
+                issues.append(where + ": existing declaration removed")
+            else:
+                issues.extend(declaration_breakages(value, new[key], where, root=False))
+        return issues
+    if isinstance(old, list):
+        unordered_lists = {"platforms", "dimensions", "actions", "strategies",
+                           "guests", "operations", "retest_triggers", "modes",
+                           "vm", "server", "volume"}
+        if at.rsplit("/", 1)[-1] in unordered_lists and all(
+                type(x) in (str, int, float, bool) for x in old + new):
+            previous = enum_members(old)
+            current = enum_members(new)
+            return [] if previous <= current else [at + ": declared values removed"]
+        if all(isinstance(x, dict) and isinstance(x.get("id"), str) for x in old + new):
+            ids_old = [x["id"] for x in old]
+            ids_new = [x["id"] for x in new]
+            if len(ids_old) != len(set(ids_old)) or len(ids_new) != len(set(ids_new)):
+                return [at + ": duplicate named declaration"]
+            indexed = {x["id"]: x for x in new}
+            issues = []
+            for item in old:
+                where = at + "/" + item["id"]
+                if item["id"] not in indexed:
+                    issues.append(where + ": named declaration removed")
+                else:
+                    issues.extend(declaration_breakages(item, indexed[item["id"]], where, root=False))
+            return issues
+        # Positional arrays such as migration stages and compound evidence
+        # records cannot be safely reordered or reinterpreted in a minor release.
+        return [] if old == new else [at + ": ordered declaration changed"]
+    return [] if old == new else [at + ": existing declaration semantics changed"]
+
+
 def quality_schema(path: str, schema: dict, policy: dict) -> None:
     if schema.get("$schema") != policy["schema_dialect"]:
         raise ValueError("New schema must use draft-2020-12: " + path)
@@ -653,6 +703,8 @@ def check_new_releases(root: Path, revision: str) -> dict:
                 breaking = event_breakages(old, doc)
             elif kind == "schemas":
                 breaking = schema_breakages(old, doc, path)
+            elif kind in ("capabilities", "platforms"):
+                breaking = declaration_breakages(old, doc, path)
             if breaking and ver[0] == older_version[0]:
                 raise ValueError("Breaking change requires a NEW MAJOR version: "
                                  + path + " " + "; ".join(breaking[:12]))
