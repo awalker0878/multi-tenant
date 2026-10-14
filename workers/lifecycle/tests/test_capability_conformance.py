@@ -124,12 +124,30 @@ def test_failure_suspends_review_until_a_new_decision(tmp_path: Path) -> None:
     assert state["suspended"]["d" * 64] == "conformance_recovery_readback_required"
     observed["snapshot"] = {"recovery_measurements": [
         {"dataset_id": "observed-dataset", "sequence": 1, "outcome": "passed",
-         "consistency_passed": True},
+         "consistency_passed": True, "method": recovery.split(":")[1],
+         "mode": "rollback", "scope_sha256": digest(scope), "artifacts": artifacts,
+         "observed_at": 1000, "readback_sha256": "d" * 64},
     ]}
     publisher.publish(assignment | {"decision_sha256": "e" * 64})
     state = json.loads(output.read_text())
     accepted = json.loads(base64.b64decode(state["records"]["e" * 64]["content_base64"]))
     assert accepted["adapter_conformant"] is True
+    # A readback for one method cannot qualify a different method's rollback.
+    another = "method:" + list(WIRE_METHODS)[1] + ":rollback"
+    observed["method_modes"][another] = "passed"
+    observed["cases"][another]["outcome"] = "passed"
+    observed["cases"][another].pop("reason", None)
+    publisher.publish(assignment | {"decision_sha256": "1" * 64})
+    state = json.loads(output.read_text())
+    assert state["suspended"]["1" * 64] == "conformance_recovery_readback_required"
+    observed["snapshot"]["recovery_measurements"].append(
+        observed["snapshot"]["recovery_measurements"][0]
+        | {"method": another.split(":")[1], "dataset_id": "second-dataset"}
+    )
+    publisher.publish(assignment | {"decision_sha256": "2" * 64})
+    state = json.loads(output.read_text())
+    receipt = json.loads(base64.b64decode(state["records"]["2" * 64]["content_base64"]))
+    assert receipt["adapter_conformant"] is True
     # Top-level native outcome and nested inventory cannot disagree about
     # the actual installed tuple, even with otherwise valid signed cases.
     observed["inventory"]["installed_tuple"] = {"platform": "foreign"}

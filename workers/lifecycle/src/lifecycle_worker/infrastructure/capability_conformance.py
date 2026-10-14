@@ -5,6 +5,7 @@ import fcntl
 import hashlib
 import json
 import os
+import re
 import tempfile
 from collections.abc import Callable
 from pathlib import Path
@@ -141,26 +142,44 @@ class ConformancePublisher:
                 ):
                     raise NativeHeld("installed_method_mode_unsupported_reason_required")
                 method_modes[name] = outcome
-            latest_restores: dict[str, dict[str, Any]] = {}
-            for sample in observed["snapshot"].get("recovery_measurements", []):
-                prior = latest_restores.get(sample["dataset_id"])
+            snapshot = observed["snapshot"]
+            if not isinstance(snapshot, dict):
+                raise NativeHeld("conformance_recovery_readback_invalid")
+            measurements = snapshot.get("recovery_measurements", [])
+            if not isinstance(measurements, list):
+                raise NativeHeld("conformance_recovery_readback_invalid")
+            latest_restores: dict[tuple[str, str, str], dict[str, Any]] = {}
+            for sample in measurements:
+                if (not isinstance(sample, dict)
+                        or sample.get("method") not in WIRE_METHODS
+                        or sample.get("mode") not in MODES
+                        or not isinstance(sample.get("dataset_id"), str)
+                        or not 1 <= len(sample["dataset_id"]) <= 160
+                        or type(sample.get("sequence")) is not int
+                        or sample["sequence"] < 1
+                        or type(sample.get("observed_at")) is not int
+                        or not 0 <= now - sample["observed_at"] <= 30
+                        or sample.get("scope_sha256") != digest(scope)
+                        or sample.get("artifacts") != artifacts
+                        or not isinstance(sample.get("readback_sha256"), str)
+                        or re.fullmatch(r"[0-9a-f]{64}", sample["readback_sha256"]) is None):
+                    raise NativeHeld("conformance_recovery_readback_invalid")
+                key = (sample["method"], sample["mode"], sample["dataset_id"])
+                prior = latest_restores.get(key)
+                if prior is not None and sample["sequence"] == prior["sequence"]:
+                    raise NativeHeld("conformance_recovery_sequence_conflict")
                 if prior is None or sample["sequence"] > prior["sequence"]:
-                    latest_restores[sample["dataset_id"]] = sample
-            # A qualified rollback/recovery outcome must include at least
-            # one fresh independent restoration/readback measurement. An
-            # empty recovery report must never qualify a recovery mode.
-            if not latest_restores and any(
-                outcome == "passed" and name.rsplit(":", 1)[-1] in {
-                    "rollback", "forward_recovery", "reverse_recovery"
-                }
-                for name, outcome in method_modes.items()
-            ):
-                raise NativeHeld("conformance_recovery_readback_required")
-            if any(
-                r["outcome"] != "passed" or r["consistency_passed"] is not True
-                for r in latest_restores.values()
-            ):
+                    latest_restores[key] = sample
+            if any(row.get("outcome") != "passed" or row.get("consistency_passed") is not True
+                   for row in latest_restores.values()):
                 raise NativeHeld("conformance_latest_restore_failed")
+            # A positive readback cannot qualify a different native method/mode.
+            for name, outcome in method_modes.items():
+                _, method, mode = name.split(":")
+                if (outcome == "passed"
+                        and mode in {"rollback", "forward_recovery", "reverse_recovery"}
+                        and not any(key[:2] == (method, mode) for key in latest_restores)):
+                    raise NativeHeld("conformance_recovery_readback_required")
             payload.update(
                 adapter_conformant=True,
                 dimensions=list(DIMENSIONS),
