@@ -80,7 +80,7 @@ TESTS = {
 
 # Non-HTTP proof is earned only by a single test exercising both live sides.
 RELEASE_TESTS = {
-    "services/lifecycle/tests/test_migration_readiness.py::"
+    "tests/contracts/test_migration_readiness_wire.py::"
     "test_planning_producer_to_lifecycle_installed_readiness_contract": (
         "contracts/schemas/planning/migration-readiness-v2.2.json",
         ("producer", "consumer"),
