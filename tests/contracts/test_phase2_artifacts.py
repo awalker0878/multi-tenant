@@ -289,6 +289,26 @@ class ArtifactTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "differs from reviewed runtime source"):
             compare_runtime_tree(source, image, "php-service")
 
+    def test_public_entrypoints_must_match_source_except_compiled_vite_output(self):
+        source = self.root / "source"
+        image = self.root / "image"
+        for folder in (source, image):
+            (folder / "build").mkdir(parents=True)
+            (folder / "index.php").write_text("<?php echo 'approved';")
+        (source / "build/app.js").write_text("source-build")
+        (image / "build/app.js").write_text("compiled-build")
+        self.assertEqual(compare_runtime_tree(
+            source, image, "public", skip_generated_build=True), 1)
+        with self.assertRaisesRegex(ValueError, "differs from reviewed runtime source"):
+            compare_runtime_tree(source, image, "public")
+        (image / "index.php").write_text("<?php echo 'modified';")
+        with self.assertRaisesRegex(ValueError, "differs from reviewed runtime source"):
+            compare_runtime_tree(source, image, "public", skip_generated_build=True)
+        (image / "index.php").write_text("<?php echo 'approved';")
+        (image / "rogue.php").write_text("<?php execute();")
+        with self.assertRaisesRegex(ValueError, "differs from reviewed runtime source"):
+            compare_runtime_tree(source, image, "public", skip_generated_build=True)
+
     def test_runtime_extra_symlink_cannot_hide_unreviewed_code(self):
         source = self.root / "source"
         image = self.root / "image"

@@ -253,7 +253,8 @@ def check_wheel(component: str, wheel: Path, root: Path = ROOT) -> dict:
 
 
 def compare_runtime_tree(source_root: Path, image_root: Path, component: str,
-                         skip_cache: bool = False) -> int:
+                         skip_cache: bool = False,
+                         skip_generated_build: bool = False) -> int:
     """Require exact bytes for every shipped product file, not just route modules."""
     if not source_root.is_dir() or not image_root.is_dir():
         raise ValueError(f"Runtime source directory is missing: {component}")
@@ -267,6 +268,7 @@ def compare_runtime_tree(source_root: Path, image_root: Path, component: str,
             for file in folder.rglob("*")
             if file.is_file()
             and not (skip_cache and file.relative_to(folder).parts[0] == "cache")
+            and not (skip_generated_build and file.relative_to(folder).parts[0] == "build")
         }
 
     expected = files(source_root)
@@ -407,7 +409,7 @@ def check_image(component: str, tag: str, root: Path = ROOT) -> dict:
             # ALL bounded runtime source code, not only a startup module, is
             # byte-for-byte identical to the reviewed checkout.
             if COMPONENTS[component][1] == "php":
-                folders = ["app", "routes", "bootstrap", "config"]
+                folders = ["app", "routes", "bootstrap", "config", "public"]
                 # SQL migrations are executable service behavior and must be
                 # present and byte-identical in every deployed PHP image.
                 folders.append("database")
@@ -417,8 +419,25 @@ def check_image(component: str, tag: str, root: Path = ROOT) -> dict:
                     source_root = root / component / folder
                     packaged_root = destination / ("runtime-" + folder.replace("/", "-"))
                     run("docker", "cp", cid + ":/app/" + folder, str(packaged_root))
-                    compare_runtime_tree(source_root, packaged_root,
-                                         f"{component}/{folder}", skip_cache=folder == "bootstrap")
+                    compare_runtime_tree(
+                        source_root, packaged_root, f"{component}/{folder}",
+                        skip_cache=folder == "bootstrap",
+                        # Vite assets are generated from the frontend build.
+                        # Their referenced bytes are checked independently.
+                        skip_generated_build=(component == "apps/console" and folder == "public"),
+                    )
+                # Entrypoint-facing PHP and dependency manifests are executable
+                # authority and supply-chain input, not optional documentation.
+                # Copy them out of the built filesystem and compare to review.
+                for name in ("artisan", "composer.json", "composer.lock"):
+                    published = destination / ("runtime-root-" + name)
+                    run("docker", "cp", cid + ":/app/" + name, str(published))
+                    reviewed = root / component / name
+                    if (not published.is_file() or not reviewed.is_file()
+                            or sha(published.read_bytes()) != sha(reviewed.read_bytes())):
+                        raise ValueError(
+                            f"Image PHP root manifest differs from reviewed source: {component}/{name}"
+                        )
             else:
                 if not local_root.is_dir():
                     run("docker", "cp", cid + ":" + app_root, str(local_root))
