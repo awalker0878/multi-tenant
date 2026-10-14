@@ -10,7 +10,9 @@ import asyncio
 import json
 import os
 import re
+import tempfile
 from pathlib import Path
+from unittest.mock import patch
 
 from assurance import inventory
 
@@ -73,6 +75,27 @@ def get_app(owner: str):
 
 
 async def probe(owner: str) -> tuple[list[dict], list[str]]:
+    """Enrol an independent ephemeral inbound principal for auth-denial probes.
+
+    The service's real credential loader must succeed before a missing token
+    can prove 401. A missing test mount is a 503 dependency failure, not an
+    authorization observation. Never add a production credential fallback.
+    """
+    if owner != "planning" or os.environ.get(
+        "PLANNING_ASSURANCE_INVALIDATION_CREDENTIAL_FILE"
+    ):
+        return await _probe_with_router(owner)
+    with tempfile.TemporaryDirectory(prefix="planning-invalidation-probe-") as folder:
+        credential = Path(folder) / "inbound-credential"
+        credential.write_text("synthetic-independent-denial-principal-" + "q" * 64)
+        credential.chmod(0o600)
+        with patch.dict(os.environ, {
+            "PLANNING_ASSURANCE_INVALIDATION_CREDENTIAL_FILE": str(credential),
+        }):
+            return await _probe_with_router(owner)
+
+
+async def _probe_with_router(owner: str) -> tuple[list[dict], list[str]]:
     operations = inventory()["operations"]
     try:
         app = get_app(owner)
