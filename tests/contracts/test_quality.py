@@ -97,6 +97,33 @@ class HttpQualityTests(unittest.TestCase):
             with self.subTest(change=change), self.assertRaisesRegex(ValueError, "Idempotency|idempotency"):
                 quality_api("contracts/openapi/things-v2.json", api, ERROR, POLICY)
 
+    def test_every_declared_http_failure_uses_the_standard_error_envelope(self):
+        api = good_api()
+        op = api["paths"]["/v2/things"]["post"]
+        for invalid in (response({"type": "object"}), {"description": "No schema"}):
+            op["responses"]["404"] = invalid
+            with self.subTest(invalid=invalid), self.assertRaisesRegex(ValueError, "All explicit HTTP error responses"):
+                quality_api("contracts/openapi/things-v2.json", api, ERROR, POLICY)
+        op["responses"]["404"] = response({"$ref": "#/components/schemas/Error"})
+        quality_api("contracts/openapi/things-v2.json", api, ERROR, POLICY)
+
+    def test_empty_new_api_cannot_pass_release_admission(self):
+        api = good_api()
+        api["paths"] = {}
+        with self.assertRaisesRegex(ValueError, "executable HTTP operations"):
+            quality_api("contracts/openapi/things-v2.json", api, ERROR, POLICY)
+
+    def test_enum_and_const_compatibility_preserves_json_value_types(self):
+        for prior, changed in [
+            ({"enum": [1]}, {"enum": ["1"]}),
+            ({"enum": [True]}, {"enum": [1]}),
+            ({"const": None}, {}),
+            ({"const": 1}, {"const": True}),
+        ]:
+            with self.subTest(prior=prior, changed=changed):
+                issues = schema_breakages(prior, changed, "wire")
+                self.assertTrue(issues, "a type-changing semantic release needs a new major")
+
     def test_non_json_requests_cannot_bypass_body_validation(self):
         api = good_api()
         operation = api["paths"]["/v2/things"]["post"]
@@ -284,7 +311,8 @@ class SchemaAndEvents(unittest.TestCase):
                 "channels": {"changed": channel},
                 "components": {"messages": {"Changed": {
                     "contentType": "application/json",
-                    "payload": {"schema": {"$ref": "../schemas/events/pulse-v2.json"}}
+                    "payload": {"schemaFormat": "application/schema+json;version=draft-2020-12",
+                                "schema": {"$ref": "../schemas/events/pulse-v2.json"}}
                 }}},
                 "operations": {"publish": {"action": "send", "channel": {"$ref": "#/channels/changed"}}}
             }
@@ -306,6 +334,14 @@ class SchemaAndEvents(unittest.TestCase):
             broken = copy.deepcopy(event)
             broken["operations"]["publish"]["channel"]["$ref"] = "#/channels/unknown"
             with self.assertRaisesRegex(ValueError, "unbound channel"):
+                quality_event("contracts/asyncapi/pulse-v2.yaml", broken, POLICY, root)
+            broken = copy.deepcopy(event)
+            broken["components"]["messages"]["Changed"]["payload"].pop("schemaFormat")
+            with self.assertRaisesRegex(ValueError, "schemaFormat"):
+                quality_event("contracts/asyncapi/pulse-v2.yaml", broken, POLICY, root)
+            broken = copy.deepcopy(event)
+            broken["channels"]["changed"]["address"] = ""
+            with self.assertRaisesRegex(ValueError, "broker address"):
                 quality_event("contracts/asyncapi/pulse-v2.yaml", broken, POLICY, root)
             broken = copy.deepcopy(event)
             broken["channels"]["changed"]["address"] = "pulse.secret.v2"

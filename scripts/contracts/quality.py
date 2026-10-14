@@ -59,6 +59,12 @@ def type_set(schema: dict) -> set[str]:
     return set(value) if isinstance(value, list) else {value} if value else set()
 
 
+def enum_members(values: list) -> set[str]:
+    """Keep JSON value types distinct (1, true and "1" are different enum members)."""
+    return {json.dumps(value, sort_keys=True, separators=(",", ":"), allow_nan=False)
+            for value in values}
+
+
 # Unmodelled JSON Schema assertions are never silently assumed compatible.
 # Annotations can change without altering the accepted wire set.
 HANDLED_ASSERTIONS = frozenset({
@@ -87,9 +93,9 @@ def request_breaks(old: dict, new: dict, before: dict, after: dict, at: str) -> 
     failures = unknown_assertion_changes(a, b, at)
     if type_set(b) and (not type_set(a) or not type_set(a) <= type_set(b)):
         failures.append(at + ": request type narrowed")
-    if b.get("const") is not None and a.get("const") != b["const"]:
+    if "const" in b and ("const" not in a or enum_members([a["const"]]) != enum_members([b["const"]])):
         failures.append(at + ": request const narrowed")
-    if "enum" in b and ("enum" not in a or not set(map(str, a["enum"])) <= set(map(str, b["enum"]))):
+    if "enum" in b and ("enum" not in a or not enum_members(a["enum"]) <= enum_members(b["enum"])):
         failures.append(at + ": request enum narrowed")
     for lo, hi in (("minimum", "maximum"), ("minLength", "maxLength"),
                    ("minItems", "maxItems")):
@@ -135,9 +141,9 @@ def response_breaks(old: dict, new: dict, before: dict, after: dict, at: str) ->
     failures = unknown_assertion_changes(a, b, at)
     if type_set(a) and (not type_set(b) or not type_set(b) <= type_set(a)):
         failures.append(at + ": response type widened")
-    if a.get("const") is not None and b.get("const") != a["const"]:
+    if "const" in a and ("const" not in b or enum_members([a["const"]]) != enum_members([b["const"]])):
         failures.append(at + ": response constant changed")
-    if "enum" in a and ("enum" not in b or not set(map(str, b["enum"])) <= set(map(str, a["enum"]))):
+    if "enum" in a and ("enum" not in b or not enum_members(b["enum"]) <= enum_members(a["enum"])):
         failures.append(at + ": response enum widened")
     if set(a.get("required", [])) - set(b.get("required", [])):
         failures.append(at + ": previously required response properties became optional")
@@ -342,6 +348,10 @@ def quality_api(path: str, doc: dict, error: dict, policy: dict) -> None:
     if parsed_version != file_version:
         raise ValueError("OpenAPI info.version does not match versioned canonical filename: " + path)
     declared = doc.get("components", {}).get("securitySchemes", {})
+    if not isinstance(doc.get("paths"), dict) or not any(
+            verb in HTTP for item in doc["paths"].values() if isinstance(item, dict)
+            for verb in item):
+        raise ValueError("New OpenAPI release must declare executable HTTP operations: " + path)
     defined_error = doc.get("components", {}).get("schemas", {}).get("Error")
     stripped = {key: val for key, val in error.items() if key not in ("$id", "$schema")}
     if defined_error != stripped:
@@ -377,6 +387,13 @@ def quality_api(path: str, doc: dict, error: dict, policy: dict) -> None:
                     for media in response["content"].values()
                 ):
                     raise ValueError("Response body media type lacks a schema: " + label)
+            # Every documented 4xx/5xx is part of the client wire contract,
+            # not only the mandatory minimum status set.
+            for status in codes:
+                if re.fullmatch(r"[45][0-9]{2}", str(status)) and body(op, str(status)) != {
+                        "$ref": "#/components/schemas/Error"}:
+                    raise ValueError("All explicit HTTP error responses require Error v2: "
+                                     + label + " " + str(status))
             required_errors = [] if sec == [] else policy["required_error_responses"]
             request = op.get("requestBody")
             if request is not None:
@@ -431,7 +448,14 @@ def quality_event(path: str, doc: dict, policy: dict, root: Path) -> None:
     operations = doc.get("operations", {})
     if not channels or not messages or not operations:
         raise ValueError("AsyncAPI requires channels, messages and operations: " + path)
+    seen_addresses: set[str] = set()
     for key, channel in channels.items():
+        if not isinstance(channel, dict):
+            raise ValueError("Invalid AsyncAPI channel: " + str(key))
+        address = channel.get("address")
+        if not isinstance(address, str) or not address.strip() or address in seen_addresses:
+            raise ValueError("Missing or duplicate AsyncAPI broker address: " + str(key))
+        seen_addresses.add(address)
         delivery = channel.get("x-delivery")
         if not isinstance(delivery, dict) or delivery.get("guarantee") != policy["event_guarantee"]:
             raise ValueError("Channel missing at-least-once delivery contract: " + key)
@@ -455,10 +479,22 @@ def quality_event(path: str, doc: dict, policy: dict, root: Path) -> None:
             reference = binding.get("$ref") if isinstance(binding, dict) else None
             if reference not in {"#/components/messages/" + name for name in messages}:
                 raise ValueError("Unknown AsyncAPI message binding: " + key)
+    used_messages = {
+        binding["$ref"].removeprefix("#/components/messages/")
+        for channel in channels.values() for binding in channel["messages"].values()
+    }
+    if used_messages != set(messages):
+        raise ValueError("AsyncAPI release has unused or unbound messages: " + path)
     for name, msg in messages.items():
+        if not isinstance(msg, dict):
+            raise ValueError("Invalid AsyncAPI message: " + str(name))
         if msg.get("contentType") != "application/json":
             raise ValueError("New message must use application/json: " + name)
-        pointer = msg.get("payload", {}).get("schema", {}).get("$ref")
+        payload_definition = msg.get("payload", {})
+        if payload_definition.get("schemaFormat") != (
+                "application/schema+json;version=draft-2020-12"):
+            raise ValueError("Event payload must specify draft-2020-12 schemaFormat: " + name)
+        pointer = payload_definition.get("schema", {}).get("$ref")
         if not isinstance(pointer, str) or not pointer.startswith("../schemas/events/"):
             raise ValueError("Event payload requires active canonical event schema: " + name)
         source = (root / path).parent / pointer

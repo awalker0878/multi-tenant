@@ -29,7 +29,7 @@ operation must declare a resolvable, non-anonymous security requirement.
 Public unauthenticated endpoints must be explicitly marked and limited to
 approved diagnostic paths. Typed 200/201 JSON responses and explicit 401, 403 and 503
 failure responses must be present; any request body, including non-JSON
-media, requires an explicit schema and a 422 response; mutations require 409. Error responses use the exact new canonical
+media, requires an explicit schema and a 422 response; mutations require 409. All explicitly documented 4xx/5xx responses, including statuses beyond the required minimum, use the exact new canonical
 `contracts/schemas/common/error-v2.json` envelope: stable machine code,
 safe message, correlation UUID, retryability and optional bounded field
 details. No generic default response substitutes for these cases.
@@ -50,7 +50,7 @@ not rewritten in place.
 
 New AsyncAPI contracts use version 3.0 and canonical event payloads with an
 explicit, typed tenant/identity/correlation envelope (UUID identities and
-date-time occurrence). Each channel must define
+date-time occurrence). Each channel must have a unique nonempty broker address and bind every declared message. Messages must explicitly use JSON Schema draft-2020-12 format. Each channel must define
 at-least-once delivery, tenant ordering, event-ID deduplication, bounded
 retry attempts, exponential jitter backoff, after-commit acknowledgment,
 a dead-letter address, a retention window and a bounded deduplication
