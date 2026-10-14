@@ -88,5 +88,5 @@ def test_signed_envelope_provides_exact_authority_custody_and_send() -> None:
             manifest, {"tenant_id": "tenant", "site_id": "site",
                        "source_profile_sha256": digest("source"),
                        "target_profile_sha256": digest("target")},
-            signed_scopes, 160, private,
+            signed_scopes, 160, sign,
         )

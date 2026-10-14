@@ -154,6 +154,7 @@ def target_records() -> dict[str, Any]:
         "flavors": {"flavors": [{"id": "small", "vcpus": 2, "ram": 4096, "disk": 0}]},
         "volume_types": {"volume_types": [{"id": "type-1", "is_public": False}]},
         "network_extensions": {"extensions": [{"alias": "security-group"}]},
+        "security_groups": {"security_groups": []},
         "compute_version": {"min_version": "2.1", "version": "2.100"},
         "volume_version": {"min_version": "3.0", "version": "3.75"},
     }
