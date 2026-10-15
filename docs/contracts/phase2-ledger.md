@@ -609,3 +609,21 @@ Lifecycle units pass**, **86 database cases require CI**; Ruff, strict mypy,
 source-bound release inventory and documentation checks pass. The protected
 worker and redemption schemas are unchanged. Live and database callback-chain
 acceptance remains pending current-source CI.
+
+
+### Fencing probe transport validity
+
+Direct live worker negative probes now supply the exact body/path-bound replay
+key, matching the unchanged worker transport contract. The sealed-absence
+late-arrival probe also requires the grant to remain unexpired; otherwise a
+403 cannot prove that the seal fenced the request. The post-restore old-grant
+probe is labelled only as continued denial, with an explicit limitation that
+it may also be expired. A fresh-grant, epoch-only live control remains open
+and must not be inferred from that combined denial. No schema, expiry or
+custody enforcement is relaxed to obtain passing fixture results.
+
+All P06 browser jobs on run 38785554175 pass (Chromium, Firefox and
+WebKit), including crash/recovery, custody, history replay and restore controls.
+The stricter fencing transport correction passes **227 contract tests** locally;
+the added replay-key regression reaches the real worker endpoint and rejects
+a key bound to a different attempt. Final-source live CI is still required.

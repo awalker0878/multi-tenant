@@ -14,6 +14,12 @@ import uuid
 from temporal_fixture import TemporalFixture
 
 
+def effect_headers(grant, credential):
+    material={'path':'/v1/effects','body':grant}
+    replay=hashlib.sha256(json.dumps(material,sort_keys=True,separators=(',',':'),allow_nan=False).encode()).hexdigest()
+    return {'Authorization':'Bearer '+credential,'Idempotency-Key':replay}
+
+
 def _campaign(c,p):
     from fault_peers import TlsProxy, AlertReceiver
     root,private,out=c['root'],c['private'],c['out']
@@ -96,6 +102,9 @@ def _campaign(c,p):
     def command(index,action):
         view=current(index)
         return lifecycle('jobs/'+view['id']+'/commands',view['scope'],{'action':action,'expected_revision':view['revision']},expected=202)
+    def simulator_effect(grant):
+        return wire(common['SIMULATOR_URL'],'/v1/effects','POST',grant,
+                    effect_headers(grant,credentials['lifecycle-simulator'][0]))
     for action,method in [('provision','native_api'),('migrate','native_api_export_import'),('recover','forward_recovery'),('retire','owned_retirement')]:
         dest=copy.deepcopy(p['a']);dest.update(site_id=str(uuid.uuid4()),endpoint_id=str(uuid.uuid4()),generation_id=str(uuid.uuid4()))
         p['peer'].destinations[dest['endpoint_id']]=dest
@@ -142,7 +151,8 @@ def _campaign(c,p):
     c['stop']('lifecycle');spawn('lifecycle',lifecycle_command);wait_for('lifecycle_restart',lambda:ready(common['LIFECYCLE_URL']),15)
     run([*witness,'reconcile',tenant,jobs[0]['id']],env=envs['lifecycle'],label='p06-new-process-seals-absence')
     late=json.loads(grant_file.read_text())
-    check('p06-delayed-worker-cannot-cross-seal',wire(common['SIMULATOR_URL'],'/v1/effects','POST',late,{'Authorization':'Bearer '+credentials['lifecycle-simulator'][0]})[0]==403)
+    check('p06-delayed-worker-probe-is-still-unexpired',late['expires_at']>int(time.time()))
+    check('p06-delayed-worker-cannot-cross-seal',simulator_effect(late)[0]==403)
     command(0,'retry_unstarted')
     # Process dies after target write acceptance. Journal remains uncertain; no source return.
     for effect in plans[1]['content']['effects']:
@@ -228,7 +238,8 @@ def _campaign(c,p):
     run([*witness,'effect',tenant,jobs[0]['id'],'reserve'],env=envs['lifecycle'],expected=1,label='p06-restored-worker-denied')
     check('p06-old-database-starts-without-new-write-authority',current(0)['state']=='held' and current(0)['resources_retained'])
     late=json.loads(grant_file.read_text())
-    check('p06-pre-restore-worker-cannot-write-new-epoch',wire(common['SIMULATOR_URL'],'/v1/effects','POST',late,{'Authorization':'Bearer '+credentials['lifecycle-simulator'][0]})[0]==403)
+    check('p06-old-worker-grant-remains-denied-after-restore',simulator_effect(late)[0]==403)
+    report['limitations'].append('The post-restore old-grant denial is not isolated proof of the epoch fence: that grant may also be expired. A separate fresh-grant epoch-only live probe remains unqualified.')
     check('p06-restore-independent-accepted-effects-preserved',sql('SELECT count(*) FROM sim.observations WHERE effect_count=1;','simulation')==before_restore_count)
     check('p06-restore-does-not-invent-completion',sql("SELECT count(*) FROM app.execution_projection WHERE state='completed';",'lifecycle')=='0')
     (out/'restore-observations.json').write_text(json.dumps({'backup_sha256':backup_hash,'restored_jobs':4,'independent_effect_count':int(before_restore_count),'external_epoch_changed':True,'read_only_hold':True,'re_enable_decision':'DENIED: restored journal and current epoch require independent reconciliation and newly bound authority; no automatic release or old-epoch restoration'},indent=2)+'\n')

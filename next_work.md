@@ -1,3 +1,14 @@
+## Fencing probe transport correction — 2026-10-15
+
+On head `3c58fa74379c093eaa213448c75b28488d43809d`, P06 Chromium, Firefox and WebKit
+and the PostgreSQL callback-chain suite pass. Direct fencing probes now send the
+required canonical replay key; a separate regression proves these headers
+reach the actual strict worker endpoint and that a key bound to another
+attempt is rejected. The seal probe requires an unexpired grant. The restored
+old-grant test is explicitly limited to continued denial, with fresh-grant
+live epoch isolation still open. Current-source CI remains required for this
+probe correction; no complete security or release qualification is claimed.
+
 ## Current callback correction — 2026-10-15
 
 On head `648daafa3e9bbe09785c8b18e888dfe7363b9b9b`, the P06 PostgreSQL

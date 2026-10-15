@@ -56,7 +56,7 @@ class Effects:
         return self.reconcile(data)
 
 
-def request_worker(path, body, *, bearer="effect-only", service=None):
+def request_worker(path, body, *, bearer="effect-only", service=None, supplied_headers=None):
     service = service or Effects()
     credentials = {
         "LIFECYCLE_SIMULATOR_CREDENTIAL_FILE": "effect-only",
@@ -76,11 +76,12 @@ def request_worker(path, body, *, bearer="effect-only", service=None):
     async def send(message):
         emitted.append(message)
 
+    headers = supplied_headers or {'Authorization': 'Bearer ' + bearer, 'Idempotency-Key': key}
     scope = {
         "type": "http", "method": "POST", "path": path, "query_string": b"",
-        "headers": [(b"authorization", ("Bearer " + bearer).encode()),
+        "headers": [(b"authorization", headers['Authorization'].encode()),
                     (b"content-type", b"application/json"),
-                    (b"idempotency-key", key.encode())],
+                    (b"idempotency-key", headers['Idempotency-Key'].encode())],
     }
     asyncio.run(SimulationApp(service, credentials.__getitem__)(
         scope, receive, send))
@@ -88,6 +89,17 @@ def request_worker(path, body, *, bearer="effect-only", service=None):
 
 
 class SimulationOwnerContracts(unittest.TestCase):
+    def test_live_fencing_probe_headers_reach_the_actual_effect_owner(self):
+        sys.path.insert(0, str(ROOT/'scripts/p06'))
+        from live_execution import effect_headers
+        headers = effect_headers(GRANT, 'effect-only')
+        status, payload = request_worker('/v1/effects', GRANT, supplied_headers=headers)
+        self.assertEqual(status, 200)
+        self.assertEqual(payload, {'accepted':True, 'duplicate':False})
+        stale = effect_headers({**GRANT, 'attempt_id':TENANT}, 'effect-only')
+        status, _ = request_worker('/v1/effects', GRANT, supplied_headers=stale)
+        self.assertEqual(status, 403)
+
     def test_authenticated_worker_and_lifecycle_consumer(self):
         for route, body, response_name in (
             ("/v1/effects", GRANT, "EffectReceipt"),
