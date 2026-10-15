@@ -96,6 +96,7 @@ def test_actual_durable_grant_passes_worker_http_contract(world: dict[str, Any])
     import json
     from jsonschema import Draft202012Validator, FormatChecker
     from lifecycle_worker.interfaces.simulation import SimulationApp
+    from lifecycle.interfaces.execution import ExecutionApp
     w=world;job=w['admit']()
     grant=w['service'].acquire(w['tenant'],job['id'],'reserve',WORKER)
     body={k:v for k,v in grant.items() if k!='completed'}
@@ -106,6 +107,20 @@ def test_actual_durable_grant_passes_worker_http_contract(world: dict[str, Any])
     credentials={'LIFECYCLE_SIMULATOR_CREDENTIAL_FILE':'effect-only',
                  'ASSURANCE_SIMULATOR_CREDENTIAL_FILE':'observer-only',
                  'SIMULATOR_LIFECYCLE_CREDENTIAL_FILE':'callback-only'}
+    class Caller:
+        def caller(self, credential, audience):
+            assert credential=='r'*64 and audience=='simulator'
+    def redeem_over_http(value):
+        replies=[]
+        async def receive():return {'type':'http.request','body':json.dumps(value).encode(),'more_body':False}
+        async def send(message):replies.append(message)
+        scope={'type':'http','method':'POST','path':'/internal/simulation-grants/redemptions',
+               'query_string':b'','headers':[(b'authorization',b'Bearer '+b'r'*64),
+                                           (b'content-type',b'application/json')]}
+        asyncio.run(ExecutionApp(w['service'],Caller())(scope,receive,send))
+        assert replies[0]['status']==200
+        return json.loads(replies[-1]['body'])
+    w['peer'].redeem=redeem_over_http
     key=hashlib.sha256(json.dumps({'path':'/v1/effects','body':body},sort_keys=True,
                                 separators=(',',':'),allow_nan=False).encode()).hexdigest()
     sent=[]

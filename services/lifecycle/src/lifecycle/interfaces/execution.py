@@ -64,7 +64,9 @@ class ExecutionApp:
                 and scope["method"] == "POST"
             ):
                 await asyncio.to_thread(self.authority.caller, token[7:], "simulator")
-                payload = await asyncio.to_thread(self.execution.redeem, body, "sim-worker")
+                payload = await asyncio.to_thread(
+                    self.execution.redeem, body, identity(body["worker_id"])
+                )
                 status = 200
             else:
                 internal = re.fullmatch(

@@ -1,3 +1,16 @@
+## Current callback correction — 2026-10-15
+
+On head `648daafa3e9bbe09785c8b18e888dfe7363b9b9b`, the P06 PostgreSQL
+suite including the new acquired-grant/worker-HTTP test passes, while live
+execution still holds at migration reserve. Lifecycle's redemption HTTP
+handler contains a second hard-coded worker name. It now passes the canonical
+worker UUID from the request into the existing journal/campaign checks, after
+authenticating the simulator audience. A UUID does not bypass journal, grant,
+campaign, expiry, custody or single-use checks. Regression coverage now includes
+the real Lifecycle redemption ASGI callback as part of the PostgreSQL-to-worker
+HTTP chain, plus local valid/invalid route argument checks. No passing live
+P06 result or complete assurance is claimed before current-source CI.
+
 ## Current CI finding — typed simulation worker identity (2026-10-15)
 
 Run 38782109274 on head `dbbcb1196f3dd32efb82fdae4685c3edd041f8b8`

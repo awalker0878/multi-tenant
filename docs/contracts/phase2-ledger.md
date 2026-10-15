@@ -587,3 +587,25 @@ releases**. Missing claims: producer 170, consumer 196, authorization 164,
 tenant isolation 163, authentication 3 and route 5. This is explicit unfinished
 repository-owned assurance work, separately from deployment enrollment and real
 native/receiving qualification. No broader completion is claimed.
+
+
+### Redemption callback closes the producer/consumer chain
+
+Run [38783949271](https://github.com/awalker0878/multi-tenant/actions/runs/38783949271)
+on head `648daafa3e9bbe09785c8b18e888dfe7363b9b9b` passes the P06 core
+PostgreSQL suite, including the new grant-to-worker HTTP case. Live migration
+reserve still reports outcome unknown. The real worker callback reaches
+`ExecutionApp`, which independently retained the second hard-coded worker
+name in its redemption call. The authenticated simulator handler now passes
+`identity(body['worker_id'])`; the execution owner still enforces exact journal
+worker, grant, campaign, current authority, expiry, custody and single-use state.
+The database regression is strengthened to route redemption back through the
+actual Lifecycle ASGI handler instead of a direct domain callback. Local route
+checks require a canonical UUID and prove invalid workers never reach redemption.
+This corrects a missed executable boundary; no schema or security check is relaxed.
+
+Callback correction local verification: **226 contract tests pass**, **386
+Lifecycle units pass**, **86 database cases require CI**; Ruff, strict mypy,
+source-bound release inventory and documentation checks pass. The protected
+worker and redemption schemas are unchanged. Live and database callback-chain
+acceptance remains pending current-source CI.

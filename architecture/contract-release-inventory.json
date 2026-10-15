@@ -1571,7 +1571,7 @@
           "kind": "wire-source",
           "marker": "/evidence",
           "source": "services/lifecycle/src/lifecycle/interfaces/execution.py",
-          "source_sha256": "142bc2f71f12880a075be32d360f96414c3d10bf5dde1d2c264b5c13810d5d98"
+          "source_sha256": "651cb19e3f7053790fea6d7b0fd812370da882ae5d5ff3c0471fcae8bfaa73f0"
         },
         {
           "component": "lifecycle",
@@ -4417,7 +4417,7 @@
           "kind": "wire-source",
           "marker": "/evidence-bindings",
           "source": "services/lifecycle/src/lifecycle/interfaces/execution.py",
-          "source_sha256": "142bc2f71f12880a075be32d360f96414c3d10bf5dde1d2c264b5c13810d5d98"
+          "source_sha256": "651cb19e3f7053790fea6d7b0fd812370da882ae5d5ff3c0471fcae8bfaa73f0"
         },
         {
           "component": "lifecycle",
@@ -4431,7 +4431,7 @@
           "kind": "wire-source",
           "marker": "/redemptions",
           "source": "services/lifecycle/src/lifecycle/interfaces/execution.py",
-          "source_sha256": "142bc2f71f12880a075be32d360f96414c3d10bf5dde1d2c264b5c13810d5d98"
+          "source_sha256": "651cb19e3f7053790fea6d7b0fd812370da882ae5d5ff3c0471fcae8bfaa73f0"
         },
         {
           "component": "lifecycle",
@@ -4887,7 +4887,7 @@
           "kind": "wire-source",
           "marker": "/jobs",
           "source": "services/lifecycle/src/lifecycle/interfaces/execution.py",
-          "source_sha256": "142bc2f71f12880a075be32d360f96414c3d10bf5dde1d2c264b5c13810d5d98"
+          "source_sha256": "651cb19e3f7053790fea6d7b0fd812370da882ae5d5ff3c0471fcae8bfaa73f0"
         },
         {
           "kind": "validation-or-generation",
@@ -5871,7 +5871,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/openapi/worker-simulation-v1.json",
           "source": "scripts/p06/test_execution.py",
-          "source_sha256": "4b374683724c2d26ad1c25e359d7d1f92913bc9d24e0db0e8c16ae22aa99395b"
+          "source_sha256": "9507e4b50e2d2bdb0a6e830f86a154c5afcb3cee93079165eb96bd0cec0c07db"
         },
         {
           "kind": "validation-or-generation",
