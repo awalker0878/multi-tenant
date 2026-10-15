@@ -106,6 +106,10 @@ def _campaign(c,p):
         req={'action':body['action'],'method':method,'lane':'isolated_campaign','executor_ids':[fixture['operator_id']],'valid_until':int(time.time())+900}
         created=p['planning']('plans',{'assessment_id':assessment['id'],'candidate':0,'request':req},sites=[dest['site_id']],expected=201)
         plan=p['planning']('plans/'+created['id'],sites=[dest['site_id']]);content,binding=plan['content'],plan['binding'];plans.append(plan)
+        (out/('p06-'+action+'-plan-inputs.json')).write_text(json.dumps({
+            'holds':content['holds'],'validity':plan['validity'],'action':content['action'],
+            'method':content['method'],'evidence_level':'E2',
+        },indent=2)+'\n')
         approval=gov('/v1/tenants/'+tenant+'/approvals',{'plan_id':plan['id'],'plan_revision':1,'plan_digest':binding['digest'],'expires_at':datetime.datetime.fromtimestamp(req['valid_until'],datetime.UTC).isoformat()},token=fixture['author_token'])
         gov('/v1/tenants/'+tenant+'/approvals/'+approval['id']+'/approve',{'revision':1,'reason':'Independent isolated P06 simulation review.'},token=fixture['reviewer_token'],expected=200)
         campaign_id=str(uuid.uuid4());scope=content['scope'];expires=int(time.time())+900

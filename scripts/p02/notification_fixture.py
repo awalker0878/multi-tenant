@@ -61,6 +61,11 @@ class NotificationBroker:
             if state.get('Health', {}).get('Status') == 'healthy':
                 break
             if not state.get('Running') or time.monotonic() >= deadline:
+                # Retain redacted diagnostics before cleanup removes the
+                # disposable peer; a timeout alone cannot identify its cause.
+                self.run(['docker', 'logs', self.name], label='notification-broker-diagnostic')
+                self.run(['docker', 'inspect', '--format', '{{json .State}}', self.name],
+                         label='notification-broker-state')
                 raise RuntimeError('notification_broker_not_ready')
             time.sleep(1)
         self.run(['docker', 'exec', self.name, 'rabbitmq-diagnostics', '-q', 'check_port_connectivity', '--address', '127.0.0.1'], label='notification-broker-ready')

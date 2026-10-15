@@ -28,8 +28,13 @@ def main() -> int:
     parser.add_argument("--input-directory", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--require-qualified", action="store_true")
+    parser.add_argument("--journey-directory", type=Path)
     args = parser.parse_args()
-    outcome = assess(observations=combine(args.input_directory),
+    observations = combine(args.input_directory)
+    if args.journey_directory:
+        from journey_assurance import producers
+        observations.extend(producers(args.journey_directory, observations))
+    outcome = assess(observations=observations,
                      require_provenance=args.require_qualified)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     missing = (outcome["summary"]["unqualified_http_operations"]

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import os
 import sys
 import tempfile
@@ -287,6 +288,65 @@ class AssuranceCoverageTests(unittest.TestCase):
         (self.root / self.api).unlink()
         with self.assertRaisesRegex(ValueError, "Missing canonical contract"):
             inventory(self.root)
+
+    def journey_measurement(self):
+        from route_conformance import HttpConformance
+        validator = self.root/'scripts/contracts/route_conformance.py'
+        validator.parent.mkdir(parents=True)
+        validator.write_bytes((ROOT/'scripts/contracts/route_conformance.py').read_bytes())
+        output = self.root/'campaign/http-conformance.json'
+        output.parent.mkdir()
+        probe = HttpConformance(self.root, output, {'https://sample.invalid':'sample'},
+                                'scripts/p05/verify_live.py:wire')
+        probe.observe('https://sample.invalid', '/v1/things/current', 'GET', None, {},
+                      200, {}, {'Content-Type':'application/json'})
+        report = {'result':'PASS','source_unchanged':True,
+                  'source_revision':os.environ['GITHUB_SHA'],
+                  'run_id':os.environ['GITHUB_RUN_ID'],'run_attempt':os.environ['GITHUB_RUN_ATTEMPT'],
+                  'source_sha256':{'scripts/contracts/route_conformance.py':hashlib.sha256(validator.read_bytes()).hexdigest()},
+                  'artifact_sha256':{'http-conformance.json':hashlib.sha256(output.read_bytes()).hexdigest()}}
+        (output.parent/'report.json').write_text(json.dumps(report))
+        return output, report
+
+    def test_live_wire_proves_only_its_executed_producer(self):
+        from journey_assurance import producers
+        with patch.dict(os.environ, {'GITHUB_RUN_ID':'123','GITHUB_RUN_ATTEMPT':'2','GITHUB_SHA':'a'*40}):
+            output, report = self.journey_measurement()
+            rows = producers(output.parent, [], self.root)
+            self.assertEqual([row['claim'] for row in rows], ['producer'])
+            data = assess(self.root, rows, require_provenance=True)
+            self.assertEqual(data['coverage'][0]['verified'], ['producer'])
+            self.assertIn('authorization', data['coverage'][0]['missing'])
+            self.assertIn('tenant_isolation', data['coverage'][0]['missing'])
+            self.assertIn('consumer', data['coverage'][0]['missing'])
+            self.assertEqual(producers(output.parent, rows, self.root), [])
+            report['result'] = 'FAIL'
+            (output.parent/'report.json').write_text(json.dumps(report))
+            self.assertEqual(producers(output.parent, [], self.root), [])
+
+    def test_journey_admission_rejects_stale_tampered_and_invalid_wire(self):
+        from journey_assurance import producers
+        with patch.dict(os.environ, {'GITHUB_RUN_ID':'123','GITHUB_RUN_ATTEMPT':'2','GITHUB_SHA':'a'*40}):
+            output, report = self.journey_measurement()
+            original = json.loads(output.read_text())
+            report_path = output.parent/'report.json'
+            for field,value in [('request_valid',False),('response_valid',False),('status_code',403),
+                                ('release_sha256','f'*64),('run_attempt','1'),
+                                ('path','/v1/unregistered'),('test','unexecuted-test')]:
+                rows = [{**original[0],field:value}]
+                output.write_text(json.dumps(rows))
+                report['artifact_sha256'][output.name] = hashlib.sha256(output.read_bytes()).hexdigest()
+                report_path.write_text(json.dumps(report))
+                with self.subTest(field=field), self.assertRaises(ValueError):
+                    producers(output.parent, [], self.root)
+            output.write_text(json.dumps(original))
+            with self.assertRaisesRegex(ValueError, 'measured wire bytes differ'):
+                producers(output.parent, [], self.root)
+            report['artifact_sha256'][output.name] = hashlib.sha256(output.read_bytes()).hexdigest()
+            report['run_attempt'] = '1'
+            report_path.write_text(json.dumps(report))
+            with self.assertRaisesRegex(ValueError, 'Stale journey'):
+                producers(output.parent, [], self.root)
 
 
 

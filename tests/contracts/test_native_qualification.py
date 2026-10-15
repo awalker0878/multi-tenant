@@ -18,6 +18,32 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class NativeQualificationTest(unittest.TestCase):
+    def test_later_campaign_enrollment_requires_current_scope_bound_observations(self):
+        sys.path.insert(0, str(ROOT/'services/planning/src'))
+        sys.path.insert(0, str(ROOT/'services/planning/tests'))
+        import planning_fixture
+        now = int(time.time())
+        with patch.object(planning_fixture, 'NOW', now-300):
+            intent, destination, _, policy, qualification = planning_fixture.inputs()
+        destination['site_id'] = qualification['scope']['site_id'] = '20000000-0000-4000-8000-000000000004'
+        planning_fixture.verify_fixture(qualification, now)
+        with tempfile.TemporaryDirectory() as directory:
+            for observed_at in (now-300, now):
+                with patch.object(planning_fixture, 'NOW', observed_at):
+                    snapshot = planning_fixture.snapshot_fixture(intent, destination, policy, qualification)
+                bundle, keys = signed_fixture(qualification, Path(directory)/'keys', now=now,
+                                              inventory=destination, snapshot=snapshot['data'])
+                path = Path(directory)/'fixture.json'
+                path.write_text(json.dumps({'bundle':bundle,'keys':keys,'scope':bundle['record']['scope']}))
+                result = subprocess.run([os.environ.get('CAPABILITY_PHP_BIN','php'),
+                    str(ROOT/'scripts/check_native_qualification.php'),str(path),'--wire'],
+                    capture_output=True,text=True)
+                if observed_at == now:
+                    self.assertEqual(result.returncode, 0, result.stdout+result.stderr)
+                else:
+                    self.assertNotEqual(result.returncode, 0)
+                    self.assertIn('native_recovery_readback_invalid', result.stdout+result.stderr)
+
     def test_renewed_signed_snapshot_remains_eligible_without_changing_plan_inputs(self):
         sys.path.insert(0, str(ROOT/'services/planning/src'))
         sys.path.insert(0, str(ROOT/'services/planning/tests'))

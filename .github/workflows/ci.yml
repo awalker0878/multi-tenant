@@ -465,7 +465,7 @@ jobs:
   contract-assurance:
     name: CI / Contract assurance
     if: always() && needs.scope.outputs.contracts == 'true'
-    needs: [scope, contracts, laravel-routes]
+    needs: [scope, contracts, laravel-routes, runtime-integration]
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -487,6 +487,13 @@ jobs:
           pattern: contract-assurance-*-${{ github.sha }}
           path: ${{ runner.temp }}/contract-measurements
           merge-multiple: true
+      - name: Download source-bound live wire campaigns from this exact attempt
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        continue-on-error: true
+        with:
+          pattern: p0[56]-live-*-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/journey-measurements
+          merge-multiple: false
       - name: Fail closed on absent, stale or incomplete contract qualification
         env:
           GITHUB_RUN_ID: ${{ github.run_id }}
@@ -494,6 +501,7 @@ jobs:
         run: |
           python scripts/contracts/combine_assurance.py \
             --input-directory "$RUNNER_TEMP/contract-measurements" \
+            --journey-directory "$RUNNER_TEMP/journey-measurements" \
             --output "$RUNNER_TEMP/contract-assurance-report.json" \
             --require-qualified
       - name: Retain explicit qualification gaps even on failed admission

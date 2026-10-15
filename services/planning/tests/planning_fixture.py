@@ -293,7 +293,10 @@ def snapshot_fixture(
     intent: dict[str, Any], destination: dict[str, Any], policy: dict[str, Any], q: dict[str, Any]
 ) -> dict[str, Any]:
     pools: list[Any] = []
-    for index, workload in enumerate(intent["workloads"]):
+    placed_workloads = sorted(
+        intent["workloads"], key=lambda w: (-w["compute"]["memory_mib"], w["id"])
+    )
+    for index, workload in enumerate(placed_workloads):
         vector: dict[str, Any] = {
             "vcpus": workload["compute"]["vcpus"],
             "memory_mib": workload["compute"]["memory_mib"],
@@ -450,7 +453,7 @@ def snapshot_fixture(
                 "zone": pools[i]["zone"],
                 "site_id": destination["site_id"],
             }
-            for i, w in enumerate(intent["workloads"])
+            for i, w in enumerate(placed_workloads)
         },
     }
     recoveries = [

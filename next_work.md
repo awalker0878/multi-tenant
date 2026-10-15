@@ -14,10 +14,13 @@ entry. Fixture renewal includes nested network and isolation observations.
 P05 browser revocation waits for the explained authority hold, and failed
 initial assessments are retained for diagnosis.
 
-Local Planning verification: **608 passed, 22 PostgreSQL cases skipped**;
-Ruff and strict mypy pass. The full contract suite passes **222 tests**,
+Local Planning verification: **609 passed, 22 PostgreSQL cases skipped**;
+Ruff and strict mypy pass. The full contract suite passes **226 tests**,
 including the actual PHP verifier with signed snapshot renewal and negative
-controls. These repairs are **not accepted** until the current-source live
+controls. Follow-up source fixes correct random workload/pool ordering and
+rebuild campaign observations at enrollment time; stale initial observations
+remain rejected. Successful current-run journey wire measurements are now
+consumed as producer proof only, with separate consumer/security/image gates. These repairs are **not accepted** until the current-source live
 CI journeys pass. The broader contract assurance gate and external protected
 Planning enrollment/native E3/E4 evidence remain open. PR #64 stays draft.
 

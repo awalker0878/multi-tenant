@@ -94,13 +94,15 @@ def campaign(c, extension=None):
     quals={'schema_version':2,'records':[]}
     trust={'schema_version':1,'keys':{}}
     def enroll_qualification(d, action='application.provision', method='native_api'):
+        enrolled_at=int(time.time())
+        capability_fixture.NOW=enrolled_at
         q=copy.deepcopy(model['qualification']);q['scope'].update({k:d[k] for k in ['tenant_id','site_id','endpoint_id','native_scope','installed_tuple']})
         q['scope'].update(action=action,method=method)
         q['version']=2
-        capability_fixture.verify_fixture(q, now)
+        capability_fixture.verify_fixture(q, enrolled_at)
         d['capability_snapshot']=capability_fixture.snapshot_fixture(model['intent'],d,policy,q)
         bundle,keys=signed_fixture(
-            q,private/('fixture-keys-'+d['site_id']),inventory=d,
+            q,private/('fixture-keys-'+d['site_id']),now=enrolled_at,inventory=d,
             snapshot=d['capability_snapshot']['data'],
         )
         # Scope-specific enrolled keys; these are isolated E2 peer fixtures.

@@ -499,3 +499,55 @@ regressions preserve holds for expired, continuously mismatched or foreign
 proofs and detect semantic recovery/readback changes. Live acceptance awaits
 CI on the resulting source revision. Full contract/security/release coverage
 and real protected enrollment, native E3 and independent E4 remain open.
+
+
+### Follow-up diagnosis and producer-evidence ingestion
+
+Run [38780170967](https://github.com/awalker0878/multi-tenant/actions/runs/38780170967)
+executes head `2754b992eb96951f59e56203f0451bba0440169b`. Its retained initial
+assessment proves the intermittent P05 failure is
+`native_fault_hierarchy_unverified`: random ID rebinding changes placement
+sorting while the fixture previously assigned hosts by input order. Synthetic
+pool/hierarchy construction now uses the same explicit workload ordering, with
+a reversed-order regression. No production isolation check is removed.
+
+All three P06 browsers progress beyond the former signed-registry access fault
+and hold at `campaign_safety_inputs_missing`. Replaying retained live inputs
+through the real PHP verifier identifies a stale newly signed campaign specimen:
+its recovery samples still use P05 startup time, exceeding the unchanged
+30-second dossier observation bound. New enrollment now creates observations
+and signatures at one current enrollment time. The regression rejects a
+five-minute-old specimen and accepts freshly scope-bound measurements. The
+retained live inputs re-evaluate as eligible locally with current signatures.
+P06 persists each campaign's actual plan holds for further CI diagnosis.
+
+The contract CI failure on this head is the generated release evidence
+inventory's now-stale source hashes. Regenerate it from current source and
+retain the unchanged inventory check. This is not runtime assurance.
+
+The assurance aggregator previously ignored P05/P06 wire artifacts. It now
+waits for runtime integration and admits only producer proof from successful
+journeys on the same source/run/attempt, with exact validator and artifact
+hashes, canonical operation/release identity, request/response conformance and
+contracted success status. Failed journeys confer no proof. Repeated browser
+observations cannot fabricate consumer, authorization, tenant-isolation or
+image provenance. Negative tests reject stale, tampered or invalid receipts.
+The strict qualification gate remains mandatory; missing claims stay missing.
+
+
+Follow-up local validation: **226 contract tests pass**, **609 Planning tests
+pass**, **22 PostgreSQL cases remain CI-only**; Ruff, strict mypy, generated
+bundle/authority parity, active registry/integrity and nine-component runtime
+binding checks pass. The regenerated inventory contains **75 active releases,
+49 dependency edges and 37 installed copies**, with the existing external
+collection enrollment limitation retained. Replaying the completed P05 WebKit
+artifact through the new ingestion code yields **20 distinct producer proofs**
+and **zero qualified operations** from those proofs alone, as expected.
+
+The same CI run independently reproduces Governance's pinned upstream
+`zlib-1.3.2-r0.apk` HTTP 404 across all three build attempts. Exact artifact
+hashes/signature requirements remain mandatory; an unavailable reviewed input
+is not replaced with unreviewed bytes. P02 broker readiness still fails in one
+browser job; retain redacted container state/logs before cleanup to diagnose
+that separate failure. Current-source live campaign and release assurance
+acceptance remain unverified until the next CI run finishes.

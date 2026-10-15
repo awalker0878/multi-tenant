@@ -150,3 +150,31 @@ def test_current_observation_renewal_preserves_semantics_but_never_freshness() -
         sample = changed["capability_snapshot"]["data"]["recovery_measurements"][0]
         sample[change] = sample[change] + 1 if type(sample[change]) is int else "f" * 64
         assert inventory_digest(renewed) != inventory_digest(changed)
+
+
+def test_synthetic_fault_hierarchy_is_valid_for_reordered_workload_ids() -> None:
+    from copy import deepcopy
+
+    from planning_fixture import snapshot_fixture
+
+    from planning.domain.model import digest
+    from planning.domain.network_evidence import isolation_checks
+
+    intent, destination, _, policy, qualification = inputs()
+    # Live fixtures rebind IDs randomly. Equal-sized workloads may consequently
+    # sort in the opposite order from the input list during physical placement.
+    reversed_intent = deepcopy(intent)
+    reversed_intent["workloads"].reverse()
+    context = next(iter(policy["network_flow_contexts"].values()))
+    for i, workload in enumerate(reversed_intent["workloads"]):
+        flow = {
+            "from": "foreign-domain-" + str(i),
+            "to": workload["id"],
+            "protocol": "tcp",
+            "port": 22,
+        }
+        policy["network_flow_contexts"][digest(flow)] = context
+    observed = snapshot_fixture(reversed_intent, destination, policy, qualification)
+    checks = isolation_checks(reversed_intent, destination, observed["data"], policy, NOW)
+    hierarchy = next(row for row in checks if row[0] == "placement.fault_hierarchy")
+    assert hierarchy[1] == "eligible"
