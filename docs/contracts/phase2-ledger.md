@@ -423,3 +423,44 @@ actual locked Planning environment, 17 route/wire controls (including distinct
 active OIDC/local error contracts), and PHP formatting/syntax. The original
 SELECT FOR UPDATE implementation fails the current PostgreSQL authority test;
 its corrected transaction must be rerun with unchanged restricted grants.
+
+### Verified CI checkpoint and remaining live defects
+
+Run [38744215057](https://github.com/awalker0878/multi-tenant/actions/runs/38744215057),
+attempt 1, tests branch head `10b6aea9a8af7ebf18870c0da14ea5830cc940c7`
+through merge revision `f6c84e70f9a88ffe7121451b24dc2663b2f90261`.
+
+- The restricted PostgreSQL authority transaction and epoch tests pass with the
+  existing grants. P05 plan/reservation and P06 journal/independent simulation
+  PostgreSQL jobs also pass.
+- All four supported Laravel quality suites, five Python service/worker quality
+  jobs, architecture, security, contracts and three live Laravel route checks
+  pass. All nine image-binding builds and the exact-source aggregation pass.
+- P02, P03 and P04 live journeys pass on Chromium, Firefox and WebKit. P05 passes
+  Firefox and WebKit; Chromium fails
+  `two-authorized-destinations-explain-positive-and-blocked`. This intermittent
+  assessment failure remains a repository-owned gap; its finding payload must
+  be inspected before choosing a correction.
+- P06 Chromium and WebKit reach a later `KeyError: 'scope'`. Source inspection
+  confirms `scripts/p06/live_execution.py` copies a signed registry bundle and
+  accesses `q['scope']`, although the current bundle holds the record under
+  `q['record']`. Repairing this requires issuing and enrolling a new signed,
+  scope-bound fixture for each campaign and updating its current runtime proof;
+  a nested-key substitution alone would not repair the old unsigned fixture
+  protocol. P06 Firefox stops at the earlier intermittent P05 assessment check.
+  No full P06 live journey passes for this tree.
+- The native-contract job was still running when this checkpoint was inspected;
+  its result is not inferred from earlier trees.
+- The current minimum assurance gate fails closed: **352/1,073 verified claims,
+  0/166 qualified HTTP operations, 4/75 qualified canonical releases**, and
+  **204 missing boundaries**. These E2 measurements do not establish native,
+  deployment, security or release qualification.
+
+The local execution service subsequently reports `environment_offline:
+Environment is not connected`. GitHub source/log reads remain available, but
+local editing, artifact extraction and executable regression checks cannot run.
+The above source diagnosis is recorded without claiming a tested repair.
+Repository-owned P05/P06 defects and assurance coverage remain open, separately
+from the unavailable protected Planning enrollment and real provider/custody/
+receiving evidence. No merge to main or production admission is authorized by
+these results.
