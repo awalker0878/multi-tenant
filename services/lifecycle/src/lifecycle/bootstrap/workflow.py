@@ -10,6 +10,7 @@ from temporalio.service import TLSConfig
 from temporalio.worker import Worker
 
 from lifecycle.bootstrap.server import execution_service
+from lifecycle.domain.execution import identity
 from lifecycle.infrastructure.execution_owners import AlertReceiver
 from lifecycle.infrastructure.foundation import mounted_secret
 from lifecycle.infrastructure.store import Postgres
@@ -18,6 +19,7 @@ from lifecycle.infrastructure.workflows import SimulationJourney
 
 
 async def run() -> None:
+    worker = identity(os.environ["LIFECYCLE_SIMULATION_WORKER_ID"])
     ca = Path(os.environ["TEMPORAL_CA_FILE"])
     if not ca.is_absolute():
         raise ValueError("verified_temporal_tls_required")
@@ -30,7 +32,7 @@ async def run() -> None:
         rpc_metadata={"authorization": "Bearer " + mounted_secret("TEMPORAL_CREDENTIAL_FILE")},
     )
     execution = execution_service()
-    activities = ExecutionActivities(execution, "sim-worker")
+    activities = ExecutionActivities(execution, worker)
     dispatcher = Dispatcher(Postgres(), client)
     with ThreadPoolExecutor(max_workers=8) as executor:
         async with Worker(

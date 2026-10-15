@@ -28,9 +28,10 @@ def _campaign(c,p):
         value=secrets.token_urlsafe(32);path=private/(name+'.secret');path.write_text(value);path.chmod(0o600)
         credentials[name]=(value,str(path));c['private_values'].append(value)
     epoch=str(uuid.uuid4());epoch_file=private/'execution-epoch';epoch_file.write_text(epoch);epoch_file.chmod(0o600)
+    simulation_worker_id=str(uuid.uuid4())
     registry_file=private/'simulation-campaigns.json';registry={'schema_version':1,'records':[]};registry_file.write_text(json.dumps(registry))
     common={'LIFECYCLE_URL':'https://127.0.0.1:8450','LIFECYCLE_CA_FILE':str(c['certificate']),'SIMULATOR_URL':'https://127.0.0.1:8449','SIMULATOR_CA_FILE':str(c['certificate']),
-        'LIFECYCLE_CUSTODY_EPOCH_FILE':str(epoch_file),'SIMULATION_CUSTODY_EPOCH_FILE':str(epoch_file),'LIFECYCLE_SOURCE_REVISION':os.environ['GITHUB_SHA'],'LIFECYCLE_SIMULATION_CAMPAIGNS_FILE':str(registry_file),
+        'LIFECYCLE_CUSTODY_EPOCH_FILE':str(epoch_file),'SIMULATION_CUSTODY_EPOCH_FILE':str(epoch_file),'LIFECYCLE_SOURCE_REVISION':os.environ['GITHUB_SHA'],'LIFECYCLE_SIMULATION_CAMPAIGNS_FILE':str(registry_file),'LIFECYCLE_SIMULATION_WORKER_ID':simulation_worker_id,
         'GOVERNANCE_URL':'https://127.0.0.1:8442','GOVERNANCE_CA_FILE':str(c['certificate']),'PLANNING_URL':'https://127.0.0.1:8446','PLANNING_CA_FILE':str(c['certificate']),'ASSURANCE_URL':'https://127.0.0.1:8447','ASSURANCE_CA_FILE':str(c['certificate'])}
     for name in links:common[name.upper().replace('-','_')+'_CREDENTIAL_FILE']=credentials[name][1]
     common.update(LIFECYCLE_CONSOLE_CALLER_FILE=credentials['console-lifecycle'][1],LIFECYCLE_SIMULATOR_CALLER_FILE=credentials['simulator-lifecycle'][1],LIFECYCLE_ASSURANCE_CALLER_FILE=credentials['assurance-lifecycle'][1],PLANNING_LIFECYCLE_READER_CREDENTIAL_FILE=credentials['lifecycle-planning'][1],ASSURANCE_GOVERNANCE_CREDENTIAL_FILE=credentials['assurance-governance'][1])
@@ -118,7 +119,7 @@ def _campaign(c,p):
             'actor_id':fixture['operator_id'],'endpoints':[common['SIMULATOR_URL']],'credential_scope_refs':['isolated-p06-simulator'],
             'reservations':[dict(r,state='reserved',plan_digest=binding['digest'],expires_at=expires,receipt_id=str(uuid.uuid4())) for r in content['reservation_intents']]}
         snapshot['campaign']={k:snapshot[k] for k in ['scope','actor_id','environment_class','credential_scope_refs']}
-        snapshot['campaign'].update(id=campaign_id,adapter='p06-simulator-v1',custody_epoch=epoch,worker_ids=['sim-worker'],action=content['action'],method=content['method'],installed_tuple=content['installed_tuple'],artifacts=content['artifacts'],plan_digest=binding['digest'],expires_at=expires,revoked=False,endpoint_allowlist=snapshot['endpoints'],data_scope=['synthetic-data'],cleanup_owner='disposable-campaign-owner',max_effects=32)
+        snapshot['campaign'].update(id=campaign_id,adapter='p06-simulator-v1',custody_epoch=epoch,worker_ids=[simulation_worker_id],action=content['action'],method=content['method'],installed_tuple=content['installed_tuple'],artifacts=content['artifacts'],plan_digest=binding['digest'],expires_at=expires,revoked=False,endpoint_allowlist=snapshot['endpoints'],data_scope=['synthetic-data'],cleanup_owner='disposable-campaign-owner',max_effects=32)
         registry['records'].append(snapshot);registry_file.write_text(json.dumps(registry))
         admission={'plan_id':plan['id'],'plan_revision':1,'plan_digest':binding['digest'],'approval_id':approval['id'],'campaign_id':campaign_id}
         idem=str(uuid.uuid4())

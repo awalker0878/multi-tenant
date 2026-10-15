@@ -16,8 +16,11 @@ class Rejected(Exception):
 
 
 def identity(value: Any) -> str:
-    if not isinstance(value, str) or str(UUID(value)) != value:
-        raise Rejected("invalid_identity", 422)
+    try:
+        if not isinstance(value, str) or str(UUID(value)) != value:
+            raise ValueError
+    except ValueError:
+        raise Rejected("invalid_identity", 422) from None
     return value
 
 

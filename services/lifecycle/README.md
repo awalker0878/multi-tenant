@@ -68,6 +68,9 @@ admission boundaries and P06 handoff.
 `lifecycle-serve` also serves the scoped execution contract in
 [`lifecycle-v1.json`](../../contracts/openapi/lifecycle-v1.json).
 `lifecycle-workflows` runs the versioned Temporal worker and durable dispatcher.
+Set `LIFECYCLE_SIMULATION_WORKER_ID` to its canonical UUID and enroll that same
+identity in the campaign's `worker_ids`. Missing or malformed identities stop
+startup; effect grants and redemption reject non-UUID worker identities.
 Owned migrations establish command receipts, journal, resource holds and alerts.
 Use the [implementation record](../../docs/implementation/p06-execution.md) and
 [runbook](../../docs/operations/runbooks/durable-simulation.md) for exact authority,

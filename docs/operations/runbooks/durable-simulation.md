@@ -28,6 +28,9 @@ Every PostgreSQL connection requires `DB_SSLMODE=verify-full`, an absolute
 verified `TEMPORAL_SERVER_NAME` and mounted `TEMPORAL_CREDENTIAL_FILE`. Use a
 namespace identity with only its needed read/write/worker permissions, separate
 from schema administration. No unauthenticated or plaintext fallback exists.
+Configure `LIFECYCLE_SIMULATION_WORKER_ID` as the poller's canonical UUID and
+enroll that exact UUID in each authorized campaign. Missing or malformed
+worker identities fail before workflow transport connects.
 
 Every owner URL uses verified HTTPS and an absolute CA mount. Supply distinct
 credentials for every directed service link:
@@ -55,7 +58,7 @@ credentials for every directed service link:
    `schema_version: 1`, and `records`. Each record includes exact scope, current
    input/artifact digests, simulation-only reservation receipts and safety facts.
    Its campaign binds `id`, `adapter: p06-simulator-v1`, current epoch,
-   `worker_ids: [sim-worker]`, action/method/installed tuple/plan digest/actor,
+   `worker_ids` containing the configured worker UUID, action/method/installed tuple/plan digest/actor,
    isolated-lab class, one configured simulator endpoint, credential/data scopes,
    cleanup owner, expiry, revocation and effect budget. This is independently
    approved simulation authority, not Console-supplied owner truth. See the

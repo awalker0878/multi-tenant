@@ -551,3 +551,39 @@ is not replaced with unreviewed bytes. P02 broker readiness still fails in one
 browser job; retain redacted container state/logs before cleanup to diagnose
 that separate failure. Current-source live campaign and release assurance
 acceptance remain unverified until the next CI run finishes.
+
+
+### Typed worker identity and actual effect transport
+
+Run [38782109274](https://github.com/awalker0878/multi-tenant/actions/runs/38782109274)
+on head `dbbcb1196f3dd32efb82fdae4685c3edd041f8b8` passes all three P05
+browser campaigns and all nine source-bound image builds/aggregation. The
+pinned Alpine package was independently retrieved as HTTP 200 with the exact
+reviewed size and SHA-256; earlier 404s were intermittent, not a justified
+replacement of pinned bytes. P02 succeeds in all three browsers on this run.
+
+All P06 browsers progress through campaign admission, crash-before-acceptance,
+sealing and retry, then stop at `p06-migrate-reserve: outcome_unknown`. Actual
+source comparison identifies the hard-coded `sim-worker` producer identity,
+which the worker's UUID contract correctly rejects. The separate Temporal
+poller and process witness now require `LIFECYCLE_SIMULATION_WORKER_ID`, and
+campaigns enroll that exact UUID. The execution owner rejects invalid worker
+identities before durable acquisition or redemption. Unit fixtures now use a
+canonical UUID instead of bypassing the real transport's identity requirements.
+The crash witness removes its local `completed` flag before persisting/sending
+the actual typed effect grant, so late-arrival tests exercise real fencing
+rather than an unrelated extra-property denial.
+
+Lifecycle units pass **384 tests** with **86 database cases skipped**; Ruff and
+strict mypy pass. A new PostgreSQL-backed test sends a real acquired grant through
+the actual worker ASGI endpoint and validates the canonical SimulationGrant.
+Local database execution cannot start because the isolated execution UID mapping
+rejects chown to the fixture's nonroot owner with EINVAL; these tests remain
+CI-required, not locally verified or silently skipped as assurance.
+
+The updated aggregator executes successfully and remains red with **372/1,073
+verified claims, 0/166 qualified HTTP operations and 4/75 qualified canonical
+releases**. Missing claims: producer 170, consumer 196, authorization 164,
+tenant isolation 163, authentication 3 and route 5. This is explicit unfinished
+repository-owned assurance work, separately from deployment enrollment and real
+native/receiving qualification. No broader completion is claimed.

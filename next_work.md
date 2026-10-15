@@ -1,3 +1,25 @@
+## Current CI finding — typed simulation worker identity (2026-10-15)
+
+Run 38782109274 on head `dbbcb1196f3dd32efb82fdae4685c3edd041f8b8`
+passes P05 live journeys in Chromium, Firefox and WebKit, all nine image
+bindings, database authority and current contract checks. P06 reaches actual
+simulation effect execution, where the producer's hard-coded `sim-worker`
+identity violates the unchanged UUID effect contract. The poller/witness now
+use an explicitly configured and campaign-enrolled UUID; grant acquisition
+and redemption reject invalid identities before durable access. Crash witness
+payloads also remove the local `completed` flag before effect-owner transport.
+The stricter worker schema remains unchanged. A real PostgreSQL-to-worker-ASGI
+contract regression is added; local PostgreSQL startup is blocked by the
+execution environment's UID mapping (`chown` returns EINVAL), so that new
+case must execute in CI. Local Lifecycle units: 384 passed, 86 database cases
+skipped; Ruff and strict mypy pass.
+
+The live producer-evidence ingestion now works in CI: **372/1,073 claims
+verified**, **0/166 qualified HTTP operations**, **4/75 qualified canonical
+releases**. Missing consumer/security evidence remains repository-owned work;
+protected Planning enrollment and actual native E3/E4 evidence remain separate
+external dependencies. No completion, merge or production qualification claim.
+
 ## Contract remediation resume — 2026-10-15
 
 Current source repairs preserve exact runtime proof matching and fail-closed
