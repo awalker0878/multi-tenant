@@ -1610,7 +1610,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/openapi/assurance-evidence-v1.json",
           "source": "scripts/p06/live_execution.py",
-          "source_sha256": "a675d9a7171021652ed3abfe7edbbce7b70d6ebf7b3d0cf235f32ecfafeffc0c"
+          "source_sha256": "1ab14f379a6a24911da9c57bd1f1936ae7acbc350a0af4f8925cc9ec1e90c803"
         },
         {
           "kind": "validation-or-generation",
@@ -2460,7 +2460,7 @@
           "kind": "wire-source",
           "marker": "/actor-delegations",
           "source": "apps/console/app/Infrastructure/Jobs/JobsClient.php",
-          "source_sha256": "97d9405a98f2634c894b8a4458edca552061205e5c51695e59c35781b18eeb5d"
+          "source_sha256": "afa152d7d97e5f010b9af2b0ac26625848ceb8fab7fbceaeb9bc3987e9a513e0"
         },
         {
           "component": "console",
@@ -3183,7 +3183,7 @@
           "kind": "wire-source",
           "marker": "/v1/tenants",
           "source": "apps/console/app/Infrastructure/Jobs/JobsClient.php",
-          "source_sha256": "97d9405a98f2634c894b8a4458edca552061205e5c51695e59c35781b18eeb5d"
+          "source_sha256": "afa152d7d97e5f010b9af2b0ac26625848ceb8fab7fbceaeb9bc3987e9a513e0"
         },
         {
           "component": "console",
@@ -4640,21 +4640,21 @@
           "kind": "installed-loader",
           "marker": "apps/console/resources/contracts/lifecycle-migration-campaigns-v1.json",
           "source": "apps/console/app/Infrastructure/Jobs/JobsClient.php",
-          "source_sha256": "97d9405a98f2634c894b8a4458edca552061205e5c51695e59c35781b18eeb5d"
+          "source_sha256": "afa152d7d97e5f010b9af2b0ac26625848ceb8fab7fbceaeb9bc3987e9a513e0"
         },
         {
           "component": "console",
           "kind": "runtime-source-reference",
           "marker": "lifecycle-migration-campaigns-v1.json",
           "source": "apps/console/app/Infrastructure/Jobs/JobsClient.php",
-          "source_sha256": "97d9405a98f2634c894b8a4458edca552061205e5c51695e59c35781b18eeb5d"
+          "source_sha256": "afa152d7d97e5f010b9af2b0ac26625848ceb8fab7fbceaeb9bc3987e9a513e0"
         },
         {
           "component": "console",
           "kind": "wire-source",
           "marker": "/commands",
           "source": "apps/console/app/Infrastructure/Jobs/JobsClient.php",
-          "source_sha256": "97d9405a98f2634c894b8a4458edca552061205e5c51695e59c35781b18eeb5d"
+          "source_sha256": "afa152d7d97e5f010b9af2b0ac26625848ceb8fab7fbceaeb9bc3987e9a513e0"
         },
         {
           "component": "console",
@@ -4761,14 +4761,14 @@
           "kind": "installed-loader",
           "marker": "apps/console/resources/contracts/lifecycle-native-jobs-v1.1.json",
           "source": "apps/console/app/Infrastructure/Jobs/JobsClient.php",
-          "source_sha256": "97d9405a98f2634c894b8a4458edca552061205e5c51695e59c35781b18eeb5d"
+          "source_sha256": "afa152d7d97e5f010b9af2b0ac26625848ceb8fab7fbceaeb9bc3987e9a513e0"
         },
         {
           "component": "console",
           "kind": "runtime-source-reference",
           "marker": "lifecycle-native-jobs-v1.1.json",
           "source": "apps/console/app/Infrastructure/Jobs/JobsClient.php",
-          "source_sha256": "97d9405a98f2634c894b8a4458edca552061205e5c51695e59c35781b18eeb5d"
+          "source_sha256": "afa152d7d97e5f010b9af2b0ac26625848ceb8fab7fbceaeb9bc3987e9a513e0"
         },
         {
           "component": "lifecycle",
@@ -4845,21 +4845,21 @@
           "kind": "installed-loader",
           "marker": "apps/console/resources/contracts/lifecycle-v1.json",
           "source": "apps/console/app/Infrastructure/Jobs/JobsClient.php",
-          "source_sha256": "97d9405a98f2634c894b8a4458edca552061205e5c51695e59c35781b18eeb5d"
+          "source_sha256": "afa152d7d97e5f010b9af2b0ac26625848ceb8fab7fbceaeb9bc3987e9a513e0"
         },
         {
           "component": "console",
           "kind": "runtime-source-reference",
           "marker": "lifecycle-v1.json",
           "source": "apps/console/app/Infrastructure/Jobs/JobsClient.php",
-          "source_sha256": "97d9405a98f2634c894b8a4458edca552061205e5c51695e59c35781b18eeb5d"
+          "source_sha256": "afa152d7d97e5f010b9af2b0ac26625848ceb8fab7fbceaeb9bc3987e9a513e0"
         },
         {
           "component": "console",
           "kind": "wire-source",
           "marker": "/commands",
           "source": "apps/console/app/Infrastructure/Jobs/JobsClient.php",
-          "source_sha256": "97d9405a98f2634c894b8a4458edca552061205e5c51695e59c35781b18eeb5d"
+          "source_sha256": "afa152d7d97e5f010b9af2b0ac26625848ceb8fab7fbceaeb9bc3987e9a513e0"
         },
         {
           "component": "console",
@@ -4905,13 +4905,13 @@
           "kind": "validation-or-generation",
           "marker": "contracts/openapi/lifecycle-v1.json",
           "source": "scripts/p06/live_execution.py",
-          "source_sha256": "a675d9a7171021652ed3abfe7edbbce7b70d6ebf7b3d0cf235f32ecfafeffc0c"
+          "source_sha256": "1ab14f379a6a24911da9c57bd1f1936ae7acbc350a0af4f8925cc9ec1e90c803"
         },
         {
           "kind": "validation-or-generation",
           "marker": "contracts/openapi/lifecycle-v1.json",
           "source": "scripts/p06/verify_console_consumers.php",
-          "source_sha256": "b649ddabe04d6453c02d23aefcf096dfe82f26789dfdf5b0d1cc882941221157"
+          "source_sha256": "a24bb3e219b6775fae6e585596fb558987e3aa1d201a40525e0dfda7d9f0db27"
         },
         {
           "kind": "validation-or-generation",
@@ -4923,7 +4923,7 @@
           "kind": "validation-or-generation",
           "marker": "lifecycle-v1.json",
           "source": "tests/contracts/test_assurance.py",
-          "source_sha256": "5d24f8b362e59c0174d53bef25ce75c977f44963a1cb2925ea3447ae3311367d"
+          "source_sha256": "887dc5ba400de8899422a4b6f45b7ca3163adfc7aa77641159e9d61298530488"
         }
       ]
     },

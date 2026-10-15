@@ -87,6 +87,9 @@ final class JobsClient implements JobsGateway
                 throw new JobsFailure(403, 'scope_mismatch');
             }
             if (! $native && ! $campaign && ! $evidence) {
+                if ($response->status() !== ($method === 'POST' ? 202 : 200)) {
+                    throw new JobsFailure;
+                }
                 if ($tail === 'jobs') {
                     foreach (['plan_id', 'plan_digest', 'approval_id'] as $binding) {
                         if (($result[$binding] ?? null) !== ($body[$binding] ?? null)) {

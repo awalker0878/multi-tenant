@@ -1,3 +1,25 @@
+## Exact Console success-status enforcement — 2026-10-15
+
+The next correction also binds simulation success status to the requested
+operation: GET requires 200; admission/commands require 202. The previous
+shared 200/202 allowlist could accept a schema-valid response with the other
+operation's status. Three additional Laravel regressions and live TLS status
+substitutions extend the real Console witness from nine to twelve negative
+controls. The evidence reader requires all twelve controls; earlier nine-case
+receipts cannot qualify the new source. No active contract bytes are changed.
+Current-source hosted acceptance is required.
+
+The retained exact APK repair already passes hosted Console, Catalogue,
+Assurance and Governance image builds on `b8a29397` (run 38823577600). P06
+Chromium, Firefox and WebKit pass there, resolving the prior Chromium bootstrap
+fault for that source. All implementation checks and all nine built image/wheel
+bindings pass; the broader measured assurance gate remains separately open.
+Local verification for the status correction: **237 contract tests pass**,
+with PHP syntax, Pint, source-bound inventory and documentation checks passing. The last completed measured gate remains
+**388/1,073 claims**, **3/166 operations**, **5/75 releases**, with **201**
+boundaries still missing evidence. Native E3/E4 and Planning enrollment are
+not supplied by these source/fixture checks. Keep PR #64 draft.
+
 ## Locked APK availability repair and live acceptance — 2026-10-15
 
 On head `24079d0c44dcb22fa6411958fa21d1a319242a47`,

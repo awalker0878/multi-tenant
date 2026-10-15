@@ -137,9 +137,9 @@ def consumers(folder: Path, existing: list[dict], root: Path = ROOT) -> list[dic
     loader = 'apps/console/app/Infrastructure/Jobs/JobsClient.php'
     hashes = {path: hashlib.sha256((root/path).read_bytes()).hexdigest() for path in (witness, loader)}
     controls = {
-        ('POST', '/v1/tenants/{tenant}/jobs'): ['plan_id', 'plan_digest', 'approval_id'],
-        ('GET', '/v1/tenants/{tenant}/jobs/{job}'): ['id', 'tenant_id', 'uncontracted'],
-        ('POST', '/v1/tenants/{tenant}/jobs/{job}/commands'): ['job_id', 'command_id', 'action'],
+        ('POST', '/v1/tenants/{tenant}/jobs'): ['plan_id', 'plan_digest', 'approval_id', 'status_code'],
+        ('GET', '/v1/tenants/{tenant}/jobs/{job}'): ['id', 'tenant_id', 'uncontracted', 'status_code'],
+        ('POST', '/v1/tenants/{tenant}/jobs/{job}/commands'): ['job_id', 'command_id', 'action', 'status_code'],
     }
     proved = {(row['key'], row.get('consumer_id')) for row in existing if row.get('claim') == 'consumer'}
     evidence = []

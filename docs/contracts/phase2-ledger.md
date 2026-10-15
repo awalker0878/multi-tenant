@@ -721,3 +721,21 @@ claims**, **21/271 consumer boundaries**, **3/166 HTTP operations** and **5/75
 canonical releases**. It remains **FAIL** with 201 boundaries missing evidence;
 image/deployment/native qualification is separate. Full local P01 verification
 for the retained exact APK: **91 tests pass**, including six Alpine cases.
+
+
+### Exact Console success status
+
+Simulation reads must return 200; admission and commands must return 202.
+The shared success-code allowlist previously accepted either code at all three
+boundaries. The consumer now checks the operation's exact status. Three added
+Laravel cases and live TLS status substitutions extend the witness to twelve
+negative controls, with the exact set enforced by evidence admission. This
+correction preserves all active contract bytes and needs current-source CI.
+The APK repair passes all four PHP image builds on `b8a29397`; P06 Chromium
+and Firefox pass on that source. Full assurance remains incomplete independently
+of these passing implementation checks.
+
+On `b8a29397`, all implementation jobs, all P02–P06 browser/SQL campaigns
+and all nine built image/wheel bindings pass. The status correction passes
+**237 contract tests** locally, plus syntax/Pint, inventory and documentation
+checks. Its new live status controls still require current-source CI.

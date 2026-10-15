@@ -432,7 +432,7 @@ class AssuranceCoverageTests(unittest.TestCase):
                'loader_sha256': report['source_sha256'][sources[1]],
                'installed_copy': installed, 'installed_sha256': op['release_sha256'],
                'response_sha256': 'c'*64, 'positive_status_code': 200,
-               'rejected_response_substitutions': ['id', 'tenant_id', 'uncontracted'],
+               'rejected_response_substitutions': ['id', 'tenant_id', 'uncontracted', 'status_code'],
                'revision': os.environ['GITHUB_SHA'], 'run_id': os.environ['GITHUB_RUN_ID'],
                'run_attempt': os.environ['GITHUB_RUN_ATTEMPT']}
         output = output.parent/'consumer-conformance.json'

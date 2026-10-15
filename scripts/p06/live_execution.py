@@ -250,7 +250,7 @@ def _campaign(c,p):
     injected_before=proxy.injected
     run(['php','scripts/p06/verify_console_consumers.php',str(consumer_input),str(out/'consumer-conformance.json')],
         env=envs['console'],label='p06-real-console-contract-consumers')
-    check('p06-console-rejects-nine-substituted-owner-responses',proxy.injected-injected_before==9 and not fault_file.exists())
+    check('p06-console-rejects-twelve-substituted-owner-responses',proxy.injected-injected_before==12 and not fault_file.exists())
     check('p06-distinct-services-own-stores',sql("SELECT has_table_privilege('assurance_runtime','app.evidence_uploads','UPDATE') OR has_table_privilege('assurance_runtime','app.evidence_records','DELETE');",'assurance')=='f')
     backup=private/'lifecycle-before-effects.sql'
     with backup.open('wb') as stream:

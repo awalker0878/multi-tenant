@@ -24,7 +24,9 @@ it('rejects schema valid simulation responses bound to a different request', fun
             'cancel_requested' => false, 'pause_requested' => false, 'stop_requested' => false, 'resources_retained' => true,
             'evidence' => null, 'recovery_mode' => 'pre_target_write_reconciliation', 'operations' => [], 'events' => []];
     $poisoned = $value;
-    $poisoned[$field] = $field === 'action' ? 'stop' : ($field === 'plan_digest' ? str_repeat('b', 64) : $other);
+    if ($field !== 'http_status') {
+        $poisoned[$field] = $field === 'action' ? 'stop' : ($field === 'plan_digest' ? str_repeat('b', 64) : $other);
+    }
     $gov = tempnam(sys_get_temp_dir(), 'sim-gov-');
     $secret = tempnam(sys_get_temp_dir(), 'sim-lifecycle-');
     file_put_contents($gov, str_repeat('b', 64));
@@ -33,7 +35,8 @@ it('rejects schema valid simulation responses bound to a different request', fun
         'jobs.url' => 'https://lifecycle.example.test', 'jobs.credential_file' => $secret, 'jobs.ca_file' => $secret]);
     Http::preventStrayRequests();
     Http::fake(['governance.example.test/*' => Http::response(['delegation_token' => str_repeat('d', 64), 'audience' => 'lifecycle', 'authority_use' => 'request_bound'], 201),
-        'lifecycle.example.test/*' => Http::sequence()->push($value, $method === 'POST' ? 202 : 200)->push($poisoned, $method === 'POST' ? 202 : 200)]);
+        'lifecycle.example.test/*' => Http::sequence()->push($value, $method === 'POST' ? 202 : 200)
+            ->push($poisoned, $field === 'http_status' ? ($method === 'POST' ? 200 : 202) : ($method === 'POST' ? 202 : 200))]);
     try {
         $client = app(JobsClient::class);
         expect($client->call(str_repeat('a', 64), $id, $scope, $method, $tail, $body, $key))->toMatchArray($value);
@@ -41,7 +44,8 @@ it('rejects schema valid simulation responses bound to a different request', fun
             $client->call(str_repeat('a', 64), $id, $scope, $method, $tail, $body, $key);
             test()->fail('A schema-valid response from a different request was accepted');
         } catch (JobsFailure $failure) {
-            expect($failure->status)->toBe(403)->and($failure->reason)->toBe('scope_mismatch');
+            expect($failure->status)->toBe($field === 'http_status' ? 503 : 403)
+                ->and($failure->reason)->toBe($field === 'http_status' ? 'jobs_unavailable' : 'scope_mismatch');
         }
     } finally {
         unlink($gov);
@@ -55,4 +59,7 @@ it('rejects schema valid simulation responses bound to a different request', fun
     ['POST', 'commands', 'job_id'],
     ['POST', 'commands', 'command_id'],
     ['POST', 'commands', 'action'],
+    ['GET', 'read', 'http_status'],
+    ['POST', 'admit', 'http_status'],
+    ['POST', 'commands', 'http_status'],
 ]);
