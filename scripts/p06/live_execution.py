@@ -100,8 +100,7 @@ def _campaign(c,p):
         p['peer'].destinations[dest['endpoint_id']]=dest
         p['registry']['assignments'].append({'tenant_id':tenant,'site_id':dest['site_id'],'endpoint_id':dest['endpoint_id'],'profile':'synthetic','policy':'synthetic'})
         p['registry_file'].write_text(json.dumps(p['registry']))
-        q=copy.deepcopy(p['original_qual']['records'][0]);q['scope'].update({k:dest[k] for k in ['site_id','endpoint_id']});q['scope'].update(action='application.'+action,method=method)
-        quals=json.loads(p['qualification_file'].read_text());quals['records'].append(q);p['qualification_file'].write_text(json.dumps(quals))
+        p['publish_qualification'](dest,'application.'+action,method)
         body={'revision_id':p['revision'],'action':'application.'+action,'method':method,'candidates':[{k:dest[k] for k in ['site_id','endpoint_id','generation_id']}]}
         assessment=p['planning']('assessments',body,sites=[dest['site_id']],expected=201)
         req={'action':body['action'],'method':method,'lane':'isolated_campaign','executor_ids':[fixture['operator_id']],'valid_until':int(time.time())+900}

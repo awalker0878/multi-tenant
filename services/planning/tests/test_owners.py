@@ -3,18 +3,20 @@
 import hashlib
 import json
 import os
+from copy import deepcopy
 from pathlib import Path
 from unittest.mock import Mock
 
 import pytest
-from planning_fixture import ACTOR, APP, ENDPOINT, ENV, GENERATION, REVISION, SITE, TENANT
+from planning_fixture import ACTOR, APP, ENDPOINT, ENV, GENERATION, NOW, REVISION, SITE, TENANT
 
 from planning.domain.model import Actor, Rejected
 from planning.infrastructure.owners import OwnerSources
 
 
+@pytest.mark.parametrize("renewal", ["none", "current", "still_mismatched", "foreign", "expired"])
 def test_protected_registry_resolves_exact_scoped_owner_inputs(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, renewal: str
 ) -> None:
     from planning_fixture import inputs
 
@@ -53,8 +55,33 @@ def test_protected_registry_resolves_exact_scoped_owner_inputs(
             json.dumps(intent, sort_keys=True, ensure_ascii=False, separators=(",", ":")).encode()
         ).hexdigest(),
     }
-    owner_read = Mock(side_effect=[catalogue, destination, qualification])
+    monkeypatch.setattr("planning.infrastructure.owners.time.time", lambda: NOW)
+    responses = [catalogue, destination, qualification]
+    refreshed = deepcopy(destination)
+    if renewal != "none":
+        qualification["verification"]["runtime_sha256"] = "c" * 64
+        refreshed["capability_snapshot"]["source_sha256"] = (
+            "d" * 64 if renewal == "still_mismatched" else "c" * 64
+        )
+        if renewal == "foreign":
+            refreshed["tenant_id"] = "20000000-0000-4000-8000-000000000001"
+        if renewal == "expired":
+            qualification["verification"]["expires_at"] = NOW
+        else:
+            responses.append(refreshed)
+    owner_read = Mock(side_effect=responses)
     monkeypatch.setattr("planning.infrastructure.owners.request", owner_read)
+    if renewal == "foreign":
+        with pytest.raises(Rejected, match="inventory_identity_changed"):
+            OwnerSources().resolve(
+                Actor(TENANT, ACTOR, "plan.read", APP, ENV),
+                REVISION,
+                [{"site_id": SITE, "endpoint_id": ENDPOINT, "generation_id": GENERATION}],
+                {SITE: "a" * 64},
+                "application.provision",
+                "native_api",
+            )
+        return
     result, rows = OwnerSources().resolve(
         Actor(TENANT, ACTOR, "plan.read", APP, ENV),
         REVISION,
@@ -66,12 +93,25 @@ def test_protected_registry_resolves_exact_scoped_owner_inputs(
     assert result == catalogue
     assert rows == [
         {
-            "destination": destination,
+            "destination": refreshed if renewal in {"current", "still_mismatched"} else destination,
             "profile": profile,
             "policy": policy,
             "qualification": qualification,
         }
     ]
+    assert owner_read.call_count == len(responses)
+    from planning.domain.assessment import assess
+
+    assert assess(
+        intent,
+        rows[0]["destination"],
+        profile,
+        policy,
+        qualification,
+        "application.provision",
+        "native_api",
+        NOW,
+    )["operationally_eligible"] is (renewal in {"none", "current"})
 
 
 @pytest.mark.parametrize(

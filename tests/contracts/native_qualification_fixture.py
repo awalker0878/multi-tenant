@@ -4,9 +4,9 @@ import base64
 import copy
 import hashlib
 import json
-from pathlib import Path
 import subprocess
 import time
+from pathlib import Path
 
 
 def digest(value):
@@ -17,6 +17,7 @@ def digest(value):
 def composition_readiness(content, tenant, now):
     """Current synthetic E2 resolver specimen; never enrolled E3/E4 evidence."""
     from importlib.util import module_from_spec, spec_from_file_location
+
     from lifecycle.domain.capability_definitions import METHOD_ALIASES
     root = Path(__file__).resolve().parents[2]
     locator = spec_from_file_location('_composition_readiness', root/'services/lifecycle/tests/test_migration_readiness.py')
@@ -127,7 +128,11 @@ def refresh_runtime(envelope, directory, now=None):
     snapshot=payload.get('snapshot',{})
     if snapshot:
         snapshot['isolation'].update(observed_at=now,expires_at=now+120)
-        for row in snapshot['network']['measurements']+snapshot['recovery_measurements']:
+        observations = snapshot['network']['measurements'] + snapshot['network']['return_paths']
+        observations += list(snapshot['network']['application_flow_selections'].values())
+        observations += list(snapshot['isolation']['boundary_controls'].values())
+        observations += snapshot['recovery_measurements']
+        for row in observations:
             row.update(observed_at=now,expires_at=now+120)
     raw=json.dumps(payload,sort_keys=True,ensure_ascii=True,separators=(',',':')).encode()
     signature=subprocess.check_output(['openssl','dgst','-sha256','-sign',str(Path(directory)/'observer.pem')],input=raw)
@@ -141,16 +146,18 @@ class FixtureRuntimePublisher:
         import threading
         self.path, self.registry, self.directory = Path(path), registry, Path(directory)
         self.stop=threading.Event()
+        self.lock=threading.Lock()
         self.refresh()
         self.thread=threading.Thread(target=self.run,daemon=True)
         self.thread.start()
 
     def refresh(self):
-        records={row['decision']['sha256']:refresh_runtime(row['runtime'],self.directory/('fixture-keys-'+row['record']['scope']['site_id'])) for row in self.registry['records']}
-        temporary=self.path.with_suffix('.tmp')
-        temporary.write_text(json.dumps({'schema_version':1,'records':records}))
-        temporary.chmod(0o600)
-        temporary.replace(self.path)
+        with self.lock:
+            records={row['decision']['sha256']:refresh_runtime(row['runtime'],self.directory/('fixture-keys-'+row['record']['scope']['site_id'])) for row in list(self.registry['records'])}
+            temporary=self.path.with_suffix('.tmp')
+            temporary.write_text(json.dumps({'schema_version':1,'records':records}))
+            temporary.chmod(0o600)
+            temporary.replace(self.path)
 
     def run(self):
         while not self.stop.wait(15):

@@ -314,6 +314,37 @@ class OwnerSources:
                     delegations[site],
                     actor.action,
                 )
+                current_snapshot = destination.get("capability_snapshot")
+                if (
+                    verified(qualification, int(time.time()))
+                    and isinstance(current_snapshot, dict)
+                    and current_snapshot.get("source_sha256")
+                    != qualification["verification"].get("runtime_sha256")
+                ):
+                    # The observer can publish between the two independent reads.
+                    # Reread once; never relax exact proof equality or reuse a
+                    # qualification for a changed installed identity/native scope.
+                    refreshed = request(
+                        "INVENTORY",
+                        "GET",
+                        base.replace("/planning-inputs/", "/planning-capability-inputs/")
+                        + f"/{site}/{candidate['endpoint_id']}/{candidate['generation_id']}",
+                        delegation=delegations[site],
+                        action=actor.action,
+                    )
+                    if any(
+                        refreshed[k] != destination[k]
+                        for k in (
+                            "tenant_id",
+                            "site_id",
+                            "endpoint_id",
+                            "generation_id",
+                            "native_scope",
+                            "installed_tuple",
+                        )
+                    ):
+                        raise Rejected("inventory_identity_changed", 503)
+                    destination = refreshed
                 results.append(
                     {
                         "destination": destination,

@@ -1,3 +1,26 @@
+## Contract remediation resume — 2026-10-15
+
+Current source repairs preserve exact runtime proof matching and fail-closed
+qualification. Planning rereads Inventory once when an independently verified
+Assurance receipt identifies a newer runtime proof; changed native scope or
+installed identity is rejected and a continuing mismatch remains held. Plan
+input digests exclude only observation freshness at known measurement paths;
+policy, scope, sequence, readback and recovery event times remain pinned, and
+all current freshness/expiry checks still execute.
+
+P06 now enrolls independently signed E2 fixture dossiers and scope-bound keys
+for each new campaign, publishing current runtime proofs before the registry
+entry. Fixture renewal includes nested network and isolation observations.
+P05 browser revocation waits for the explained authority hold, and failed
+initial assessments are retained for diagnosis.
+
+Local Planning verification: **608 passed, 22 PostgreSQL cases skipped**;
+Ruff and strict mypy pass. The full contract suite passes **222 tests**,
+including the actual PHP verifier with signed snapshot renewal and negative
+controls. These repairs are **not accepted** until the current-source live
+CI journeys pass. The broader contract assurance gate and external protected
+Planning enrollment/native E3/E4 evidence remain open. PR #64 stays draft.
+
 ## Contract framework: Phase 4 and Phase 5 closeout (2026-10-12)
 
 **Phase 4 — executable capability qualification:** E2 implementation strengthened.

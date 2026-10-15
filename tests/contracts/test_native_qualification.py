@@ -12,12 +12,41 @@ from unittest.mock import patch
 import sys
 from jsonschema import Draft202012Validator, FormatChecker
 
-from native_qualification_fixture import signed_fixture
+from native_qualification_fixture import refresh_runtime, signed_fixture
 
 ROOT = Path(__file__).resolve().parents[2]
 
 
 class NativeQualificationTest(unittest.TestCase):
+    def test_renewed_signed_snapshot_remains_eligible_without_changing_plan_inputs(self):
+        sys.path.insert(0, str(ROOT/'services/planning/src'))
+        sys.path.insert(0, str(ROOT/'services/planning/tests'))
+        import planning_fixture
+        from planning.domain.assessment import assess
+        from planning.domain.operational_evidence import inventory_digest
+        now = int(time.time())
+        with patch.object(planning_fixture, 'NOW', now-30), tempfile.TemporaryDirectory() as directory:
+            intent, destination, profile, policy, qualification = planning_fixture.inputs()
+            bundle, keys = signed_fixture(qualification, Path(directory)/'keys', now=now-30,
+                inventory=destination, snapshot=destination['capability_snapshot']['data'])
+            destination['capability_snapshot']['decision_sha256'] = bundle['decision']['sha256']
+            path = Path(directory)/'fixture.json'
+            bundle['runtime'] = refresh_runtime(bundle['runtime'], Path(directory)/'keys', now)
+            path.write_text(json.dumps({'bundle':bundle,'keys':keys,'scope':bundle['record']['scope']}))
+            resolved = json.loads(subprocess.check_output([os.environ.get('CAPABILITY_PHP_BIN','php'),
+                str(ROOT/'scripts/check_native_qualification.php'), str(path), '--wire']))
+            import base64
+            runtime = json.loads(base64.b64decode(bundle['runtime']['content_base64']))
+            renewed = deepcopy(destination)
+            renewed['capability_snapshot'] = {
+                'definition_sha256':runtime['definition_sha256'], 'source_sha256':bundle['runtime']['sha256'],
+                'decision_sha256':runtime['decision_sha256'], 'scope_sha256':runtime['scope_sha256'],
+                'observed_at':runtime['observed_at'], 'expires_at':runtime['expires_at'], 'data':runtime['snapshot'],
+            }
+            self.assertEqual(inventory_digest(destination), inventory_digest(renewed))
+            result = assess(intent, renewed, profile, policy, resolved, 'application.provision', 'native_api', int(time.time()))
+            self.assertTrue(result['operationally_eligible'], result['findings'])
+
     def test_qualification_scope_guard_rejects_values_the_closed_wire_cannot_return(self):
         scope = json.loads((ROOT/'contracts/fixtures/planning/synthetic-inputs-v1.json').read_text())['qualification']['scope']
         schema = json.loads((ROOT/'contracts/schemas/planning/qualification-v3.json').read_text())['properties']['scope']

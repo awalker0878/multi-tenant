@@ -93,8 +93,9 @@ def campaign(c, extension=None):
     registry_file.write_text(json.dumps(registry))
     quals={'schema_version':2,'records':[]}
     trust={'schema_version':1,'keys':{}}
-    for d in [a,b]:
+    def enroll_qualification(d, action='application.provision', method='native_api'):
         q=copy.deepcopy(model['qualification']);q['scope'].update({k:d[k] for k in ['tenant_id','site_id','endpoint_id','native_scope','installed_tuple']})
+        q['scope'].update(action=action,method=method)
         q['version']=2
         capability_fixture.verify_fixture(q, now)
         d['capability_snapshot']=capability_fixture.snapshot_fixture(model['intent'],d,policy,q)
@@ -108,12 +109,24 @@ def campaign(c, extension=None):
             envelope['key_id']=prefix+envelope['key_id']
         trust['keys'].update({prefix+k:v for k,v in keys.items()})
         quals['records'].append(bundle)
+        return bundle
+    for d in [a,b]:
+        enroll_qualification(d)
     qualification_file=private/'qualification-registry.json';qualification_file.write_text(json.dumps(quals))
     qualification_file.chmod(0o600)
     trust_file=private/'qualification-trust.json';trust_file.write_text(json.dumps(trust));trust_file.chmod(0o600)
     envs['assurance']['ASSURANCE_QUALIFICATION_TRUST_FILE']=str(trust_file)
     runtime_file=private/'qualification-runtime.json'
-    c['proxies'].append(FixtureRuntimePublisher(runtime_file,quals,private))
+    runtime_publisher=FixtureRuntimePublisher(runtime_file,quals,private)
+    c['proxies'].append(runtime_publisher)
+    def publish_qualification(d, action, method):
+        enroll_qualification(d,action,method)
+        # Install trust and current proof before exposing the newly signed scope.
+        for path,value in [(trust_file,trust),(qualification_file,quals)]:
+            temporary=path.with_suffix('.next')
+            temporary.write_text(json.dumps(value));temporary.chmod(0o600)
+            temporary.replace(path)
+            if path==trust_file:runtime_publisher.refresh()
     envs['assurance']['ASSURANCE_QUALIFICATION_RUNTIME_FILE']=str(runtime_file)
     envs['planning']['PLANNING_REGISTRY_FILE']=str(registry_file)
     envs['assurance']['ASSURANCE_QUALIFICATION_REGISTRY_FILE']=str(qualification_file)
@@ -149,6 +162,7 @@ def campaign(c, extension=None):
     with ThreadPoolExecutor(2) as pool:replies=list(pool.map(lambda _:planning('assessments',create,key=key,expected=201),range(2)))
     check('live-concurrent-idempotency-one-result',replies[0]==replies[1])
     assessment=planning('assessments/'+replies[0]['id'])
+    (out/'initial-assessment.json').write_text(json.dumps(assessment,indent=2)+'\n')
     check('two-authorized-destinations-explain-positive-and-blocked',[r['status'] for r in assessment['results']]==['eligible','blocked'])
     planning('assessments',dict(create,method='native_api_export_import'),key=key,expected=409)
     req={'action':'application.provision','method':'native_api','lane':'operational','executor_ids':[fixture['operator_id']],'valid_until':int(time.time())+900}
@@ -166,7 +180,9 @@ def campaign(c, extension=None):
     check('real-governance-approval-content-binding-and-changed-digest-denial',True)
     c['stop']('planning');c['start']('planning')
     check('service-restart-preserves-immutable-plan',planning('plans/'+first['id'],sites=[a['site_id']])['content']==saved['content'])
-    original_qual=copy.deepcopy(quals);quals['records'][0]['record']['revoked']=True;qualification_file.write_text(json.dumps(quals))
+    original_qual=copy.deepcopy(quals)
+    revoked_qual=copy.deepcopy(quals);revoked_qual['records'][0]['record']['revoked']=True
+    qualification_file.write_text(json.dumps(revoked_qual))
     held=planning('plans/'+first['id'],sites=[a['site_id']])
     check('current-qualification-revocation-holds-without-changing-plan',not held['validity']['current'] and held['content']==saved['content'])
     qualification_file.write_text(json.dumps(original_qual))

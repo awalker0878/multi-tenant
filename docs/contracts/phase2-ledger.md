@@ -464,3 +464,38 @@ Repository-owned P05/P06 defects and assurance coverage remain open, separately
 from the unavailable protected Planning enrollment and real provider/custody/
 receiving evidence. No merge to main or production admission is authorized by
 these results.
+
+
+### 2026-10-15 resumed executable repairs
+
+The workspace is executable again. The latest completed baseline run is
+[38745811357](https://github.com/awalker0878/multi-tenant/actions/runs/38745811357)
+on head `f57f4bf5c5012750ce5813c8928bf7a51d9dec32`. Native contracts, service
+quality, active contracts, Laravel router/denial probes and PostgreSQL authority
+transactions pass. Live P05/P06 fail; one Governance image download fails on a
+pinned upstream Alpine APK 404, and P02 WebKit stops at broker readiness. Those
+failures have not been relabelled as successful checks.
+
+Current corrections:
+
+- Planning retries an Inventory read once when independently verified Assurance
+  identifies a different current runtime proof. The native/installed identity
+  must remain equal and exact snapshot/proof equality is still mandatory.
+- Known observation freshness fields no longer change immutable plan input
+  semantics. Every current freshness check still executes, while scope, policy,
+  sequence, readback, native identity and actual recovery event times stay bound.
+- Synthetic E2 runtime renewal now covers nested network selections, return
+  paths and isolation controls. Concurrent runtime publications are serialized.
+- Each P06 campaign generates a new signed, scope-bound dossier and enrolls its
+  own observer/reviewer keys and current runtime proof before publishing it.
+  Editing signed scope bytes in an existing dossier is no longer attempted.
+- P05 retains initial assessment findings before asserting eligibility and waits
+  for the current-authority revocation explanation during the browser poll.
+
+Local verification: **222 contract tests pass**; **608 Planning tests pass**,
+**22 database tests require CI**; Ruff and strict mypy pass. The signed renewal
+regression executes the actual PHP verifier and Planning assessment; negative
+regressions preserve holds for expired, continuously mismatched or foreign
+proofs and detect semantic recovery/readback changes. Live acceptance awaits
+CI on the resulting source revision. Full contract/security/release coverage
+and real protected enrollment, native E3 and independent E4 remain open.

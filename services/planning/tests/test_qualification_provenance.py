@@ -101,3 +101,52 @@ def test_runtime_refresh_does_not_change_the_reviewed_record_binding() -> None:
     assert not verified(record, NOW + 6)
     refreshed["verification"]["decision_sha256"] = "d" * 64
     assert binding_digest(record) != binding_digest(refreshed)
+
+
+def test_current_observation_renewal_preserves_semantics_but_never_freshness() -> None:
+    from copy import deepcopy
+
+    from planning.domain.operational_evidence import inventory_digest
+
+    intent, destination, profile, policy, qualification = inputs()
+    original = deepcopy(destination)
+    renewed = deepcopy(destination)
+    data = renewed["capability_snapshot"]["data"]
+    network = data["network"]
+    observations = [data["isolation"], *data["isolation"]["boundary_controls"].values()]
+    observations += network["measurements"] + network["return_paths"]
+    observations += list(network["application_flow_selections"].values())
+    observations += data["recovery_measurements"]
+    for row in [renewed["capability_snapshot"], *observations]:
+        row.update(observed_at=NOW + 30, expires_at=NOW + 150)
+    renewed["capability_snapshot"]["source_sha256"] = "c" * 64
+    qualification["verification"].update(resolved_at=NOW + 30, runtime_sha256="c" * 64)
+    assert inventory_digest(destination) == inventory_digest(renewed)
+    assert destination == original
+    assert assess(
+        intent,
+        renewed,
+        profile,
+        policy,
+        qualification,
+        "application.provision",
+        "native_api",
+        NOW + 30,
+    )["operationally_eligible"]
+    # Matching bytes and an unchanged plan digest never waive live freshness.
+    qualification["verification"]["resolved_at"] = NOW + 100
+    assert not assess(
+        intent,
+        renewed,
+        profile,
+        policy,
+        qualification,
+        "application.provision",
+        "native_api",
+        NOW + 100,
+    )["operationally_eligible"]
+    for change in ("policy_sha256", "sequence", "failure_at", "readback_sha256"):
+        changed = deepcopy(renewed)
+        sample = changed["capability_snapshot"]["data"]["recovery_measurements"][0]
+        sample[change] = sample[change] + 1 if type(sample[change]) is int else "f" * 64
+        assert inventory_digest(renewed) != inventory_digest(changed)
