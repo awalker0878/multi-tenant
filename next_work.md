@@ -1,3 +1,35 @@
+## Resume checkpoint — isolated fencing and authenticated denials (2026-10-15)
+
+Exact branch head `e7cde0aa25471d7f83064c2583d8f9e85d254cc8` completed
+[CI run 38786986460](https://github.com/awalker0878/multi-tenant/actions/runs/38786986460).
+All service quality, PostgreSQL, live P02–P06 browser journeys and nine
+built-contract binding jobs pass. The run tests PR merge revision
+`fdb5d0e1a731fdec69273c8e1cbf8980c58b2c9e`; this is not a deployment result.
+Contract assurance remains red: **379/1,073 claims**, **18/271 consumer
+boundaries**, **0/166 qualified operations**, **4/75 qualified releases**.
+Missing internal consumer/security/producer evidence remains engineering work.
+
+Current changes add two independent live epoch controls using one fresh durable
+grant: effect-owner epoch mismatch, then journal-owner epoch mismatch, then
+acceptance and duplicate suppression with the exact same grant. Both denials
+must occur before expiry and leave the effect count unchanged. This isolated
+fault injection precedes the restore exercise and cannot re-enable a restored
+journal. Authenticated wrong-scope and cross-tenant probes now cover Lifecycle
+admission, job reads and commands; each requires a positive control, independently
+validated requests/responses, no protected identifier disclosure and unchanged
+snapshots across eight Lifecycle tables and the independent effect ledger.
+
+Local verification: **235 contract tests pass**; canonical integrity, publication/retirement,
+quality-policy cutover, source-bound inventory and documentation checks pass.
+The new PostgreSQL/ASGI case and live journeys require hosted CI.
+
+Source/attempt/artifact-bound security evidence ingestion remains fail closed
+on stale sources, malformed probes, missing positive controls, state changes,
+disclosure or failed campaigns. These new live/SQL controls need current-source
+CI before acceptance. Protected Planning enrollment, independently commissioned
+providers and E3/E4 native evidence remain external dependencies. PR #64 stays
+draft. Do not merge main or infer production/native authority.
+
 ## Fencing probe transport correction — 2026-10-15
 
 On head `3c58fa74379c093eaa213448c75b28488d43809d`, P06 Chromium, Firefox and WebKit

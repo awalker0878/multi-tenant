@@ -348,6 +348,61 @@ class AssuranceCoverageTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'Stale journey'):
                 producers(output.parent, [], self.root)
 
+    def security_measurement(self):
+        output, report = self.journey_measurement()
+        source = 'scripts/p06/live_execution.py'
+        file = self.root/source
+        file.parent.mkdir(parents=True)
+        file.write_bytes((ROOT/source).read_bytes())
+        row = self.evidence('tenant_isolation')
+        row.update(test='scripts/p06/live_execution.py:security_probes',
+                   authority_checked='current-effective-authority',
+                   positive_status_code=200, request_valid=True, response_valid=True,
+                   state_before_sha256='b'*64, state_after_sha256='b'*64,
+                   revision=os.environ['GITHUB_SHA'], run_id=os.environ['GITHUB_RUN_ID'],
+                   run_attempt=os.environ['GITHUB_RUN_ATTEMPT'])
+        output = output.parent/'security-conformance.json'
+        output.write_text(json.dumps([row]))
+        report['source_sha256'][source] = hashlib.sha256(file.read_bytes()).hexdigest()
+        report['artifact_sha256'][output.name] = hashlib.sha256(output.read_bytes()).hexdigest()
+        (output.parent/'report.json').write_text(json.dumps(report))
+        return output, report, row
+
+    def test_security_requires_separate_authenticated_denials_and_state_controls(self):
+        from journey_assurance import security
+        with patch.dict(os.environ, {'GITHUB_RUN_ID':'123','GITHUB_RUN_ATTEMPT':'2','GITHUB_SHA':'a'*40}):
+            output, report, row = self.security_measurement()
+            proofs = security(output.parent, [], self.root)
+            self.assertEqual([r['claim'] for r in proofs], ['tenant_isolation'])
+            self.assertEqual(security(output.parent, proofs, self.root), [])
+            measured = assess(self.root, proofs, require_provenance=True)
+            self.assertEqual(measured['coverage'][0]['verified'], ['tenant_isolation'])
+            self.assertEqual(measured['summary']['qualified_http_operations'], 0)
+            report['result'] = 'FAIL'
+            (output.parent/'report.json').write_text(json.dumps(report))
+            self.assertEqual(security(output.parent, [], self.root), [])
+
+    def test_security_rejects_stale_malformed_disclosing_or_mutating_probes(self):
+        from journey_assurance import security
+        with patch.dict(os.environ, {'GITHUB_RUN_ID':'123','GITHUB_RUN_ATTEMPT':'2','GITHUB_SHA':'a'*40}):
+            output, report, original = self.security_measurement()
+            for field,value in [('request_valid',False),('response_valid',False),
+                                ('status_code',503),('positive_status_code',403),
+                                ('positive_status_code',True),('authenticated',False),
+                                ('authority_checked','cached'),('requested_tenant',original['credential_tenant']),
+                                ('state_after_sha256','c'*64),('state_before_sha256',''),
+                                ('unauthorized_mutation',True),('unauthorized_disclosure',True),
+                                ('release_sha256','f'*64),('run_attempt','1'),
+                                ('test','unexecuted-test'),('claim','consumer')]:
+                output.write_text(json.dumps([{**original,field:value}]))
+                report['artifact_sha256'][output.name] = hashlib.sha256(output.read_bytes()).hexdigest()
+                (output.parent/'report.json').write_text(json.dumps(report))
+                with self.subTest(field=field), self.assertRaises(ValueError):
+                    security(output.parent, [], self.root)
+            output.write_text(json.dumps([original]))
+            with self.assertRaisesRegex(ValueError, 'measured bytes differ'):
+                security(output.parent, [], self.root)
+
 
 
 class PlanningDenialProbeTests(unittest.TestCase):

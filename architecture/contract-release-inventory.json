@@ -1610,7 +1610,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/openapi/assurance-evidence-v1.json",
           "source": "scripts/p06/live_execution.py",
-          "source_sha256": "e15aeed72c91df7f1e74b4095cda8129ba66fad6287dca1aa55f82573b284161"
+          "source_sha256": "727a055a0ef1010bb8db134bc72909ef46244b0c9a46c985f6428662b65b1488"
         },
         {
           "kind": "validation-or-generation",
@@ -4905,7 +4905,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/openapi/lifecycle-v1.json",
           "source": "scripts/p06/live_execution.py",
-          "source_sha256": "e15aeed72c91df7f1e74b4095cda8129ba66fad6287dca1aa55f82573b284161"
+          "source_sha256": "727a055a0ef1010bb8db134bc72909ef46244b0c9a46c985f6428662b65b1488"
         },
         {
           "kind": "validation-or-generation",
@@ -5871,7 +5871,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/openapi/worker-simulation-v1.json",
           "source": "scripts/p06/test_execution.py",
-          "source_sha256": "9507e4b50e2d2bdb0a6e830f86a154c5afcb3cee93079165eb96bd0cec0c07db"
+          "source_sha256": "85466719d53f6a7f5acf5daafd03ee4f0c78ef790aa12ce5aa22114eacfbf6ca"
         },
         {
           "kind": "validation-or-generation",

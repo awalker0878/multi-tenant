@@ -118,20 +118,40 @@ def test_actual_durable_grant_passes_worker_http_contract(world: dict[str, Any])
                'query_string':b'','headers':[(b'authorization',b'Bearer '+b'r'*64),
                                            (b'content-type',b'application/json')]}
         asyncio.run(ExecutionApp(w['service'],Caller())(scope,receive,send))
-        assert replies[0]['status']==200
+        if replies[0]['status']!=200:
+            raise ValueError('authority_denied')
         return json.loads(replies[-1]['body'])
     w['peer'].redeem=redeem_over_http
     key=hashlib.sha256(json.dumps({'path':'/v1/effects','body':body},sort_keys=True,
                                 separators=(',',':'),allow_nan=False).encode()).hexdigest()
-    sent=[]
-    async def receive():return {'type':'http.request','body':json.dumps(body).encode(),'more_body':False}
-    async def send(message):sent.append(message)
-    scope={'type':'http','method':'POST','path':'/v1/effects','query_string':b'',
-           'headers':[(b'authorization',b'Bearer effect-only'),(b'content-type',b'application/json'),
-                      (b'idempotency-key',key.encode())]}
-    asyncio.run(SimulationApp(w['peer'],credentials.__getitem__)(scope,receive,send))
-    assert sent[0]['status']==200
-    assert json.loads(sent[-1]['body'])=={'accepted':True,'duplicate':False}
+    async def exchange():
+        sent=[]
+        async def receive():return {'type':'http.request','body':json.dumps(body).encode(),'more_body':False}
+        async def send(message):sent.append(message)
+        scope={'type':'http','method':'POST','path':'/v1/effects','query_string':b'',
+               'headers':[(b'authorization',b'Bearer effect-only'),(b'content-type',b'application/json'),
+                          (b'idempotency-key',key.encode())]}
+        await SimulationApp(w['peer'],credentials.__getitem__)(scope,receive,send)
+        return sent[0]['status'],json.loads(sent[-1]['body'])
+    # Vary each independently owned custody epoch while keeping the exact
+    # unexpired durable grant, transport and current authority unchanged.
+    original_epoch=w['current'].epoch
+    simulator_epoch=[original_epoch]
+    w['peer'].custody=lambda:simulator_epoch[0]
+    for owner in ('effect-owner','journal-owner'):
+        if owner=='effect-owner':simulator_epoch[0]=str(uuid4())
+        else:w['current'].epoch=str(uuid4())
+        assert body['expires_at']>w['clock'][0]
+        assert asyncio.run(exchange())[0]==403
+        with w['connect']() as connection:
+            assert connection.execute('SELECT count(*) n FROM sim.observations').fetchone()['n']==0
+        with w['database'].transaction() as tx:
+            assert tx.one('SELECT redeemed FROM app.execution_operations WHERE id=%s',(body['operation_id'],))['redeemed'] is False
+        simulator_epoch[0]=original_epoch;w['current'].epoch=original_epoch
+    assert asyncio.run(exchange())==(200,{'accepted':True,'duplicate':False})
+    assert asyncio.run(exchange())==(200,{'accepted':True,'duplicate':True})
+    with w['connect']() as connection:
+        assert connection.execute('SELECT count(*) n FROM sim.observations WHERE effect_count=1').fetchone()['n']==1
 
 
 def test_simulated_journey_independent_readback_and_evidence(world: dict[str, Any]) -> None:

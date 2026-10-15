@@ -627,3 +627,32 @@ WebKit), including crash/recovery, custody, history replay and restore controls.
 The stricter fencing transport correction passes **227 contract tests** locally;
 the added replay-key regression reaches the real worker endpoint and rejects
 a key bound to a different attempt. Final-source live CI is still required.
+
+
+### Independent current-source checkpoint and remaining security evidence
+
+Head `e7cde0aa25471d7f83064c2583d8f9e85d254cc8` completed
+[run 38786986460](https://github.com/awalker0878/multi-tenant/actions/runs/38786986460)
+at tested PR merge revision `fdb5d0e1a731fdec69273c8e1cbf8980c58b2c9e`.
+All service, SQL, P02–P06 browser and nine built-binding jobs passed. Contract
+assurance remains **FAIL**, with **379/1,073 claims**, **18/271 consumer
+boundaries**, **0/166 qualified HTTP operations**, and **4/75 releases**.
+The missing internal evidence is not described as an external blocker.
+
+The next live campaign isolates each independently mounted custody epoch
+while an actual durable grant remains unexpired. The exact same grant must
+subsequently be accepted once and recognized as a duplicate; mere denial
+cannot earn the control. The PostgreSQL/ASGI regression exercises the worker,
+Lifecycle redemption handler and journal together under both epoch faults.
+Separate live authenticated wrong-scope/cross-tenant probes cover admission,
+job reads and commands, compare the full execution and independent-effect
+state before/after denial, and reject protected resource disclosure. Their
+qualification receipts require exact source, run attempt and artifact digests,
+valid request/response schemas and successful positive controls. New controls
+remain unverified until the corrected source completes real CI. The older
+post-restore grant still proves continued denial only; isolated pre-restore
+controls do not authorize restored-journal re-enablement or native writes.
+
+Local verification for these controls: **235 contract tests pass**; canonical
+integrity, publication/retirement, quality-policy cutover, source-bound release
+inventory and documentation validation pass. Database/live controls require CI.

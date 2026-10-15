@@ -69,3 +69,54 @@ def producers(folder: Path, existing: list[dict], root: Path = ROOT) -> list[dic
                                  "response_sha256": row["response_sha256"], **expected})
                 proved.add(key)
     return evidence
+
+
+def security(folder: Path, existing: list[dict], root: Path = ROOT) -> list[dict]:
+    """Admit measured authenticated denials only with positive and durable controls."""
+    from assurance import assess
+    operations = {row['key']: row for row in inventory(root)['operations']}
+    proved = {(row['key'], row['claim']) for row in existing}
+    expected = {'revision': os.environ.get('GITHUB_SHA'),
+                'run_id': os.environ.get('GITHUB_RUN_ID'),
+                'run_attempt': os.environ.get('GITHUB_RUN_ATTEMPT')}
+    if not all(expected.values()):
+        raise ValueError('Current journey CI provenance is required')
+    sources = ('scripts/p06/live_execution.py', 'scripts/contracts/route_conformance.py')
+    hashes = {source: hashlib.sha256((root/source).read_bytes()).hexdigest() for source in sources}
+    evidence = []
+    for file in sorted(folder.rglob('security-conformance.json')):
+        report = json.loads((file.parent/'report.json').read_text())
+        if (report.get('source_revision') != expected['revision']
+                or any(report.get(key) != expected[key] for key in ('run_id', 'run_attempt'))):
+            raise ValueError('Stale journey security provenance')
+        if report.get('result') != 'PASS' or report.get('source_unchanged') is not True:
+            continue
+        if (any(report.get('source_sha256', {}).get(source) != digest for source, digest in hashes.items())
+                or report.get('artifact_sha256', {}).get(file.name)
+                != hashlib.sha256(file.read_bytes()).hexdigest()):
+            raise ValueError('Journey security source or measured bytes differ')
+        rows = json.loads(file.read_text())
+        if not isinstance(rows, list):
+            raise ValueError('Malformed journey security measurements')
+        for row in rows:
+            operation = operations.get(row.get('key'))
+            positive = row.get('positive_status_code')
+            before, after = row.get('state_before_sha256'), row.get('state_after_sha256')
+            if (operation is None or row.get('claim') not in {'authorization', 'tenant_isolation'}
+                    or any(row.get(key) != value for key, value in expected.items())
+                    or row.get('test') != 'scripts/p06/live_execution.py:security_probes'
+                    or row.get('authority_checked') != 'current-effective-authority'
+                    or type(positive) is not int or not 200 <= positive < 300
+                    or str(positive) not in operation['response_statuses']
+                    or row.get('request_valid') is not True or row.get('response_valid') is not True
+                    or not isinstance(before, str) or re.fullmatch(r'[a-f0-9]{64}', before) is None
+                    or before != after):
+                raise ValueError('Journey security lacks valid positive and unchanged-state controls')
+            # Reuse the independent claim admission checks for tenant separation,
+            # effective authority, exact release, disclosure and mutation verdicts.
+            assess(root, [row], require_provenance=True)
+            identity = (row['key'], row['claim'])
+            if identity not in proved:
+                evidence.append(row)
+                proved.add(identity)
+    return evidence
