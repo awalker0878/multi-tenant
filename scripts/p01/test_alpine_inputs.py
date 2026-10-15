@@ -5,7 +5,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from alpine_inputs import validate_apks
+from alpine_inputs import validate_apks, validate_cache
 
 
 class AlpineInputsTest(unittest.TestCase):
@@ -46,6 +46,34 @@ class AlpineInputsTest(unittest.TestCase):
                 lock = copy.deepcopy(self.lock)
                 lock['packages'][filename][field] = value
                 with self.assertRaises(ValueError): self.check(lock)
+
+    def test_retained_current_apk_is_exactly_the_previously_reviewed_artifact(self):
+        root = Path(__file__).resolve().parents[2]
+        for component in ('apps/console', 'services/assurance', 'services/catalogue', 'services/governance'):
+            proved = validate_cache(root/component/'build/apk-cache', self.lock)
+            self.assertEqual(list(proved), ['zlib-1.3.2-r0.apk'])
+
+    def test_cache_rejects_tampering_extra_files_symlinks_and_missing_inputs(self):
+        root = Path(__file__).resolve().parents[2]
+        current = root/'services/assurance/build/apk-cache/zlib-1.3.2-r0.apk'
+        with tempfile.TemporaryDirectory() as temporary:
+            cache = Path(temporary)/'cache'
+            with self.assertRaises(ValueError): validate_cache(cache, self.lock)
+            cache.mkdir()
+            with self.assertRaises(ValueError): validate_cache(cache, self.lock)
+            target = cache/current.name
+            raw = current.read_bytes()
+            for changed in (raw[:-1], bytes([raw[0] ^ 1])+raw[1:]):
+                target.write_bytes(changed)
+                with self.assertRaises(ValueError): validate_cache(cache, self.lock)
+            target.write_bytes(raw)
+            extra = cache/'unreviewed.apk'
+            extra.write_bytes(raw)
+            with self.assertRaises(ValueError): validate_cache(cache, self.lock)
+            extra.unlink()
+            target.unlink()
+            target.symlink_to(current)
+            with self.assertRaises(ValueError): validate_cache(cache, self.lock)
 
 
 if __name__ == '__main__':

@@ -1,3 +1,32 @@
+## Locked APK availability repair and live acceptance — 2026-10-15
+
+On head `24079d0c44dcb22fa6411958fa21d1a319242a47`,
+[run 38822505865](https://github.com/awalker0878/multi-tenant/actions/runs/38822505865)
+passes Contract Integrity, Console quality (including seven new request-binding
+cases), P06 PostgreSQL, P06 Firefox/WebKit, and all three P02 browser jobs.
+The two passing P06 campaigns execute both independent fresh-grant epoch
+fences, current-authority/cross-tenant denial controls, the real Console client,
+and all nine substituted-response rejections. Chromium's Temporal namespace
+setup process segfaulted; it did not reach those controls. Do not call that job
+passed or claim complete browser acceptance. Overall assurance remains open.
+
+Its measured gate now verifies **388/1,073 claims**, **21/271 consumer
+boundaries**, **3/166 HTTP operations** and **5/75 canonical releases**.
+This is the first fully evidenced HTTP set, not complete platform or native
+qualification. The remaining 201 boundaries have explicit missing evidence.
+
+The package availability defect now has a source repair: each isolated PHP
+build context retains the previously retrieved **exact locked zlib APK**.
+All copies match the existing length/hash; no version, lock, source URL, image
+base or signature trust changes. Strict build-context validation covers the
+cache, and the real downloader rejects same-length tampering. Offline APK
+signature verification remains mandatory. **91 P01 tests pass**, including six Alpine input tests; all
+four exact context inventories include the retained bytes; actual PHP transport
+accepts the original and rejects a corrupted copy without network access.
+Current-source image builds must verify this repair before claiming resolution.
+The external Planning registry and real native E3/E4 commissioning remain
+unavailable, and missing internal evidence is still separate unfinished work.
+
 ## P02 broker startup correction — 2026-10-15
 
 The retained P02 Firefox/WebKit failure artifacts from run 38821391028 show

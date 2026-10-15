@@ -13,6 +13,7 @@ RUN node -e 'if (process.version !== "v24.19.0") throw new Error(process.version
 
 FROM ${PHP_BASE} AS php-base
 COPY build/download-apks.php build/apk.lock.json /tmp/service-build/
+COPY build/apk-cache/ /tmp/service-build/apk-cache/
 RUN : > /etc/apk/repositories \
     && php /tmp/service-build/download-apks.php build \
     && apk add --no-network --repositories-file /dev/null --virtual .phpize-deps /tmp/service-apks/*.apk \

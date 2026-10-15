@@ -694,3 +694,30 @@ The new epoch PostgreSQL/ASGI case passes on `33c45188`. Locally **390
 Lifecycle tests pass / 86 PostgreSQL cases skip**, with full Ruff/format/mypy
 passing. Independent Planning registry lookup is absent/None; official Alpine
 mirror probes also reproduce locked-zlib 404. Internal evidence gaps remain.
+
+
+### Executed live controls and exact locked-APK recovery
+
+Run 38822505865 on `24079d0c` passes Console quality, Contract Integrity,
+P06 PostgreSQL, both Firefox/WebKit P06 campaigns, and all three P02 browsers.
+The live campaigns execute fresh-grant effect/journal epoch isolation,
+authenticated current-authority and cross-tenant denials, the shipped Console
+consumer and nine response-substitution controls. Chromium instead segfaulted
+in the Temporal namespace bootstrap; it provides no passing live evidence.
+
+The locked zlib archive is retained from the earlier successful download with
+its exact existing 56,195-byte length and SHA-256. All four isolated PHP contexts
+now include the original signed APK as a reviewed source input. No dependency
+version, closure lock, base image, upstream URL or signing trust is changed.
+Python context checks and the real PHP downloader reject tampering; offline
+APK distribution-signature verification is preserved. Six Alpine tests and
+all four exact context inventories pass locally; actual downloader acceptance
+and same-length corruption rejection pass without network access. Current-
+source image qualification is still required. This does not close other
+internal assurance gaps, Planning deployment enrollment or native E3/E4.
+
+The independently retrieved gate for run 38822505865 verifies **388/1,073
+claims**, **21/271 consumer boundaries**, **3/166 HTTP operations** and **5/75
+canonical releases**. It remains **FAIL** with 201 boundaries missing evidence;
+image/deployment/native qualification is separate. Full local P01 verification
+for the retained exact APK: **91 tests pass**, including six Alpine cases.

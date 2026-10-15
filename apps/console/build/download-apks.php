@@ -22,7 +22,13 @@ foreach ($lock['groups'][$group] as $filename) {
         || basename($package['url']) !== $filename) {
         throw new RuntimeException('Invalid APK artifact identity');
     }
-    $input = fopen($package['url'], 'rb', false, $context);
+    // Reviewed local bytes remain subject to the unchanged length/hash lock;
+    // apk verifies the distribution signature during the offline install.
+    $cached = __DIR__.'/apk-cache/'.$filename;
+    if (is_link($cached)) {
+        throw new RuntimeException('Symlinked APK cache input');
+    }
+    $input = fopen(is_file($cached) ? $cached : $package['url'], 'rb', false, $context);
     $output = fopen($destination.'/'.$filename, 'xb');
     if ($input === false || $output === false) {
         throw new RuntimeException('APK download unavailable');
