@@ -86,6 +86,22 @@ final class JobsClient implements JobsGateway
             if ($native && (($result['job_id'] ?? null) !== explode('/', $tail)[1] || ($result['scope']['tenant_id'] ?? null) !== $tenant)) {
                 throw new JobsFailure(403, 'scope_mismatch');
             }
+            if (! $native && ! $campaign && ! $evidence) {
+                if ($tail === 'jobs') {
+                    foreach (['plan_id', 'plan_digest', 'approval_id'] as $binding) {
+                        if (($result[$binding] ?? null) !== ($body[$binding] ?? null)) {
+                            throw new JobsFailure(403, 'scope_mismatch');
+                        }
+                    }
+                } else {
+                    $requestedJob = explode('/', $tail)[1];
+                    $command = str_ends_with($tail, '/commands');
+                    if (($result[$command ? 'job_id' : 'id'] ?? null) !== $requestedJob
+                        || ($command && (($result['command_id'] ?? null) !== $key || ($result['action'] ?? null) !== ($body['action'] ?? null)))) {
+                        throw new JobsFailure(403, 'scope_mismatch');
+                    }
+                }
+            }
 
             if (! $evidence && $method === 'GET') {
                 $result['control_allowed'] = false;

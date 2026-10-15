@@ -1,3 +1,32 @@
+## Current Console binding correction — 2026-10-15
+
+The actual Console `JobsClient` now binds simulation reads to the requested job,
+admissions to their plan ID/digest/approval, and command receipts to job, command
+key and action. Valid schema and tenant scope alone did not enforce these
+bindings. Seven focused Laravel regressions and a live TLS witness challenge
+nine schema-valid or uncontracted substitutions against the real client and
+owner. Only current-source successful campaigns may contribute the three
+executed Console consumer receipts; source, loader, installed release, artifact,
+run attempt and negative-control identities are checked independently.
+
+Run [38821391028](https://github.com/awalker0878/multi-tenant/actions/runs/38821391028)
+for `33c451881329c217004b318f521c71c1763e3633` is not accepted: the new
+wrong-scope probe revealed Governance's 401 delegation denial propagating as
+workload reauthentication after Lifecycle had authenticated the caller. The
+Lifecycle actor boundary now maps that specific upstream 401 to forbidden 403;
+403/404/503 remain unchanged and no authority is granted. Four focused Python
+regressions, Ruff and strict mypy pass. **237 contract tests pass** locally;
+the newly added Laravel and final live controls require CI.
+
+An independent image build failure on that run is an upstream 404 for locked
+`zlib-1.3.2-r0.apk`. Direct retrieval (including a cache-bypass query) also
+returns 404; the previously retrieved 56,195-byte artifact matches the existing
+SHA-256 `b636306cbf8a0c15493b38de608ba11605fd8f11ade631f5ece6f7fdf5a1e09e`.
+Do not relax the byte lock, silently upgrade the package or claim a final
+built-image binding without a successful source-pinned build. Other missing
+contract evidence remains internal work; this availability issue does not
+reclassify it as externally complete. Keep PR #64 draft and do not merge main.
+
 ## Resume checkpoint — isolated fencing and authenticated denials (2026-10-15)
 
 Exact branch head `e7cde0aa25471d7f83064c2583d8f9e85d254cc8` completed

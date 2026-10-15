@@ -32,9 +32,10 @@ def main() -> int:
     args = parser.parse_args()
     observations = combine(args.input_directory)
     if args.journey_directory:
-        from journey_assurance import producers, security
+        from journey_assurance import producers, security, consumers
         observations.extend(producers(args.journey_directory, observations))
         observations.extend(security(args.journey_directory, observations))
+        observations.extend(consumers(args.journey_directory, observations))
     outcome = assess(observations=observations,
                      require_provenance=args.require_qualified)
     args.output.parent.mkdir(parents=True, exist_ok=True)

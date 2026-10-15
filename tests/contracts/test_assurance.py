@@ -403,6 +403,81 @@ class AssuranceCoverageTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'measured bytes differ'):
                 security(output.parent, [], self.root)
 
+    def consumer_measurement(self):
+        output, report = self.journey_measurement()
+        api = json.loads((self.root/self.api).read_text())
+        operation = api['paths'].pop(self.op)['get']
+        operation['parameters'] = [
+            {'name': name, 'in': 'path', 'required': True, 'schema': {'type': 'string'}}
+            for name in ('tenant', 'job')]
+        api['paths']['/v1/tenants/{tenant}/jobs/{job}'] = {'get': operation}
+        self.write(self.api, api)
+        installed = 'apps/console/resources/contracts/lifecycle-v1.json'
+        copy = self.root/installed
+        copy.parent.mkdir(parents=True)
+        copy.write_bytes((self.root/self.api).read_bytes())
+        registry = json.loads((self.root/'architecture/contract-consumers.json').read_text())
+        registry['active_releases'][0].update(owner='lifecycle', consumers=['console'], copies=[installed])
+        self.write('architecture/contract-consumers.json', registry)
+        sources = ['scripts/p06/verify_console_consumers.php', 'apps/console/app/Infrastructure/Jobs/JobsClient.php']
+        for source in sources:
+            file = self.root/source
+            file.parent.mkdir(parents=True, exist_ok=True)
+            file.write_bytes((ROOT/source).read_bytes())
+            report['source_sha256'][source] = hashlib.sha256(file.read_bytes()).hexdigest()
+        op = inventory(self.root)['operations'][0]
+        row = {'key': op['key'], 'claim': 'consumer', 'source': 'live-consumer', 'result': 'PASS',
+               'consumer_id': 'console', 'release_sha256': op['release_sha256'],
+               'test': sources[0]+':JobsClient', 'consumer_loader': sources[1],
+               'loader_sha256': report['source_sha256'][sources[1]],
+               'installed_copy': installed, 'installed_sha256': op['release_sha256'],
+               'response_sha256': 'c'*64, 'positive_status_code': 200,
+               'rejected_response_substitutions': ['id', 'tenant_id', 'uncontracted'],
+               'revision': os.environ['GITHUB_SHA'], 'run_id': os.environ['GITHUB_RUN_ID'],
+               'run_attempt': os.environ['GITHUB_RUN_ATTEMPT']}
+        output = output.parent/'consumer-conformance.json'
+        output.write_text(json.dumps([row]))
+        report['artifact_sha256'][output.name] = hashlib.sha256(output.read_bytes()).hexdigest()
+        (output.parent/'report.json').write_text(json.dumps(report))
+        return output, report, row
+
+    def test_live_consumer_credits_only_its_executed_registered_boundary(self):
+        from journey_assurance import consumers
+        with patch.dict(os.environ, {'GITHUB_RUN_ID':'123','GITHUB_RUN_ATTEMPT':'2','GITHUB_SHA':'a'*40}):
+            output, report, original = self.consumer_measurement()
+            rows = consumers(output.parent, [], self.root)
+            self.assertEqual([row['claim'] for row in rows], ['consumer'])
+            self.assertEqual([row['consumer_id'] for row in rows], ['console'])
+            self.assertEqual(consumers(output.parent, rows, self.root), [])
+            measured = assess(self.root, rows, require_provenance=True)
+            self.assertEqual(measured['coverage'][0]['verified'], ['consumer'])
+            self.assertEqual(measured['summary']['qualified_http_operations'], 0)
+            report['result'] = 'FAIL'
+            (output.parent/'report.json').write_text(json.dumps(report))
+            self.assertEqual(consumers(output.parent, [], self.root), [])
+
+    def test_consumer_rejects_wrong_loader_copy_and_missing_negative_controls(self):
+        from journey_assurance import consumers
+        with patch.dict(os.environ, {'GITHUB_RUN_ID':'123','GITHUB_RUN_ATTEMPT':'2','GITHUB_SHA':'a'*40}):
+            output, report, original = self.consumer_measurement()
+            for field,value in [('consumer_id','unexecuted'),('consumer_loader','another/loader.php'),
+                                ('loader_sha256','f'*64),('installed_copy','unregistered.json'),
+                                ('installed_sha256','f'*64),('response_sha256',''),
+                                ('positive_status_code',403),('rejected_response_substitutions',[]),
+                                ('claim','producer'),('run_attempt','1'),('release_sha256','f'*64),
+                                ('test','unexecuted')]:
+                output.write_text(json.dumps([{**original,field:value}]))
+                report['artifact_sha256'][output.name] = hashlib.sha256(output.read_bytes()).hexdigest()
+                (output.parent/'report.json').write_text(json.dumps(report))
+                with self.subTest(field=field), self.assertRaises(ValueError):
+                    consumers(output.parent, [], self.root)
+            output.write_text(json.dumps([original]))
+            report['artifact_sha256'][output.name] = hashlib.sha256(output.read_bytes()).hexdigest()
+            (output.parent/'report.json').write_text(json.dumps(report))
+            (self.root/original['installed_copy']).write_text('{}')
+            with self.assertRaisesRegex(ValueError, 'installed release differs'):
+                consumers(output.parent, [], self.root)
+
 
 
 class PlanningDenialProbeTests(unittest.TestCase):

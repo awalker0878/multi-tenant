@@ -120,3 +120,64 @@ def security(folder: Path, existing: list[dict], root: Path = ROOT) -> list[dict
                 evidence.append(row)
                 proved.add(identity)
     return evidence
+
+
+def consumers(folder: Path, existing: list[dict], root: Path = ROOT) -> list[dict]:
+    """Qualify only the actual Console loader and its exercised request controls."""
+    from assurance import assess
+    operations = {row['key']: row for row in inventory(root)['operations']}
+    releases = {row['path']: row for row in json.loads(
+        (root/'architecture/contract-consumers.json').read_text())['active_releases']}
+    expected = {'revision': os.environ.get('GITHUB_SHA'),
+                'run_id': os.environ.get('GITHUB_RUN_ID'),
+                'run_attempt': os.environ.get('GITHUB_RUN_ATTEMPT')}
+    if not all(expected.values()):
+        raise ValueError('Current journey CI provenance is required')
+    witness = 'scripts/p06/verify_console_consumers.php'
+    loader = 'apps/console/app/Infrastructure/Jobs/JobsClient.php'
+    hashes = {path: hashlib.sha256((root/path).read_bytes()).hexdigest() for path in (witness, loader)}
+    controls = {
+        ('POST', '/v1/tenants/{tenant}/jobs'): ['plan_id', 'plan_digest', 'approval_id'],
+        ('GET', '/v1/tenants/{tenant}/jobs/{job}'): ['id', 'tenant_id', 'uncontracted'],
+        ('POST', '/v1/tenants/{tenant}/jobs/{job}/commands'): ['job_id', 'command_id', 'action'],
+    }
+    proved = {(row['key'], row.get('consumer_id')) for row in existing if row.get('claim') == 'consumer'}
+    evidence = []
+    for file in sorted(folder.rglob('consumer-conformance.json')):
+        report = json.loads((file.parent/'report.json').read_text())
+        if (report.get('source_revision') != expected['revision']
+                or any(report.get(key) != expected[key] for key in ('run_id', 'run_attempt'))):
+            raise ValueError('Stale journey consumer provenance')
+        if report.get('result') != 'PASS' or report.get('source_unchanged') is not True:
+            continue
+        if (any(report.get('source_sha256', {}).get(source) != digest for source, digest in hashes.items())
+                or report.get('artifact_sha256', {}).get(file.name) != hashlib.sha256(file.read_bytes()).hexdigest()):
+            raise ValueError('Journey consumer source or measured bytes differ')
+        rows = json.loads(file.read_text())
+        if not isinstance(rows, list):
+            raise ValueError('Malformed journey consumer measurements')
+        for row in rows:
+            operation = operations.get(row.get('key'))
+            status, digest = row.get('positive_status_code'), row.get('response_sha256')
+            if (operation is None or operation['owner'] != 'lifecycle'
+                    or row.get('test') != witness+':JobsClient' or row.get('consumer_id') != 'console'
+                    or row.get('claim') != 'consumer' or row.get('consumer_loader') != loader
+                    or row.get('loader_sha256') != hashes[loader]
+                    or any(row.get(key) != value for key, value in expected.items())
+                    or (operation['method'], operation['path']) not in controls
+                    or row.get('rejected_response_substitutions') != controls[(operation['method'], operation['path'])]
+                    or type(status) is not int or not 200 <= status < 300
+                    or str(status) not in operation['response_statuses']
+                    or not isinstance(digest, str) or re.fullmatch('[0-9a-f]{64}', digest) is None):
+                raise ValueError('Journey consumer lacks its executed loader and response controls')
+            copy = row.get('installed_copy')
+            if (copy not in releases[operation['release']].get('copies', [])
+                    or row.get('installed_sha256') != operation['release_sha256']
+                    or hashlib.sha256((root/copy).read_bytes()).hexdigest() != operation['release_sha256']):
+                raise ValueError('Journey consumer installed release differs')
+            assess(root, [row], require_provenance=True)
+            identity = (row['key'], row['consumer_id'])
+            if identity not in proved:
+                evidence.append(row)
+                proved.add(identity)
+    return evidence

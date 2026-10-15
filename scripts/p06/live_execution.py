@@ -118,6 +118,8 @@ def security_probes(c, base, tenant, foreign, scope, job, admission, admission_k
                          'revision':os.environ['GITHUB_SHA'],'run_id':os.environ['GITHUB_RUN_ID'],
                          'run_attempt':os.environ['GITHUB_RUN_ATTEMPT']})
     (c['out']/'security-conformance.json').write_text(json.dumps(rows,indent=2)+'\n')
+    return [{'method':method,'tail':path.removeprefix(prefix+'/'),'path':template,
+             'body':body or {},'key':key} for method,path,template,_,body,key,_ in cases]
 
 
 def _campaign(c,p):
@@ -239,7 +241,16 @@ def _campaign(c,p):
             check('p06-admission-response-lost-after-commit',proxy.injected==1)
         job=lifecycle('jobs',scope,admission,key=idem,expected=202);jobs.append(job);workflows.append(job['workflow_id'])
         check('p06-'+action+'-one-logical-job',lifecycle('jobs',scope,admission,key=idem,expected=202)['id']==job['id'])
-    security_probes(c,common['LIFECYCLE_URL'],tenant,fixture['foreign_tenant'],scope,jobs[-1],admission,idem)
+    consumer_calls=security_probes(c,common['LIFECYCLE_URL'],tenant,fixture['foreign_tenant'],scope,jobs[-1],admission,idem)
+    consumer_input=private/'console-consumer.json'
+    consumer_input.write_text(json.dumps({'session':fixture['operator_token'],'tenant':tenant,
+                                        'scope':{k:scope[k] for k in ['site_id','environment','resource_id']},
+                                        'job_id':jobs[-1]['id'],'fault_file':str(fault_file),'calls':consumer_calls}))
+    consumer_input.chmod(0o600)
+    injected_before=proxy.injected
+    run(['php','scripts/p06/verify_console_consumers.php',str(consumer_input),str(out/'consumer-conformance.json')],
+        env=envs['console'],label='p06-real-console-contract-consumers')
+    check('p06-console-rejects-nine-substituted-owner-responses',proxy.injected-injected_before==9 and not fault_file.exists())
     check('p06-distinct-services-own-stores',sql("SELECT has_table_privilege('assurance_runtime','app.evidence_uploads','UPDATE') OR has_table_privilege('assurance_runtime','app.evidence_records','DELETE');",'assurance')=='f')
     backup=private/'lifecycle-before-effects.sql'
     with backup.open('wb') as stream:

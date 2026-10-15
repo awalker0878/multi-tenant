@@ -656,3 +656,27 @@ controls do not authorize restored-journal re-enablement or native writes.
 Local verification for these controls: **235 contract tests pass**; canonical
 integrity, publication/retirement, quality-policy cutover, source-bound release
 inventory and documentation validation pass. Database/live controls require CI.
+
+
+### Console request binding and live consumer qualification
+
+The Console's simulation client previously checked schema and tenant/scope,
+without comparing a read's job ID, an admission's plan/approval binding or a
+command's job/key/action. These are now explicit fail-closed checks. Seven
+Laravel cases and a live TLS consumer witness challenge nine substitutions
+in actual owner responses. The witness executes the shipped JobsClient,
+current Governance delegation and Lifecycle service, with no HTTP fake or
+substituted producer for positive evidence. Consumer receipts are admitted
+only from successful current-source campaigns with source/loader/installed
+release and artifact bindings plus all request-specific negative controls.
+Local contract regressions: **237 passed**. PHP syntax and Laravel Pint pass.
+Four Lifecycle delegation-status tests, Ruff and strict mypy pass.
+
+Run 38821391028 on head `33c451881329c217004b318f521c71c1763e3633` is
+not accepted: wrong-scope authority is denied, but upstream Governance's 401
+was propagated after workload authentication. The actor boundary now exposes
+that refusal as 403; dependency failures remain 503 and denial is preserved.
+That run also exposes upstream 404 for the locked zlib APK in the Assurance
+image builder. Independent direct downloads reproduce 404; cached bytes
+match the unchanged lock. No package-lock relaxation, native qualification,
+completed runtime assurance or release completion is inferred.

@@ -270,13 +270,22 @@ class ExecutionOwners:
         if not re.fullmatch(r"[0-9a-f]{64}", delegation):
             raise Rejected("invalid_delegation", 403)
         scope = {k: scope[k] for k in ("site_id", "environment", "resource_id")}
-        result = request(
-            "GOVERNANCE",
-            "POST",
-            f"/v1/tenants/{tenant}/delegated-authorizations",
-            {"action": action, "scope": scope},
-            delegation,
-        )
+        try:
+            result = request(
+                "GOVERNANCE",
+                "POST",
+                f"/v1/tenants/{tenant}/delegated-authorizations",
+                {"action": action, "scope": scope},
+                delegation,
+            )
+        except Rejected as error:
+            # The caller workload was already authenticated by ExecutionApp.
+            # Governance rejects a delegation bound to another scope with 401;
+            # that is an actor-authority denial at this service boundary, not
+            # a request to authenticate the accepted service credential again.
+            if error.status == 401:
+                raise Rejected("delegation_denied", 403) from None
+            raise
         expected = {
             "allowed": True,
             "audience": "lifecycle",

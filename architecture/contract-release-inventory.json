@@ -1550,21 +1550,21 @@
           "kind": "installed-loader",
           "marker": "services/lifecycle/src/lifecycle/infrastructure/contracts/assurance-evidence-v1.json",
           "source": "services/lifecycle/src/lifecycle/infrastructure/execution_owners.py",
-          "source_sha256": "ab907cdb9bdc44c76f8bf7e27544575311d5046202af6f64ce359676688a9632"
+          "source_sha256": "a0f560952428dc441788c421a59e82febaf404ee188f4d24f4b1849df2333e9e"
         },
         {
           "component": "lifecycle",
           "kind": "runtime-source-reference",
           "marker": "assurance-evidence-v1.json",
           "source": "services/lifecycle/src/lifecycle/infrastructure/execution_owners.py",
-          "source_sha256": "ab907cdb9bdc44c76f8bf7e27544575311d5046202af6f64ce359676688a9632"
+          "source_sha256": "a0f560952428dc441788c421a59e82febaf404ee188f4d24f4b1849df2333e9e"
         },
         {
           "component": "lifecycle",
           "kind": "wire-source",
           "marker": "/evidence",
           "source": "services/lifecycle/src/lifecycle/infrastructure/execution_owners.py",
-          "source_sha256": "ab907cdb9bdc44c76f8bf7e27544575311d5046202af6f64ce359676688a9632"
+          "source_sha256": "a0f560952428dc441788c421a59e82febaf404ee188f4d24f4b1849df2333e9e"
         },
         {
           "component": "lifecycle",
@@ -1578,14 +1578,14 @@
           "kind": "wire-source",
           "marker": "/evidence-uploads",
           "source": "services/lifecycle/src/lifecycle/infrastructure/execution_owners.py",
-          "source_sha256": "ab907cdb9bdc44c76f8bf7e27544575311d5046202af6f64ce359676688a9632"
+          "source_sha256": "a0f560952428dc441788c421a59e82febaf404ee188f4d24f4b1849df2333e9e"
         },
         {
           "component": "lifecycle",
           "kind": "wire-source",
           "marker": "/finalization",
           "source": "services/lifecycle/src/lifecycle/infrastructure/execution_owners.py",
-          "source_sha256": "ab907cdb9bdc44c76f8bf7e27544575311d5046202af6f64ce359676688a9632"
+          "source_sha256": "a0f560952428dc441788c421a59e82febaf404ee188f4d24f4b1849df2333e9e"
         },
         {
           "component": "planning",
@@ -1610,7 +1610,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/openapi/assurance-evidence-v1.json",
           "source": "scripts/p06/live_execution.py",
-          "source_sha256": "727a055a0ef1010bb8db134bc72909ef46244b0c9a46c985f6428662b65b1488"
+          "source_sha256": "a675d9a7171021652ed3abfe7edbbce7b70d6ebf7b3d0cf235f32ecfafeffc0c"
         },
         {
           "kind": "validation-or-generation",
@@ -2460,7 +2460,7 @@
           "kind": "wire-source",
           "marker": "/actor-delegations",
           "source": "apps/console/app/Infrastructure/Jobs/JobsClient.php",
-          "source_sha256": "36fe94865a8a17935f67d5d038dd85b48d7c083da88d877e6fe8f2cdd60aa6a2"
+          "source_sha256": "97d9405a98f2634c894b8a4458edca552061205e5c51695e59c35781b18eeb5d"
         },
         {
           "component": "console",
@@ -2523,21 +2523,21 @@
           "kind": "installed-loader",
           "marker": "services/lifecycle/src/lifecycle/infrastructure/contracts/governance-delegation-v2.json",
           "source": "services/lifecycle/src/lifecycle/infrastructure/execution_owners.py",
-          "source_sha256": "ab907cdb9bdc44c76f8bf7e27544575311d5046202af6f64ce359676688a9632"
+          "source_sha256": "a0f560952428dc441788c421a59e82febaf404ee188f4d24f4b1849df2333e9e"
         },
         {
           "component": "lifecycle",
           "kind": "runtime-source-reference",
           "marker": "governance-delegation-v2.json",
           "source": "services/lifecycle/src/lifecycle/infrastructure/execution_owners.py",
-          "source_sha256": "ab907cdb9bdc44c76f8bf7e27544575311d5046202af6f64ce359676688a9632"
+          "source_sha256": "a0f560952428dc441788c421a59e82febaf404ee188f4d24f4b1849df2333e9e"
         },
         {
           "component": "lifecycle",
           "kind": "wire-source",
           "marker": "/delegated-authorizations",
           "source": "services/lifecycle/src/lifecycle/infrastructure/execution_owners.py",
-          "source_sha256": "ab907cdb9bdc44c76f8bf7e27544575311d5046202af6f64ce359676688a9632"
+          "source_sha256": "a0f560952428dc441788c421a59e82febaf404ee188f4d24f4b1849df2333e9e"
         },
         {
           "component": "lifecycle",
@@ -3012,21 +3012,21 @@
           "kind": "installed-loader",
           "marker": "services/lifecycle/src/lifecycle/infrastructure/contracts/governance-service-checks-v1.json",
           "source": "services/lifecycle/src/lifecycle/infrastructure/execution_owners.py",
-          "source_sha256": "ab907cdb9bdc44c76f8bf7e27544575311d5046202af6f64ce359676688a9632"
+          "source_sha256": "a0f560952428dc441788c421a59e82febaf404ee188f4d24f4b1849df2333e9e"
         },
         {
           "component": "lifecycle",
           "kind": "runtime-source-reference",
           "marker": "governance-service-checks-v1.json",
           "source": "services/lifecycle/src/lifecycle/infrastructure/execution_owners.py",
-          "source_sha256": "ab907cdb9bdc44c76f8bf7e27544575311d5046202af6f64ce359676688a9632"
+          "source_sha256": "a0f560952428dc441788c421a59e82febaf404ee188f4d24f4b1849df2333e9e"
         },
         {
           "component": "lifecycle",
           "kind": "wire-source",
           "marker": "/execution-approval-checks",
           "source": "services/lifecycle/src/lifecycle/infrastructure/execution_owners.py",
-          "source_sha256": "ab907cdb9bdc44c76f8bf7e27544575311d5046202af6f64ce359676688a9632"
+          "source_sha256": "a0f560952428dc441788c421a59e82febaf404ee188f4d24f4b1849df2333e9e"
         },
         {
           "kind": "validation-or-generation",
@@ -3183,7 +3183,7 @@
           "kind": "wire-source",
           "marker": "/v1/tenants",
           "source": "apps/console/app/Infrastructure/Jobs/JobsClient.php",
-          "source_sha256": "36fe94865a8a17935f67d5d038dd85b48d7c083da88d877e6fe8f2cdd60aa6a2"
+          "source_sha256": "97d9405a98f2634c894b8a4458edca552061205e5c51695e59c35781b18eeb5d"
         },
         {
           "component": "console",
@@ -3274,7 +3274,7 @@
           "kind": "wire-source",
           "marker": "/v1/tenants",
           "source": "services/lifecycle/src/lifecycle/infrastructure/execution_owners.py",
-          "source_sha256": "ab907cdb9bdc44c76f8bf7e27544575311d5046202af6f64ce359676688a9632"
+          "source_sha256": "a0f560952428dc441788c421a59e82febaf404ee188f4d24f4b1849df2333e9e"
         },
         {
           "component": "lifecycle",
@@ -3288,7 +3288,7 @@
           "kind": "wire-source",
           "marker": "/v1/tenants/{tenant}",
           "source": "services/lifecycle/src/lifecycle/infrastructure/execution_owners.py",
-          "source_sha256": "ab907cdb9bdc44c76f8bf7e27544575311d5046202af6f64ce359676688a9632"
+          "source_sha256": "a0f560952428dc441788c421a59e82febaf404ee188f4d24f4b1849df2333e9e"
         },
         {
           "component": "planning",
@@ -4640,21 +4640,21 @@
           "kind": "installed-loader",
           "marker": "apps/console/resources/contracts/lifecycle-migration-campaigns-v1.json",
           "source": "apps/console/app/Infrastructure/Jobs/JobsClient.php",
-          "source_sha256": "36fe94865a8a17935f67d5d038dd85b48d7c083da88d877e6fe8f2cdd60aa6a2"
+          "source_sha256": "97d9405a98f2634c894b8a4458edca552061205e5c51695e59c35781b18eeb5d"
         },
         {
           "component": "console",
           "kind": "runtime-source-reference",
           "marker": "lifecycle-migration-campaigns-v1.json",
           "source": "apps/console/app/Infrastructure/Jobs/JobsClient.php",
-          "source_sha256": "36fe94865a8a17935f67d5d038dd85b48d7c083da88d877e6fe8f2cdd60aa6a2"
+          "source_sha256": "97d9405a98f2634c894b8a4458edca552061205e5c51695e59c35781b18eeb5d"
         },
         {
           "component": "console",
           "kind": "wire-source",
           "marker": "/commands",
           "source": "apps/console/app/Infrastructure/Jobs/JobsClient.php",
-          "source_sha256": "36fe94865a8a17935f67d5d038dd85b48d7c083da88d877e6fe8f2cdd60aa6a2"
+          "source_sha256": "97d9405a98f2634c894b8a4458edca552061205e5c51695e59c35781b18eeb5d"
         },
         {
           "component": "console",
@@ -4761,14 +4761,14 @@
           "kind": "installed-loader",
           "marker": "apps/console/resources/contracts/lifecycle-native-jobs-v1.1.json",
           "source": "apps/console/app/Infrastructure/Jobs/JobsClient.php",
-          "source_sha256": "36fe94865a8a17935f67d5d038dd85b48d7c083da88d877e6fe8f2cdd60aa6a2"
+          "source_sha256": "97d9405a98f2634c894b8a4458edca552061205e5c51695e59c35781b18eeb5d"
         },
         {
           "component": "console",
           "kind": "runtime-source-reference",
           "marker": "lifecycle-native-jobs-v1.1.json",
           "source": "apps/console/app/Infrastructure/Jobs/JobsClient.php",
-          "source_sha256": "36fe94865a8a17935f67d5d038dd85b48d7c083da88d877e6fe8f2cdd60aa6a2"
+          "source_sha256": "97d9405a98f2634c894b8a4458edca552061205e5c51695e59c35781b18eeb5d"
         },
         {
           "component": "lifecycle",
@@ -4845,21 +4845,21 @@
           "kind": "installed-loader",
           "marker": "apps/console/resources/contracts/lifecycle-v1.json",
           "source": "apps/console/app/Infrastructure/Jobs/JobsClient.php",
-          "source_sha256": "36fe94865a8a17935f67d5d038dd85b48d7c083da88d877e6fe8f2cdd60aa6a2"
+          "source_sha256": "97d9405a98f2634c894b8a4458edca552061205e5c51695e59c35781b18eeb5d"
         },
         {
           "component": "console",
           "kind": "runtime-source-reference",
           "marker": "lifecycle-v1.json",
           "source": "apps/console/app/Infrastructure/Jobs/JobsClient.php",
-          "source_sha256": "36fe94865a8a17935f67d5d038dd85b48d7c083da88d877e6fe8f2cdd60aa6a2"
+          "source_sha256": "97d9405a98f2634c894b8a4458edca552061205e5c51695e59c35781b18eeb5d"
         },
         {
           "component": "console",
           "kind": "wire-source",
           "marker": "/commands",
           "source": "apps/console/app/Infrastructure/Jobs/JobsClient.php",
-          "source_sha256": "36fe94865a8a17935f67d5d038dd85b48d7c083da88d877e6fe8f2cdd60aa6a2"
+          "source_sha256": "97d9405a98f2634c894b8a4458edca552061205e5c51695e59c35781b18eeb5d"
         },
         {
           "component": "console",
@@ -4905,13 +4905,25 @@
           "kind": "validation-or-generation",
           "marker": "contracts/openapi/lifecycle-v1.json",
           "source": "scripts/p06/live_execution.py",
-          "source_sha256": "727a055a0ef1010bb8db134bc72909ef46244b0c9a46c985f6428662b65b1488"
+          "source_sha256": "a675d9a7171021652ed3abfe7edbbce7b70d6ebf7b3d0cf235f32ecfafeffc0c"
+        },
+        {
+          "kind": "validation-or-generation",
+          "marker": "contracts/openapi/lifecycle-v1.json",
+          "source": "scripts/p06/verify_console_consumers.php",
+          "source_sha256": "b649ddabe04d6453c02d23aefcf096dfe82f26789dfdf5b0d1cc882941221157"
         },
         {
           "kind": "validation-or-generation",
           "marker": "lifecycle-v1.json",
           "source": "scripts/contracts/route_conformance.py",
           "source_sha256": "92295f17aa2b5e57b761a3e6deebc6eb0872e1774675a9f8a79e8d9de4d182e7"
+        },
+        {
+          "kind": "validation-or-generation",
+          "marker": "lifecycle-v1.json",
+          "source": "tests/contracts/test_assurance.py",
+          "source_sha256": "5d24f8b362e59c0174d53bef25ce75c977f44963a1cb2925ea3447ae3311367d"
         }
       ]
     },
@@ -4959,7 +4971,7 @@
           "kind": "wire-source",
           "marker": "/revisions",
           "source": "services/lifecycle/src/lifecycle/infrastructure/execution_owners.py",
-          "source_sha256": "ab907cdb9bdc44c76f8bf7e27544575311d5046202af6f64ce359676688a9632"
+          "source_sha256": "a0f560952428dc441788c421a59e82febaf404ee188f4d24f4b1849df2333e9e"
         },
         {
           "component": "lifecycle",
@@ -5055,21 +5067,21 @@
           "kind": "installed-loader",
           "marker": "services/lifecycle/src/lifecycle/infrastructure/contracts/planning-lifecycle-reads-v1.json",
           "source": "services/lifecycle/src/lifecycle/infrastructure/execution_owners.py",
-          "source_sha256": "ab907cdb9bdc44c76f8bf7e27544575311d5046202af6f64ce359676688a9632"
+          "source_sha256": "a0f560952428dc441788c421a59e82febaf404ee188f4d24f4b1849df2333e9e"
         },
         {
           "component": "lifecycle",
           "kind": "runtime-source-reference",
           "marker": "planning-lifecycle-reads-v1.json",
           "source": "services/lifecycle/src/lifecycle/infrastructure/execution_owners.py",
-          "source_sha256": "ab907cdb9bdc44c76f8bf7e27544575311d5046202af6f64ce359676688a9632"
+          "source_sha256": "a0f560952428dc441788c421a59e82febaf404ee188f4d24f4b1849df2333e9e"
         },
         {
           "component": "lifecycle",
           "kind": "wire-source",
           "marker": "/revisions",
           "source": "services/lifecycle/src/lifecycle/infrastructure/execution_owners.py",
-          "source_sha256": "ab907cdb9bdc44c76f8bf7e27544575311d5046202af6f64ce359676688a9632"
+          "source_sha256": "a0f560952428dc441788c421a59e82febaf404ee188f4d24f4b1849df2333e9e"
         },
         {
           "component": "lifecycle",
@@ -5823,28 +5835,28 @@
           "kind": "installed-loader",
           "marker": "services/lifecycle/src/lifecycle/infrastructure/contracts/worker-simulation-v1.json",
           "source": "services/lifecycle/src/lifecycle/infrastructure/execution_owners.py",
-          "source_sha256": "ab907cdb9bdc44c76f8bf7e27544575311d5046202af6f64ce359676688a9632"
+          "source_sha256": "a0f560952428dc441788c421a59e82febaf404ee188f4d24f4b1849df2333e9e"
         },
         {
           "component": "lifecycle",
           "kind": "runtime-source-reference",
           "marker": "worker-simulation-v1.json",
           "source": "services/lifecycle/src/lifecycle/infrastructure/execution_owners.py",
-          "source_sha256": "ab907cdb9bdc44c76f8bf7e27544575311d5046202af6f64ce359676688a9632"
+          "source_sha256": "a0f560952428dc441788c421a59e82febaf404ee188f4d24f4b1849df2333e9e"
         },
         {
           "component": "lifecycle",
           "kind": "wire-source",
           "marker": "/effects",
           "source": "services/lifecycle/src/lifecycle/infrastructure/execution_owners.py",
-          "source_sha256": "ab907cdb9bdc44c76f8bf7e27544575311d5046202af6f64ce359676688a9632"
+          "source_sha256": "a0f560952428dc441788c421a59e82febaf404ee188f4d24f4b1849df2333e9e"
         },
         {
           "component": "lifecycle",
           "kind": "wire-source",
           "marker": "/reconciliations",
           "source": "services/lifecycle/src/lifecycle/infrastructure/execution_owners.py",
-          "source_sha256": "ab907cdb9bdc44c76f8bf7e27544575311d5046202af6f64ce359676688a9632"
+          "source_sha256": "a0f560952428dc441788c421a59e82febaf404ee188f4d24f4b1849df2333e9e"
         },
         {
           "component": "lifecycle-workers",
@@ -7072,14 +7084,14 @@
           "kind": "installed-loader",
           "marker": "services/lifecycle/src/lifecycle/infrastructure/contracts/alert-delivery-v1.json",
           "source": "services/lifecycle/src/lifecycle/infrastructure/execution_owners.py",
-          "source_sha256": "ab907cdb9bdc44c76f8bf7e27544575311d5046202af6f64ce359676688a9632"
+          "source_sha256": "a0f560952428dc441788c421a59e82febaf404ee188f4d24f4b1849df2333e9e"
         },
         {
           "component": "lifecycle",
           "kind": "runtime-source-reference",
           "marker": "alert-delivery-v1.json",
           "source": "services/lifecycle/src/lifecycle/infrastructure/execution_owners.py",
-          "source_sha256": "ab907cdb9bdc44c76f8bf7e27544575311d5046202af6f64ce359676688a9632"
+          "source_sha256": "a0f560952428dc441788c421a59e82febaf404ee188f4d24f4b1849df2333e9e"
         },
         {
           "component": "lifecycle",
