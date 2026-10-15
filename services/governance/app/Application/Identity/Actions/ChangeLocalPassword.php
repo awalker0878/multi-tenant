@@ -15,9 +15,9 @@ final class ChangeLocalPassword
 {
     public function __construct(private readonly ResolveLocalSession $resolve, private readonly IssueLocalSession $sessions) {}
 
-    public function handle(#[\SensitiveParameter] string $token, #[\SensitiveParameter] string $currentPassword, #[\SensitiveParameter] string $newPassword): SessionCredentials
+    public function handle(#[\SensitiveParameter] string $token, #[\SensitiveParameter] string $currentPassword, #[\SensitiveParameter] string $newPassword, string $key, #[\SensitiveParameter] string $workload): SessionCredentials
     {
-        $result = DB::transaction(function () use ($token, $currentPassword, $newPassword): SessionCredentials|IdentityDenied {
+        $result = DB::transaction(function () use ($token, $currentPassword, $newPassword, $key, $workload): SessionCredentials|IdentityDenied {
             $administrator = BootstrapAdministrator::query()->lockForUpdate()->findOrFail(1);
             $this->resolve->handle($token);
             if ($administrator->locked_until?->isFuture()) {
@@ -38,6 +38,8 @@ final class ChangeLocalPassword
                 || Hash::check($newPassword, (string) $administrator->password_hash)) {
                 return new IdentityDenied('password_policy', 422);
             }
+            IdentityLedger::command('bootstrap-admin', 'changeLocalPassword', $key, $workload,
+                ['current_password' => $currentPassword, 'password' => $newPassword], hash('sha256', $token));
             $administrator->forceFill([
                 'password_hash' => Hash::make($newPassword), 'state' => 'local_setup',
                 'credential_version' => $administrator->credential_version + 1,

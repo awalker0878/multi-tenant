@@ -130,7 +130,7 @@ def main() -> int:
         return result.decode()
 
     try:
-        api = json.loads((root / 'contracts/openapi/governance-local-identity-v1.json').read_text())
+        api = json.loads((root / 'contracts/openapi/governance-local-identity-v2.json').read_text())
         validate_spec(api)
         check('openapi-specification-valid', True)
         for contract in sorted((root / 'contracts/openapi').glob('governance-*.json')):
@@ -313,7 +313,7 @@ def main() -> int:
             def wire(path: str, schema: str | dict, expected: int = 200, body: dict | None = None, token: str = '', workload: str | None = None) -> dict:
                 request = urllib.request.Request('http://127.0.0.1:8032' + path,
                     data=json.dumps(body).encode() if body is not None else None,
-                    headers={'Authorization': 'Bearer ' + (workload if workload is not None else credential), 'X-Console-Session': token, 'Content-Type': 'application/json', 'Accept': 'application/json'})
+                    headers={'Authorization': 'Bearer ' + (workload if workload is not None else credential), 'X-Console-Session': token, 'Idempotency-Key': secrets.token_hex(32), 'Content-Type': 'application/json', 'Accept': 'application/json'})
                 try:
                     response = urllib.request.urlopen(request, timeout=5)
                 except urllib.error.HTTPError as error:

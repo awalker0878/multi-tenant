@@ -1,9 +1,9 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Governance local installation identity",
-    "version": "1.0.0",
-    "description": "P02 bootstrap slice. Workload credentials and browser authority are separate. Provider values are configured as application settings in the external OIDC slice; none are deployment configuration."
+    "title": "Governance Console identity",
+    "version": "2.0.0",
+    "description": "Current bootstrap and federated session identity. Strict server-held identity/session wire; installation-scoped at-most-once credential issuance with no credential replay. No tenant or native authority is minted by this response."
   },
   "security": [
     {
@@ -28,7 +28,7 @@
             }
           },
           "401": {
-            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
             "content": {
               "application/json": {
                 "schema": {
@@ -38,7 +38,7 @@
             }
           },
           "403": {
-            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
             "content": {
               "application/json": {
                 "schema": {
@@ -48,7 +48,7 @@
             }
           },
           "422": {
-            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
             "content": {
               "application/json": {
                 "schema": {
@@ -58,7 +58,7 @@
             }
           },
           "429": {
-            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
             "content": {
               "application/json": {
                 "schema": {
@@ -68,7 +68,17 @@
             }
           },
           "503": {
-            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
             "content": {
               "application/json": {
                 "schema": {
@@ -92,7 +102,32 @@
           {
             "ConsoleWorkload": []
           }
-        ]
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{32,64}$",
+              "minLength": 32,
+              "maxLength": 64
+            },
+            "description": "Strong installation/principal/operation command identity; credential issuance is at most once and raw credentials are never replayed."
+          }
+        ],
+        "x-idempotency": {
+          "scope": [
+            "tenant_id",
+            "actor_id",
+            "operation_id",
+            "request_digest"
+          ],
+          "ttl_seconds": 604800,
+          "conflict_status": 409,
+          "description": "tenant_id is null for these installation operations, never a fabricated tenant or a client-selected authority. Additional namespace is the verified installation admission binding and authenticated workload. Actor and session scope are derived by Governance. Credential-issuing retries conflict without secret replay; sign-out remains idempotent."
+        }
       }
     },
     "/identity/session": {
@@ -111,7 +146,7 @@
             }
           },
           "401": {
-            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
             "content": {
               "application/json": {
                 "schema": {
@@ -121,7 +156,7 @@
             }
           },
           "403": {
-            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
             "content": {
               "application/json": {
                 "schema": {
@@ -131,7 +166,7 @@
             }
           },
           "422": {
-            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
             "content": {
               "application/json": {
                 "schema": {
@@ -141,7 +176,7 @@
             }
           },
           "429": {
-            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
             "content": {
               "application/json": {
                 "schema": {
@@ -151,7 +186,7 @@
             }
           },
           "503": {
-            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
             "content": {
               "application/json": {
                 "schema": {
@@ -179,7 +214,7 @@
             }
           },
           "401": {
-            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
             "content": {
               "application/json": {
                 "schema": {
@@ -189,7 +224,7 @@
             }
           },
           "403": {
-            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
             "content": {
               "application/json": {
                 "schema": {
@@ -199,7 +234,7 @@
             }
           },
           "422": {
-            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
             "content": {
               "application/json": {
                 "schema": {
@@ -209,7 +244,7 @@
             }
           },
           "429": {
-            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
             "content": {
               "application/json": {
                 "schema": {
@@ -219,7 +254,17 @@
             }
           },
           "503": {
-            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
             "content": {
               "application/json": {
                 "schema": {
@@ -238,6 +283,31 @@
               }
             }
           }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{32,64}$",
+              "minLength": 32,
+              "maxLength": 64
+            },
+            "description": "Strong installation/principal/operation command identity; credential issuance is at most once and raw credentials are never replayed."
+          }
+        ],
+        "x-idempotency": {
+          "scope": [
+            "tenant_id",
+            "actor_id",
+            "operation_id",
+            "request_digest"
+          ],
+          "ttl_seconds": 604800,
+          "conflict_status": 409,
+          "description": "tenant_id is null for these installation operations, never a fabricated tenant or a client-selected authority. Additional namespace is the verified installation admission binding and authenticated workload. Actor and session scope are derived by Governance. Credential-issuing retries conflict without secret replay; sign-out remains idempotent."
         }
       }
     },
@@ -257,7 +327,7 @@
             }
           },
           "401": {
-            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
             "content": {
               "application/json": {
                 "schema": {
@@ -267,7 +337,7 @@
             }
           },
           "403": {
-            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
             "content": {
               "application/json": {
                 "schema": {
@@ -277,7 +347,7 @@
             }
           },
           "422": {
-            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
             "content": {
               "application/json": {
                 "schema": {
@@ -287,7 +357,7 @@
             }
           },
           "429": {
-            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
             "content": {
               "application/json": {
                 "schema": {
@@ -297,12 +367,59 @@
             }
           },
           "503": {
-            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
                 }
+              }
+            }
+          },
+          "409": {
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{32,64}$",
+              "minLength": 32,
+              "maxLength": 64
+            },
+            "description": "Strong installation/principal/operation command identity; credential issuance is at most once and raw credentials are never replayed."
+          }
+        ],
+        "x-idempotency": {
+          "scope": [
+            "tenant_id",
+            "actor_id",
+            "operation_id",
+            "request_digest"
+          ],
+          "ttl_seconds": 604800,
+          "conflict_status": 409,
+          "description": "tenant_id is null for these installation operations, never a fabricated tenant or a client-selected authority. Additional namespace is the verified installation admission binding and authenticated workload. Actor and session scope are derived by Governance. Credential-issuing retries conflict without secret replay; sign-out remains idempotent."
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {}
               }
             }
           }
@@ -325,7 +442,7 @@
             }
           },
           "401": {
-            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
             "content": {
               "application/json": {
                 "schema": {
@@ -335,7 +452,7 @@
             }
           },
           "403": {
-            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
             "content": {
               "application/json": {
                 "schema": {
@@ -345,7 +462,7 @@
             }
           },
           "422": {
-            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
             "content": {
               "application/json": {
                 "schema": {
@@ -355,7 +472,7 @@
             }
           },
           "429": {
-            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
             "content": {
               "application/json": {
                 "schema": {
@@ -365,7 +482,7 @@
             }
           },
           "503": {
-            "description": "Denied, invalid input, throttled, or unavailable. No credential values are returned.",
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
             "content": {
               "application/json": {
                 "schema": {
@@ -416,9 +533,41 @@
                 "identity.logout",
                 "identity.setup"
               ]
+            },
+            "uniqueItems": true,
+            "minItems": 2,
+            "maxItems": 3
+          }
+        },
+        "oneOf": [
+          {
+            "properties": {
+              "password_change_required": {
+                "const": true
+              },
+              "permissions": {
+                "const": [
+                  "identity.password.change",
+                  "identity.logout"
+                ]
+              }
+            }
+          },
+          {
+            "properties": {
+              "password_change_required": {
+                "const": false
+              },
+              "permissions": {
+                "const": [
+                  "identity.setup",
+                  "identity.password.change",
+                  "identity.logout"
+                ]
+              }
             }
           }
-        }
+        ]
       },
       "Session": {
         "type": "object",
@@ -439,7 +588,7 @@
             "format": "date-time"
           },
           "identity": {
-            "$ref": "#/components/schemas/LocalIdentity"
+            "$ref": "#/components/schemas/Identity"
           }
         }
       },
@@ -451,7 +600,7 @@
         "additionalProperties": false,
         "properties": {
           "identity": {
-            "$ref": "#/components/schemas/LocalIdentity"
+            "$ref": "#/components/schemas/Identity"
           }
         }
       },
@@ -464,7 +613,7 @@
         "additionalProperties": false,
         "properties": {
           "identity": {
-            "$ref": "#/components/schemas/LocalIdentity"
+            "$ref": "#/components/schemas/Identity"
           },
           "oidc": {
             "type": "object",
@@ -474,7 +623,10 @@
             "additionalProperties": false,
             "properties": {
               "state": {
-                "const": "not_configured"
+                "enum": [
+                  "not_configured",
+                  "active"
+                ]
               }
             }
           }
@@ -493,30 +645,57 @@
         }
       },
       "Error": {
+        "title": "Contracted API error v2",
         "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "message",
+          "correlation_id",
+          "retryable"
+        ],
         "properties": {
-          "error": {
-            "type": "string"
+          "code": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{2,95}$"
           },
           "message": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
           },
-          "errors": {
-            "type": "object"
-          }
-        },
-        "anyOf": [
-          {
-            "required": [
-              "error"
-            ]
+          "correlation_id": {
+            "type": "string",
+            "format": "uuid"
           },
-          {
-            "required": [
-              "message"
-            ]
+          "retryable": {
+            "type": "boolean"
+          },
+          "details": {
+            "type": "array",
+            "maxItems": 64,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field",
+                "reason"
+              ],
+              "properties": {
+                "field": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256
+                }
+              }
+            }
           }
-        ]
+        }
       },
       "Login": {
         "type": "object",
@@ -534,7 +713,8 @@
             "writeOnly": true,
             "maxLength": 512
           }
-        }
+        },
+        "additionalProperties": false
       },
       "PasswordChange": {
         "type": "object",
@@ -561,7 +741,56 @@
             "minLength": 15,
             "maxLength": 128
           }
+        },
+        "additionalProperties": false
+      },
+      "FederatedIdentity": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "subject",
+          "kind",
+          "password_change_required",
+          "permissions"
+        ],
+        "properties": {
+          "subject": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "const": "federated"
+          },
+          "password_change_required": {
+            "const": false
+          },
+          "permissions": {
+            "oneOf": [
+              {
+                "const": [
+                  "identity.logout"
+                ]
+              },
+              {
+                "const": [
+                  "identity.setup",
+                  "tenants.create",
+                  "identity.logout"
+                ]
+              }
+            ]
+          }
         }
+      },
+      "Identity": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/LocalIdentity"
+          },
+          {
+            "$ref": "#/components/schemas/FederatedIdentity"
+          }
+        ]
       }
     }
   }

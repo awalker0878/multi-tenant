@@ -8,6 +8,8 @@ use App\Domain\Identity\IdentityFailure;
 use App\Infrastructure\Foundation\MountedSecret;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
+use Opis\JsonSchema\Validator;
+use Throwable;
 
 final class GovernanceClient
 {
@@ -33,21 +35,35 @@ final class GovernanceClient
         // for callers that do not supply an HTTP retry identity; never reuse
         // a key across distinct grants or sessions.
         if ($method === 'POST' && (str_ends_with($path, '/actor-delegations')
-            || str_ends_with($path, '/revocation'))) {
+            || str_ends_with($path, '/revocation')
+            || in_array($path, ['/identity/local-sessions', '/identity/password', '/identity/logout'], true))) {
             $commandKey ??= bin2hex(random_bytes(16));
         }
         try {
             $response = Http::acceptJson()->asJson()->withToken($credential)
                 ->withHeaders(['X-Console-Session' => $token, ...($commandKey === null ? [] : ['Idempotency-Key' => $commandKey])])->connectTimeout(2)->timeout(5)
                 ->withOptions(['allow_redirects' => false, 'verify' => $ca ?? true])
-                ->send($method, rtrim((string) $base, '/').$path, ['json' => $body]);
+                ->send($method, rtrim((string) $base, '/').$path, $method === 'GET' ? [] : ['json' => $body === [] ? (object) [] : $body]);
         } catch (ConnectionException) {
             // Never retain HTTP request/body/credential data in exception context.
             throw new IdentityFailure(503);
         }
         if (! $response->successful()) {
             // A bad workload identity is an unavailable dependency, not a browser logout.
-            $status = $response->json('error') === 'invalid_workload_identity' ? 503 : $response->status();
+            $identityV2 = in_array($path, ['/identity/local-sessions', '/identity/session', '/identity/password', '/identity/logout', '/identity/setup'], true);
+            if ($identityV2) {
+                try {
+                    $api = json_decode(file_get_contents(resource_path('contracts/governance-local-identity-v2.json')) ?: '', true, 64, JSON_THROW_ON_ERROR);
+                    $definition = $api['paths'][$path][strtolower($method)]['responses'][(string) $response->status()]['content']['application/json']['schema'] ?? null;
+                    if (! is_array($definition) || ! (new Validator)->validate(json_decode($response->body(), false, 64, JSON_THROW_ON_ERROR),
+                        json_decode(json_encode($definition + ['components' => $api['components']], JSON_THROW_ON_ERROR)))->isValid()) {
+                        throw new IdentityFailure(503);
+                    }
+                } catch (Throwable) {
+                    throw new IdentityFailure(503);
+                }
+            }
+            $status = $response->json($identityV2 ? 'code' : 'error') === 'invalid_workload_identity' ? 503 : $response->status();
             throw new IdentityFailure(in_array($status, [401, 403, 404, 409, 422, 429], true) ? $status : 503);
         }
         $data = $response->json();

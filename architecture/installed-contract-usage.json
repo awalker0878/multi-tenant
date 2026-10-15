@@ -29,6 +29,19 @@
       "ci": ".github/workflows/ci.yml"
     },
     {
+      "copy": "apps/console/resources/contracts/governance-local-identity-v2.json",
+      "canonical": "contracts/openapi/governance-local-identity-v2.json",
+      "loader": "apps/console/app/Infrastructure/Identity/GovernanceIdentityGateway.php",
+      "load_kind": "literal",
+      "packaging": "apps/console/Dockerfile",
+      "packaging_marker": "COPY --from=dependencies /app/resources/contracts/ ./resources/contracts/",
+      "package_data": null,
+      "package_data_marker": null,
+      "generator": null,
+      "generation_mode": "canonical_snapshot",
+      "ci": ".github/workflows/ci.yml"
+    },
+    {
       "copy": "apps/console/resources/contracts/identity-change-v1.json",
       "canonical": "contracts/schemas/events/identity-change-v1.json",
       "loader": "apps/console/app/Infrastructure/Notifications/GovernanceNotificationDecoder.php",

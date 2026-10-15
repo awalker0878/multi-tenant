@@ -33,7 +33,7 @@ remain in progress or queued under [the phase card](phases/p02.md).
   Outbox transport/delivery is still future work; durable rows are not a claim
   that a consumer has received events.
 
-The implemented [HTTP contract](../../contracts/openapi/governance-local-identity-v1.json)
+The implemented [HTTP contract](../../contracts/openapi/governance-local-identity-v2.json)
 belongs to Governance, with Console as its consumer. Browser authority never
 substitutes for the mounted Console workload identity. Replacing/removing that
 file revokes the workload credential on the next request. Service trust uses

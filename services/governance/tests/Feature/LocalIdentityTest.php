@@ -18,6 +18,35 @@ afterEach(function (): void {
     $this->travelBack();
 });
 
+it('retains command digests without replaying credential issuance or weakening failed attempts', function (): void {
+    $key = bin2hex(random_bytes(16));
+    $payload = ['username' => 'admin', 'password' => $this->temporary];
+    $this->withHeader('Idempotency-Key', $key);
+    $issued = $this->postJson('/identity/local-sessions', $payload)->assertOk()->json();
+    $this->postJson('/identity/local-sessions', $payload)->assertStatus(409)
+        ->assertJsonPath('code', 'identity_command_conflict');
+    expect(DB::table('app.identity_sessions')->count())->toBe(1)
+        ->and(json_encode(DB::table('app.identity_command_keys')->get()))->not->toContain($this->temporary)
+        ->not->toContain($issued['session_token']);
+    $this->postJson('/identity/local-sessions', ['username' => 'admin', 'password' => 'incorrect-password'])->assertUnauthorized();
+    expect(DB::table('app.bootstrap_administrator')->value('failed_attempts'))->toBe(1);
+    $this->withHeader('Idempotency-Key', bin2hex(random_bytes(16)));
+    $this->postJson('/identity/local-sessions', $payload)->assertOk();
+    expect(DB::table('app.identity_sessions')->count())->toBe(2);
+});
+
+it('rejects expired command identities and client supplied identity scope', function (): void {
+    $key = bin2hex(random_bytes(16));
+    $this->withHeader('Idempotency-Key', $key);
+    $payload = ['username' => 'admin', 'password' => $this->temporary];
+    $this->postJson('/identity/local-sessions', $payload)->assertOk();
+    DB::table('app.identity_command_keys')->update(['expires_at' => now()->subSecond()]);
+    $this->postJson('/identity/local-sessions', $payload)->assertStatus(409);
+    $this->withHeader('Idempotency-Key', bin2hex(random_bytes(16)));
+    $this->postJson('/identity/local-sessions', $payload + ['tenant_id' => 'forged'])->assertUnprocessable();
+    expect(DB::table('app.identity_sessions')->count())->toBe(1);
+});
+
 it('generates one high entropy credential and never redisplays or resets it on retry', function (): void {
     expect($this->temporary)->toMatch('/\A[0-9a-f]{48}\z/');
     $administrator = Administrator::query()->findOrFail(1);
@@ -37,7 +66,7 @@ it('generates one high entropy credential and never redisplays or resets it on r
 it('requires independent mounted console identity and rejects health credentials', function (): void {
     $this->withHeader('Authorization', 'Bearer synthetic-health-token-0000000000000000')
         ->postJson('/identity/local-sessions', ['username' => 'admin', 'password' => $this->temporary])
-        ->assertUnauthorized()->assertJsonPath('error', 'invalid_workload_identity');
+        ->assertUnauthorized()->assertJsonPath('code', 'invalid_workload_identity');
     expect(DB::table('app.identity_sessions')->count())->toBe(0);
     file_put_contents($this->credentialFile, bin2hex(random_bytes(32)));
     $this->withHeader('Authorization', 'Bearer '.$this->workload)->getJson('/identity/setup')->assertUnauthorized();
@@ -49,7 +78,7 @@ it('requires independent mounted console identity and rejects health credentials
 it('enforces first-login restrictions in direct APIs then rotates all sessions on password change', function (): void {
     $first = localLogin($this);
     $second = localLogin($this);
-    $this->withHeader('X-Console-Session', $first)->getJson('/identity/setup')->assertForbidden()->assertJsonPath('error', 'password_change_required');
+    $this->withHeader('X-Console-Session', $first)->getJson('/identity/setup')->assertForbidden()->assertJsonPath('code', 'password_change_required');
     $this->getJson('/identity/session')->assertOk()->assertJsonPath('identity.permissions', ['identity.password.change', 'identity.logout']);
     $new = changeLocalPassword($this, $first);
     expect($new)->not->toBe($first);

@@ -76,7 +76,9 @@ def main():
                          ['uv', 'run', '--frozen', 'ruff', 'format', '--check', 'src', 'tests'],
                          ['uv', 'run', '--frozen', 'mypy', 'src', 'tests'],
                          ['uv', 'run', '--frozen', 'pytest', '-q', '--junitxml=' + str(output / (suite + '.xml'))],
-                         ['uv', 'build', '--no-build-isolation', '--wheel']):
+                         ['uv', 'build', '--no-build-isolation', '--wheel',
+                          '--config-setting=--global-option=build',
+                          '--config-setting=--global-option=--build-base=' + str(output / 'build-stage' / suite)]):
                 command(directory, argv)
             xml = ElementTree.parse(output / (suite + '.xml'))
             totals = {k: sum(int(s.get(k, 0)) for s in xml.iter('testsuite')) for k in ('tests', 'failures', 'errors', 'skipped')}

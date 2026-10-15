@@ -33,17 +33,19 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->dontReport([IdentityDenied::class]);
         $exceptions->dontFlash(['current_password', 'password', 'password_confirmation', 'client_secret', 'code', 'state', 'browser_binding', 'verification_token', 'delegation_token']);
         $delegationRequest = static fn (Request $request): bool => preg_match(
-            '#\\A/v1/tenants/[0-9a-f-]{36}/(?:actor-delegations(?:/[0-9a-f-]{36}/revocation)?|delegated-authorizations)\\z#D',
+            '#\\A(?:/identity/(?:local-sessions|session|password|logout|setup)|/v1/tenants/[0-9a-f-]{36}/(?:actor-delegations(?:/[0-9a-f-]{36}/revocation)?|delegated-authorizations))\\z#D',
             $request->getPathInfo()
         ) === 1;
         $errorBody = static fn (string $code, int $status): array => [
-            'code' => $code, 'message' => 'Delegation request denied or unavailable',
+            'code' => $code, 'message' => 'Identity request denied or unavailable',
             'correlation_id' => (string) Str::uuid(), 'retryable' => $status >= 500,
         ];
         $exceptions->render(function (IdentityDenied $error, Request $request) use ($delegationRequest, $errorBody) {
             if ($delegationRequest($request)) {
                 return response()->json($errorBody($error->reason, $error->status), $error->status,
-                    ['Cache-Control' => 'no-store, private']);
+                    ['Cache-Control' => 'no-store, private',
+                        ...($error->status === 429 ? ['Retry-After' => (string) config('identity.lock_seconds')] : []),
+                    ]);
             }
 
             return response()->json(['error' => $error->reason], $error->status, [

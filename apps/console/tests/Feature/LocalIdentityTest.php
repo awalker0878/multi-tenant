@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use App\Domain\Identity\IdentityFailure;
+use App\Infrastructure\Identity\GovernanceIdentityGateway;
 use Illuminate\Http\Client\Request as OutboundRequest;
 use Illuminate\Support\Facades\Http;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -20,8 +22,28 @@ afterEach(function (): void {
 
 function identityResponse(bool $changeRequired = true, string $token = ''): array
 {
-    return ['identity' => ['subject' => 'bootstrap-admin', 'password_change_required' => $changeRequired], 'session_token' => $token ?: str_repeat('a', 64)];
+    return ['identity' => ['subject' => 'bootstrap-admin', 'password_change_required' => $changeRequired,
+        'permissions' => $changeRequired ? ['identity.password.change', 'identity.logout'] : ['identity.setup', 'identity.password.change', 'identity.logout']],
+        'session_token' => $token ?: str_repeat('a', 64), 'expires_at' => now()->addHour()->toIso8601String()];
 }
+
+it('validates exact federated identity and retains session expiry from the installed release', function (): void {
+    $this->freezeTime();
+    $identity = ['subject' => '550e8400-e29b-41d4-a716-446655440000', 'kind' => 'federated',
+        'password_change_required' => false, 'permissions' => ['identity.logout']];
+    Http::fake(['governance.example.test/identity/session' => Http::response(['identity' => $identity])]);
+    $actor = app(GovernanceIdentityGateway::class)->current(str_repeat('a', 64));
+    expect($actor->federated)->toBeTrue()->and($actor->installationAdministrator)->toBeFalse();
+    foreach ([$identity + ['role' => 'admin'], array_replace($identity, ['subject' => 'forged']),
+        array_replace($identity, ['permissions' => ['identity.setup']])] as $invalid) {
+        Http::fake(['governance.example.test/identity/session' => Http::response(['identity' => $invalid])]);
+        expect(fn () => app(GovernanceIdentityGateway::class)->current(str_repeat('a', 64)))->toThrow(IdentityFailure::class);
+    }
+    Http::fake(['governance.example.test/identity/local-sessions' => Http::response(identityResponse())]);
+    $session = app(GovernanceIdentityGateway::class)->login('admin', 'synthetic-password');
+    expect($session->expiresAt)->toBe(identityResponse()['expires_at']);
+    Http::assertSent(fn (OutboundRequest $request): bool => preg_match('/\A[a-f0-9]{32,64}\z/', $request->header('Idempotency-Key')[0] ?? '') === 1);
+});
 
 it('renders an accessible sign-in page without making an identity call or exposing credentials', function (): void {
     Http::fake();
@@ -44,7 +66,7 @@ it('replaces the anonymous session and CSRF state and keeps the owner token serv
 });
 
 it('rechecks owner authority on each protected page and blocks setup before password change', function (): void {
-    Http::fake(['governance.example.test/identity/session' => Http::response(identityResponse())]);
+    Http::fake(['governance.example.test/identity/session' => Http::response(['identity' => identityResponse()['identity']])]);
     $this->withSession(['identity.token' => str_repeat('a', 64)])->get('/setup')->assertRedirect('/password');
     $this->get('/password')->assertOk()->assertInertia(fn (Assert $page): Assert => $page->component('identity/Password')->missing('session_token')->missing('password'));
     Http::assertSentCount(2);
@@ -53,7 +75,7 @@ it('rechecks owner authority on each protected page and blocks setup before pass
 
 it('rotates session and CSRF again after changing the password and discards form values', function (): void {
     Http::fake([
-        'governance.example.test/identity/session' => Http::response(identityResponse()),
+        'governance.example.test/identity/session' => Http::response(['identity' => identityResponse()['identity']]),
         'governance.example.test/identity/password' => Http::response(identityResponse(false, str_repeat('b', 64))),
     ]);
     $this->withSession(['identity.token' => str_repeat('a', 64), '_token' => 'before-change']);
@@ -65,8 +87,9 @@ it('rotates session and CSRF again after changing the password and discards form
 
 it('does not flash passwords after a rejected change and never exposes upstream diagnostics', function (): void {
     Http::fake([
-        'governance.example.test/identity/session' => Http::response(identityResponse()),
-        'governance.example.test/identity/password' => Http::response(['error' => 'password_policy', 'debug' => 'private-provider-response'], 422),
+        'governance.example.test/identity/session' => Http::response(['identity' => identityResponse()['identity']]),
+        'governance.example.test/identity/password' => Http::response(['code' => 'password_policy', 'message' => 'Request denied',
+            'correlation_id' => '550e8400-e29b-41d4-a716-446655440000', 'retryable' => false], 422),
     ]);
     $this->withSession(['identity.token' => str_repeat('a', 64)])->from('/password')
         ->post('/password', ['current_password' => 'synthetic-temporary-password', 'password' => 'synthetic-temporary-password', 'password_confirmation' => 'synthetic-temporary-password'])
@@ -76,9 +99,20 @@ it('does not flash passwords after a rejected change and never exposes upstream 
 });
 
 it('invalidates revoked sessions and never trusts a forged browser identity', function (): void {
-    Http::fake(['governance.example.test/identity/session' => Http::response(['error' => 'invalid_session'], 401)]);
+    Http::fake(['governance.example.test/identity/session' => Http::response(['code' => 'invalid_session', 'message' => 'Session denied',
+        'correlation_id' => '550e8400-e29b-41d4-a716-446655440000', 'retryable' => false], 401)]);
     $this->withSession(['identity.token' => str_repeat('a', 64), 'identity.password_change_required' => false, 'identity.role' => 'admin'])
         ->get('/setup')->assertRedirect('/login')->assertSessionMissing('identity');
+});
+
+it('holds the session when the owner returns an incompatible error or expired credential', function (): void {
+    Http::fake(['governance.example.test/identity/session' => Http::response(['error' => 'invalid_session', 'debug' => 'private diagnostics'], 401)]);
+    $this->withSession(['identity.token' => str_repeat('a', 64)])->get('/setup')->assertStatus(503)
+        ->assertSessionHas('identity.token')->assertDontSee('private diagnostics');
+    $expired = identityResponse();
+    $expired['expires_at'] = now()->subSecond()->toIso8601String();
+    Http::fake(['governance.example.test/identity/local-sessions' => Http::response($expired)]);
+    expect(fn () => app(GovernanceIdentityGateway::class)->login('admin', 'synthetic-password'))->toThrow(IdentityFailure::class);
 });
 
 it('fails closed on an unavailable owner while retaining the session for a retry', function (): void {
@@ -89,7 +123,7 @@ it('fails closed on an unavailable owner while retaining the session for a retry
 
 it('revokes owner authority before clearing the browser session on logout', function (): void {
     Http::fake([
-        'governance.example.test/identity/session' => Http::response(identityResponse()),
+        'governance.example.test/identity/session' => Http::response(['identity' => identityResponse()['identity']]),
         'governance.example.test/identity/logout' => Http::response(['status' => 'signed_out']),
     ]);
     $this->withSession(['identity.token' => str_repeat('a', 64)])->post('/logout')->assertRedirect('/login')->assertSessionMissing('identity.token');

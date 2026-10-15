@@ -11,9 +11,11 @@ beforeEach(function (): void {
     file_put_contents($this->credentialFile, bin2hex(random_bytes(32)));
     config(['identity.governance_url' => 'https://governance.example.test', 'identity.credential_file' => $this->credentialFile]);
     Http::preventStrayRequests();
-    $this->local = ['identity' => ['subject' => 'bootstrap-admin', 'password_change_required' => false]];
+    $this->local = ['identity' => ['subject' => 'bootstrap-admin', 'password_change_required' => false,
+        'permissions' => ['identity.setup', 'identity.password.change', 'identity.logout']]];
     $this->federated = ['identity' => ['kind' => 'federated', 'subject' => '550e8400-e29b-41d4-a716-446655440000',
-        'password_change_required' => false, 'permissions' => ['identity.setup', 'identity.logout']], 'session_token' => str_repeat('b', 64)];
+        'password_change_required' => false, 'permissions' => ['identity.setup', 'tenants.create', 'identity.logout']],
+        'session_token' => str_repeat('b', 64), 'expires_at' => now()->addHour()->toIso8601String()];
     $this->withSession(['identity.token' => str_repeat('a', 64)]);
 });
 

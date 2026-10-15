@@ -91,10 +91,6 @@
       "governance",
       "inventory"
     ],
-    "contracts/openapi/governance-local-identity-v1.json": [
-      "governance",
-      "console"
-    ],
     "contracts/openapi/governance-native-approval-v1.1.json": [
       "governance",
       "lifecycle"
@@ -308,6 +304,10 @@
     "contracts/schemas/planning/governance-delegation-response-v2.json": [
       "governance",
       "planning"
+    ],
+    "contracts/openapi/governance-local-identity-v2.json": [
+      "governance",
+      "console"
     ]
   },
   "scope": "Implemented consumers: Planning consumes Catalogue reference facts; Console uses Governance identity APIs and five tenant-administration notifications as refresh hints. Diagnostics are owned by all seven applications. No shared SQL authority is implied.",
@@ -580,14 +580,18 @@
       ]
     },
     {
-      "path": "contracts/openapi/governance-local-identity-v1.json",
+      "path": "contracts/openapi/governance-local-identity-v2.json",
       "owner": "governance",
       "consumers": [
         "console"
       ],
-      "copies": [],
+      "copies": [
+        "apps/console/resources/contracts/governance-local-identity-v2.json"
+      ],
       "source_manifest": null,
-      "depends_on": []
+      "depends_on": [
+        "contracts/schemas/common/error-v2.json"
+      ]
     },
     {
       "path": "contracts/openapi/governance-native-approval-v1.1.json",

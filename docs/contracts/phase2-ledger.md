@@ -273,3 +273,73 @@ Returned data and credentials are not retained. Five admission-control regressio
 reject unknown methods/statuses, invalid requests/payloads and copy drift; denied
 traffic is never credited as positive conformance or complete security assurance.
 The existing full assurance gate is not replaced or relaxed.
+
+The [existing machine-readable snapshot](../../verification/contracts/phase2-preflight.json)
+now records the independently reconstructed initial Git baseline and current
+inventory, all 166 HTTP/security rows, 83 consumer relationships, five event
+releases, 30 native method/mode entries, installed-copy/source bindings, actual
+retrieved CI/artifact identities, findings and current acceptance gaps. Canonical
+schema pointers avoid duplicating contract definitions. It is an ongoing evidence
+snapshot, not a qualification receipt or a completion claim.
+
+Run `38647622315` reaches real recovered federated sign-in. The new live probe
+rejects `/identity/session` because the surviving bootstrap-only schema does not
+permit the legitimate `FederatedIdentity` returned by Governance. This is a
+confirmed producer/contract mismatch, not a validator defect. Preserve federated
+functionality; publish an intentional new release and enforce its exact installed
+Console decoder. P05/P06 also reach concurrent assessment and expose a remaining
+synthetic-fixture eligibility mismatch. Both findings remain open. No repository
+defect is relabelled as an external blocker.
+
+
+### Resumed remediation — 2026-10-15
+
+Recovered the unfinished working tree at remote `609c161102418b9f3492f1124fbf28fa51307d0f`.
+The latest independently retrieved CI run is `38647622315`, attempt 1; its tested
+merge revision is `d95e85b565b5a93e9485ff464758aa3265162d7f`.
+
+- Publish Governance local identity v2 intentionally, preserving both actual
+  bootstrap and federated identity variants with exact permissions, session
+  expiry, closed request bodies, Error v2 and command idempotency. Retire v1
+  after the sole Console consumer migrates; add an actual packaged Console
+  decoder. Supported PHP runtime and live database evidence remain CI gates.
+- Credential issuance records only keyed request/command digests and never
+  replays raw credentials. Owner locks serialize commands; failed-password
+  counters still commit independently of idempotency conflicts. Logout retains
+  its idempotent revocation behavior. Preserve Retry-After on throttling.
+- Console rejects incompatible success/error envelopes, invalid identity or
+  permissions and expired returned credentials. Retain session expiry in the
+  server-held session, and preserve the browser session on an incompatible
+  upstream error. Identity recovery now validates the current active schema
+  in addition to exact reconciled actor equality.
+- Independently reproduced Assurance rejecting the Planning recovery fixture
+  with `native_recovery_readback_invalid`. The specimen used a generic strategy
+  string where the actual signed decoder requires a canonical method identity,
+  mode, scope and readback digest. Bind the existing explicit synthetic cold
+  export specimen to `VM_COLD_EXPORT` and these required fields. The regression
+  invokes the real PHP decoder and rejects re-signed missing-field and generic
+  method controls. No runtime validator or native evidence requirement changes.
+- P08 wheel staging polluted the source tree before P09's architecture gate.
+  Direct wheel build intermediates into the qualification output directory;
+  retain the unchanged architecture boundary checks. An isolated wheel build
+  succeeds and the actual architecture validator passes on the source tree.
+
+Current independently derived inventory: 75 releases, 166 HTTP operations,
+49 canonical dependency edges, 83 consumer relationships, 36 installed copies,
+five AsyncAPI releases and nine deployable components. The two additional
+edges since the initial baseline are intentional Error v2 dependencies.
+
+Local Planning: **603 passed / 22 PostgreSQL cases skipped**. Strict publication
+quality passes for eight releases introduced since the Git-derived policy
+adoption commit `bb0adb3c08609f2ed674ae0c44efe5ef5ef28e1c`, as CI requires.
+The earlier unadapted full-main invocation correctly rejected a release that
+predates that policy; it is not reported as a passing check. PHP syntax/Pint
+checks use the extracted 8.3 toolchain and do not qualify supported PHP 8.5.11.
+
+Full assurance remains **FAIL / INCOMPLETE**. The last actual minimum report
+contains 358/1,073 claims, 0/166 qualified HTTP operations and 4/75 qualified
+releases. Repository changes still need a new CI run. External protected
+Planning enrollment and real provider/custody/receiving E3/E4 remain unavailable.
+No merge to main, native qualification or production admission is claimed.
+
+Final local source regressions: **217 passed**, plus **16 publication/retirement controls passed**. The original missing-field/generic-method specimen fails the new real signed-decoder controls. These checks do not replace supported runtime integration.

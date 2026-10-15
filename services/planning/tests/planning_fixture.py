@@ -28,6 +28,8 @@ def inputs() -> tuple[
     )
     for w in intent["workloads"]:
         w["requirements"] = []
+    for dataset in intent["datasets"]:
+        dataset["recovery"]["method"] = "VM_COLD_EXPORT"
     p = profile(
         "openstack",
         "synthetic-v1",
@@ -464,6 +466,11 @@ def snapshot_fixture(
             "policy_sha256": policy_sha,
             "storage_backend": destination["installed_tuple"]["storage_backend"],
             "method": dataset["recovery"]["method"],
+            "mode": "forward_recovery",
+            "scope_sha256": digest(q["scope"]),
+            "readback_sha256": digest(
+                {"fixture": "synthetic-recovery-readback", "dataset_id": dataset["id"]}
+            ),
             "consistency": dataset["consistency"],
             "representative_bytes": 40 * 1024**3,
             "load": 1,

@@ -6,8 +6,8 @@
   ],
   "summary": {
     "active_releases": 75,
-    "canonical_dependency_edges": 48,
-    "installed_copies": 35,
+    "canonical_dependency_edges": 49,
+    "installed_copies": 36,
     "requiring_correction": 1
   },
   "releases": [
@@ -399,14 +399,14 @@
           "kind": "wire-source",
           "marker": "identity.login.denied",
           "source": "services/governance/app/Application/Identity/Actions/LoginLocalAdministrator.php",
-          "source_sha256": "1246efbaeb8b5dcb8d72cf949134063803e19ed282fc94a463beb03e07c7d6d4"
+          "source_sha256": "a131f66a92376cc9fdb38065d8ef56fce532d4c56b8ba2ecd76b1f9e1437f4d2"
         },
         {
           "component": "governance",
           "kind": "wire-source",
           "marker": "identity.login.succeeded",
           "source": "services/governance/app/Application/Identity/Actions/LoginLocalAdministrator.php",
-          "source_sha256": "1246efbaeb8b5dcb8d72cf949134063803e19ed282fc94a463beb03e07c7d6d4"
+          "source_sha256": "a131f66a92376cc9fdb38065d8ef56fce532d4c56b8ba2ecd76b1f9e1437f4d2"
         },
         {
           "component": "governance",
@@ -434,21 +434,21 @@
           "kind": "wire-source",
           "marker": "identity.password.changed",
           "source": "services/governance/app/Application/Identity/Actions/ChangeLocalPassword.php",
-          "source_sha256": "f79d80cfcc074bff444d0c9f548003bf4415836f51c0341ea2d0a4001c3bede6"
+          "source_sha256": "29ba80709d87b4eabde84f752a7afb892933a41ff9558c35fce7647f55505c8f"
         },
         {
           "component": "governance",
           "kind": "wire-source",
           "marker": "identity.password.denied",
           "source": "services/governance/app/Application/Identity/Actions/ChangeLocalPassword.php",
-          "source_sha256": "f79d80cfcc074bff444d0c9f548003bf4415836f51c0341ea2d0a4001c3bede6"
+          "source_sha256": "29ba80709d87b4eabde84f752a7afb892933a41ff9558c35fce7647f55505c8f"
         },
         {
           "component": "governance",
           "kind": "wire-source",
           "marker": "identity.session.revoked",
           "source": "services/governance/app/Application/Identity/Actions/LogoutIdentitySession.php",
-          "source_sha256": "a4f1d297db331c51d67805c8be6deee6bcc243de857e376f0c67ff99658082eb"
+          "source_sha256": "f8f718673c6a7eb103b467346d832153578438970fb027ca5225d86b78d55258"
         },
         {
           "kind": "validation-or-generation",
@@ -2446,7 +2446,7 @@
           "kind": "wire-source",
           "marker": "/actor-delegations",
           "source": "apps/console/app/Infrastructure/Governance/GovernanceClient.php",
-          "source_sha256": "29d45b9c96b256def56726e4ee1dc899435778e5ab320222019e98a878aa45ce"
+          "source_sha256": "dc9698f9c27702eb165cfde9ee3c8d9885d9858aec94fa00236c04ee078b5afc"
         },
         {
           "component": "console",
@@ -2474,7 +2474,7 @@
           "kind": "wire-source",
           "marker": "/revocation",
           "source": "apps/console/app/Infrastructure/Governance/GovernanceClient.php",
-          "source_sha256": "29d45b9c96b256def56726e4ee1dc899435778e5ab320222019e98a878aa45ce"
+          "source_sha256": "dc9698f9c27702eb165cfde9ee3c8d9885d9858aec94fa00236c04ee078b5afc"
         },
         {
           "component": "governance",
@@ -2635,28 +2635,28 @@
           "kind": "wire-source",
           "marker": "/activation",
           "source": "apps/console/app/Infrastructure/Identity/GovernanceIdentityGateway.php",
-          "source_sha256": "5dfa33e619b947cf62156eea61153b82e93551f47cdb86626e94ce216e8cd884"
+          "source_sha256": "7588067740f4b043d3cffc003635b7bbf7500131547a27b42758d61ebeae2b23"
         },
         {
           "component": "console",
           "kind": "wire-source",
           "marker": "/callback",
           "source": "apps/console/app/Infrastructure/Identity/GovernanceIdentityGateway.php",
-          "source_sha256": "5dfa33e619b947cf62156eea61153b82e93551f47cdb86626e94ce216e8cd884"
+          "source_sha256": "7588067740f4b043d3cffc003635b7bbf7500131547a27b42758d61ebeae2b23"
         },
         {
           "component": "console",
           "kind": "wire-source",
           "marker": "/flows",
           "source": "apps/console/app/Infrastructure/Identity/GovernanceIdentityGateway.php",
-          "source_sha256": "5dfa33e619b947cf62156eea61153b82e93551f47cdb86626e94ce216e8cd884"
+          "source_sha256": "7588067740f4b043d3cffc003635b7bbf7500131547a27b42758d61ebeae2b23"
         },
         {
           "component": "console",
           "kind": "wire-source",
           "marker": "/oidc",
           "source": "apps/console/app/Infrastructure/Identity/GovernanceIdentityGateway.php",
-          "source_sha256": "5dfa33e619b947cf62156eea61153b82e93551f47cdb86626e94ce216e8cd884"
+          "source_sha256": "7588067740f4b043d3cffc003635b7bbf7500131547a27b42758d61ebeae2b23"
         },
         {
           "component": "governance",
@@ -2736,8 +2736,8 @@
       ]
     },
     {
-      "path": "contracts/openapi/governance-local-identity-v1.json",
-      "canonical_sha256": "79f17eb90e3c0fd335d7be95f4fd71666adf017d8c31254872ef64c1dfc7ad0e",
+      "path": "contracts/openapi/governance-local-identity-v2.json",
+      "canonical_sha256": "483390512108ce53fd7d887d91b7dcb070ff0ab7b0bcbe7f5eccd5bc931904a9",
       "owner": "governance",
       "consumers": [
         "console"
@@ -2745,39 +2745,106 @@
       "classification": "active and verified",
       "verification_scope": "source integrity and lifecycle; runtime conformance is separately qualified",
       "lifecycle": "producer-owned or independently referenced validation/generation definition",
-      "depends_on": [],
+      "depends_on": [
+        "contracts/schemas/common/error-v2.json"
+      ],
       "source_manifest": null,
-      "installed_copies": [],
+      "installed_copies": [
+        "apps/console/resources/contracts/governance-local-identity-v2.json"
+      ],
       "consumer_bindings_unverified": [],
       "external_evidence_required": [],
       "evidence": [
         {
           "component": "console",
+          "kind": "installed-loader",
+          "marker": "apps/console/resources/contracts/governance-local-identity-v2.json",
+          "source": "apps/console/app/Infrastructure/Governance/GovernanceClient.php",
+          "source_sha256": "dc9698f9c27702eb165cfde9ee3c8d9885d9858aec94fa00236c04ee078b5afc"
+        },
+        {
+          "component": "console",
+          "kind": "installed-loader",
+          "marker": "apps/console/resources/contracts/governance-local-identity-v2.json",
+          "source": "apps/console/app/Infrastructure/Identity/GovernanceIdentityGateway.php",
+          "source_sha256": "7588067740f4b043d3cffc003635b7bbf7500131547a27b42758d61ebeae2b23"
+        },
+        {
+          "component": "console",
+          "kind": "runtime-source-reference",
+          "marker": "governance-local-identity-v2.json",
+          "source": "apps/console/app/Infrastructure/Governance/GovernanceClient.php",
+          "source_sha256": "dc9698f9c27702eb165cfde9ee3c8d9885d9858aec94fa00236c04ee078b5afc"
+        },
+        {
+          "component": "console",
+          "kind": "runtime-source-reference",
+          "marker": "governance-local-identity-v2.json",
+          "source": "apps/console/app/Infrastructure/Identity/GovernanceIdentityGateway.php",
+          "source_sha256": "7588067740f4b043d3cffc003635b7bbf7500131547a27b42758d61ebeae2b23"
+        },
+        {
+          "component": "console",
+          "kind": "wire-source",
+          "marker": "/local-sessions",
+          "source": "apps/console/app/Infrastructure/Governance/GovernanceClient.php",
+          "source_sha256": "dc9698f9c27702eb165cfde9ee3c8d9885d9858aec94fa00236c04ee078b5afc"
+        },
+        {
+          "component": "console",
           "kind": "wire-source",
           "marker": "/local-sessions",
           "source": "apps/console/app/Infrastructure/Identity/GovernanceIdentityGateway.php",
-          "source_sha256": "5dfa33e619b947cf62156eea61153b82e93551f47cdb86626e94ce216e8cd884"
+          "source_sha256": "7588067740f4b043d3cffc003635b7bbf7500131547a27b42758d61ebeae2b23"
+        },
+        {
+          "component": "console",
+          "kind": "wire-source",
+          "marker": "/logout",
+          "source": "apps/console/app/Infrastructure/Governance/GovernanceClient.php",
+          "source_sha256": "dc9698f9c27702eb165cfde9ee3c8d9885d9858aec94fa00236c04ee078b5afc"
         },
         {
           "component": "console",
           "kind": "wire-source",
           "marker": "/logout",
           "source": "apps/console/app/Infrastructure/Identity/GovernanceIdentityGateway.php",
-          "source_sha256": "5dfa33e619b947cf62156eea61153b82e93551f47cdb86626e94ce216e8cd884"
+          "source_sha256": "7588067740f4b043d3cffc003635b7bbf7500131547a27b42758d61ebeae2b23"
+        },
+        {
+          "component": "console",
+          "kind": "wire-source",
+          "marker": "/password",
+          "source": "apps/console/app/Infrastructure/Governance/GovernanceClient.php",
+          "source_sha256": "dc9698f9c27702eb165cfde9ee3c8d9885d9858aec94fa00236c04ee078b5afc"
         },
         {
           "component": "console",
           "kind": "wire-source",
           "marker": "/password",
           "source": "apps/console/app/Infrastructure/Identity/GovernanceIdentityGateway.php",
-          "source_sha256": "5dfa33e619b947cf62156eea61153b82e93551f47cdb86626e94ce216e8cd884"
+          "source_sha256": "7588067740f4b043d3cffc003635b7bbf7500131547a27b42758d61ebeae2b23"
+        },
+        {
+          "component": "console",
+          "kind": "wire-source",
+          "marker": "/session",
+          "source": "apps/console/app/Infrastructure/Governance/GovernanceClient.php",
+          "source_sha256": "dc9698f9c27702eb165cfde9ee3c8d9885d9858aec94fa00236c04ee078b5afc"
         },
         {
           "component": "console",
           "kind": "wire-source",
           "marker": "/session",
           "source": "apps/console/app/Infrastructure/Identity/GovernanceIdentityGateway.php",
-          "source_sha256": "5dfa33e619b947cf62156eea61153b82e93551f47cdb86626e94ce216e8cd884"
+          "source_sha256": "7588067740f4b043d3cffc003635b7bbf7500131547a27b42758d61ebeae2b23"
+        },
+        {
+          "component": "console",
+          "kind": "wire-source",
+          "marker": "/setup",
+          "source": "apps/console/app/Infrastructure/Governance/GovernanceClient.php",
+          "source_sha256": "dc9698f9c27702eb165cfde9ee3c8d9885d9858aec94fa00236c04ee078b5afc"
         },
         {
           "component": "governance",
@@ -2799,6 +2866,13 @@
           "marker": "/password",
           "source": "services/governance/routes/api.php",
           "source_sha256": "ea077c2f0f0c20f9baca02eee5c8b7f86f7ce6b4ba54aa319e130c21803b66e6"
+        },
+        {
+          "component": "governance",
+          "kind": "wire-source",
+          "marker": "/session",
+          "source": "services/governance/app/Domain/Identity/IdentityLedger.php",
+          "source_sha256": "b005e5fe1f72fb697c1346d24a60e4405169800ef29f2e17e9658b1f6d2b87f8"
         },
         {
           "component": "governance",
@@ -2823,9 +2897,9 @@
         },
         {
           "kind": "validation-or-generation",
-          "marker": "contracts/openapi/governance-local-identity-v1.json",
+          "marker": "contracts/openapi/governance-local-identity-v2.json",
           "source": "scripts/p02/verify_identity.py",
-          "source_sha256": "24b24203f4535ec67f858cdd7f7935103c48a875a6e6093062bc40c0f9c2ddf1"
+          "source_sha256": "1c042ab73c868096621ae797a143ff47a948d21024c5214cc29b3c7a1be2bcb9"
         }
       ]
     },
@@ -6479,6 +6553,13 @@
           "source_sha256": "9ead19bc444775346efa640d1ba377ff858b47b81c79429b77ff163f134d969e"
         },
         {
+          "component": "governance",
+          "kind": "embedded-or-validation-dependency",
+          "marker": "contracts/schemas/common/error-v2.json",
+          "source": "contracts/openapi/governance-local-identity-v2.json",
+          "source_sha256": "483390512108ce53fd7d887d91b7dcb070ff0ab7b0bcbe7f5eccd5bc931904a9"
+        },
+        {
           "component": "lifecycle-workers",
           "kind": "embedded-or-validation-dependency",
           "marker": "contracts/schemas/common/error-v2.json",
@@ -6683,7 +6764,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/schemas/events/governance-change-v1.json",
           "source": "scripts/p02/verify_identity.py",
-          "source_sha256": "24b24203f4535ec67f858cdd7f7935103c48a875a6e6093062bc40c0f9c2ddf1"
+          "source_sha256": "1c042ab73c868096621ae797a143ff47a948d21024c5214cc29b3c7a1be2bcb9"
         }
       ]
     },
@@ -6765,7 +6846,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/schemas/events/identity-change-v1.json",
           "source": "scripts/p02/verify_identity.py",
-          "source_sha256": "24b24203f4535ec67f858cdd7f7935103c48a875a6e6093062bc40c0f9c2ddf1"
+          "source_sha256": "1c042ab73c868096621ae797a143ff47a948d21024c5214cc29b3c7a1be2bcb9"
         },
         {
           "kind": "validation-or-generation",

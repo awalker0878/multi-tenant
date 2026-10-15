@@ -48,6 +48,10 @@ function initializeIdentityFixture(object $test): void
                     'app.delegation_command_keys_expiry ON delegation_command_keys', $sql
                 );
             }
+            if (basename($migration) === '015_identity_command_keys.sql') {
+                $sql = str_replace('identity_command_keys_expiry ON app.identity_command_keys',
+                    'app.identity_command_keys_expiry ON identity_command_keys', $sql);
+            }
             // Real owner/function privileges are exercised on PostgreSQL, never inferred here.
             $sql = preg_replace('/-- BEGIN POSTGRES RECOVERY FUNCTION.*?-- END POSTGRES RECOVERY FUNCTION/s', '', $sql);
             $sql = str_replace('identity_sessions_expiry ON app.identity_sessions', 'app.identity_sessions_expiry ON identity_sessions', $sql);
@@ -73,6 +77,7 @@ function initializeIdentityFixture(object $test): void
     chmod($test->credentialFile, 0600);
     config(['identity.console_credential_file' => $test->credentialFile]);
     $test->withHeader('Authorization', 'Bearer '.$test->workload);
+    $test->withHeader('Idempotency-Key', bin2hex(random_bytes(16)));
     $test->admissionFile = tempnam(sys_get_temp_dir(), 'p02-admission-');
     $test->admission = ['version' => 1, 'installation_id' => (string) Str::uuid(), 'epoch' => bin2hex(random_bytes(32)), 'state' => 'active', 'bootstrap_allowed' => true];
     file_put_contents($test->admissionFile, json_encode($test->admission));
@@ -83,13 +88,13 @@ function initializeIdentityFixture(object $test): void
 
 function localLogin(object $test, ?string $password = null): string
 {
-    return $test->postJson('/identity/local-sessions', ['username' => 'admin', 'password' => $password ?? $test->temporary])
+    return $test->withHeader('Idempotency-Key', bin2hex(random_bytes(16)))->postJson('/identity/local-sessions', ['username' => 'admin', 'password' => $password ?? $test->temporary])
         ->assertOk()->assertHeader('Cache-Control', 'no-store, private')->json('session_token');
 }
 
 function changeLocalPassword(object $test, string $token, string $password = 'a different long password'): string
 {
-    return $test->withHeader('X-Console-Session', $token)->postJson('/identity/password', [
+    return $test->withHeader('Idempotency-Key', bin2hex(random_bytes(16)))->withHeader('X-Console-Session', $token)->postJson('/identity/password', [
         'current_password' => $test->temporary, 'password' => $password, 'password_confirmation' => $password,
     ])->assertOk()->assertJsonPath('identity.password_change_required', false)->json('session_token');
 }

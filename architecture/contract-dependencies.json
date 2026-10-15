@@ -170,10 +170,12 @@
     {
       "consumer": "console",
       "provider": "governance",
-      "release": "contracts/openapi/governance-local-identity-v1.json",
+      "release": "contracts/openapi/governance-local-identity-v2.json",
       "kind": "http",
-      "installed_copies": [],
-      "evidence": "registry-declaration"
+      "installed_copies": [
+        "apps/console/resources/contracts/governance-local-identity-v2.json"
+      ],
+      "evidence": "installed-loader"
     },
     {
       "consumer": "console",
@@ -854,6 +856,11 @@
       "evidence": "independently-discovered"
     },
     {
+      "release": "contracts/openapi/governance-local-identity-v2.json",
+      "depends_on": "contracts/schemas/common/error-v2.json",
+      "evidence": "independently-discovered"
+    },
+    {
       "release": "contracts/openapi/governance-native-approval-v1.1.json",
       "depends_on": "contracts/schemas/common/error-v1.json",
       "evidence": "independently-discovered"
@@ -1027,9 +1034,9 @@
   "summary": {
     "producer_local_copies": 8,
     "declared_relationships": 83,
-    "canonical_dependency_edges": 48,
-    "with_installed_loader": 27,
-    "without_installed_loader": 56,
+    "canonical_dependency_edges": 49,
+    "with_installed_loader": 28,
+    "without_installed_loader": 55,
     "by_kind": {
       "capability": 9,
       "event": 4,
