@@ -12,6 +12,10 @@ $fixture = json_decode(file_get_contents($argv[1]), true, 64, JSON_THROW_ON_ERRO
 $resolver = new NativeQualification;
 $now = time();
 $result = $resolver->resolve($fixture['bundle'], $fixture['keys'], $fixture['scope'], $now);
+if (($argv[2] ?? null) === '--wire') {
+    echo json_encode($result, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
+    exit;
+}
 if ($result['verification']['valid'] !== true || $result['version'] !== 2) {
     throw new RuntimeException('signed_native_record_failed');
 }

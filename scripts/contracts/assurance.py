@@ -141,6 +141,14 @@ def assess(root: Path = ROOT, observations: list[dict] | None = None,
     operations = {r["key"]: r for r in data["operations"]}
     releases = {r["path"]: r for r in data["releases"]}
     proofs = {key: {} for key in [*operations, *releases]}
+    consumer_proofs = {key: {} for key in proofs}
+
+    def consumers_for(key: str) -> list[str]:
+        boundary = operations[key] if key in operations else releases[key]
+        # A source-only definition needs its owner's actual validator, never
+        # an invented remote consumer. Other boundaries require every caller.
+        return boundary["consumers"] or [boundary["owner"]]
+
     for observation in observations or []:
         key = observation.get("key")
         claim = observation.get("claim")
@@ -198,14 +206,38 @@ def assess(root: Path = ROOT, observations: list[dict] | None = None,
             or not isinstance(observation.get("credential_tenant"), str)
             or not observation["credential_tenant"]
             or not isinstance(observation.get("requested_tenant"), str)
+            or not observation["requested_tenant"]
             or observation["credential_tenant"] == observation["requested_tenant"]
+            or observation.get("unauthorized_disclosure") is not False
+            or observation.get("unauthorized_mutation") is not False
         ):
             raise ValueError(f"Tenant isolation evidence requires an authenticated cross-tenant denial: {key}")
         if key in releases and claim not in {"producer", "consumer"}:
             raise ValueError(f"Release assurance cannot claim HTTP-only evidence: {key} {claim}")
+        if claim == "consumer":
+            consumer = observation.get("consumer_id")
+            boundary = operations[key] if key in operations else releases[key]
+            if (not isinstance(consumer, str) or consumer not in consumers_for(key)
+                    or (not boundary["consumers"]
+                        and observation.get("consumer_boundary") != "owner-local")):
+                raise ValueError(f"Consumer evidence must name its executed registered or owner-local boundary: {key}")
+            if consumer in consumer_proofs[key]:
+                raise ValueError(f"Duplicate operation assurance evidence: {key} consumer {consumer}")
+            consumer_proofs[key][consumer] = {"source": observation["source"], "test": observation["test"]}
+            continue
         if claim in proofs[key]:
             raise ValueError(f"Duplicate operation assurance evidence: {key} {claim}")
         proofs[key][claim] = {"source": observation["source"], "test": observation["test"]}
+
+    def consumer_coverage(key: str) -> dict:
+        required = consumers_for(key)
+        verified = sorted(consumer_proofs[key])
+        return {"required": required, "verified": verified,
+                "missing": sorted(set(required) - set(verified))}
+
+    for key in proofs:
+        if not consumer_coverage(key)["missing"]:
+            proofs[key]["consumer"] = consumer_proofs[key]
     coverage = []
     for key, operation in operations.items():
         required = ["route", "producer", "consumer"]
@@ -218,6 +250,7 @@ def assess(root: Path = ROOT, observations: list[dict] | None = None,
             "key": key, "release": operation["release"],
             "required": required, "verified": sorted(proofs[key]),
             "missing": missing, "qualified": not missing,
+            "consumer_coverage": consumer_coverage(key),
         })
     groups: dict[str, list[dict]] = {}
     for operation in coverage:
@@ -241,6 +274,8 @@ def assess(root: Path = ROOT, observations: list[dict] | None = None,
             "path": path, "kind": release["kind"],
             "required": required, "verified": verified,
             "missing": missing, "qualified": qualified,
+            **({"consumer_coverage": consumer_coverage(path)}
+               if release["kind"] != "openapi" else {}),
         })
     data["coverage"] = coverage
     data["release_coverage"] = release_coverage
@@ -257,6 +292,10 @@ def assess(root: Path = ROOT, observations: list[dict] | None = None,
         "verified_claims": sum(len(c["verified"]) for c in coverage)
                            + sum(len(c["verified"]) for c in release_coverage
                                  if c["kind"] != "openapi"),
+        "required_consumer_boundaries": sum(len(consumers_for(key)) for key in [
+            *operations, *(p for p, r in releases.items() if r["kind"] != "openapi")]),
+        "verified_consumer_boundaries": sum(len(consumer_proofs[key]) for key in [
+            *operations, *(p for p, r in releases.items() if r["kind"] != "openapi")]),
     }
     return data
 

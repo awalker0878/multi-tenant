@@ -23,14 +23,6 @@
     },
     {
       "consumer": "assurance",
-      "provider": "contract-platform",
-      "release": "contracts/schemas/common/error-v1.json",
-      "kind": "schema",
-      "installed_copies": [],
-      "evidence": "registry-declaration"
-    },
-    {
-      "consumer": "assurance",
       "provider": "governance",
       "release": "contracts/openapi/governance-service-checks-v1.json",
       "kind": "http",
@@ -522,7 +514,7 @@
     {
       "consumer": "planning",
       "provider": "assurance",
-      "release": "contracts/openapi/assurance-qualification-v1.json",
+      "release": "contracts/openapi/assurance-qualification-v2.json",
       "kind": "http",
       "installed_copies": [],
       "evidence": "registry-declaration"
@@ -540,10 +532,10 @@
     {
       "consumer": "planning",
       "provider": "assurance",
-      "release": "contracts/schemas/planning/qualification-v2.1.json",
+      "release": "contracts/schemas/planning/qualification-v3.json",
       "kind": "schema",
       "installed_copies": [
-        "services/planning/src/planning/infrastructure/inputs/qualification-v2.1.json"
+        "services/planning/src/planning/infrastructure/inputs/qualification-v3.json"
       ],
       "evidence": "installed-loader"
     },
@@ -634,6 +626,16 @@
       "kind": "schema",
       "installed_copies": [],
       "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "planning",
+      "provider": "contract-platform",
+      "release": "contracts/schemas/common/error-v2.json",
+      "kind": "schema",
+      "installed_copies": [
+        "services/planning/src/planning/infrastructure/inputs/error-v2.json"
+      ],
+      "evidence": "installed-loader"
     },
     {
       "consumer": "planning",
@@ -806,18 +808,18 @@
       "evidence": "independently-discovered"
     },
     {
-      "release": "contracts/openapi/assurance-qualification-v1.json",
-      "depends_on": "contracts/schemas/common/error-v1.json",
+      "release": "contracts/openapi/assurance-qualification-v2.json",
+      "depends_on": "contracts/schemas/common/error-v2.json",
       "evidence": "independently-discovered"
     },
     {
-      "release": "contracts/openapi/assurance-qualification-v1.json",
+      "release": "contracts/openapi/assurance-qualification-v2.json",
       "depends_on": "contracts/schemas/planning/migration-support-v2.json",
       "evidence": "independently-discovered"
     },
     {
-      "release": "contracts/openapi/assurance-qualification-v1.json",
-      "depends_on": "contracts/schemas/planning/qualification-v2.1.json",
+      "release": "contracts/openapi/assurance-qualification-v2.json",
+      "depends_on": "contracts/schemas/planning/qualification-v3.json",
       "evidence": "independently-discovered"
     },
     {
@@ -1035,8 +1037,8 @@
     "producer_local_copies": 8,
     "declared_relationships": 83,
     "canonical_dependency_edges": 49,
-    "with_installed_loader": 28,
-    "without_installed_loader": 55,
+    "with_installed_loader": 29,
+    "without_installed_loader": 54,
     "by_kind": {
       "capability": 9,
       "event": 4,

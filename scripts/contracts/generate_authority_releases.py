@@ -58,8 +58,8 @@ RELEASES = {
         "PlacementReserveCommand": "contracts/schemas/planning/placement-reservation-v1.json",
         "PlacementDigestCommand": "contracts/schemas/planning/placement-reservation-v1.json",
     },
-    "assurance-qualification-v1.json": {
-        "Qualification": "contracts/schemas/planning/qualification-v2.1.json",
+    "assurance-qualification-v2.json": {
+        "Qualification": "contracts/schemas/planning/qualification-v3.json",
         "MigrationSupport": "contracts/schemas/planning/migration-support-v2.json",
     },
     "planning-lifecycle-reads-v1.json": {
@@ -116,6 +116,14 @@ def assemble(name: str, root: Path = ROOT) -> dict:
         elif component != "MigrationInput":  # current embedded v4 wire payload
             value = normalized(value)
         output["components"]["schemas"][component] = value
+    if name == "assurance-qualification-v2.json":
+        scope = copy.deepcopy(output["components"]["schemas"]["Qualification"]["properties"]["scope"])
+        for item in output["paths"].values():
+            for method, operation in item.items():
+                if method == "post":
+                    body = operation["requestBody"]["content"]["application/json"]["schema"]
+                    if "qualification_scope" in body.get("properties", {}):
+                        body["properties"]["qualification_scope"] = copy.deepcopy(scope)
     return output
 
 

@@ -48,7 +48,7 @@
       "assurance",
       "lifecycle"
     ],
-    "contracts/openapi/assurance-qualification-v1.json": [
+    "contracts/openapi/assurance-qualification-v2.json": [
       "assurance",
       "planning"
     ],
@@ -189,7 +189,6 @@
       "catalogue",
       "inventory",
       "governance",
-      "assurance",
       "planning",
       "lifecycle"
     ],
@@ -243,7 +242,7 @@
       "assurance",
       "planning"
     ],
-    "contracts/schemas/planning/qualification-v2.1.json": [
+    "contracts/schemas/planning/qualification-v3.json": [
       "assurance",
       "planning"
     ],
@@ -281,7 +280,8 @@
       "planning"
     ],
     "contracts/schemas/common/error-v2.json": [
-      "contract-platform"
+      "contract-platform",
+      "planning"
     ],
     "contracts/schemas/planning/placement-reservation-v1.json": [
       "lifecycle",
@@ -452,7 +452,7 @@
       "depends_on": []
     },
     {
-      "path": "contracts/openapi/assurance-qualification-v1.json",
+      "path": "contracts/openapi/assurance-qualification-v2.json",
       "owner": "assurance",
       "consumers": [
         "planning"
@@ -460,9 +460,9 @@
       "copies": [],
       "source_manifest": null,
       "depends_on": [
-        "contracts/schemas/common/error-v1.json",
+        "contracts/schemas/common/error-v2.json",
         "contracts/schemas/planning/migration-support-v2.json",
-        "contracts/schemas/planning/qualification-v2.1.json"
+        "contracts/schemas/planning/qualification-v3.json"
       ]
     },
     {
@@ -923,7 +923,6 @@
         "catalogue",
         "inventory",
         "governance",
-        "assurance",
         "planning",
         "lifecycle"
       ],
@@ -934,8 +933,12 @@
     {
       "path": "contracts/schemas/common/error-v2.json",
       "owner": "contract-platform",
-      "consumers": [],
-      "copies": [],
+      "consumers": [
+        "planning"
+      ],
+      "copies": [
+        "services/planning/src/planning/infrastructure/inputs/error-v2.json"
+      ],
       "source_manifest": null,
       "depends_on": []
     },
@@ -1157,13 +1160,13 @@
       "depends_on": []
     },
     {
-      "path": "contracts/schemas/planning/qualification-v2.1.json",
+      "path": "contracts/schemas/planning/qualification-v3.json",
       "owner": "assurance",
       "consumers": [
         "planning"
       ],
       "copies": [
-        "services/planning/src/planning/infrastructure/inputs/qualification-v2.1.json"
+        "services/planning/src/planning/infrastructure/inputs/qualification-v3.json"
       ],
       "source_manifest": null,
       "depends_on": []

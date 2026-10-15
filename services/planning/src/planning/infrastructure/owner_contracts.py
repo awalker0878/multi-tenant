@@ -47,8 +47,8 @@ OWNER_OPERATIONS: tuple[tuple[str, str, str, str], ...] = (
         r"/(?:internal|v1)/tenants/[^/]+/migration-inputs/[^/]+/[^/]+/[^/]+/[1-9][0-9]{0,8}/[0-9a-f]{64}",
         "migration-input-v4",
     ),
-    ("ASSURANCE", "POST", r"/v1/tenants/[^/]+/planning-qualification-v2", "qualification-v2.1"),
-    ("ASSURANCE", "POST", r"/internal/tenants/[^/]+/qualification-checks", "qualification-v2.1"),
+    ("ASSURANCE", "POST", r"/v1/tenants/[^/]+/planning-qualification-v2", "qualification-v3"),
+    ("ASSURANCE", "POST", r"/internal/tenants/[^/]+/qualification-checks", "qualification-v3"),
     ("ASSURANCE", "POST", r"/v1/tenants/[^/]+/migration-qualifications", "migration-support-v2"),
 )
 

@@ -73,6 +73,7 @@ class AssuranceCoverageTests(unittest.TestCase):
             "result": "PASS",
             "release_sha256": release_hash or row["release_sha256"],
             "test": "service-owned-executable-test",
+            **({"consumer_id": "other"} if claim == "consumer" else {}),
             **({
                 "denial_kind": "missing-credential", "status_code": 401,
             } if claim == "authentication" else {
@@ -84,6 +85,7 @@ class AssuranceCoverageTests(unittest.TestCase):
                 "credential_tenant": "10000000-0000-4000-8000-000000000001",
                 "requested_tenant": "10000000-0000-4000-8000-000000000002",
                 "status_code": 403,
+                "unauthorized_disclosure": False, "unauthorized_mutation": False,
             } if claim == "tenant_isolation" else {}),
         }
 
@@ -107,6 +109,44 @@ class AssuranceCoverageTests(unittest.TestCase):
         data = assess(self.root, [self.evidence(claim) for claim in claims])
         self.assertEqual(data["summary"]["qualified_http_operations"], 1)
         self.assertEqual(data["summary"]["verified_claims"], 6)
+
+    def test_one_executed_consumer_cannot_qualify_another_registered_caller(self):
+        registry = json.loads((self.root / 'architecture/contract-consumers.json').read_text())
+        for release in registry['active_releases']:
+            release['consumers'].append('second')
+        self.write('architecture/contract-consumers.json', registry)
+        rows = [self.evidence(claim) for claim in (
+            'route', 'producer', 'consumer', 'authentication', 'authorization', 'tenant_isolation')]
+        output = assess(self.root, rows)
+        self.assertEqual(output['coverage'][0]['missing'], ['consumer'])
+        self.assertEqual(output['coverage'][0]['consumer_coverage']['missing'], ['second'])
+        rows.append({**self.evidence('consumer'), 'consumer_id': 'second'})
+        self.assertTrue(assess(self.root, rows)['coverage'][0]['qualified'])
+        for consumer in (None, '', 'unregistered'):
+            with self.assertRaisesRegex(ValueError, 'executed registered or owner-local boundary'):
+                assess(self.root, [{**self.evidence('consumer'), 'consumer_id': consumer}])
+
+    def test_non_http_consumers_are_independently_required_and_local_use_is_explicit(self):
+        registry = json.loads((self.root / 'architecture/contract-consumers.json').read_text())
+        registry['active_releases'][1]['consumers'] = []
+        self.write('architecture/contract-consumers.json', registry)
+        release = next(r for r in inventory(self.root)['releases'] if r['path'] == self.schema)
+        proof = {**self.evidence('consumer'), 'key': self.schema,
+                 'release_sha256': release['sha256'], 'consumer_id': 'sample'}
+        with self.assertRaisesRegex(ValueError, 'owner-local boundary'):
+            assess(self.root, [proof])
+        proof['consumer_boundary'] = 'owner-local'
+        output = assess(self.root, [proof])
+        row = next(r for r in output['release_coverage'] if r['path'] == self.schema)
+        self.assertEqual(row['consumer_coverage'], {'required': ['sample'], 'verified': ['sample'], 'missing': []})
+        self.assertEqual(row['missing'], ['producer'])
+
+    def test_cross_tenant_denial_with_disclosure_mutation_or_no_target_is_inadmissible(self):
+        for field, value in (('requested_tenant', ''), ('unauthorized_disclosure', True),
+                             ('unauthorized_mutation', True), ('unauthorized_disclosure', None),
+                             ('unauthorized_mutation', None)):
+            with self.assertRaisesRegex(ValueError, 'authenticated cross-tenant denial'):
+                assess(self.root, [{**self.evidence('tenant_isolation'), field: value}])
 
     def test_release_gate_rejects_unattested_evidence(self):
         claims = ["route", "producer", "consumer", "authentication", "authorization", "tenant_isolation"]

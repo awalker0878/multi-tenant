@@ -109,7 +109,7 @@ def check_implemented_api_contracts():
                 ("POST", "/v1/tenants/{tenant}/execution-approval-checks"),
             },
         ),
-        "contracts/openapi/assurance-qualification-v1.json": (
+        "contracts/openapi/assurance-qualification-v2.json": (
             "assurance", {
                 ("POST", "/v1/tenants/{tenant}/migration-qualifications"),
                 ("POST", "/internal/tenants/{tenant}/qualification-checks"),
@@ -166,7 +166,7 @@ def check_implemented_api_contracts():
         ("contracts/openapi/catalogue-internal-v1.json",
          "/v1/tenants/{tenant}/planning-inputs/{application}/{environment}/{site}/{revision}"):
             ("X-Actor-Delegation", "X-Planning-Action"),
-        ("contracts/openapi/assurance-qualification-v1.json",
+        ("contracts/openapi/assurance-qualification-v2.json",
          "/v1/tenants/{tenant}/planning-qualification-v2"):
             ("X-Actor-Delegation", "X-Planning-Action"),
     }
@@ -236,9 +236,9 @@ def check_implemented_api_contracts():
         reference = normalize_uuids(load(source))
         if inv_api["components"]["schemas"][embedded] != reference or (installed is not None and load(source) != load(installed)):
             raise ValueError(f"Inventory native {embedded} producer/consumer schema drift")
-    assurance_api = load("contracts/openapi/assurance-qualification-v1.json")
+    assurance_api = load("contracts/openapi/assurance-qualification-v2.json")
     for embedded, source in (
-        ("Qualification", "contracts/schemas/planning/qualification-v2.1.json"),
+        ("Qualification", "contracts/schemas/planning/qualification-v3.json"),
         ("MigrationSupport", "contracts/schemas/planning/migration-support-v2.json"),
     ):
         if assurance_api["components"]["schemas"][embedded] != normalize_uuids(load(source)):
@@ -297,9 +297,9 @@ def check_uuid_policy():
         "planning-qualification-events-v1.json",
         "lifecycle-internal-authority-v1.json",
         "governance-service-checks-v1.json",
-        "assurance-qualification-v1.json",
         "governance-inventory-collection-v1.1.json",
         "governance-native-approval-v1.1.json",
+        "assurance-qualification-v2.json",
     )
     canonical = load("contracts/schemas/planning/migration-input-v4.json")
     violations = 0
@@ -317,6 +317,13 @@ def check_uuid_policy():
                 for index, item in enumerate(node):
                     visit(item, f"{pointer}/{index}")
             elif isinstance(node, dict):
+                if pointer == "/components/schemas/Error":
+                    strict_error = {k: v for k, v in load("contracts/schemas/common/error-v2.json").items()
+                                    if k not in {"$schema", "$id"}}
+                    if node == strict_error:
+                        # The exact canonical error owns its correlation UUID
+                        # syntax; resource/authority UUIDs remain strict below.
+                        return
                 if node.get("format") == "uuid":
                     pattern = node.get("pattern")
                     if pattern != UUID_PATTERN and not (
@@ -349,7 +356,6 @@ def check_error_policy():
         "planning-qualification-events-v1.json",
         "lifecycle-internal-authority-v1.json",
         "governance-service-checks-v1.json",
-        "assurance-qualification-v1.json",
         "governance-inventory-collection-v1.1.json",
         "governance-native-approval-v1.1.json",
     )
@@ -370,3 +376,15 @@ def check_error_policy():
                         raise ValueError(
                             f"Owner error body not contracted: {name}:{method} {endpoint}:{status}"
                         )
+    document = load("contracts/openapi/assurance-qualification-v2.json")
+    strict = load("contracts/schemas/common/error-v2.json")
+    strict = {k: v for k, v in strict.items() if k not in {"$schema", "$id"}}
+    if document["components"]["schemas"]["Error"] != strict:
+        raise ValueError("Shared owner error schema drift: assurance-qualification-v2.json")
+    for endpoint, item in document["paths"].items():
+        for method, operation in item.items():
+            if method not in {"get", "post", "put", "patch", "delete"}:
+                continue
+            for status, response in operation["responses"].items():
+                if status.startswith(("4", "5")) and response.get("content", {}).get("application/json", {}).get("schema") != {"$ref": "#/components/schemas/Error"}:
+                    raise ValueError(f"Owner error body not contracted: assurance-qualification-v2.json:{method} {endpoint}:{status}")

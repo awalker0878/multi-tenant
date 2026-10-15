@@ -34,16 +34,23 @@ it('validates exact federated identity and retains session expiry from the insta
     Http::fake(['governance.example.test/identity/session' => Http::response(['identity' => $identity])]);
     $actor = app(GovernanceIdentityGateway::class)->current(str_repeat('a', 64));
     expect($actor->federated)->toBeTrue()->and($actor->installationAdministrator)->toBeFalse();
-    foreach ([$identity + ['role' => 'admin'], array_replace($identity, ['subject' => 'forged']),
-        array_replace($identity, ['permissions' => ['identity.setup']])] as $invalid) {
-        Http::fake(['governance.example.test/identity/session' => Http::response(['identity' => $invalid])]);
-        expect(fn () => app(GovernanceIdentityGateway::class)->current(str_repeat('a', 64)))->toThrow(IdentityFailure::class);
-    }
     Http::fake(['governance.example.test/identity/local-sessions' => Http::response(identityResponse())]);
     $session = app(GovernanceIdentityGateway::class)->login('admin', 'synthetic-password');
     expect($session->expiresAt)->toBe(identityResponse()['expires_at']);
     Http::assertSent(fn (OutboundRequest $request): bool => preg_match('/\A[a-f0-9]{32,64}\z/', $request->header('Idempotency-Key')[0] ?? '') === 1);
 });
+
+it('rejects an incompatible identity through the actual installed decoder', function (string $fault): void {
+    $identity = ['subject' => '550e8400-e29b-41d4-a716-446655440000', 'kind' => 'federated',
+        'password_change_required' => false, 'permissions' => ['identity.logout']];
+    $invalid = match ($fault) {
+        'unknown-field' => $identity + ['role' => 'admin'],
+        'subject' => array_replace($identity, ['subject' => 'forged']),
+        'permissions' => array_replace($identity, ['permissions' => ['identity.setup']]),
+    };
+    Http::fake(['governance.example.test/identity/session' => Http::response(['identity' => $invalid])]);
+    expect(fn () => app(GovernanceIdentityGateway::class)->current(str_repeat('a', 64)))->toThrow(IdentityFailure::class);
+})->with(['unknown-field', 'subject', 'permissions']);
 
 it('renders an accessible sign-in page without making an identity call or exposing credentials', function (): void {
     Http::fake();

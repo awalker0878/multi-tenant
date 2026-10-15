@@ -35,7 +35,7 @@ installed release before interpreting an authority or business decision.
 | Inventory planning input | `schemas/planning/inventory-input-v2.json` | Planning |
 | Inventory migration input | `schemas/planning/migration-input-v4.json` | Planning |
 | Governance delegated authorization | `openapi/governance-delegation-v2.json` | Lifecycle and Planning |
-| Qualification | `schemas/planning/qualification-v2.1.json` | Planning |
+| Qualification | `schemas/planning/qualification-v3.json` | Planning |
 | Migration support | `schemas/planning/migration-support-v2.json` | Planning |
 | Migration readiness | `schemas/planning/migration-readiness-v2.2.json` | Planning and Lifecycle |
 

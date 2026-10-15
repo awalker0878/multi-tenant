@@ -6,8 +6,10 @@ namespace App\Http\Controllers;
 
 use App\Application\Foundation\Contracts\SecretReader;
 use App\Application\Qualification\Actions\QualificationAuthorityLedger;
+use App\Application\Qualification\Actions\RecordQualificationCommand;
 use App\Application\Qualification\Actions\ResolveQualification;
 use App\Domain\Qualification\NativeQualification;
+use App\Domain\Qualification\QualificationScope;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Throwable;
@@ -30,7 +32,7 @@ final class QualificationPublicationController
         abort_if(strlen($request->getContent()) > 524288, 413);
         $input = $request->validate([
             'operation' => ['required', 'in:publish,suspend,revoke,restore'],
-            'command_id' => ['required', 'uuid'],
+            'command_id' => ['required', 'uuid', 'lowercase'],
             'expected_epoch' => ['required', 'integer', 'min:0'],
             'reason' => ['required', 'string', 'max:1024'],
             'qualification_scope' => [
@@ -48,6 +50,8 @@ final class QualificationPublicationController
             'qualification_scope.artifacts' => ['required', 'array'],
             'bundle' => ['required_if:operation,publish,restore', 'nullable', 'array'],
         ]);
+        abort_unless(is_int($input['expected_epoch']), 422);
+        abort_unless(QualificationScope::valid($input['qualification_scope']), 422);
         abort_unless($input['qualification_scope']['tenant_id'] === $tenant
             && count(array_diff(array_keys($request->all()), [
                 'operation', 'command_id', 'expected_epoch', 'reason', 'qualification_scope', 'bundle',
@@ -96,6 +100,8 @@ final class QualificationPublicationController
             abort_unless($bundle === null, 422, 'mutation_bundle_not_allowed');
         }
 
+        (new RecordQualificationCommand)->handle($tenant, $reviewerId.':'.hash('sha256', $requiredCredential),
+            'mutateAssuranceQualificationPublication', $request->headers->all('idempotency-key'), $input);
         $result = $ledger->mutate(
             $scope, $operation, $input['command_id'], (int) $input['expected_epoch'],
             $input['reason'], $bundle, $decisionSha, $decisionRevision, $reviewerId

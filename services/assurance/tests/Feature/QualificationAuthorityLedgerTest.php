@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Application\Qualification\Actions\DeliverQualificationInvalidation;
 use App\Application\Qualification\Actions\QualificationAuthorityLedger;
+use App\Application\Qualification\Actions\RecordQualificationCommand;
 use App\Application\Qualification\Contracts\ConfirmedInvalidationPublisher;
 use App\Domain\Qualification\NativeQualification;
 use Illuminate\Database\QueryException;
@@ -45,6 +46,25 @@ beforeEach(function (): void {
         'artifacts' => ['adapter' => str_repeat('b', 64)],
     ];
     $this->ledger = new QualificationAuthorityLedger;
+});
+
+it('persists scoped query digests without caching authority or granting runtime update privileges', function (): void {
+    $commands = new RecordQualificationCommand;
+    $key = bin2hex(random_bytes(32));
+    $tenant = $this->scope['tenant_id'];
+    $commands->handle($tenant, 'verified-actor', 'readCurrent', [$key], ['revision' => 1]);
+    $commands->handle($tenant, 'verified-actor', 'readCurrent', [$key], ['revision' => 1]);
+    expect(DB::table('app.qualification_command_keys')->where('key_sha256', hash('sha256', $key))->count())->toBe(1);
+    try {
+        $commands->handle($tenant, 'verified-actor', 'readCurrent', [$key], ['revision' => 2]);
+        $this->fail('A changed query reused an accepted command identity.');
+    } catch (HttpException $error) {
+        expect($error->getStatusCode())->toBe(409);
+    }
+    $commands->handle((string) Str::uuid(), 'verified-actor', 'readCurrent', [$key], ['revision' => 2]);
+    expect(DB::table('app.qualification_command_keys')->where('key_sha256', hash('sha256', $key))->count())->toBe(2);
+    expect(fn () => DB::table('app.qualification_command_keys')->update(['request_sha256' => str_repeat('a', 64)]))
+        ->toThrow(QueryException::class);
 });
 
 it('serializes publication and holds the exact authority epoch with durable outbox evidence', function (): void {

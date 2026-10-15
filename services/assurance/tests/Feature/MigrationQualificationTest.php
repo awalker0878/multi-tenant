@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 beforeEach(function (): void {
+    $this->qualificationCommands();
     $this->id = '10000000-0000-4000-8000-000000000001';
     $this->caller = tempnam(sys_get_temp_dir(), 'migration-caller-');
     $this->outgoing = tempnam(sys_get_temp_dir(), 'migration-outgoing-');
@@ -48,11 +49,12 @@ it('binds every scope dimension and rejects ambiguous or writable custody', func
             ->assertJsonPath('api_evidence', []);
         $other = $this->body;
         $other['scope']['site_id'] = '10000000-0000-4000-8000-000000000002';
+        $this->withHeader('Idempotency-Key', bin2hex(random_bytes(32)));
         $this->postJson($this->path, $other)->assertOk()->assertJsonPath('records', []);
         $other['scope']['tenant_id'] = $other['scope']['site_id'];
         $this->postJson($this->path, $other)->assertForbidden();
         file_put_contents($file, json_encode(['schema_version' => 1, 'assignments' => [$record, $record]], JSON_THROW_ON_ERROR));
-        $this->postJson($this->path, $this->body)->assertStatus(503);
+        $this->withHeader('Idempotency-Key', bin2hex(random_bytes(32)))->postJson($this->path, $this->body)->assertStatus(503);
         chmod($file, 0666);
         $this->postJson($this->path, $this->body)->assertStatus(503);
     } finally {

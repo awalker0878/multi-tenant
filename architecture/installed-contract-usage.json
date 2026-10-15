@@ -367,6 +367,19 @@
       "ci": ".github/workflows/ci.yml"
     },
     {
+      "copy": "services/planning/src/planning/infrastructure/inputs/error-v2.json",
+      "canonical": "contracts/schemas/common/error-v2.json",
+      "loader": "services/planning/src/planning/infrastructure/owners.py",
+      "load_kind": "literal",
+      "packaging": "services/planning/Dockerfile",
+      "packaging_marker": "COPY src/ ./src/",
+      "package_data": "services/planning/pyproject.toml",
+      "package_data_marker": "\"planning.infrastructure.inputs\" = [\"*.json\"]",
+      "generator": null,
+      "generation_mode": "canonical_snapshot",
+      "ci": ".github/workflows/ci.yml"
+    },
+    {
       "copy": "services/planning/src/planning/infrastructure/inputs/governance-delegation-response-v2.json",
       "canonical": "contracts/schemas/planning/governance-delegation-response-v2.json",
       "loader": "services/planning/src/planning/infrastructure/owner_contracts.py",
@@ -445,8 +458,8 @@
       "ci": ".github/workflows/ci.yml"
     },
     {
-      "copy": "services/planning/src/planning/infrastructure/inputs/qualification-v2.1.json",
-      "canonical": "contracts/schemas/planning/qualification-v2.1.json",
+      "copy": "services/planning/src/planning/infrastructure/inputs/qualification-v3.json",
+      "canonical": "contracts/schemas/planning/qualification-v3.json",
       "loader": "services/planning/src/planning/infrastructure/owner_contracts.py",
       "load_kind": "planning_typed",
       "packaging": "services/planning/Dockerfile",

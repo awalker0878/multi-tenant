@@ -67,13 +67,13 @@ SHA = "a" * 64
             "ASSURANCE",
             "POST",
             f"/v1/tenants/{TENANT}/planning-qualification-v2",
-            "qualification-v2.1",
+            "qualification-v3",
         ),
         (
             "ASSURANCE",
             "POST",
             f"/internal/tenants/{TENANT}/qualification-checks",
-            "qualification-v2.1",
+            "qualification-v3",
         ),
         (
             "GOVERNANCE",
@@ -118,9 +118,12 @@ def test_real_owner_transport_validates_qualified_assurance_response(monkeypatch
         "flow_evidence": None,
     }
     body: list[Any] = [payload]
+    response_status = [200]
 
     class Response:
-        status = 200
+        @property
+        def status(self) -> int:
+            return response_status[0]
 
         def read(self: Any, max_bytes: Any) -> Any:
             return json.dumps(body[0]).encode()
@@ -163,6 +166,21 @@ def test_real_owner_transport_validates_qualified_assurance_response(monkeypatch
     with pytest.raises(Rejected) as error:
         owners.request("ASSURANCE", "POST", path, {}, schema_name="unsupported-response-v99")
     assert error.value.status == 503
+
+    response_status[0] = 403
+    body[0] = {
+        "code": "qualification_request_denied",
+        "message": "Denied",
+        "correlation_id": TENANT,
+        "retryable": False,
+    }
+    with pytest.raises(Rejected) as denied:
+        owners.request("ASSURANCE", "POST", path, {})
+    assert denied.value.status == 403
+    body[0] = {"error": "denied", "uncontracted": True}
+    with pytest.raises(Rejected) as incompatible:
+        owners.request("ASSURANCE", "POST", path, {})
+    assert incompatible.value.status == 503
 
 
 def test_catalogue_current_v2_validates_nested_intent_not_only_envelope() -> None:

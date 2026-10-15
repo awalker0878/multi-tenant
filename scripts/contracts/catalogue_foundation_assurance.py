@@ -90,6 +90,7 @@ def verify() -> list[dict]:
     return [{
         "key": path, "claim": claim, "source": source,
         "result": "PASS",
+        **({"consumer_id": "planning"} if claim == "consumer" else {}),
         "release_sha256": hashlib.sha256((ROOT / path).read_bytes()).hexdigest(),
         "test": "catalogue_foundation_assurance.py:php_codec_to_planning_decoder",
         "run_id": os.environ.get("GITHUB_RUN_ID"),

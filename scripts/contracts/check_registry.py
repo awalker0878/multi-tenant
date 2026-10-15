@@ -151,8 +151,8 @@ def check_owner_operation_bindings():
         ("CATALOGUE", "GET", r"/internal/tenants/[^/]+/applications/[^/]+/environments/[^/]+/current-planning-intent", "catalogue-current-v2"),
         ("INVENTORY", "GET", r"/(?:internal|v1)/tenants/[^/]+/planning-capability-inputs/[^/]+/[^/]+/[^/]+/[^/]+/[^/]+", "inventory-input-v2"),
         ("INVENTORY", "GET", r"/(?:internal|v1)/tenants/[^/]+/migration-inputs/[^/]+/[^/]+/[^/]+/[1-9][0-9]{0,8}/[0-9a-f]{64}", "migration-input-v4"),
-        ("ASSURANCE", "POST", r"/v1/tenants/[^/]+/planning-qualification-v2", "qualification-v2.1"),
-        ("ASSURANCE", "POST", r"/internal/tenants/[^/]+/qualification-checks", "qualification-v2.1"),
+        ("ASSURANCE", "POST", r"/v1/tenants/[^/]+/planning-qualification-v2", "qualification-v3"),
+        ("ASSURANCE", "POST", r"/internal/tenants/[^/]+/qualification-checks", "qualification-v3"),
         ("ASSURANCE", "POST", r"/v1/tenants/[^/]+/migration-qualifications", "migration-support-v2"),
     }
     if len(operations) != len(expected_bindings) or set(operations) != expected_bindings:
@@ -164,7 +164,7 @@ def check_owner_operation_bindings():
         ("CATALOGUE", "catalogue-current-v2"),
         ("INVENTORY", "inventory-input-v2"),
         ("INVENTORY", "migration-input-v4"),
-        ("ASSURANCE", "qualification-v2.1"),
+        ("ASSURANCE", "qualification-v3"),
         ("ASSURANCE", "migration-support-v2"),
         ("GOVERNANCE", "governance-delegation-response-v2"),
         ("LIFECYCLE", "placement-reservation-v1"),

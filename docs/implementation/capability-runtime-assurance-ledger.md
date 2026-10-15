@@ -387,7 +387,7 @@ Implementation addition to draft PR #64:
   documentation evidence, optional E4 impact acknowledgements, and
   route admission rechecks. This test evidence remains **unverified**
   until exact-head CI runs actually complete.
-- A separate API-version documentation-record canonical schema is not published. The current API-evidence projection is carried by `contracts/openapi/assurance-qualification-v1.json`; vendor documentation metadata remains a separate rollout requirement.
+- A separate API-version documentation-record canonical schema is not published. The current API-evidence projection is carried by `contracts/openapi/assurance-qualification-v2.json`; vendor documentation metadata remains a separate rollout requirement.
 
 **Outstanding:** full call-site mapping and route rollout, commissioned
 version discovery and live probes, independently enrolled E3/E4 evidence,

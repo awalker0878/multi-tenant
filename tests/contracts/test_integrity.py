@@ -51,10 +51,10 @@ class ContractIntegrityTests(unittest.TestCase):
         check_error_policy()
         from check_http import check_error_policy as check
         from check_schema import load as real_load
-        original = real_load("contracts/openapi/assurance-qualification-v1.json")
+        original = real_load("contracts/openapi/assurance-qualification-v2.json")
         altered = json.loads(json.dumps(original))
         altered["paths"]["/internal/tenants/{tenant}/qualification-publications"]["post"]["responses"]["409"].pop("content")
-        with patch("check_http.load", side_effect=lambda path: altered if path == "contracts/openapi/assurance-qualification-v1.json" else real_load(path)):
+        with patch("check_http.load", side_effect=lambda path: altered if path == "contracts/openapi/assurance-qualification-v2.json" else real_load(path)):
             with self.assertRaisesRegex(ValueError, "Owner error body not contracted"):
                 check()
 

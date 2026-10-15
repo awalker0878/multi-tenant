@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Assurance scoped qualification service operations",
-    "version": "1.0.0",
-    "description": "Read-only E2 support and independently verified E3/E4 qualification publication gates; publication does not itself confer native writes. Retired unversioned planning-qualification alias is absent."
+    "version": "2.0.0",
+    "description": "Current signed qualification and publication boundaries. Every command key is bound to the verified service/principal, operation and request; current authority is recomputed on retries and no qualification response is cached."
   },
   "security": [
     {
@@ -23,6 +23,17 @@
               "type": "string",
               "format": "uuid",
               "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{32,64}$",
+              "minLength": 32,
+              "maxLength": 64
             }
           }
         ],
@@ -96,7 +107,7 @@
             }
           },
           "403": {
-            "description": "HTTP 403: denied, malformed, not found, conflicted, locked, or unavailable as applicable; never authorizes a write",
+            "description": "Denied, invalid, conflicting or unavailable; no qualification authority is inferred.",
             "content": {
               "application/json": {
                 "schema": {
@@ -106,7 +117,7 @@
             }
           },
           "422": {
-            "description": "HTTP 422: denied, malformed, not found, conflicted, locked, or unavailable as applicable; never authorizes a write",
+            "description": "Denied, invalid, conflicting or unavailable; no qualification authority is inferred.",
             "content": {
               "application/json": {
                 "schema": {
@@ -116,7 +127,27 @@
             }
           },
           "503": {
-            "description": "HTTP 503: denied, malformed, not found, conflicted, locked, or unavailable as applicable; never authorizes a write",
+            "description": "Denied, invalid, conflicting or unavailable; no qualification authority is inferred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Denied, invalid, conflicting or unavailable; no qualification authority is inferred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Denied, invalid, conflicting or unavailable; no qualification authority is inferred.",
             "content": {
               "application/json": {
                 "schema": {
@@ -125,6 +156,17 @@
               }
             }
           }
+        },
+        "x-idempotency": {
+          "scope": [
+            "tenant_id",
+            "actor_id",
+            "operation_id",
+            "request_digest"
+          ],
+          "ttl_seconds": 604800,
+          "conflict_status": 409,
+          "description": "Owner records request digests under authenticated tenant, principal and operation. Reads recompute current authority, never replay cached support; publications also retain their existing immutable command_id receipt."
         }
       }
     },
@@ -140,6 +182,17 @@
               "type": "string",
               "format": "uuid",
               "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{32,64}$",
+              "minLength": 32,
+              "maxLength": 64
             }
           }
         ],
@@ -157,17 +210,6 @@
                   "qualification_scope": {
                     "type": "object",
                     "additionalProperties": false,
-                    "required": [
-                      "tenant_id",
-                      "site_id",
-                      "endpoint_id",
-                      "native_scope",
-                      "installed_tuple",
-                      "action",
-                      "method",
-                      "profile_digest",
-                      "artifacts"
-                    ],
                     "properties": {
                       "tenant_id": {
                         "type": "string",
@@ -186,17 +228,26 @@
                       },
                       "native_scope": {
                         "type": "string",
-                        "minLength": 1
+                        "minLength": 1,
+                        "maxLength": 1024
                       },
                       "installed_tuple": {
                         "type": "object",
-                        "additionalProperties": true
+                        "minProperties": 1
                       },
                       "action": {
-                        "type": "string"
+                        "type": "string",
+                        "enum": [
+                          "application.provision",
+                          "application.migrate",
+                          "application.recover",
+                          "application.retire"
+                        ]
                       },
                       "method": {
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128
                       },
                       "profile_digest": {
                         "type": "string",
@@ -204,9 +255,44 @@
                       },
                       "artifacts": {
                         "type": "object",
-                        "additionalProperties": true
+                        "additionalProperties": false,
+                        "properties": {
+                          "compiler": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "adapter": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "automation": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "contracts": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          }
+                        },
+                        "required": [
+                          "compiler",
+                          "adapter",
+                          "automation",
+                          "contracts"
+                        ]
                       }
-                    }
+                    },
+                    "required": [
+                      "tenant_id",
+                      "site_id",
+                      "endpoint_id",
+                      "native_scope",
+                      "installed_tuple",
+                      "action",
+                      "method",
+                      "profile_digest",
+                      "artifacts"
+                    ]
                   }
                 }
               }
@@ -225,7 +311,7 @@
             }
           },
           "403": {
-            "description": "HTTP 403: denied, malformed, not found, conflicted, locked, or unavailable as applicable; never authorizes a write",
+            "description": "Denied, invalid, conflicting or unavailable; no qualification authority is inferred.",
             "content": {
               "application/json": {
                 "schema": {
@@ -235,7 +321,7 @@
             }
           },
           "422": {
-            "description": "HTTP 422: denied, malformed, not found, conflicted, locked, or unavailable as applicable; never authorizes a write",
+            "description": "Denied, invalid, conflicting or unavailable; no qualification authority is inferred.",
             "content": {
               "application/json": {
                 "schema": {
@@ -245,7 +331,27 @@
             }
           },
           "503": {
-            "description": "HTTP 503: denied, malformed, not found, conflicted, locked, or unavailable as applicable; never authorizes a write",
+            "description": "Denied, invalid, conflicting or unavailable; no qualification authority is inferred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Denied, invalid, conflicting or unavailable; no qualification authority is inferred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Denied, invalid, conflicting or unavailable; no qualification authority is inferred.",
             "content": {
               "application/json": {
                 "schema": {
@@ -254,6 +360,17 @@
               }
             }
           }
+        },
+        "x-idempotency": {
+          "scope": [
+            "tenant_id",
+            "actor_id",
+            "operation_id",
+            "request_digest"
+          ],
+          "ttl_seconds": 604800,
+          "conflict_status": 409,
+          "description": "Owner records request digests under authenticated tenant, principal and operation. Reads recompute current authority, never replay cached support; publications also retain their existing immutable command_id receipt."
         }
       }
     },
@@ -269,6 +386,17 @@
               "type": "string",
               "format": "uuid",
               "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{32,64}$",
+              "minLength": 32,
+              "maxLength": 64
             }
           }
         ],
@@ -312,17 +440,6 @@
                   "qualification_scope": {
                     "type": "object",
                     "additionalProperties": false,
-                    "required": [
-                      "tenant_id",
-                      "site_id",
-                      "endpoint_id",
-                      "native_scope",
-                      "installed_tuple",
-                      "action",
-                      "method",
-                      "profile_digest",
-                      "artifacts"
-                    ],
                     "properties": {
                       "tenant_id": {
                         "type": "string",
@@ -341,17 +458,26 @@
                       },
                       "native_scope": {
                         "type": "string",
-                        "minLength": 1
+                        "minLength": 1,
+                        "maxLength": 1024
                       },
                       "installed_tuple": {
                         "type": "object",
-                        "additionalProperties": true
+                        "minProperties": 1
                       },
                       "action": {
-                        "type": "string"
+                        "type": "string",
+                        "enum": [
+                          "application.provision",
+                          "application.migrate",
+                          "application.recover",
+                          "application.retire"
+                        ]
                       },
                       "method": {
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128
                       },
                       "profile_digest": {
                         "type": "string",
@@ -359,9 +485,44 @@
                       },
                       "artifacts": {
                         "type": "object",
-                        "additionalProperties": true
+                        "additionalProperties": false,
+                        "properties": {
+                          "compiler": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "adapter": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "automation": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "contracts": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          }
+                        },
+                        "required": [
+                          "compiler",
+                          "adapter",
+                          "automation",
+                          "contracts"
+                        ]
                       }
-                    }
+                    },
+                    "required": [
+                      "tenant_id",
+                      "site_id",
+                      "endpoint_id",
+                      "native_scope",
+                      "installed_tuple",
+                      "action",
+                      "method",
+                      "profile_digest",
+                      "artifacts"
+                    ]
                   },
                   "bundle": {
                     "type": [
@@ -387,7 +548,7 @@
             }
           },
           "403": {
-            "description": "HTTP 403: denied, malformed, not found, conflicted, locked, or unavailable as applicable; never authorizes a write",
+            "description": "Denied, invalid, conflicting or unavailable; no qualification authority is inferred.",
             "content": {
               "application/json": {
                 "schema": {
@@ -397,7 +558,7 @@
             }
           },
           "409": {
-            "description": "HTTP 409: denied, malformed, not found, conflicted, locked, or unavailable as applicable; never authorizes a write",
+            "description": "Denied, invalid, conflicting or unavailable; no qualification authority is inferred.",
             "content": {
               "application/json": {
                 "schema": {
@@ -407,7 +568,7 @@
             }
           },
           "413": {
-            "description": "HTTP 413: denied, malformed, not found, conflicted, locked, or unavailable as applicable; never authorizes a write",
+            "description": "Denied, invalid, conflicting or unavailable; no qualification authority is inferred.",
             "content": {
               "application/json": {
                 "schema": {
@@ -417,7 +578,7 @@
             }
           },
           "422": {
-            "description": "HTTP 422: denied, malformed, not found, conflicted, locked, or unavailable as applicable; never authorizes a write",
+            "description": "Denied, invalid, conflicting or unavailable; no qualification authority is inferred.",
             "content": {
               "application/json": {
                 "schema": {
@@ -427,7 +588,7 @@
             }
           },
           "423": {
-            "description": "HTTP 423: denied, malformed, not found, conflicted, locked, or unavailable as applicable; never authorizes a write",
+            "description": "Denied, invalid, conflicting or unavailable; no qualification authority is inferred.",
             "content": {
               "application/json": {
                 "schema": {
@@ -437,7 +598,17 @@
             }
           },
           "503": {
-            "description": "HTTP 503: denied, malformed, not found, conflicted, locked, or unavailable as applicable; never authorizes a write",
+            "description": "Denied, invalid, conflicting or unavailable; no qualification authority is inferred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Denied, invalid, conflicting or unavailable; no qualification authority is inferred.",
             "content": {
               "application/json": {
                 "schema": {
@@ -446,6 +617,17 @@
               }
             }
           }
+        },
+        "x-idempotency": {
+          "scope": [
+            "tenant_id",
+            "actor_id",
+            "operation_id",
+            "request_digest"
+          ],
+          "ttl_seconds": 604800,
+          "conflict_status": 409,
+          "description": "Owner records request digests under authenticated tenant, principal and operation. Reads recompute current authority, never replay cached support; publications also retain their existing immutable command_id receipt."
         }
       }
     },
@@ -481,6 +663,17 @@
                 "plan.read",
                 "plan.create"
               ]
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{32,64}$",
+              "minLength": 32,
+              "maxLength": 64
             }
           }
         ],
@@ -532,17 +725,6 @@
                   "qualification_scope": {
                     "type": "object",
                     "additionalProperties": false,
-                    "required": [
-                      "tenant_id",
-                      "site_id",
-                      "endpoint_id",
-                      "native_scope",
-                      "installed_tuple",
-                      "action",
-                      "method",
-                      "profile_digest",
-                      "artifacts"
-                    ],
                     "properties": {
                       "tenant_id": {
                         "type": "string",
@@ -561,17 +743,26 @@
                       },
                       "native_scope": {
                         "type": "string",
-                        "minLength": 1
+                        "minLength": 1,
+                        "maxLength": 1024
                       },
                       "installed_tuple": {
                         "type": "object",
-                        "additionalProperties": true
+                        "minProperties": 1
                       },
                       "action": {
-                        "type": "string"
+                        "type": "string",
+                        "enum": [
+                          "application.provision",
+                          "application.migrate",
+                          "application.recover",
+                          "application.retire"
+                        ]
                       },
                       "method": {
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128
                       },
                       "profile_digest": {
                         "type": "string",
@@ -579,9 +770,44 @@
                       },
                       "artifacts": {
                         "type": "object",
-                        "additionalProperties": true
+                        "additionalProperties": false,
+                        "properties": {
+                          "compiler": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "adapter": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "automation": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "contracts": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          }
+                        },
+                        "required": [
+                          "compiler",
+                          "adapter",
+                          "automation",
+                          "contracts"
+                        ]
                       }
-                    }
+                    },
+                    "required": [
+                      "tenant_id",
+                      "site_id",
+                      "endpoint_id",
+                      "native_scope",
+                      "installed_tuple",
+                      "action",
+                      "method",
+                      "profile_digest",
+                      "artifacts"
+                    ]
                   }
                 }
               }
@@ -600,7 +826,7 @@
             }
           },
           "403": {
-            "description": "HTTP 403: denied, malformed, not found, conflicted, locked, or unavailable as applicable; never authorizes a write",
+            "description": "Denied, invalid, conflicting or unavailable; no qualification authority is inferred.",
             "content": {
               "application/json": {
                 "schema": {
@@ -610,7 +836,7 @@
             }
           },
           "422": {
-            "description": "HTTP 422: denied, malformed, not found, conflicted, locked, or unavailable as applicable; never authorizes a write",
+            "description": "Denied, invalid, conflicting or unavailable; no qualification authority is inferred.",
             "content": {
               "application/json": {
                 "schema": {
@@ -620,7 +846,27 @@
             }
           },
           "503": {
-            "description": "HTTP 503: denied, malformed, not found, conflicted, locked, or unavailable as applicable; never authorizes a write",
+            "description": "Denied, invalid, conflicting or unavailable; no qualification authority is inferred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Denied, invalid, conflicting or unavailable; no qualification authority is inferred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Denied, invalid, conflicting or unavailable; no qualification authority is inferred.",
             "content": {
               "application/json": {
                 "schema": {
@@ -629,6 +875,17 @@
               }
             }
           }
+        },
+        "x-idempotency": {
+          "scope": [
+            "tenant_id",
+            "actor_id",
+            "operation_id",
+            "request_digest"
+          ],
+          "ttl_seconds": 604800,
+          "conflict_status": 409,
+          "description": "Owner records request digests under authenticated tenant, principal and operation. Reads recompute current authority, never replay cached support; publications also retain their existing immutable command_id receipt."
         }
       }
     }
@@ -1640,10 +1897,13 @@
                 "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
               },
               "native_scope": {
-                "type": "string"
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024
               },
               "installed_tuple": {
-                "type": "object"
+                "type": "object",
+                "minProperties": 1
               },
               "action": {
                 "type": "string",
@@ -1655,7 +1915,9 @@
                 ]
               },
               "method": {
-                "type": "string"
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
               },
               "profile_digest": {
                 "type": "string",
@@ -1827,6 +2089,224 @@
                 ]
               }
             ]
+          },
+          "method_modes": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "method:VM_COLD_EXPORT:rehearsal",
+              "method:VM_COLD_EXPORT:cutover",
+              "method:VM_COLD_EXPORT:rollback",
+              "method:VM_COLD_EXPORT:forward_recovery",
+              "method:VM_COLD_EXPORT:reverse_recovery",
+              "method:VM_COLD_EXPORT:cleanup",
+              "method:APPLICATION_REBUILD_RESTORE:rehearsal",
+              "method:APPLICATION_REBUILD_RESTORE:cutover",
+              "method:APPLICATION_REBUILD_RESTORE:rollback",
+              "method:APPLICATION_REBUILD_RESTORE:forward_recovery",
+              "method:APPLICATION_REBUILD_RESTORE:reverse_recovery",
+              "method:APPLICATION_REBUILD_RESTORE:cleanup",
+              "method:VM_SNAPSHOT_BASELINE_APP_DELTA:rehearsal",
+              "method:VM_SNAPSHOT_BASELINE_APP_DELTA:cutover",
+              "method:VM_SNAPSHOT_BASELINE_APP_DELTA:rollback",
+              "method:VM_SNAPSHOT_BASELINE_APP_DELTA:forward_recovery",
+              "method:VM_SNAPSHOT_BASELINE_APP_DELTA:reverse_recovery",
+              "method:VM_SNAPSHOT_BASELINE_APP_DELTA:cleanup",
+              "method:VM_SNAPSHOT_BASELINE_FILE_DELTA:rehearsal",
+              "method:VM_SNAPSHOT_BASELINE_FILE_DELTA:cutover",
+              "method:VM_SNAPSHOT_BASELINE_FILE_DELTA:rollback",
+              "method:VM_SNAPSHOT_BASELINE_FILE_DELTA:forward_recovery",
+              "method:VM_SNAPSHOT_BASELINE_FILE_DELTA:reverse_recovery",
+              "method:VM_SNAPSHOT_BASELINE_FILE_DELTA:cleanup",
+              "method:EXTERNAL_BLOCK_REPLICATION:rehearsal",
+              "method:EXTERNAL_BLOCK_REPLICATION:cutover",
+              "method:EXTERNAL_BLOCK_REPLICATION:rollback",
+              "method:EXTERNAL_BLOCK_REPLICATION:forward_recovery",
+              "method:EXTERNAL_BLOCK_REPLICATION:reverse_recovery",
+              "method:EXTERNAL_BLOCK_REPLICATION:cleanup"
+            ],
+            "properties": {
+              "method:VM_COLD_EXPORT:rehearsal": {
+                "enum": [
+                  "passed",
+                  "unsupported"
+                ]
+              },
+              "method:VM_COLD_EXPORT:cutover": {
+                "enum": [
+                  "passed",
+                  "unsupported"
+                ]
+              },
+              "method:VM_COLD_EXPORT:rollback": {
+                "enum": [
+                  "passed",
+                  "unsupported"
+                ]
+              },
+              "method:VM_COLD_EXPORT:forward_recovery": {
+                "enum": [
+                  "passed",
+                  "unsupported"
+                ]
+              },
+              "method:VM_COLD_EXPORT:reverse_recovery": {
+                "enum": [
+                  "passed",
+                  "unsupported"
+                ]
+              },
+              "method:VM_COLD_EXPORT:cleanup": {
+                "enum": [
+                  "passed",
+                  "unsupported"
+                ]
+              },
+              "method:APPLICATION_REBUILD_RESTORE:rehearsal": {
+                "enum": [
+                  "passed",
+                  "unsupported"
+                ]
+              },
+              "method:APPLICATION_REBUILD_RESTORE:cutover": {
+                "enum": [
+                  "passed",
+                  "unsupported"
+                ]
+              },
+              "method:APPLICATION_REBUILD_RESTORE:rollback": {
+                "enum": [
+                  "passed",
+                  "unsupported"
+                ]
+              },
+              "method:APPLICATION_REBUILD_RESTORE:forward_recovery": {
+                "enum": [
+                  "passed",
+                  "unsupported"
+                ]
+              },
+              "method:APPLICATION_REBUILD_RESTORE:reverse_recovery": {
+                "enum": [
+                  "passed",
+                  "unsupported"
+                ]
+              },
+              "method:APPLICATION_REBUILD_RESTORE:cleanup": {
+                "enum": [
+                  "passed",
+                  "unsupported"
+                ]
+              },
+              "method:VM_SNAPSHOT_BASELINE_APP_DELTA:rehearsal": {
+                "enum": [
+                  "passed",
+                  "unsupported"
+                ]
+              },
+              "method:VM_SNAPSHOT_BASELINE_APP_DELTA:cutover": {
+                "enum": [
+                  "passed",
+                  "unsupported"
+                ]
+              },
+              "method:VM_SNAPSHOT_BASELINE_APP_DELTA:rollback": {
+                "enum": [
+                  "passed",
+                  "unsupported"
+                ]
+              },
+              "method:VM_SNAPSHOT_BASELINE_APP_DELTA:forward_recovery": {
+                "enum": [
+                  "passed",
+                  "unsupported"
+                ]
+              },
+              "method:VM_SNAPSHOT_BASELINE_APP_DELTA:reverse_recovery": {
+                "enum": [
+                  "passed",
+                  "unsupported"
+                ]
+              },
+              "method:VM_SNAPSHOT_BASELINE_APP_DELTA:cleanup": {
+                "enum": [
+                  "passed",
+                  "unsupported"
+                ]
+              },
+              "method:VM_SNAPSHOT_BASELINE_FILE_DELTA:rehearsal": {
+                "enum": [
+                  "passed",
+                  "unsupported"
+                ]
+              },
+              "method:VM_SNAPSHOT_BASELINE_FILE_DELTA:cutover": {
+                "enum": [
+                  "passed",
+                  "unsupported"
+                ]
+              },
+              "method:VM_SNAPSHOT_BASELINE_FILE_DELTA:rollback": {
+                "enum": [
+                  "passed",
+                  "unsupported"
+                ]
+              },
+              "method:VM_SNAPSHOT_BASELINE_FILE_DELTA:forward_recovery": {
+                "enum": [
+                  "passed",
+                  "unsupported"
+                ]
+              },
+              "method:VM_SNAPSHOT_BASELINE_FILE_DELTA:reverse_recovery": {
+                "enum": [
+                  "passed",
+                  "unsupported"
+                ]
+              },
+              "method:VM_SNAPSHOT_BASELINE_FILE_DELTA:cleanup": {
+                "enum": [
+                  "passed",
+                  "unsupported"
+                ]
+              },
+              "method:EXTERNAL_BLOCK_REPLICATION:rehearsal": {
+                "enum": [
+                  "passed",
+                  "unsupported"
+                ]
+              },
+              "method:EXTERNAL_BLOCK_REPLICATION:cutover": {
+                "enum": [
+                  "passed",
+                  "unsupported"
+                ]
+              },
+              "method:EXTERNAL_BLOCK_REPLICATION:rollback": {
+                "enum": [
+                  "passed",
+                  "unsupported"
+                ]
+              },
+              "method:EXTERNAL_BLOCK_REPLICATION:forward_recovery": {
+                "enum": [
+                  "passed",
+                  "unsupported"
+                ]
+              },
+              "method:EXTERNAL_BLOCK_REPLICATION:reverse_recovery": {
+                "enum": [
+                  "passed",
+                  "unsupported"
+                ]
+              },
+              "method:EXTERNAL_BLOCK_REPLICATION:cleanup": {
+                "enum": [
+                  "passed",
+                  "unsupported"
+                ]
+              }
+            }
           }
         },
         "required": [
@@ -1842,8 +2322,8 @@
           "capabilities",
           "verification"
         ],
-        "$id": "urn:multi-tenant:qualification:v2.1",
-        "title": "Verified native qualification v2",
+        "$id": "https://schemas.multi-tenant.local/contracts/schemas/planning/qualification-v3.json",
+        "title": "Resolved current Assurance qualification v3",
         "allOf": [
           {
             "if": {
@@ -1870,6 +2350,23 @@
                   }
                 }
               }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "qualified"
+                }
+              },
+              "required": [
+                "status"
+              ]
+            },
+            "then": {
+              "required": [
+                "method_modes"
+              ]
             }
           }
         ]
@@ -1906,37 +2403,57 @@
         }
       },
       "Error": {
+        "title": "Contracted API error v2",
         "type": "object",
         "additionalProperties": false,
-        "required": [],
+        "required": [
+          "code",
+          "message",
+          "correlation_id",
+          "retryable"
+        ],
         "properties": {
-          "error": {
+          "code": {
             "type": "string",
-            "pattern": "^[a-z][a-z0-9_]*$"
+            "pattern": "^[a-z][a-z0-9_.-]{2,95}$"
           },
           "message": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
           },
-          "errors": {
-            "type": "object",
-            "additionalProperties": true
+          "correlation_id": {
+            "type": "string",
+            "format": "uuid"
           },
-          "field": {
-            "type": "string"
+          "retryable": {
+            "type": "boolean"
+          },
+          "details": {
+            "type": "array",
+            "maxItems": 64,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field",
+                "reason"
+              ],
+              "properties": {
+                "field": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256
+                }
+              }
+            }
           }
-        },
-        "anyOf": [
-          {
-            "required": [
-              "error"
-            ]
-          },
-          {
-            "required": [
-              "message"
-            ]
-          }
-        ]
+        }
       }
     }
   }

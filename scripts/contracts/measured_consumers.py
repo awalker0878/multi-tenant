@@ -122,6 +122,30 @@ RELEASE_TESTS = {
     ),
 }
 
+# Attribution follows the executable consumer exercised by each selector,
+# independently of the canonical registry's (possibly larger) caller list.
+CONSUMER_TEST_SCOPES = {
+    "services/planning/tests/": "planning",
+    "tests/contracts/test_inventory_planning_contract.py::": "planning",
+    "tests/contracts/test_authority_boundaries.py::OwnerBoundaryContracts::": "planning",
+    "tests/contracts/test_authority_boundaries.py::LifecycleOwnerTransportContracts::": "lifecycle",
+    "tests/contracts/test_simulation_owner.py::": "lifecycle",
+    "tests/contracts/test_migration_readiness_wire.py::": "lifecycle",
+    "tests/contracts/test_alert_owner.py::": "lifecycle",
+}
+
+
+def executed_consumer(test: str, boundary: dict) -> dict:
+    matches = [consumer for prefix, consumer in CONSUMER_TEST_SCOPES.items()
+               if test.startswith(prefix)]
+    if len(matches) != 1:
+        raise ValueError("No unambiguous executed consumer for: " + test)
+    consumer = matches[0]
+    if consumer not in (boundary["consumers"] or [boundary["owner"]]):
+        raise ValueError("Executed consumer is not registered on current boundary: " + test)
+    return {"consumer_id": consumer,
+            **({"consumer_boundary": "owner-local"} if not boundary["consumers"] else {})}
+
 
 def verified_consumers(root: Path = ROOT) -> list[dict]:
     current = {operation["key"]: operation for operation in inventory(root)["operations"]}
@@ -237,6 +261,7 @@ def verified_consumers(root: Path = ROOT) -> list[dict]:
                                "authentication": "live-denial"}[claim],
                     "result": "PASS", "release_sha256": current[key]["release_sha256"],
                     "test": test,
+                    **(executed_consumer(test, current[key]) if claim == "consumer" else {}),
                     **({"denial_kind": "invalid-credential", "status_code": 403}
                        if claim == "authentication" else {}),
                 })
@@ -249,6 +274,7 @@ def verified_consumers(root: Path = ROOT) -> list[dict]:
                 "key": path, "claim": claim,
                 "source": "live-producer" if claim == "producer" else "live-consumer",
                 "result": "PASS", "release_sha256": releases[path]["sha256"], "test": test,
+                **(executed_consumer(test, releases[path]) if claim == "consumer" else {}),
             })
     for observation in evidence:
         observation["run_id"] = os.environ.get("GITHUB_RUN_ID")

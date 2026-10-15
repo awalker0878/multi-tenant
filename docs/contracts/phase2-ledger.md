@@ -343,3 +343,60 @@ Planning enrollment and real provider/custody/receiving E3/E4 remain unavailable
 No merge to main, native qualification or production admission is claimed.
 
 Final local source regressions: **217 passed**, plus **16 publication/retirement controls passed**. The original missing-field/generic-method specimen fails the new real signed-decoder controls. These checks do not replace supported runtime integration.
+
+### Qualification wire and evidence admission follow-up
+
+The supported run for `a3b5e8ee` is `38738058752`, tested merge revision
+`015a7fdccb2a39438ddbc77446d0086a7f877e3a`. Its native-contract E2 job now passes,
+including P08/P09 source isolation. All nine image builds and their release
+binding aggregation pass for that exact earlier tree. They do not qualify the
+subsequent replacement contracts or a deployed installation.
+
+The live P05/P06 assessment exposed another confirmed wire defect: the actual
+Assurance resolver returns its signed `method_modes`, while the closed installed
+qualification schema omits it. Dropping the field would invalidate the reviewed
+record digest. Publish `qualification-v3` and Assurance qualification API v2;
+require the exact method/mode matrix for qualified records while preserving
+explicit unknown results. Migrate the sole Planning consumer and remove the two
+superseded canonical files and old installed copy. Request scopes derive from
+the same new schema; malformed IDs, tuple objects, artifacts and actions cannot
+be echoed into an invalid successful response. Publication epochs remain JSON
+integers. No native verification predicate is relaxed.
+
+The new API preserves strict new-release requirements: Error v2 and scoped
+Idempotency-Key receipts. Assurance stores digests only, recomputes current
+qualification on every query, and rechecks delegated actor authority before
+retaining query identity. Existing publication command/epoch deduplication still
+owns the mutation result. Add the owner-only migration and real PostgreSQL
+conflict/isolation/privilege regression. Planning generates a fresh key for each
+current read, validates success through its installed v3 schema, and validates
+denials through an actual installed Error v2 decoder before accepting status
+semantics. Unsafe or incompatible errors become unavailable authority.
+
+Independently reproduced and fixed two false-pass paths in the assurance model:
+
+- Authenticated cross-tenant status alone admitted evidence reporting disclosure
+  and mutation. Require explicit absence of both effects and a nonempty foreign
+  target.
+- An unnamed consumer proof could qualify all declared callers. Attribute every
+  executed consumer by component, require every registered caller independently,
+  and report missing consumer boundaries. Source-only definitions require an
+  explicitly identified owner-local validator; no remote consumer is invented.
+  Existing executable probes now name only the consumers they actually execute.
+
+Supported PHP also identified two test-specimen defects. Governance admission
+asserted the retired Error v1 shape; require Error v2's exact key count, code,
+retryability and UUID correlation instead. Console's repeated HTTP fake callbacks
+kept returning the initial success, so isolate each malformed identity in its
+own test. The decoder assertions remain strict. A broker startup failed with a
+cookie-permission diagnostic; a targeted retry of that job passed. No production
+permission or broker health requirement was weakened.
+
+Current source inventory: **75 releases, 166 HTTP operations, 49 dependency edges,
+83 consumer relationships and 37 installed copies**. Assurance's Error v1
+relationship disappears after its API replacement; Error v2 now has a real
+installed Planning consumer. The protected external Planning enrollment and real
+provider/custody/receiving evidence remain unavailable. Full assurance is still
+**FAIL / INCOMPLETE**, including unresolved per-operation and event evidence.
+
+Checkpoint verification: **221 local contract tests passed**, **603 Planning tests passed / 22 infrastructure skips**, and strict types passed for 109 source files. All ten releases introduced since policy adoption pass strict quality. Replacements preserve surviving canonical bytes. Current supported PHP, PostgreSQL/broker/browser and new artifact identities must be verified in the next CI run.

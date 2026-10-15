@@ -134,11 +134,11 @@ class HttpRouteConformanceTests(unittest.TestCase):
                     verify_app(owner, {route, ("POST", "/v1/tenants/{tenant}/surprise")}, root)
 
     def test_retired_unversioned_qualification_alias_is_not_exempt(self):
-        spec = json.loads((ROOT / "contracts/openapi/assurance-qualification-v1.json").read_text())
+        spec = json.loads((ROOT / "contracts/openapi/assurance-qualification-v2.json").read_text())
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             (root / "architecture").mkdir()
-            path = "contracts/openapi/assurance-qualification-v1.json"
+            path = "contracts/openapi/assurance-qualification-v2.json"
             target = root / path
             target.parent.mkdir(parents=True)
             target.write_text(json.dumps(spec))

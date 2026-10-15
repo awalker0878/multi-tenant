@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Application\Foundation\Contracts\SecretReader;
+use App\Application\Qualification\Actions\RecordQualificationCommand;
 use App\Application\Qualification\Actions\ResolveQualification;
 use App\Domain\Qualification\NativeQualification;
 use Illuminate\Http\JsonResponse;
@@ -32,6 +33,8 @@ final class MigrationQualificationController
             'release_sha256' => ['required', 'regex:/\A[a-f0-9]{64}\z/'],
         ]);
         abort_unless($input['scope']['tenant_id'] === $tenant, 403);
+        (new RecordQualificationCommand)->handle($tenant, 'service:planning:'.hash('sha256', $token),
+            'readAssuranceMigrationQualification', $request->headers->all('idempotency-key'), $input);
         $path = config('planning.migration_support_registry_file');
         $records = [];
         $apiEvidence = [];

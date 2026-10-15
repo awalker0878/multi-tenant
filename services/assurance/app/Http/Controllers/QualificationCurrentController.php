@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Application\Foundation\Contracts\SecretReader;
+use App\Application\Qualification\Actions\RecordQualificationCommand;
 use App\Application\Qualification\Actions\ResolveQualification;
+use App\Domain\Qualification\QualificationScope;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -21,7 +23,10 @@ final class QualificationCurrentController
         abort_unless(count($values) === 1 && is_string($values[0]) && hash_equals('Bearer '.$incoming, $values[0]), 403);
         abort_if(strlen($request->getContent()) > 32768 || array_keys($request->all()) !== ['qualification_scope'], 422);
         $input = $request->validate(['qualification_scope' => ['required', 'array:tenant_id,site_id,endpoint_id,native_scope,installed_tuple,action,method,profile_digest,artifacts']]);
+        abort_unless(QualificationScope::valid($input['qualification_scope']), 422);
         abort_unless(($input['qualification_scope']['tenant_id'] ?? null) === $tenant, 403);
+        (new RecordQualificationCommand)->handle($tenant, 'service:planning:'.hash('sha256', $incoming),
+            'readAssuranceCurrentQualification', $request->headers->all('idempotency-key'), $input);
 
         return response()->json($resolver->handle($input['qualification_scope']))->header('Cache-Control', 'no-store, private');
     }

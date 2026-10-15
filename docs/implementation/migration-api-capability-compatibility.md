@@ -58,7 +58,7 @@ list and entitled for the caller.
 - If the selected version becomes unavailable, a subsequent read and native
   admission must be held; a newer version does not inherit the old proof.
 - API version metadata is described by
-  the active `contracts/openapi/assurance-qualification-v1.json` API evidence projection; the proposed separate vendor-documentation record schema is not an active release. Desired documentation includes product
+  the active `contracts/openapi/assurance-qualification-v2.json` API evidence projection; the proposed separate vendor-documentation record schema is not an active release. Desired documentation includes product
   release, per-family/version, release/deprecation/sunset dates, official spec
   URL/checksum and changed/removed semantic capabilities. Unknown dates or
   missing specifications must be recorded as null/unknown, not invented.

@@ -23,7 +23,7 @@ beforeEach(function (): void {
             'action' => 'application.provision',
             'method' => 'native_api',
             'profile_digest' => str_repeat('a', 64),
-            'artifacts' => ['adapter' => str_repeat('b', 64)],
+            'artifacts' => array_fill_keys(['compiler', 'adapter', 'automation', 'contracts'], str_repeat('b', 64)),
         ],
     ];
 });
@@ -89,7 +89,9 @@ it('rejects publication outside the current tenant and invalid typed epochs', fu
     $outside['qualification_scope']['tenant_id'] = '10000000-0000-4000-8000-000000000099';
     $this->postJson($this->url, $outside)->assertForbidden();
 
-    $invalid = $this->payload;
-    $invalid['expected_epoch'] = -1;
-    $this->postJson($this->url, $invalid)->assertStatus(422);
+    foreach ([-1, '1', true] as $epoch) {
+        $invalid = $this->payload;
+        $invalid['expected_epoch'] = $epoch;
+        $this->postJson($this->url, $invalid)->assertStatus(422);
+    }
 });

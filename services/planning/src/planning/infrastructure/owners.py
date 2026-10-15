@@ -6,6 +6,7 @@ import http.client
 import json
 import os
 import re
+import secrets
 import ssl
 import stat
 import time
@@ -66,6 +67,10 @@ def request(
                     allow_nan=False,
                 ).encode()
             ).hexdigest()
+        elif owner == "ASSURANCE" and method == "POST":
+            # Each call is a current read, with no response cache or automatic
+            # transport retry. A new query gets a new strong command identity.
+            headers["Idempotency-Key"] = secrets.token_hex(32)
         if delegation:
             headers["X-Actor-Delegation"] = delegation
         if action:
@@ -77,6 +82,18 @@ def request(
             connection.request(method, path, None if body is None else json.dumps(body), headers)
             response = connection.getresponse()
             raw = response.read(524289)
+            if owner == "ASSURANCE" and response.status != 200:
+                error_schema = json.loads(
+                    files("planning.infrastructure.inputs").joinpath("error-v2.json").read_text()
+                )
+                if (
+                    len(raw) > 524288
+                    or response.getheader("Content-Encoding", "identity") != "identity"
+                    or not Draft202012Validator(
+                        error_schema, format_checker=FormatChecker()
+                    ).is_valid(decode(raw))
+                ):
+                    raise ValueError
             if response.status in {401, 403, 404}:
                 raise Rejected("source_access_denied", 403)
             if (
@@ -335,7 +352,7 @@ def qualification_current(plan: dict[str, Any]) -> None:
         "POST",
         f"/internal/tenants/{scope['tenant_id']}/qualification-checks",
         {"qualification_scope": pinned["scope"]},
-        schema_name="qualification-v2.1",
+        schema_name="qualification-v3",
     )
     if (
         not verified(current, int(time.time()))
