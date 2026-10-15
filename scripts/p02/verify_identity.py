@@ -321,8 +321,13 @@ def main() -> int:
                 with response:
                     value = json.loads(response.read())
                     check('wire-' + path + '-' + str(expected), response.status == expected)
-                    validator = {'$ref': '#/components/schemas/' + schema, 'components': api['components']} if isinstance(schema, str) else schema
-                    OAS31Validator(validator).validate(value)
+                    # Error contracts belong to the actual operation: the
+                    # active OIDC API and local/session API have distinct
+                    # releases. The mandatory conformance observer below
+                    # validates each error against that exact canonical body.
+                    if schema != 'Error':
+                        validator = {'$ref': '#/components/schemas/' + schema, 'components': api['components']} if isinstance(schema, str) else schema
+                        OAS31Validator(validator).validate(value)
                     conformance.observe('http://127.0.0.1:8032', path, request.get_method(), body,
                                         dict(request.header_items()), response.status, value, response.headers)
                     check('wire-' + path + '-no-store', 'no-store' in response.headers.get('Cache-Control', ''))

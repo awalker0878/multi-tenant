@@ -400,3 +400,26 @@ provider/custody/receiving evidence remain unavailable. Full assurance is still
 **FAIL / INCOMPLETE**, including unresolved per-operation and event evidence.
 
 Checkpoint verification: **221 local contract tests passed**, **603 Planning tests passed / 22 infrastructure skips**, and strict types passed for 109 source files. All ten releases introduced since policy adoption pass strict quality. Replacements preserve surviving canonical bytes. Current supported PHP, PostgreSQL/broker/browser and new artifact identities must be verified in the next CI run.
+
+Run `38742662220` (`6c26a54b`, tested merge `a340851aeeb3d8a829c55990105c8434fea4b2ca`)
+reproduced a least-privilege defect in the new query receipt: PostgreSQL requires
+UPDATE privilege for SELECT FOR UPDATE. Remove that unnecessary read lock. The
+unique INSERT ON CONFLICT already serializes simultaneous claims, current receipt
+bytes cannot be updated, and retention deletes only sufficiently old expired
+rows. Keep the actual runtime UPDATE-denial regression and existing grants.
+The P05 signature check also ran in unconfigured system Python; invoke it through
+the already locked Planning environment rather than skipping schema validation.
+These corrections still require current PostgreSQL/live verification.
+
+The same run passes all four supported Laravel quality suites. P02 reaches 106
+live checks, then its helper incorrectly applies local identity's new Error v2
+to an unchanged OIDC operation that still publishes Error v1. Preserve both
+active APIs: the existing mandatory HTTP conformance observer validates errors
+against each exact active operation/status; retain the extra explicit success
+and custom-identity checks. No OIDC canonical or runtime error is rewritten.
+
+Targeted follow-up checks pass: four signed qualification/scope controls in the
+actual locked Planning environment, 17 route/wire controls (including distinct
+active OIDC/local error contracts), and PHP formatting/syntax. The original
+SELECT FOR UPDATE implementation fails the current PostgreSQL authority test;
+its corrected transaction must be rerun with unchanged restricted grants.

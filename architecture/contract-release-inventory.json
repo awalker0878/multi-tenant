@@ -1732,7 +1732,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/openapi/assurance-qualification-v2.json",
           "source": "tests/contracts/test_route_conformance.py",
-          "source_sha256": "c7c0d3c4cb596a4872a2806d7002c07d1a6f5a752168fb7f634d9087c1a92d78"
+          "source_sha256": "329ba7654c7f41718ae16ceec007fbaf58aa96760824837b1313b3e73db6c7cb"
         }
       ]
     },
@@ -2899,7 +2899,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/openapi/governance-local-identity-v2.json",
           "source": "scripts/p02/verify_identity.py",
-          "source_sha256": "1c042ab73c868096621ae797a143ff47a948d21024c5214cc29b3c7a1be2bcb9"
+          "source_sha256": "be413ec2812e7b814f82247f45cc9e7861a7df62f3764cf43b48dbe999f2dba2"
         }
       ]
     },
@@ -5004,7 +5004,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/openapi/planning-immutable-plan-v2.json",
           "source": "tests/contracts/test_route_conformance.py",
-          "source_sha256": "c7c0d3c4cb596a4872a2806d7002c07d1a6f5a752168fb7f634d9087c1a92d78"
+          "source_sha256": "329ba7654c7f41718ae16ceec007fbaf58aa96760824837b1313b3e73db6c7cb"
         }
       ]
     },
@@ -5366,7 +5366,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/openapi/planning-migration-v2.json",
           "source": "tests/contracts/test_route_conformance.py",
-          "source_sha256": "c7c0d3c4cb596a4872a2806d7002c07d1a6f5a752168fb7f634d9087c1a92d78"
+          "source_sha256": "329ba7654c7f41718ae16ceec007fbaf58aa96760824837b1313b3e73db6c7cb"
         },
         {
           "kind": "validation-or-generation",
@@ -6794,7 +6794,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/schemas/events/governance-change-v1.json",
           "source": "scripts/p02/verify_identity.py",
-          "source_sha256": "1c042ab73c868096621ae797a143ff47a948d21024c5214cc29b3c7a1be2bcb9"
+          "source_sha256": "be413ec2812e7b814f82247f45cc9e7861a7df62f3764cf43b48dbe999f2dba2"
         }
       ]
     },
@@ -6876,7 +6876,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/schemas/events/identity-change-v1.json",
           "source": "scripts/p02/verify_identity.py",
-          "source_sha256": "1c042ab73c868096621ae797a143ff47a948d21024c5214cc29b3c7a1be2bcb9"
+          "source_sha256": "be413ec2812e7b814f82247f45cc9e7861a7df62f3764cf43b48dbe999f2dba2"
         },
         {
           "kind": "validation-or-generation",

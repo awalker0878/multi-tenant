@@ -77,6 +77,19 @@ class HttpWireMeasurementTests(unittest.TestCase):
         self.assertFalse(row['positive_conformance'])
         self.assertFalse(row['security_qualified'])
 
+    def test_errors_use_the_exact_active_operation_instead_of_an_unrelated_error_version(self):
+        probe = HttpConformance(ROOT, self.output, {'https://governance.invalid': 'governance'}, 'unit:active-error-versions')
+        headers = {'Content-Type': 'application/json'}
+        error_v2 = {'code': 'invalid_session', 'message': 'Denied',
+                    'correlation_id': '10000000-0000-4000-8000-000000000001', 'retryable': False}
+        probe.observe('https://governance.invalid', '/identity/session', 'GET', None, {}, 401, error_v2, headers)
+        probe.observe('https://governance.invalid', '/identity/oidc/flows', 'POST', {}, {}, 503,
+                      {'error': 'identity_recovery_required'}, headers)
+        with self.assertRaisesRegex(ValueError, 'contract mismatch'):
+            probe.observe('https://governance.invalid', '/identity/session', 'GET', None, {}, 401,
+                          {'error': 'identity_recovery_required'}, headers)
+        self.assertTrue(all(not row['security_qualified'] for row in json.loads(self.output.read_text())))
+
     def test_installed_contract_drift_prevents_measurement(self):
         registry = self.root/'architecture/contract-consumers.json'
         value = json.loads(registry.read_text())
