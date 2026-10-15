@@ -232,7 +232,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/asyncapi/governance.yaml",
           "source": "scripts/p02/verify_events.py",
-          "source_sha256": "9dee83ef50b51bfadba9e0d1a962a8e5c5c8d220aa9377366f9c38e94c192e93"
+          "source_sha256": "764aa22d4a8bc3bfc2b7f7cb0227fbf89d3431d2ce315339afda49f2506898f7"
         }
       ]
     },
@@ -454,7 +454,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/asyncapi/identity.yaml",
           "source": "scripts/p02/verify_events.py",
-          "source_sha256": "9dee83ef50b51bfadba9e0d1a962a8e5c5c8d220aa9377366f9c38e94c192e93"
+          "source_sha256": "764aa22d4a8bc3bfc2b7f7cb0227fbf89d3431d2ce315339afda49f2506898f7"
         },
         {
           "kind": "validation-or-generation",
@@ -554,7 +554,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/asyncapi/support.yaml",
           "source": "scripts/p02/verify_events.py",
-          "source_sha256": "9dee83ef50b51bfadba9e0d1a962a8e5c5c8d220aa9377366f9c38e94c192e93"
+          "source_sha256": "764aa22d4a8bc3bfc2b7f7cb0227fbf89d3431d2ce315339afda49f2506898f7"
         }
       ]
     },
@@ -6806,7 +6806,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/schemas/events/governance-change-v1.json",
           "source": "scripts/p02/verify_events.py",
-          "source_sha256": "9dee83ef50b51bfadba9e0d1a962a8e5c5c8d220aa9377366f9c38e94c192e93"
+          "source_sha256": "764aa22d4a8bc3bfc2b7f7cb0227fbf89d3431d2ce315339afda49f2506898f7"
         },
         {
           "kind": "validation-or-generation",
@@ -6888,7 +6888,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/schemas/events/identity-change-v1.json",
           "source": "scripts/p02/verify_events.py",
-          "source_sha256": "9dee83ef50b51bfadba9e0d1a962a8e5c5c8d220aa9377366f9c38e94c192e93"
+          "source_sha256": "764aa22d4a8bc3bfc2b7f7cb0227fbf89d3431d2ce315339afda49f2506898f7"
         },
         {
           "kind": "validation-or-generation",
@@ -6957,7 +6957,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/schemas/events/support-change-v1.json",
           "source": "scripts/p02/verify_events.py",
-          "source_sha256": "9dee83ef50b51bfadba9e0d1a962a8e5c5c8d220aa9377366f9c38e94c192e93"
+          "source_sha256": "764aa22d4a8bc3bfc2b7f7cb0227fbf89d3431d2ce315339afda49f2506898f7"
         },
         {
           "kind": "validation-or-generation",
