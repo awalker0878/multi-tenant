@@ -1,3 +1,22 @@
+## P02 broker startup correction — 2026-10-15
+
+The retained P02 Firefox/WebKit failure artifacts from run 38821391028 show
+`/var/lib/rabbitmq/.erlang.cookie: eacces`, not a generic readiness timeout.
+P02's root health check could create a root-owned private cookie while the
+image entrypoint was switching to the RabbitMQ account. Both P02 fixtures now
+run health diagnostics as `rabbitmq`, matching the existing P03/P04 correction;
+post-start diagnostics also select that user. TLS, signatures, readiness
+requirements and the 90-second bound remain enforced. Current-source CI is
+required. The new epoch PostgreSQL/ASGI callback-chain case already passes on
+head `33c45188`; final live fencing/Console witness acceptance is pending.
+
+Additional local verification at `5b0ee831`: **390 Lifecycle tests pass**, with
+**86 PostgreSQL cases skipped** locally; complete Lifecycle Ruff, formatting
+and strict mypy pass. The independent protected Planning registry remains
+absent and its actual loader returns `None`. Three official Alpine mirrors
+also return 404 for the unchanged locked zlib artifact. Missing internal
+assurance evidence remains open independently of these external dependencies.
+
 ## Current Console binding correction — 2026-10-15
 
 The actual Console `JobsClient` now binds simulation reads to the requested job,

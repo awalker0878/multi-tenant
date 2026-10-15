@@ -53,7 +53,7 @@ class NotificationBroker:
             mounts.extend(['-v', str(path) + ':' + target + ':ro'])
         self.run(['docker', 'run', '-d', '--name', self.name, '--hostname', 'p02-notification-broker', '-p', '127.0.0.1:5679:5671',
                   '-e', 'RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=+S 2:2', '-e', 'RABBITMQ_CTL_ERL_ARGS=+S 2:2',
-                  '--health-cmd', 'rabbitmq-diagnostics -q check_running', '--health-interval', '2s', '--health-retries', '45',
+                  '--health-cmd', 'gosu rabbitmq rabbitmq-diagnostics -q check_running', '--health-interval', '2s', '--health-retries', '45',
                   *mounts, self.image], label='notification-broker-start')
         deadline = time.monotonic() + 90
         while True:
@@ -68,7 +68,7 @@ class NotificationBroker:
                          label='notification-broker-state')
                 raise RuntimeError('notification_broker_not_ready')
             time.sleep(1)
-        self.run(['docker', 'exec', self.name, 'rabbitmq-diagnostics', '-q', 'check_port_connectivity', '--address', '127.0.0.1'], label='notification-broker-ready')
+        self.run(['docker', 'exec', '--user', 'rabbitmq', self.name, 'rabbitmq-diagnostics', '-q', 'check_port_connectivity', '--address', '127.0.0.1'], label='notification-broker-ready')
 
     def close(self):
         subprocess.run(['docker', 'rm', '-f', self.name], capture_output=True, timeout=30)

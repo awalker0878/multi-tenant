@@ -680,3 +680,17 @@ That run also exposes upstream 404 for the locked zlib APK in the Assurance
 image builder. Independent direct downloads reproduce 404; cached bytes
 match the unchanged lock. No package-lock relaxation, native qualification,
 completed runtime assurance or release completion is inferred.
+
+
+### P02 RabbitMQ cookie ownership diagnosis
+
+The retained P02 Firefox/WebKit artifacts from run 38821391028 identify
+`/var/lib/rabbitmq/.erlang.cookie: eacces`. P02's root health diagnostic raced
+server startup and could create the cookie before the RabbitMQ user owned it.
+Both P02 fixtures now run diagnostics as the RabbitMQ account, matching the
+existing P03/P04 fixture behavior; readiness, TLS and time bounds stay strict.
+This requires a current-source live rerun, not a relabelled external blocker.
+The new epoch PostgreSQL/ASGI case passes on `33c45188`. Locally **390
+Lifecycle tests pass / 86 PostgreSQL cases skip**, with full Ruff/format/mypy
+passing. Independent Planning registry lookup is absent/None; official Alpine
+mirror probes also reproduce locked-zlib 404. Internal evidence gaps remain.
