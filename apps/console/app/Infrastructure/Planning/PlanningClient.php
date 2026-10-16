@@ -46,6 +46,12 @@ final class PlanningClient implements PlanningGateway
             throw new PlanningFailure;
         }
         try {
+            $api = json_decode(file_get_contents(resource_path($migration ? 'contracts/planning-migration-v2.json' : 'contracts/planning-v1.2.json')) ?: '', true, 64, JSON_THROW_ON_ERROR);
+            $template = preg_replace('/\/[0-9a-f-]{36}(?=\/|\z)/', '/{record}', $tail);
+            $operation = $api['paths']['/v1/tenants/{tenant}/applications/{application}/environments/{environment}/'.$template][strtolower($method)] ?? null;
+            if (! is_array($operation)) {
+                throw new PlanningFailure(422, 'invalid_scope');
+            }
             $tokens = [];
             $action = $method === 'POST' && ! in_array($tail, ['migration-support', 'migration-flow-choices', 'migration-workload-readiness'], true) && ! str_ends_with($tail, '/validity') && ! str_ends_with($tail, '/diff') ? 'plan.create' : 'plan.read';
             foreach (array_unique($sites) as $site) {
@@ -73,8 +79,7 @@ final class PlanningClient implements PlanningGateway
                 throw new PlanningFailure;
             }
             $result = json_decode($raw, true, 64, JSON_THROW_ON_ERROR);
-            $api = json_decode(file_get_contents(resource_path($migration ? 'contracts/planning-migration-v2.json' : 'contracts/planning-v1.2.json')) ?: '', true, 64, JSON_THROW_ON_ERROR);
-            if (! in_array($response->status(), [200, 201], true)) {
+            if ($response->status() < 200 || $response->status() >= 300) {
                 if ($migration) {
                     $errorSchema = ['$ref' => '#/components/schemas/Error', 'components' => $api['components']];
                     if (! (new Validator)->validate(json_decode($raw), json_decode(json_encode($errorSchema, JSON_THROW_ON_ERROR)))->isValid()) {
@@ -89,18 +94,38 @@ final class PlanningClient implements PlanningGateway
                 throw new PlanningFailure;
             }
 
-            $schemaName = $migration ? match ($tail) {
-                'migration-plans' => 'Receipt',
-                'migration-plan-options' => 'MigrationOptions',
-                'migration-support' => 'MigrationSupport',
-                'migration-flow-choices' => 'MigrationFlowChoices',
-                'migration-flow-selections' => 'MigrationFlowReceipt',
-                'migration-workload-readiness' => 'MigrationWorkloadReadiness',
-                default => 'Preparation',
-            } : ($response->status() === 201 ? 'Receipt' : (str_ends_with($tail, '/validity') ? 'Validity' : (str_ends_with($tail, '/diff') ? 'Diff' : (str_starts_with($tail, 'plans/') ? 'Plan' : 'Assessment'))));
-            $schema = ['$ref' => '#/components/schemas/'.$schemaName, 'components' => $api['components']];
+            $responseSchema = $operation['responses'][(string) $response->status()]['content']['application/json']['schema'] ?? null;
+            if (! is_array($responseSchema)) {
+                throw new PlanningFailure;
+            }
+            $schema = [...$responseSchema, 'components' => $api['components']];
             if (! (new Validator)->validate(json_decode($raw), json_decode(json_encode($schema, JSON_THROW_ON_ERROR)))->isValid()) {
                 throw new PlanningFailure;
+            }
+            if (! $migration && $method === 'GET') {
+                if (($result['id'] ?? null) !== explode('/', $tail)[1]
+                    || ($result['tenant_id'] ?? null) !== $tenant
+                    || ($result['application_id'] ?? null) !== $application
+                    || ($result['environment'] ?? null) !== $environment) {
+                    throw new PlanningFailure(403, 'scope_mismatch');
+                }
+            }
+            if (in_array($tail, ['assessments', 'plans', 'migration-plans'], true)
+                && ($result['kind'] ?? null) !== ($tail === 'assessments' ? 'assessment' : 'plan')) {
+                throw new PlanningFailure(403, 'scope_mismatch');
+            }
+            if ($tail === 'plans' || $tail === 'migration-plans' || (! $migration && $method === 'GET' && str_starts_with($tail, 'plans/'))) {
+                $binding = $result['binding'] ?? [];
+                if (($binding['plan_id'] ?? null) !== $result['id'] || ($binding['tenant_id'] ?? null) !== $tenant
+                    || ($binding['resource_id'] ?? null) !== $application || ($binding['environment'] ?? null) !== $environment
+                    || ! in_array($binding['site_id'] ?? null, $sites, true)
+                    || (isset($result['digest']) && $binding['digest'] !== $result['digest'])) {
+                    throw new PlanningFailure(403, 'scope_mismatch');
+                }
+                if ($method === 'GET' && (array_intersect_key($result['content']['scope'], array_flip(['tenant_id', 'resource_id', 'environment', 'site_id']))
+                    != array_intersect_key($binding, array_flip(['tenant_id', 'resource_id', 'environment', 'site_id'])))) {
+                    throw new PlanningFailure(403, 'scope_mismatch');
+                }
             }
 
             return $result;

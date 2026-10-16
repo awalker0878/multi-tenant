@@ -403,23 +403,33 @@ class AssuranceCoverageTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'measured bytes differ'):
                 security(output.parent, [], self.root)
 
-    def consumer_measurement(self):
+    def consumer_measurement(self, planning=False):
         output, report = self.journey_measurement()
         api = json.loads((self.root/self.api).read_text())
         operation = api['paths'].pop(self.op)['get']
         operation['parameters'] = [
             {'name': name, 'in': 'path', 'required': True, 'schema': {'type': 'string'}}
             for name in ('tenant', 'job')]
-        api['paths']['/v1/tenants/{tenant}/jobs/{job}'] = {'get': operation}
+        path = ('/v1/tenants/{tenant}/applications/{application}/environments/{environment}/plans/{record}'
+                if planning else '/v1/tenants/{tenant}/jobs/{job}')
+        if planning:
+            operation['parameters'] = [
+                {'name': name, 'in': 'path', 'required': True, 'schema': {'type': 'string'}}
+                for name in ('tenant', 'application', 'environment', 'record')]
+        api['paths'][path] = {'get': operation}
         self.write(self.api, api)
-        installed = 'apps/console/resources/contracts/lifecycle-v1.json'
+        installed = ('apps/console/resources/contracts/planning-v1.2.json' if planning
+                     else 'apps/console/resources/contracts/lifecycle-v1.json')
         copy = self.root/installed
         copy.parent.mkdir(parents=True)
         copy.write_bytes((self.root/self.api).read_bytes())
         registry = json.loads((self.root/'architecture/contract-consumers.json').read_text())
-        registry['active_releases'][0].update(owner='lifecycle', consumers=['console'], copies=[installed])
+        registry['active_releases'][0].update(owner='planning' if planning else 'lifecycle', consumers=['console'], copies=[installed])
         self.write('architecture/contract-consumers.json', registry)
-        sources = ['scripts/p06/verify_console_consumers.php', 'apps/console/app/Infrastructure/Jobs/JobsClient.php']
+        sources = (['scripts/p05/verify_console_consumers.php', 'apps/console/app/Infrastructure/Planning/PlanningClient.php']
+                   if planning else ['scripts/p06/verify_console_consumers.php', 'apps/console/app/Infrastructure/Jobs/JobsClient.php'])
+        if planning:
+            sources += ['scripts/p05/live_campaign.py', 'scripts/p04/live_fixture.py']
         for source in sources:
             file = self.root/source
             file.parent.mkdir(parents=True, exist_ok=True)
@@ -428,14 +438,17 @@ class AssuranceCoverageTests(unittest.TestCase):
         op = inventory(self.root)['operations'][0]
         row = {'key': op['key'], 'claim': 'consumer', 'source': 'live-consumer', 'result': 'PASS',
                'consumer_id': 'console', 'release_sha256': op['release_sha256'],
-               'test': sources[0]+':JobsClient', 'consumer_loader': sources[1],
+               'test': sources[0]+(':PlanningClient' if planning else ':JobsClient'), 'consumer_loader': sources[1],
                'loader_sha256': report['source_sha256'][sources[1]],
                'installed_copy': installed, 'installed_sha256': op['release_sha256'],
                'response_sha256': 'c'*64, 'positive_status_code': 200,
-               'rejected_response_substitutions': ['id', 'tenant_id', 'uncontracted', 'status_code'],
+               'rejected_response_substitutions': (['id', 'tenant_id', 'application_id', 'environment',
+                   'binding.plan_id', 'binding.tenant_id', 'binding.resource_id', 'binding.environment', 'binding.site_id',
+                   'content.scope.tenant_id', 'content.scope.resource_id', 'content.scope.environment', 'content.scope.site_id',
+                   'uncontracted', 'status_code'] if planning else ['id', 'tenant_id', 'uncontracted', 'status_code']),
                'revision': os.environ['GITHUB_SHA'], 'run_id': os.environ['GITHUB_RUN_ID'],
                'run_attempt': os.environ['GITHUB_RUN_ATTEMPT']}
-        output = output.parent/'consumer-conformance.json'
+        output = output.parent/('planning-consumer-conformance.json' if planning else 'consumer-conformance.json')
         output.write_text(json.dumps([row]))
         report['artifact_sha256'][output.name] = hashlib.sha256(output.read_bytes()).hexdigest()
         (output.parent/'report.json').write_text(json.dumps(report))
@@ -477,6 +490,25 @@ class AssuranceCoverageTests(unittest.TestCase):
             (self.root/original['installed_copy']).write_text('{}')
             with self.assertRaisesRegex(ValueError, 'installed release differs'):
                 consumers(output.parent, [], self.root)
+
+    def test_planning_consumer_requires_current_loader_copy_status_and_all_scope_controls(self):
+        from journey_assurance import consumers
+        with patch.dict(os.environ, {'GITHUB_RUN_ID':'123','GITHUB_RUN_ATTEMPT':'2','GITHUB_SHA':'a'*40}):
+            output, report, original = self.consumer_measurement(planning=True)
+            rows = consumers(output.parent, [], self.root)
+            self.assertEqual([row['consumer_id'] for row in rows], ['console'])
+            self.assertEqual(assess(self.root, rows, require_provenance=True)['summary']['qualified_http_operations'], 0)
+            cases = [('positive_status_code', 201), ('consumer_id', 'unexecuted'),
+                     ('consumer_loader', 'another/loader.php'), ('installed_sha256', 'f'*64),
+                     ('loader_sha256', 'f'*64), ('test', 'unexecuted'), ('run_attempt', '1')]
+            cases += [('rejected_response_substitutions', [item for item in original['rejected_response_substitutions'] if item != missing])
+                      for missing in original['rejected_response_substitutions']]
+            for field, value in cases:
+                output.write_text(json.dumps([{**original, field: value}]))
+                report['artifact_sha256'][output.name] = hashlib.sha256(output.read_bytes()).hexdigest()
+                (output.parent/'report.json').write_text(json.dumps(report))
+                with self.subTest(field=field, value=value), self.assertRaises(ValueError):
+                    consumers(output.parent, [], self.root)
 
 
 

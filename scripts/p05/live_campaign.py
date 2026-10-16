@@ -168,7 +168,9 @@ def campaign(c, extension=None):
     check('two-authorized-destinations-explain-positive-and-blocked',[r['status'] for r in assessment['results']]==['eligible','blocked'])
     planning('assessments',dict(create,method='native_api_export_import'),key=key,expected=409)
     req={'action':'application.provision','method':'native_api','lane':'operational','executor_ids':[fixture['operator_id']],'valid_until':int(time.time())+900}
-    first=planning('plans',{'assessment_id':assessment['id'],'candidate':0,'request':req},expected=201)
+    first_key=str(uuid.uuid4())
+    plan_body={'assessment_id':assessment['id'],'candidate':0,'request':req}
+    first=planning('plans',plan_body,key=first_key,expected=201)
     saved=planning('plans/'+first['id'],sites=[a['site_id']])
     check('immutable-plan-is-current-without-native-authority',saved['validity']['current'] and saved['content']['native_write_authorized'] is False)
     second=planning('plans',{'assessment_id':assessment['id'],'candidate':0,'request':req},expected=201)
@@ -197,6 +199,34 @@ def campaign(c, extension=None):
     check('required-browser-no-skips-retries-or-failures',browser['config']['projects'][0]['name']==c['engine'] and browser['stats']['expected']==1 and all(browser['stats'][k]==0 for k in ['unexpected','flaky','skipped']))
     check('uncertain-browser-retry-created-one-plan',int(sql("SELECT count(*) FROM app.planning_records WHERE kind='plan';",'planning'))==before_plans+1)
     check('post-commit-response-loss-was-injected',sum(getattr(p,'injected',0) for p in c['proxies'])==1)
+    # Challenge the actual installed Console consumer after browser response-loss
+    # controls finish, before asynchronous hints invalidate the published plans.
+    planning('plans/'+first['id']+'/validity',{},sites=[a['site_id']])
+    planning('plans/'+first['id']+'/diff',{'other_plan_id':second['id']},sites=[a['site_id']])
+    prefix='/v1/tenants/{tenant}/applications/{application}/environments/{environment}/'
+    read_faults=['id','tenant_id','application_id','environment']
+    binding_faults=['binding.plan_id','binding.tenant_id','binding.resource_id','binding.environment','binding.site_id']
+    calls=[]
+    for method,tail,template,body,idem,sites,faults,status in [
+        ('POST','assessments','assessments',create,key,[a['site_id'],b['site_id']],['kind'],201),
+        ('GET','assessments/'+assessment['id'],'assessments/{record}',[],None,[a['site_id'],b['site_id']],read_faults,200),
+        ('POST','plans','plans',plan_body,first_key,[a['site_id'],b['site_id']],['kind',*binding_faults,'binding.digest'],201),
+        ('GET','plans/'+first['id'],'plans/{record}',[],None,[a['site_id']],
+         [*read_faults,*binding_faults,*['content.scope.'+field for field in ['tenant_id','resource_id','environment','site_id']]],200),
+        ('POST','plans/'+first['id']+'/validity','plans/{record}/validity',{},str(uuid.uuid4()),[a['site_id']],[],200),
+        ('POST','plans/'+first['id']+'/diff','plans/{record}/diff',{'other_plan_id':second['id']},str(uuid.uuid4()),[a['site_id']],[],200),
+    ]:
+        calls.append({'method':method,'tail':tail,'path':prefix+template,'body':body,'key':idem,
+                      'sites':sites,'faults':[*faults,'uncontracted','status_code'],'status':status})
+    consumer_input=private/'planning-console-consumer.json'
+    consumer_input.write_text(json.dumps({'session':fixture['author_token'],'tenant':tenant,'application':application,
+        'environment':environment,'base':base,'fault_file':str(c['fault_file']),'calls':calls}))
+    consumer_input.chmod(0o600)
+    before_faults=sum(getattr(p,'injected',0) for p in c['proxies'])
+    run(['php','scripts/p05/verify_console_consumers.php',str(consumer_input),str(out/'planning-consumer-conformance.json')],
+        env=envs['console'],label='p05-real-console-contract-consumers')
+    check('p05-six-console-consumers-reject-response-substitutions',not c['fault_file'].exists()
+          and sum(getattr(p,'injected',0) for p in c['proxies'])-before_faults==sum(len(call['faults']) for call in calls))
     broker=PlanningBroker(root,private,run,private_values);c['proxies'].append(broker)
     envs['planning'].update(broker.environment);envs['inventory'].update(broker.environment)
     publisher=[str(root/'services/planning/.venv/bin/planning-facts'),'publish','--limit','100']

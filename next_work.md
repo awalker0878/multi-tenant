@@ -1,3 +1,27 @@
+## Planning consumer remediation — 2026-10-16
+
+Resumed from `cd61437b`; hosted run
+[38824590501](https://github.com/awalker0878/multi-tenant/actions/runs/38824590501)
+passed all implementation, SQL/browser and nine built-binding jobs. Its strict
+assurance gate remains FAIL: 388/1,073 claims, 21/271 consumer boundaries,
+3/166 HTTP operations, 5/75 canonical releases; 201 boundaries lack evidence.
+
+The Console Planning client now resolves the exact method/path and successful
+response schema/status from its installed active release. Plan and assessment
+reads bind record, tenant, application and environment; plan bindings also bind
+plan identity, site, digest and nested content scope. Creation receipts bind
+kind and returned plan scope. Thirteen foreign-record/scope regressions and a
+migration success-status regression are added. No canonical is changed.
+
+The P05 live witness exercises the shipped client on all six core Planning
+operations, over actual Governance delegation and verified TLS to Planning.
+Thirty-seven response substitutions must be rejected. Evidence admission checks
+the exact loader, installed release, witness, campaign/proxy sources, current
+run/attempt and full operation-specific negative controls. Hosted acceptance of
+this correction is still required; no receipt is earned by implementation alone.
+Deployment-owned Planning enrollment, native E3/E4 and other missing internal
+consumer/security/event evidence remain open. Keep PR #64 draft.
+
 ## Exact Console success-status enforcement — 2026-10-15
 
 The next correction also binds simulation success status to the requested

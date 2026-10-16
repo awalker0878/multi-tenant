@@ -123,7 +123,7 @@ def security(folder: Path, existing: list[dict], root: Path = ROOT) -> list[dict
 
 
 def consumers(folder: Path, existing: list[dict], root: Path = ROOT) -> list[dict]:
-    """Qualify only the actual Console loader and its exercised request controls."""
+    """Qualify only actual Console loaders and their exercised request controls."""
     from assurance import assess
     operations = {row['key']: row for row in inventory(root)['operations']}
     releases = {row['path']: row for row in json.loads(
@@ -133,17 +133,38 @@ def consumers(folder: Path, existing: list[dict], root: Path = ROOT) -> list[dic
                 'run_attempt': os.environ.get('GITHUB_RUN_ATTEMPT')}
     if not all(expected.values()):
         raise ValueError('Current journey CI provenance is required')
-    witness = 'scripts/p06/verify_console_consumers.php'
-    loader = 'apps/console/app/Infrastructure/Jobs/JobsClient.php'
-    hashes = {path: hashlib.sha256((root/path).read_bytes()).hexdigest() for path in (witness, loader)}
-    controls = {
-        ('POST', '/v1/tenants/{tenant}/jobs'): ['plan_id', 'plan_digest', 'approval_id', 'status_code'],
-        ('GET', '/v1/tenants/{tenant}/jobs/{job}'): ['id', 'tenant_id', 'uncontracted', 'status_code'],
-        ('POST', '/v1/tenants/{tenant}/jobs/{job}/commands'): ['job_id', 'command_id', 'action', 'status_code'],
+    prefix = '/v1/tenants/{tenant}/applications/{application}/environments/{environment}/'
+    read_faults = ['id', 'tenant_id', 'application_id', 'environment']
+    binding_faults = ['binding.plan_id', 'binding.tenant_id', 'binding.resource_id',
+                      'binding.environment', 'binding.site_id']
+    specifications = {
+        'consumer-conformance.json': ('lifecycle', 'scripts/p06/verify_console_consumers.php',
+            'apps/console/app/Infrastructure/Jobs/JobsClient.php', 'JobsClient', {
+                ('POST', '/v1/tenants/{tenant}/jobs'): ['plan_id', 'plan_digest', 'approval_id', 'status_code'],
+                ('GET', '/v1/tenants/{tenant}/jobs/{job}'): ['id', 'tenant_id', 'uncontracted', 'status_code'],
+                ('POST', '/v1/tenants/{tenant}/jobs/{job}/commands'): ['job_id', 'command_id', 'action', 'status_code'],
+            }),
+        'planning-consumer-conformance.json': ('planning', 'scripts/p05/verify_console_consumers.php',
+            'apps/console/app/Infrastructure/Planning/PlanningClient.php', 'PlanningClient', {
+                ('POST', prefix+'assessments'): ['kind', 'uncontracted', 'status_code'],
+                ('GET', prefix+'assessments/{record}'): [*read_faults, 'uncontracted', 'status_code'],
+                ('POST', prefix+'plans'): ['kind', *binding_faults, 'binding.digest', 'uncontracted', 'status_code'],
+                ('GET', prefix+'plans/{record}'): [*read_faults, *binding_faults,
+                    *['content.scope.'+field for field in ['tenant_id', 'resource_id', 'environment', 'site_id']],
+                    'uncontracted', 'status_code'],
+                ('POST', prefix+'plans/{record}/validity'): ['uncontracted', 'status_code'],
+                ('POST', prefix+'plans/{record}/diff'): ['uncontracted', 'status_code'],
+            }),
     }
     proved = {(row['key'], row.get('consumer_id')) for row in existing if row.get('claim') == 'consumer'}
     evidence = []
-    for file in sorted(folder.rglob('consumer-conformance.json')):
+    files = sorted(file for filename in specifications for file in folder.rglob(filename))
+    for file in files:
+        owner, witness, loader, client, controls = specifications[file.name]
+        sources = [witness, loader]
+        if owner == 'planning':
+            sources += ['scripts/p05/live_campaign.py', 'scripts/p04/live_fixture.py']
+        hashes = {path: hashlib.sha256((root/path).read_bytes()).hexdigest() for path in sources}
         report = json.loads((file.parent/'report.json').read_text())
         if (report.get('source_revision') != expected['revision']
                 or any(report.get(key) != expected[key] for key in ('run_id', 'run_attempt'))):
@@ -159,8 +180,8 @@ def consumers(folder: Path, existing: list[dict], root: Path = ROOT) -> list[dic
         for row in rows:
             operation = operations.get(row.get('key'))
             status, digest = row.get('positive_status_code'), row.get('response_sha256')
-            if (operation is None or operation['owner'] != 'lifecycle'
-                    or row.get('test') != witness+':JobsClient' or row.get('consumer_id') != 'console'
+            if (operation is None or operation['owner'] != owner
+                    or row.get('test') != witness+':'+client or row.get('consumer_id') != 'console'
                     or row.get('claim') != 'consumer' or row.get('consumer_loader') != loader
                     or row.get('loader_sha256') != hashes[loader]
                     or any(row.get(key) != value for key, value in expected.items())

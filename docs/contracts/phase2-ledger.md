@@ -739,3 +739,30 @@ On `b8a29397`, all implementation jobs, all P02–P06 browser/SQL campaigns
 and all nine built image/wheel bindings pass. The status correction passes
 **237 contract tests** locally, plus syntax/Pint, inventory and documentation
 checks. Its new live status controls still require current-source CI.
+
+
+### Planning operation and response binding — 2026-10-16
+
+Resumed at `cd61437b`. Independently retrieved run 38824590501 passes every
+implementation, database/browser campaign and all nine image/wheel bindings.
+Only strict Contract assurance and its Required dependent are red. Measured
+coverage remains 388/1,073 claims, 21/271 consumers, 3/166 HTTP operations,
+5/75 releases and 201 missing boundaries. Those gaps remain unfinished work.
+
+Independent consumer inspection found the same broad success-status issue in
+Planning, plus missing binding of otherwise schema-valid foreign record/scope
+responses. The client now selects the exact installed operation and its declared
+response status/schema instead of guessing a schema from response status. It
+rejects unmatched methods/paths, wrong receipt kinds, foreign record or scope,
+and plan binding/content mismatches. Active canonical bytes are unchanged.
+Thirteen focused foreign-record/scope controls and a migration status control
+include valid positive cases. P05 adds a shipped-client, real owner/Governance
+TLS witness for six operations with 37 response substitutions. Ingestion requires
+current source/run/attempt/artifact, exact loader/copy and every negative control.
+Broader qualification remains incomplete, and hosted final-source acceptance is
+required. External Planning enrollment and real native E3/E4 are not inferred.
+
+Local verification: all **238 contract tests pass**. Canonical generation and
+integrity, all 166 runtime route bindings, source-bound inventory, PHP syntax
+and Pint pass. Supported PHP/Laravel execution and the new live controls require
+hosted CI; local syntax and Python admission regressions are not those proofs.
