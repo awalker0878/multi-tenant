@@ -5,6 +5,7 @@ No Planning consumer evidence is earned by these owner-only assertions.
 
 from test_discovery import Campaign
 from test_readiness_http import Authority, request
+
 from inventory.infrastructure.migration_collection_evidence import read_collection_coverages
 from inventory.interfaces.discovery import InventoryApp
 
