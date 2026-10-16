@@ -1880,7 +1880,7 @@
           "kind": "installed-loader",
           "marker": "apps/console/resources/contracts/catalogue-v1.0.1.json",
           "source": "apps/console/app/Infrastructure/Catalogue/CatalogueClient.php",
-          "source_sha256": "24320e4e1ba455f2885b3357dd67187055ec08bc3e472c8d0df1f5c09fefa407"
+          "source_sha256": "1e350a5fcc2c4da5218a2d8b13bb9b728cd1983817d91c44c039eac2b9393655"
         },
         {
           "component": "console",
@@ -1894,7 +1894,7 @@
           "kind": "runtime-source-reference",
           "marker": "catalogue-v1.0.1.json",
           "source": "apps/console/app/Infrastructure/Catalogue/CatalogueClient.php",
-          "source_sha256": "24320e4e1ba455f2885b3357dd67187055ec08bc3e472c8d0df1f5c09fefa407"
+          "source_sha256": "1e350a5fcc2c4da5218a2d8b13bb9b728cd1983817d91c44c039eac2b9393655"
         },
         {
           "component": "console",
@@ -2439,7 +2439,7 @@
           "kind": "wire-source",
           "marker": "/actor-delegations",
           "source": "apps/console/app/Infrastructure/Catalogue/CatalogueClient.php",
-          "source_sha256": "24320e4e1ba455f2885b3357dd67187055ec08bc3e472c8d0df1f5c09fefa407"
+          "source_sha256": "1e350a5fcc2c4da5218a2d8b13bb9b728cd1983817d91c44c039eac2b9393655"
         },
         {
           "component": "console",
@@ -2453,7 +2453,7 @@
           "kind": "wire-source",
           "marker": "/actor-delegations",
           "source": "apps/console/app/Infrastructure/Inventory/InventoryClient.php",
-          "source_sha256": "9e3af8a059d45cfce3f7e6393e4abf28b87ed47123c744c4c2e0458d841f2e9e"
+          "source_sha256": "71cd3474200f0ecd38aa42eff29f58fb19f09cb187909a52363f52a50e9aed90"
         },
         {
           "component": "console",
@@ -3148,21 +3148,21 @@
           "kind": "wire-source",
           "marker": "/authorization-decisions",
           "source": "apps/console/app/Infrastructure/Catalogue/CatalogueClient.php",
-          "source_sha256": "24320e4e1ba455f2885b3357dd67187055ec08bc3e472c8d0df1f5c09fefa407"
+          "source_sha256": "1e350a5fcc2c4da5218a2d8b13bb9b728cd1983817d91c44c039eac2b9393655"
         },
         {
           "component": "console",
           "kind": "wire-source",
           "marker": "/authorization-decisions",
           "source": "apps/console/app/Infrastructure/Inventory/InventoryClient.php",
-          "source_sha256": "9e3af8a059d45cfce3f7e6393e4abf28b87ed47123c744c4c2e0458d841f2e9e"
+          "source_sha256": "71cd3474200f0ecd38aa42eff29f58fb19f09cb187909a52363f52a50e9aed90"
         },
         {
           "component": "console",
           "kind": "wire-source",
           "marker": "/v1/tenants",
           "source": "apps/console/app/Infrastructure/Catalogue/CatalogueClient.php",
-          "source_sha256": "24320e4e1ba455f2885b3357dd67187055ec08bc3e472c8d0df1f5c09fefa407"
+          "source_sha256": "1e350a5fcc2c4da5218a2d8b13bb9b728cd1983817d91c44c039eac2b9393655"
         },
         {
           "component": "console",
@@ -3176,7 +3176,7 @@
           "kind": "wire-source",
           "marker": "/v1/tenants",
           "source": "apps/console/app/Infrastructure/Inventory/InventoryClient.php",
-          "source_sha256": "9e3af8a059d45cfce3f7e6393e4abf28b87ed47123c744c4c2e0458d841f2e9e"
+          "source_sha256": "71cd3474200f0ecd38aa42eff29f58fb19f09cb187909a52363f52a50e9aed90"
         },
         {
           "component": "console",
@@ -3634,7 +3634,7 @@
           "kind": "installed-loader",
           "marker": "apps/console/resources/contracts/inventory-v1.9.json",
           "source": "apps/console/app/Infrastructure/Inventory/InventoryClient.php",
-          "source_sha256": "9e3af8a059d45cfce3f7e6393e4abf28b87ed47123c744c4c2e0458d841f2e9e"
+          "source_sha256": "71cd3474200f0ecd38aa42eff29f58fb19f09cb187909a52363f52a50e9aed90"
         },
         {
           "component": "console",
@@ -3648,7 +3648,7 @@
           "kind": "runtime-source-reference",
           "marker": "inventory-v1.9.json",
           "source": "apps/console/app/Infrastructure/Inventory/InventoryClient.php",
-          "source_sha256": "9e3af8a059d45cfce3f7e6393e4abf28b87ed47123c744c4c2e0458d841f2e9e"
+          "source_sha256": "71cd3474200f0ecd38aa42eff29f58fb19f09cb187909a52363f52a50e9aed90"
         },
         {
           "component": "console",

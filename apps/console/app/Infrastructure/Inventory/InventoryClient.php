@@ -91,6 +91,10 @@ final class InventoryClient implements InventoryGateway
         }
     }
 
+    /**
+     * @param  array<string, mixed>  $parameters
+     * @param  array<string, mixed>  $wire
+     */
     private function assertResponseBinding(string $operation, string $tenant, array $parameters, array $wire): void
     {
         $bindings = match ($operation) {

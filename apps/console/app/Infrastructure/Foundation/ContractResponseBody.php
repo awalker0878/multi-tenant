@@ -14,12 +14,15 @@ final class ContractResponseBody
     {
         $raw = '';
         try {
-            while (! $stream->eof() && strlen($raw) <= $limit) {
+            while (strlen($raw) <= $limit) {
                 $chunk = $stream->read(min(65536, $limit + 1 - strlen($raw)));
-                if ($chunk === '' && ! $stream->eof()) {
+                $raw .= $chunk;
+                if ($stream->eof()) {
+                    break;
+                }
+                if ($chunk === '') {
                     throw new UnexpectedValueException('contract_response_stalled');
                 }
-                $raw .= $chunk;
             }
             if (strlen($raw) > $limit) {
                 throw new LengthException('contract_response_too_large');

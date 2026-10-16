@@ -8,6 +8,7 @@ use InvalidArgumentException;
 
 final class ContractPath
 {
+    /** @param array<array-key, mixed> $parameters */
     public static function bind(string $template, string $tenant, array $parameters): string
     {
         preg_match_all('/\{([^}]+)\}/', $template, $matches);

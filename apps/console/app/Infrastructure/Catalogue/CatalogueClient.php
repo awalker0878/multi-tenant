@@ -103,6 +103,11 @@ final class CatalogueClient implements CatalogueGateway
         }
     }
 
+    /**
+     * @param  array<string, mixed>  $parameters
+     * @param  array<string, mixed>  $wire
+     * @param  array<string, mixed>  $body
+     */
     private function assertResponseBinding(string $operation, array $parameters, array $wire, array $body, ?string $environment): void
     {
         $bindings = match ($operation) {
