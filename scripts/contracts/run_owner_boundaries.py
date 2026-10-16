@@ -70,19 +70,49 @@ def run(root: Path, output: Path, service: str) -> int:
         "services": {},
     }
     selected = list(CONFIG) if service == "all" else [service]
+    ci = os.getenv("GITHUB_ACTIONS") == "true"
+    runner_temp = os.getenv("RUNNER_TEMP")
+    stage_root = Path(runner_temp) / "quality/staged" if ci and runner_temp else root
+    report_file = Path(runner_temp) / "quality/evidence/report.json" if ci and runner_temp else None
     for owner in selected:
         entry = CONFIG[owner]
-        cwd = root / entry["directory"]
+        cwd = stage_root / entry["directory"]
         source = cwd / entry["source"]
+        checkout_source = root / entry["directory"] / entry["source"]
         receipt = output.parent / (owner + "-owner-junit.xml")
         receipt.unlink(missing_ok=True)
         state = {"status": "BLOCKED"}
-        missing = [str(p) for p in (root / ".git", source) if not p.exists()]
+        missing = [str(p) for p in (root / ".git", source, checkout_source) if not p.exists()]
+        if ci and not runner_temp:
+            missing.append("RUNNER_TEMP")
+        if ci and report_file and not report_file.is_file():
+            missing.append(str(report_file))
         if owner == "governance" and not (cwd / "vendor/bin/pest").is_file():
-            missing.append("vendor/bin/pest")
+            missing.append(str(cwd / "vendor/bin/pest"))
+        if owner == "inventory" and not (cwd / ".venv/bin/pytest").is_file():
+            missing.append(str(cwd / ".venv/bin/pytest"))
         if missing:
             state["missing"] = missing
-        else:
+        elif ci:
+            try:
+                quality = json.loads(report_file.read_text())  # type: ignore[union-attr]
+                relative = str(checkout_source.relative_to(root))
+                recorded = quality["source_sha256"][relative]
+                staged_hash = hashlib.sha256(source.read_bytes()).hexdigest()
+                checkout_hash = hashlib.sha256(checkout_source.read_bytes()).hexdigest()
+                identity = all((
+                    quality.get("component") == owner,
+                    quality.get("result") == "PASS",
+                    quality.get("run_id") == os.getenv("GITHUB_RUN_ID"),
+                    quality.get("run_attempt") == os.getenv("GITHUB_RUN_ATTEMPT"),
+                    quality.get("source_sha") == os.getenv("GITHUB_SHA"),
+                    recorded == staged_hash == checkout_hash,
+                ))
+                if not identity:
+                    state["reason"] = "Isolated quality source/commit/run evidence mismatch"
+            except (OSError, ValueError, KeyError, TypeError) as error:
+                state["reason"] = "Invalid isolated quality manifest: " + type(error).__name__
+        if not missing and not state.get("reason"):
             command = [arg.replace("{receipt}", str(receipt)) for arg in entry["command"]]
             try:
                 proc = subprocess.run(command, cwd=cwd, capture_output=True, text=True, timeout=600)
