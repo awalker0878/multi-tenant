@@ -9,18 +9,26 @@ assurance gate remains FAIL: 388/1,073 claims, 21/271 consumer boundaries,
 The Console Planning client now resolves the exact method/path and successful
 response schema/status from its installed active release. Plan and assessment
 reads bind record, tenant, application and environment; plan bindings also bind
-plan identity, site, digest and nested content scope. Creation receipts bind
+plan identity, site and nested content scope. Creation receipts bind
 kind and returned plan scope. Thirteen foreign-record/scope regressions and a
 migration success-status regression are added. No canonical is changed.
 
 The P05 live witness exercises the shipped client on all six core Planning
 operations, over actual Governance delegation and verified TLS to Planning.
-Thirty-seven response substitutions must be rejected. Evidence admission checks
+Thirty-six response substitutions must be rejected. Evidence admission checks
 the exact loader, installed release, witness, campaign/proxy sources, current
 run/attempt and full operation-specific negative controls. Hosted acceptance of
 this correction is still required; no receipt is earned by implementation alone.
 Deployment-owned Planning enrollment, native E3/E4 and other missing internal
 consumer/security/event evidence remain open. Keep PR #64 draft.
+
+The first follow-up CI passes Console quality but exposes an overstrict new
+comparison between the stored-record digest and approval digest. Those are
+different identities; the equality check is removed and two positive receipt
+regressions preserve their meaning. The corrected witness has 36 substitutions.
+A further live probe covers wrong-scope and cross-tenant requests for each of
+the six operations, with valid positive controls and unchanged snapshots across
+every Planning-owned relation. Its 12 security claims still require hosted CI.
 
 ## Exact Console success-status enforcement — 2026-10-15
 

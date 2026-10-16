@@ -348,20 +348,28 @@ class AssuranceCoverageTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'Stale journey'):
                 producers(output.parent, [], self.root)
 
-    def security_measurement(self):
+    def security_measurement(self, planning=False):
         output, report = self.journey_measurement()
-        source = 'scripts/p06/live_execution.py'
+        source = 'scripts/p05/planning_security.py' if planning else 'scripts/p06/live_execution.py'
+        if planning:
+            registry = json.loads((self.root/'architecture/contract-consumers.json').read_text())
+            registry['active_releases'][0]['owner'] = 'planning'
+            self.write('architecture/contract-consumers.json', registry)
         file = self.root/source
         file.parent.mkdir(parents=True)
         file.write_bytes((ROOT/source).read_bytes())
         row = self.evidence('tenant_isolation')
-        row.update(test='scripts/p06/live_execution.py:security_probes',
+        row.update(test=source+':security_probes',
                    authority_checked='current-effective-authority',
                    positive_status_code=200, request_valid=True, response_valid=True,
                    state_before_sha256='b'*64, state_after_sha256='b'*64,
                    revision=os.environ['GITHUB_SHA'], run_id=os.environ['GITHUB_RUN_ID'],
                    run_attempt=os.environ['GITHUB_RUN_ATTEMPT'])
-        output = output.parent/'security-conformance.json'
+        if planning:
+            campaign = 'scripts/p05/live_campaign.py'
+            (self.root/campaign).write_bytes((ROOT/campaign).read_bytes())
+            report['source_sha256'][campaign] = hashlib.sha256((self.root/campaign).read_bytes()).hexdigest()
+        output = output.parent/('planning-security-conformance.json' if planning else 'security-conformance.json')
         output.write_text(json.dumps([row]))
         report['source_sha256'][source] = hashlib.sha256(file.read_bytes()).hexdigest()
         report['artifact_sha256'][output.name] = hashlib.sha256(output.read_bytes()).hexdigest()
@@ -401,6 +409,26 @@ class AssuranceCoverageTests(unittest.TestCase):
                     security(output.parent, [], self.root)
             output.write_text(json.dumps([original]))
             with self.assertRaisesRegex(ValueError, 'measured bytes differ'):
+                security(output.parent, [], self.root)
+
+    def test_planning_security_requires_live_witness_current_source_and_unchanged_state(self):
+        from journey_assurance import security
+        with patch.dict(os.environ, {'GITHUB_RUN_ID':'123','GITHUB_RUN_ATTEMPT':'2','GITHUB_SHA':'a'*40}):
+            output, report, original = self.security_measurement(planning=True)
+            self.assertEqual([row['claim'] for row in security(output.parent, [], self.root)], ['tenant_isolation'])
+            for field, value in [('state_after_sha256', 'c'*64), ('unauthorized_disclosure', True),
+                                 ('authenticated', False), ('positive_status_code', 403),
+                                 ('test', 'scripts/p06/live_execution.py:security_probes'), ('run_attempt', '1')]:
+                output.write_text(json.dumps([{**original, field: value}]))
+                report['artifact_sha256'][output.name] = hashlib.sha256(output.read_bytes()).hexdigest()
+                (output.parent/'report.json').write_text(json.dumps(report))
+                with self.subTest(field=field), self.assertRaises(ValueError):
+                    security(output.parent, [], self.root)
+            output.write_text(json.dumps([original]))
+            report['artifact_sha256'][output.name] = hashlib.sha256(output.read_bytes()).hexdigest()
+            report['source_sha256']['scripts/p05/live_campaign.py'] = 'f'*64
+            (output.parent/'report.json').write_text(json.dumps(report))
+            with self.assertRaisesRegex(ValueError, 'source or measured bytes differ'):
                 security(output.parent, [], self.root)
 
     def consumer_measurement(self, planning=False):

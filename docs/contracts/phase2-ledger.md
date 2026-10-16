@@ -757,7 +757,7 @@ rejects unmatched methods/paths, wrong receipt kinds, foreign record or scope,
 and plan binding/content mismatches. Active canonical bytes are unchanged.
 Thirteen focused foreign-record/scope controls and a migration status control
 include valid positive cases. P05 adds a shipped-client, real owner/Governance
-TLS witness for six operations with 37 response substitutions. Ingestion requires
+TLS witness for six operations with 36 response substitutions. Ingestion requires
 current source/run/attempt/artifact, exact loader/copy and every negative control.
 Broader qualification remains incomplete, and hosted final-source acceptance is
 required. External Planning enrollment and real native E3/E4 are not inferred.
@@ -766,3 +766,21 @@ Local verification: all **238 contract tests pass**. Canonical generation and
 integrity, all 166 runtime route bindings, source-bound inventory, PHP syntax
 and Pint pass. Supported PHP/Laravel execution and the new live controls require
 hosted CI; local syntax and Python admission regressions are not those proofs.
+
+The first follow-up run (38876491185, head `4ec776ae`) passes Console quality
+but its P05 browser correctly exposes an overstrict new receipt comparison:
+the stored-record digest and approval-binding digest have distinct meanings.
+Remove that comparison; preserve plan identity/site/scope binding and add two
+positive core/migration receipt controls with intentionally different digests.
+The corrected live witness requires 36 substitutions. Wrong-scope and cross-tenant
+controls now cover all six Planning operations with positive same-request controls,
+valid wire observations, no protected identifiers in errors and identical snapshots
+of every Planning-owned table before/after each denial. Twelve new claims require
+actual hosted execution; none is awarded from a static declaration.
+
+Corrected-source local verification: **239 contract tests pass**; the 26
+assurance admission regressions, canonical integrity, quality policy, PHP syntax,
+Pint and documentation checks pass. The live controls run before the browser
+revokes the author, while the original browser replay/revocation test remains
+unchanged. Its response-loss count is measured independently of the 36 intentional
+consumer substitutions. Final hosted execution is required.

@@ -67,3 +67,24 @@ it('requires the exact installed migration operation status', function (): void 
         unlink($secret);
     }
 });
+
+it('keeps the stored record digest separate from the approval binding digest', function (string $tail): void {
+    $fixture = json_decode(file_get_contents(base_path('../../contracts/fixtures/planning/synthetic-plan-v1.1.json')), true, 512, JSON_THROW_ON_ERROR);
+    $binding = $fixture['binding'];
+    $value = ['id' => $binding['plan_id'], 'kind' => 'plan', 'digest' => str_repeat('a', 64), 'binding' => $binding, 'native_write_authorized' => false];
+    $gov = tempnam(sys_get_temp_dir(), 'plan-receipt-gov-');
+    $secret = tempnam(sys_get_temp_dir(), 'plan-receipt-secret-');
+    file_put_contents($gov, str_repeat('b', 64));
+    file_put_contents($secret, str_repeat('c', 64));
+    config(['identity.governance_url' => 'https://governance.example.test', 'identity.credential_file' => $gov,
+        'planning.url' => 'https://planning.example.test', 'planning.credential_file' => $secret, 'planning.ca_file' => $secret]);
+    Http::preventStrayRequests();
+    Http::fake(['governance.example.test/*' => Http::response(['delegation_token' => str_repeat('d', 64), 'audience' => 'planning', 'authority_use' => 'request_bound'], 201),
+        'planning.example.test/*' => Http::response($value, 201)]);
+    try {
+        expect(app(PlanningClient::class)->call(str_repeat('a', 64), $binding['tenant_id'], $binding['resource_id'], $binding['environment'], 'POST', $tail, [$binding['site_id']], [], $binding['plan_id']))->toBe($value);
+    } finally {
+        unlink($gov);
+        unlink($secret);
+    }
+})->with(['plans', 'migration-plans']);

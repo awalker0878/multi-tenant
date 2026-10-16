@@ -118,8 +118,7 @@ final class PlanningClient implements PlanningGateway
                 $binding = $result['binding'] ?? [];
                 if (($binding['plan_id'] ?? null) !== $result['id'] || ($binding['tenant_id'] ?? null) !== $tenant
                     || ($binding['resource_id'] ?? null) !== $application || ($binding['environment'] ?? null) !== $environment
-                    || ! in_array($binding['site_id'] ?? null, $sites, true)
-                    || (isset($result['digest']) && $binding['digest'] !== $result['digest'])) {
+                    || ! in_array($binding['site_id'] ?? null, $sites, true)) {
                     throw new PlanningFailure(403, 'scope_mismatch');
                 }
                 if ($method === 'GET' && (array_intersect_key($result['content']['scope'], array_flip(['tenant_id', 'resource_id', 'environment', 'site_id']))

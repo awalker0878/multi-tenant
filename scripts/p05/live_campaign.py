@@ -190,17 +190,8 @@ def campaign(c, extension=None):
     held=planning('plans/'+first['id'],sites=[a['site_id']])
     check('current-qualification-revocation-holds-without-changing-plan',not held['validity']['current'] and held['content']==saved['content'])
     qualification_file.write_text(json.dumps(original_qual))
-    # Browser runs before queued historical hints conservatively invalidate existing plans.
-    fixture.update(ca_file=str(c['certificate']),application=application,environment=environment,revision=revision,assessment=assessment['id'],sites=[a['site_id'],b['site_id']],site=a['site_id'],qualification_file=str(qualification_file),fault_file=str(c['fault_file']),planning_api_base=base,console_workload=credentials['console-governance'][0],governance_url='https://127.0.0.1:8442')
-    c['fixture_file'].write_text(json.dumps(fixture))
-    before_plans=int(sql("SELECT count(*) FROM app.planning_records WHERE kind='plan';",'planning'))
-    run(['npx','playwright','test','--config=tests/browser-p05/playwright.config.ts'],cwd=root/'apps/console',env=os.environ|{'P05_BROWSER_FIXTURE':str(c['fixture_file']),'CONSOLE_BASE_URL':'http://127.0.0.1:8031'},label='p05-browser')
-    browser_path=root/'apps/console/test-results/p05-browser.json';browser=json.loads(browser_path.read_text());(out/'browser.json').write_text(c['redact'](browser_path.read_text()));c['report']['browser_stats']=browser['stats']
-    check('required-browser-no-skips-retries-or-failures',browser['config']['projects'][0]['name']==c['engine'] and browser['stats']['expected']==1 and all(browser['stats'][k]==0 for k in ['unexpected','flaky','skipped']))
-    check('uncertain-browser-retry-created-one-plan',int(sql("SELECT count(*) FROM app.planning_records WHERE kind='plan';",'planning'))==before_plans+1)
-    check('post-commit-response-loss-was-injected',sum(getattr(p,'injected',0) for p in c['proxies'])==1)
-    # Challenge the actual installed Console consumer after browser response-loss
-    # controls finish, before asynchronous hints invalidate the published plans.
+    # Challenge the shipped consumer and live denials while the author is
+    # currently authorized. The browser later revokes this same membership.
     planning('plans/'+first['id']+'/validity',{},sites=[a['site_id']])
     planning('plans/'+first['id']+'/diff',{'other_plan_id':second['id']},sites=[a['site_id']])
     prefix='/v1/tenants/{tenant}/applications/{application}/environments/{environment}/'
@@ -210,7 +201,7 @@ def campaign(c, extension=None):
     for method,tail,template,body,idem,sites,faults,status in [
         ('POST','assessments','assessments',create,key,[a['site_id'],b['site_id']],['kind'],201),
         ('GET','assessments/'+assessment['id'],'assessments/{record}',[],None,[a['site_id'],b['site_id']],read_faults,200),
-        ('POST','plans','plans',plan_body,first_key,[a['site_id'],b['site_id']],['kind',*binding_faults,'binding.digest'],201),
+        ('POST','plans','plans',plan_body,first_key,[a['site_id'],b['site_id']],['kind',*binding_faults],201),
         ('GET','plans/'+first['id'],'plans/{record}',[],None,[a['site_id']],
          [*read_faults,*binding_faults,*['content.scope.'+field for field in ['tenant_id','resource_id','environment','site_id']]],200),
         ('POST','plans/'+first['id']+'/validity','plans/{record}/validity',{},str(uuid.uuid4()),[a['site_id']],[],200),
@@ -227,6 +218,18 @@ def campaign(c, extension=None):
         env=envs['console'],label='p05-real-console-contract-consumers')
     check('p05-six-console-consumers-reject-response-substitutions',not c['fault_file'].exists()
           and sum(getattr(p,'injected',0) for p in c['proxies'])-before_faults==sum(len(call['faults']) for call in calls))
+    from planning_security import security_probes
+    security_probes(c,calls,base,application,environment,[assessment['id'],first['id'],second['id'],binding['digest']])
+    faults_before_browser=sum(getattr(p,'injected',0) for p in c['proxies'])
+    # Browser runs before queued historical hints conservatively invalidate existing plans.
+    fixture.update(ca_file=str(c['certificate']),application=application,environment=environment,revision=revision,assessment=assessment['id'],sites=[a['site_id'],b['site_id']],site=a['site_id'],qualification_file=str(qualification_file),fault_file=str(c['fault_file']),planning_api_base=base,console_workload=credentials['console-governance'][0],governance_url='https://127.0.0.1:8442')
+    c['fixture_file'].write_text(json.dumps(fixture))
+    before_plans=int(sql("SELECT count(*) FROM app.planning_records WHERE kind='plan';",'planning'))
+    run(['npx','playwright','test','--config=tests/browser-p05/playwright.config.ts'],cwd=root/'apps/console',env=os.environ|{'P05_BROWSER_FIXTURE':str(c['fixture_file']),'CONSOLE_BASE_URL':'http://127.0.0.1:8031'},label='p05-browser')
+    browser_path=root/'apps/console/test-results/p05-browser.json';browser=json.loads(browser_path.read_text());(out/'browser.json').write_text(c['redact'](browser_path.read_text()));c['report']['browser_stats']=browser['stats']
+    check('required-browser-no-skips-retries-or-failures',browser['config']['projects'][0]['name']==c['engine'] and browser['stats']['expected']==1 and all(browser['stats'][k]==0 for k in ['unexpected','flaky','skipped']))
+    check('uncertain-browser-retry-created-one-plan',int(sql("SELECT count(*) FROM app.planning_records WHERE kind='plan';",'planning'))==before_plans+1)
+    check('post-commit-response-loss-was-injected',sum(getattr(p,'injected',0) for p in c['proxies'])==faults_before_browser+1)
     broker=PlanningBroker(root,private,run,private_values);c['proxies'].append(broker)
     envs['planning'].update(broker.environment);envs['inventory'].update(broker.environment)
     publisher=[str(root/'services/planning/.venv/bin/planning-facts'),'publish','--limit','100']

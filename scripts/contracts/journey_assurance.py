@@ -81,10 +81,18 @@ def security(folder: Path, existing: list[dict], root: Path = ROOT) -> list[dict
                 'run_attempt': os.environ.get('GITHUB_RUN_ATTEMPT')}
     if not all(expected.values()):
         raise ValueError('Current journey CI provenance is required')
-    sources = ('scripts/p06/live_execution.py', 'scripts/contracts/route_conformance.py')
-    hashes = {source: hashlib.sha256((root/source).read_bytes()).hexdigest() for source in sources}
+    specifications = {
+        'security-conformance.json': ('scripts/p06/live_execution.py', None),
+        'planning-security-conformance.json': ('scripts/p05/planning_security.py', 'planning'),
+    }
     evidence = []
-    for file in sorted(folder.rglob('security-conformance.json')):
+    files = sorted(file for filename in specifications for file in folder.rglob(filename))
+    for file in files:
+        witness, owner = specifications[file.name]
+        sources = [witness, 'scripts/contracts/route_conformance.py']
+        if owner == 'planning':
+            sources.append('scripts/p05/live_campaign.py')
+        hashes = {source: hashlib.sha256((root/source).read_bytes()).hexdigest() for source in sources}
         report = json.loads((file.parent/'report.json').read_text())
         if (report.get('source_revision') != expected['revision']
                 or any(report.get(key) != expected[key] for key in ('run_id', 'run_attempt'))):
@@ -104,7 +112,8 @@ def security(folder: Path, existing: list[dict], root: Path = ROOT) -> list[dict
             before, after = row.get('state_before_sha256'), row.get('state_after_sha256')
             if (operation is None or row.get('claim') not in {'authorization', 'tenant_isolation'}
                     or any(row.get(key) != value for key, value in expected.items())
-                    or row.get('test') != 'scripts/p06/live_execution.py:security_probes'
+                    or row.get('test') != witness+':security_probes'
+                    or (owner is not None and operation['owner'] != owner)
                     or row.get('authority_checked') != 'current-effective-authority'
                     or type(positive) is not int or not 200 <= positive < 300
                     or str(positive) not in operation['response_statuses']
@@ -148,7 +157,7 @@ def consumers(folder: Path, existing: list[dict], root: Path = ROOT) -> list[dic
             'apps/console/app/Infrastructure/Planning/PlanningClient.php', 'PlanningClient', {
                 ('POST', prefix+'assessments'): ['kind', 'uncontracted', 'status_code'],
                 ('GET', prefix+'assessments/{record}'): [*read_faults, 'uncontracted', 'status_code'],
-                ('POST', prefix+'plans'): ['kind', *binding_faults, 'binding.digest', 'uncontracted', 'status_code'],
+                ('POST', prefix+'plans'): ['kind', *binding_faults, 'uncontracted', 'status_code'],
                 ('GET', prefix+'plans/{record}'): [*read_faults, *binding_faults,
                     *['content.scope.'+field for field in ['tenant_id', 'resource_id', 'environment', 'site_id']],
                     'uncontracted', 'status_code'],
