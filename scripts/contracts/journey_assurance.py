@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import hashlib
-import json
+from contract_io import read
 import os
 import re
 from pathlib import Path
@@ -22,7 +22,7 @@ def producers(folder: Path, existing: list[dict], root: Path = ROOT) -> list[dic
     validator = "scripts/contracts/route_conformance.py"
     validator_hash = hashlib.sha256((root / validator).read_bytes()).hexdigest()
     for wire in sorted(folder.rglob("http-conformance.json")):
-        report = json.loads((wire.parent / "report.json").read_text())
+        report = read(wire.parent / "report.json")
         if any(report.get(name) != expected[name] for name in ("run_id", "run_attempt")) or (
             report.get("source_revision") != expected["revision"]
         ):
@@ -35,7 +35,7 @@ def producers(folder: Path, existing: list[dict], root: Path = ROOT) -> list[dic
                 or report.get("artifact_sha256", {}).get(wire.name)
                 != hashlib.sha256(wire.read_bytes()).hexdigest()):
             raise ValueError("Journey validator or measured wire bytes differ")
-        rows = json.loads(wire.read_text())
+        rows = read(wire)
         if not isinstance(rows, list):
             raise ValueError("Malformed journey measurements")
         for row in rows:
@@ -73,8 +73,9 @@ def producers(folder: Path, existing: list[dict], root: Path = ROOT) -> list[dic
 
 def security(folder: Path, existing: list[dict], root: Path = ROOT) -> list[dict]:
     """Admit measured authenticated denials only with positive and durable controls."""
-    from assurance import assess
-    operations = {row['key']: row for row in inventory(root)['operations']}
+    from assurance import EvidenceValidator
+    validator = EvidenceValidator(root, require_provenance=True)
+    operations = validator.operations
     proved = {(row['key'], row['claim']) for row in existing}
     expected = {'revision': os.environ.get('GITHUB_SHA'),
                 'run_id': os.environ.get('GITHUB_RUN_ID'),
@@ -93,7 +94,7 @@ def security(folder: Path, existing: list[dict], root: Path = ROOT) -> list[dict
         if owner == 'planning':
             sources.append('scripts/p05/live_campaign.py')
         hashes = {source: hashlib.sha256((root/source).read_bytes()).hexdigest() for source in sources}
-        report = json.loads((file.parent/'report.json').read_text())
+        report = read(file.parent/'report.json')
         if (report.get('source_revision') != expected['revision']
                 or any(report.get(key) != expected[key] for key in ('run_id', 'run_attempt'))):
             raise ValueError('Stale journey security provenance')
@@ -103,7 +104,7 @@ def security(folder: Path, existing: list[dict], root: Path = ROOT) -> list[dict
                 or report.get('artifact_sha256', {}).get(file.name)
                 != hashlib.sha256(file.read_bytes()).hexdigest()):
             raise ValueError('Journey security source or measured bytes differ')
-        rows = json.loads(file.read_text())
+        rows = read(file)
         if not isinstance(rows, list):
             raise ValueError('Malformed journey security measurements')
         for row in rows:
@@ -123,7 +124,7 @@ def security(folder: Path, existing: list[dict], root: Path = ROOT) -> list[dict
                 raise ValueError('Journey security lacks valid positive and unchanged-state controls')
             # Reuse the independent claim admission checks for tenant separation,
             # effective authority, exact release, disclosure and mutation verdicts.
-            assess(root, [row], require_provenance=True)
+            validator.validate(row)
             identity = (row['key'], row['claim'])
             if identity not in proved:
                 evidence.append(row)
@@ -133,10 +134,10 @@ def security(folder: Path, existing: list[dict], root: Path = ROOT) -> list[dict
 
 def consumers(folder: Path, existing: list[dict], root: Path = ROOT) -> list[dict]:
     """Qualify only actual Console loaders and their exercised request controls."""
-    from assurance import assess
-    operations = {row['key']: row for row in inventory(root)['operations']}
-    releases = {row['path']: row for row in json.loads(
-        (root/'architecture/contract-consumers.json').read_text())['active_releases']}
+    from assurance import EvidenceValidator
+    validator = EvidenceValidator(root, require_provenance=True)
+    operations = validator.operations
+    releases = {row['path']: row for row in read(root/'architecture/contract-consumers.json')['active_releases']}
     expected = {'revision': os.environ.get('GITHUB_SHA'),
                 'run_id': os.environ.get('GITHUB_RUN_ID'),
                 'run_attempt': os.environ.get('GITHUB_RUN_ATTEMPT')}
@@ -174,7 +175,7 @@ def consumers(folder: Path, existing: list[dict], root: Path = ROOT) -> list[dic
         if owner == 'planning':
             sources += ['scripts/p05/live_campaign.py', 'scripts/p04/live_fixture.py']
         hashes = {path: hashlib.sha256((root/path).read_bytes()).hexdigest() for path in sources}
-        report = json.loads((file.parent/'report.json').read_text())
+        report = read(file.parent/'report.json')
         if (report.get('source_revision') != expected['revision']
                 or any(report.get(key) != expected[key] for key in ('run_id', 'run_attempt'))):
             raise ValueError('Stale journey consumer provenance')
@@ -183,7 +184,7 @@ def consumers(folder: Path, existing: list[dict], root: Path = ROOT) -> list[dic
         if (any(report.get('source_sha256', {}).get(source) != digest for source, digest in hashes.items())
                 or report.get('artifact_sha256', {}).get(file.name) != hashlib.sha256(file.read_bytes()).hexdigest()):
             raise ValueError('Journey consumer source or measured bytes differ')
-        rows = json.loads(file.read_text())
+        rows = read(file)
         if not isinstance(rows, list):
             raise ValueError('Malformed journey consumer measurements')
         for row in rows:
@@ -205,7 +206,7 @@ def consumers(folder: Path, existing: list[dict], root: Path = ROOT) -> list[dic
                     or row.get('installed_sha256') != operation['release_sha256']
                     or hashlib.sha256((root/copy).read_bytes()).hexdigest() != operation['release_sha256']):
                 raise ValueError('Journey consumer installed release differs')
-            assess(root, [row], require_provenance=True)
+            validator.validate(row)
             identity = (row['key'], row['consumer_id'])
             if identity not in proved:
                 evidence.append(row)

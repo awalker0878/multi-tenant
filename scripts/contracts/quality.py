@@ -6,6 +6,8 @@ migration shims, or silent waivers.
 """
 from __future__ import annotations
 
+from contract_io import read as load
+
 import argparse
 import json
 import re
@@ -22,10 +24,6 @@ NAME = re.compile(r"^(.*)-v([0-9]+(?:\.[0-9]+)*)\.(json|ya?ml)$")
 HTTP = {"get", "post", "put", "patch", "delete"}
 MUTATIONS = {"post", "put", "patch", "delete"}
 
-
-def load(path: Path):
-    raw = path.read_text(encoding="utf-8")
-    return yaml.safe_load(raw) if path.suffix in (".yaml", ".yml") else json.loads(raw)
 
 
 def version(path: str) -> tuple[str, tuple[int, int, int]]:

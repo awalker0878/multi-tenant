@@ -102,7 +102,7 @@ class ContractIntegrityTests(unittest.TestCase):
             "/internal/tenants/{tenant}/planning-inputs/{application}/{environment}/{site}/{endpoint}/{generation}",
             load("contracts/openapi/inventory-native-input-v1.3.json")["paths"],
         )
-        self.assertNotIn("scripts/contracts/uuid-legacy-v1.json", registry["contracts"])
+        self.assertNotIn("scripts/contracts/uuid-legacy-v1.json", {row["path"] for row in registry["active_releases"]})
 
     def test_sources_assemble_to_current_published_bundles(self):
         sources, bundles = verify()
@@ -196,6 +196,13 @@ class ContractIntegrityTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "Schema identity required"):
                     check_schema_dialects()
 
+    def test_registry_rejects_a_second_editable_ownership_index(self):
+        registry = load("architecture/contract-consumers.json")
+        registry["contracts"] = {}
+        with patch("check_registry.load", return_value=registry):
+            with self.assertRaisesRegex(ValueError, "registry format"):
+                check_consumer_registry()
+
     def test_declared_active_contract_omission_is_detected(self):
         registry = load("architecture/contract-consumers.json")
         registry["active_releases"].pop()
@@ -203,7 +210,7 @@ class ContractIntegrityTests(unittest.TestCase):
         with patch("check_registry.load", side_effect=lambda name:
                    registry if name == "architecture/contract-consumers.json"
                    else original(name)):
-            with self.assertRaisesRegex(ValueError, "does not cover every declared"):
+            with self.assertRaisesRegex(ValueError, "Canonical contracts outside active releases|Dependency not registered|Event payload schema missing"):
                 check_consumer_registry()
 
     def test_asyncapi_operation_without_a_declared_channel_is_rejected(self):
@@ -246,10 +253,9 @@ components:
         with self.assertRaisesRegex(ValueError, "Invalid"):
             local_refs({"field":{"$ref":"#/definitions/missing"}}, "negative")
 
-    def test_asyncapi_cannot_disappear_from_both_registries(self):
+    def test_deployed_asyncapi_cannot_disappear_from_catalogue(self):
         registry = load("architecture/contract-consumers.json")
         missing = "contracts/asyncapi/identity.yaml"
-        registry["contracts"].pop(missing)
         registry["active_releases"] = [
             entry for entry in registry["active_releases"] if entry["path"] != missing
         ]
@@ -265,7 +271,6 @@ components:
         check_implemented_api_contracts()
         registry = load("architecture/contract-consumers.json")
         path = "contracts/openapi/planning-lifecycle-reads-v1.json"
-        registry["contracts"].pop(path)
         registry["active_releases"] = [
             row for row in registry["active_releases"] if row["path"] != path
         ]
@@ -280,11 +285,10 @@ components:
         from check_http import check_implemented_api_contracts
         check_implemented_api_contracts()
 
-    def test_implemented_api_cannot_be_removed_from_both_registry_maps(self):
+    def test_implemented_api_cannot_be_removed_from_catalogue(self):
         from check_http import check_implemented_api_contracts
         registry = load("architecture/contract-consumers.json")
         missing = "contracts/openapi/assurance-evidence-v1.json"
-        registry["contracts"].pop(missing)
         registry["active_releases"] = [
             row for row in registry["active_releases"] if row["path"] != missing
         ]
@@ -323,11 +327,10 @@ components:
         from check_registry import check_owner_operation_bindings
         check_owner_operation_bindings()
 
-    def test_removing_dynamic_owner_contract_from_both_maps_fails(self):
+    def test_removing_dynamic_owner_contract_fails(self):
         from check_registry import check_owner_operation_bindings
         registry = load("architecture/contract-consumers.json")
         source = "contracts/schemas/planning/catalogue-current-v2.json"
-        registry["contracts"].pop(source)
         registry["active_releases"] = [
             entry for entry in registry["active_releases"] if entry["path"] != source
         ]
@@ -357,11 +360,10 @@ components:
             observed,
         )
 
-    def test_runtime_copies_cannot_disappear_from_both_registries(self):
+    def test_runtime_copies_cannot_disappear_from_catalogue(self):
         from runtime_inventory import verify_runtime_inventory
         registry = load("architecture/contract-consumers.json")
         source = "contracts/schemas/events/identity-change-v1.json"
-        registry["contracts"].pop(source)
         registry["active_releases"] = [
             entry for entry in registry["active_releases"] if entry["path"] != source
         ]

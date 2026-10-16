@@ -90,6 +90,42 @@ class AssuranceCoverageTests(unittest.TestCase):
             } if claim == "tenant_isolation" else {}),
         }
 
+    def test_inventory_is_reused_only_within_one_assessment(self):
+        rows = [self.evidence(claim) for claim in ["route", "producer", "consumer"]]
+        with patch("assurance.inventory", wraps=inventory) as derive:
+            assess(self.root, rows)
+            self.assertEqual(derive.call_count, 1)
+            document = json.loads((self.root / self.api).read_text())
+            document["info"]["description"] = "Changed current release"
+            self.write(self.api, document)
+            with self.assertRaisesRegex(ValueError, "Stale"):
+                assess(self.root, rows)
+            self.assertEqual(derive.call_count, 2)
+
+    def test_malformed_evidence_and_fractional_statuses_are_rejected(self):
+        for row in [None, [], {"key": []}, {"claim": []},
+                    {**self.evidence("route"), "source": []},
+                    {**self.evidence("authorization"), "status_code": 403.0}]:
+            with self.subTest(row=row), self.assertRaises(ValueError):
+                assess(self.root, [row])
+
+    def test_journey_admission_derives_inventory_once_per_invocation(self):
+        from journey_assurance import security
+        with patch.dict(os.environ, {'GITHUB_RUN_ID':'123','GITHUB_RUN_ATTEMPT':'2','GITHUB_SHA':'a'*40}):
+            output, _, _ = self.security_measurement()
+            with patch("assurance.inventory", wraps=inventory) as derive:
+                proofs = security(output.parent, [], self.root)
+                self.assertEqual(len(proofs), 1)
+                self.assertEqual(derive.call_count, 1)
+
+    def test_consumer_admission_derives_inventory_once_per_invocation(self):
+        from journey_assurance import consumers
+        with patch.dict(os.environ, {'GITHUB_RUN_ID':'123','GITHUB_RUN_ATTEMPT':'2','GITHUB_SHA':'a'*40}):
+            output, _, _ = self.consumer_measurement()
+            with patch("assurance.inventory", wraps=inventory) as derive:
+                self.assertEqual(len(consumers(output.parent, [], self.root)), 1)
+                self.assertEqual(derive.call_count, 1)
+
     def test_contracts_and_operations_are_independently_derived(self):
         output = inventory(self.root)
         self.assertEqual(len(output["releases"]), 2)

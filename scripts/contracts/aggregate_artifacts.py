@@ -6,6 +6,8 @@ live contract-assurance job. Never upgrade declared bindings into live proof.
 """
 from __future__ import annotations
 
+from contract_io import read
+
 import argparse
 import json
 import os
@@ -26,7 +28,7 @@ def bind_all_releases(documents: dict[tuple[str, str], dict], root: Path = ROOT)
     """
     import hashlib
 
-    registry = json.loads((root / "architecture/contract-consumers.json").read_text())
+    registry = read(root / "architecture/contract-consumers.json")
     owners = {owner: component for component, (owner, _) in COMPONENTS.items()}
     if len(owners) != len(COMPONENTS):
         raise ValueError("Ambiguous owner-to-runtime image mapping")
@@ -112,7 +114,7 @@ def aggregate(folder: Path, root: Path = ROOT, revision: str | None = None) -> d
         raise ValueError("All runtime bindings need an exact source revision")
     documents: dict[tuple[str, str], dict] = {}
     for file in sorted(folder.rglob("*.json")):
-        value = json.loads(file.read_text(encoding="utf-8"))
+        value = read(file)
         if not isinstance(value, dict):
             raise ValueError("Malformed built contract attestation: " + str(file))
         key = (value.get("component"), value.get("kind"))
@@ -176,7 +178,7 @@ def aggregate(folder: Path, root: Path = ROOT, revision: str | None = None) -> d
             continue
         # Foundation health/error conventions are shared declarations, not one
         # deployed service. Bind each declared consumer artifact explicitly.
-        registry = json.loads((root / "architecture/contract-consumers.json").read_text())
+        registry = read(root / "architecture/contract-consumers.json")
         release = next(x for x in registry["active_releases"] if x["path"] == op["release"])
         hosts = []
         for consumer in release["consumers"]:

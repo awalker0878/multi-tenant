@@ -1,9 +1,8 @@
 """Active canonical releases, live owner bindings, and installed consumers."""
 from __future__ import annotations
-import json
 import re
 from pathlib import Path
-import yaml
+from contract_io import read
 from jsonschema import Draft202012Validator, FormatChecker
 from check_schema import load
 from runtime_inventory import verify_runtime_inventory
@@ -13,18 +12,16 @@ ROOT = Path(__file__).resolve().parents[2]
 
 def check_consumer_registry():
     registry = load("architecture/contract-consumers.json")
-    inventory = registry["contracts"]
+    if set(registry) != {"schema_version", "scope", "active_releases"} or registry["schema_version"] != 2:
+        raise ValueError("Invalid active release registry format")
     releases = registry.get("active_releases")
     if not isinstance(releases, list) or not releases:
         raise ValueError("Missing machine-readable active contract release catalogue")
     names = [entry["path"] for entry in releases]
     if len(names) != len(set(names)):
         raise ValueError("Duplicate active canonical contract release")
-    if set(names) != set(inventory):
-        raise ValueError("Active contract registry does not cover every declared consumer")
-    active = set(names)
-    # Registry ownership is authoritative only when all independent indexes
-    # agree. A second editable list must not silently contradict the release.
+    # One editable ownership catalogue; independent source and installed-copy
+    # discovery below prevents a removed record from hiding a live boundary.
     for entry in releases:
         path = entry["path"]
         owner = entry["owner"]
@@ -33,13 +30,9 @@ def check_consumer_registry():
             raise ValueError(f"Duplicate or invalid release consumers: {path}")
         if owner in consumers:
             raise ValueError(f"Owner listed as its own external consumer: {path}")
-        if len(inventory[path]) != len(set(inventory[path])):
-            raise ValueError(f"Duplicate owner/consumer index entries: {path}")
         copies = entry.get("copies", [])
         if not isinstance(copies, list) or len(copies) != len(set(copies)):
             raise ValueError(f"Duplicate or invalid installed copies: {path}")
-        if set(inventory[path]) != {owner, *consumers}:
-            raise ValueError(f"Release ownership and consumer index disagree: {path}")
         dependencies = entry.get("depends_on", [])
         if not isinstance(dependencies, list) or len(dependencies) != len(set(dependencies)):
             raise ValueError(f"Duplicate or invalid release dependencies: {path}")
@@ -78,12 +71,12 @@ def check_consumer_registry():
                     native_operations[native_key] = entry["path"]
     # The deployed broker definitions are all implemented products, not optional
     # self-declared inventory entries. Their schema dependencies must be active.
-    # This detects removal of an event spec from both editable registry maps.
+    # This detects removal of an event spec from the release catalogue.
     for event_api in sorted((ROOT / "contracts/asyncapi").glob("*.yaml")):
         api_path = str(event_api.relative_to(ROOT))
         if api_path not in names:
             raise ValueError(f"Deployed AsyncAPI missing from active releases: {api_path}")
-        doc = yaml.safe_load(event_api.read_text(encoding="utf-8"))
+        doc = read(event_api)
         for message in doc.get("components", {}).get("messages", {}).values():
             reference = message["payload"]["schema"]["$ref"]
             schema_path = str((event_api.parent / reference).resolve().relative_to(ROOT.resolve()))
@@ -101,8 +94,6 @@ def check_consumer_registry():
                 or owner not in known_contexts
                 or set(consumers) - known_contexts):
             raise ValueError(f"Invalid active release ownership or consumers: {path}")
-        if not {owner, *consumers}.issubset(set(inventory.get(path, []))):
-            raise ValueError(f"Undeclared active release consumer: {path}")
         for dependency in entry.get("depends_on", []):
             if not (ROOT / dependency).is_file():
                 raise ValueError(f"Unresolved active contract dependency: {dependency}")

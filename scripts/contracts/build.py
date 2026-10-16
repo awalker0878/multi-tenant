@@ -9,6 +9,8 @@ import argparse
 import json
 from pathlib import Path
 
+from contract_io import read
+
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / "contracts" / "source"
 
@@ -46,9 +48,6 @@ def safe_destination(relative: str, *, canonical: bool) -> Path:
         raise ValueError(f"Escaping contract destination: {relative}")
     return resolved
 
-
-def read(path: Path):
-    return json.loads(path.read_text(encoding="utf-8"))
 
 def assemble(manifest_path: Path):
     manifest = read(manifest_path)

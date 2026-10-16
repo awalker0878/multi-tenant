@@ -1,7 +1,9 @@
 # Active contract ownership
 
 The deployed source of truth is [the active contract catalogue](../../contracts/README.md)
-and `architecture/contract-consumers.json`. Only active canonical OpenAPI, AsyncAPI,
+and `architecture/contract-consumers.json`. The version 2 registry has one
+ownership catalogue, `active_releases`; independent canonical, route, dependency
+and installed-loader discovery checks its completeness. Only active canonical OpenAPI, AsyncAPI,
 JSON Schema, capability and platform releases exist in the working tree.
 
 ## Runtime boundaries
@@ -70,3 +72,6 @@ Current capability labels and their active serialized method identifiers remain
 distinct. Their existing mapping does not accept retired contract versions or
 alternate obsolete identifiers; it is required by the current support/readiness
 boundary.
+
+The [current feature audit](feature-audit.md) identifies implemented corrections,
+capability coverage, and the remaining qualification work.

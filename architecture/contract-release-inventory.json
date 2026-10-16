@@ -54,7 +54,7 @@
           "kind": "validation-or-generation",
           "marker": "catalogue-intent.yaml",
           "source": "scripts/contracts/check_events.py",
-          "source_sha256": "2a72d95a903a98caf0449601b9288cd3ce7d360f9a85c9414fae0397b9e03412"
+          "source_sha256": "a69dd75e6463a646af1e8fcae2b22226dd394f0294ebfbb07e790489fe6f3ca6"
         }
       ]
     },
@@ -460,7 +460,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/asyncapi/identity.yaml",
           "source": "tests/contracts/test_integrity.py",
-          "source_sha256": "91890a071a2c068df0f4cde526f03b3b14856c75ca1205848bae2d0b9fc84292"
+          "source_sha256": "b7c371838fbf209a6e7966cd97581f5c8571327c2d57bc3f87809c0e1738860b"
         }
       ]
     },
@@ -660,7 +660,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/capabilities/definitions-v1.json",
           "source": "scripts/contracts/assurance.py",
-          "source_sha256": "02b85a919e86df9e167f69f586387311aa909ebc829fc26aabfc8c49c7814e07"
+          "source_sha256": "0a4851ee05fbc075ce8e2aa410e2e229e895c6d0a999a9fac39ed3744a467681"
         },
         {
           "kind": "validation-or-generation",
@@ -998,7 +998,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/capabilities/migration-collection-manifest-v1.json",
           "source": "scripts/contracts/assurance.py",
-          "source_sha256": "02b85a919e86df9e167f69f586387311aa909ebc829fc26aabfc8c49c7814e07"
+          "source_sha256": "0a4851ee05fbc075ce8e2aa410e2e229e895c6d0a999a9fac39ed3744a467681"
         },
         {
           "kind": "validation-or-generation",
@@ -1022,7 +1022,7 @@
           "kind": "validation-or-generation",
           "marker": "migration-collection-manifest-v1.json",
           "source": "scripts/contracts/check_schema.py",
-          "source_sha256": "dd82624119ac666bda0a9b7e9bcfb7df0e4661771344d5f822e6547af4a8c96b"
+          "source_sha256": "9f33c0d2a5a1ac8d0b919fc942822a7aa167c43bef5ac4ca01c6d440ec18cbf1"
         }
       ]
     },
@@ -1216,7 +1216,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/capabilities/migration-feature-policy-v1.json",
           "source": "scripts/contracts/assurance.py",
-          "source_sha256": "02b85a919e86df9e167f69f586387311aa909ebc829fc26aabfc8c49c7814e07"
+          "source_sha256": "0a4851ee05fbc075ce8e2aa410e2e229e895c6d0a999a9fac39ed3744a467681"
         },
         {
           "kind": "validation-or-generation",
@@ -1234,7 +1234,7 @@
           "kind": "validation-or-generation",
           "marker": "migration-feature-policy-v1.json",
           "source": "scripts/contracts/check_schema.py",
-          "source_sha256": "dd82624119ac666bda0a9b7e9bcfb7df0e4661771344d5f822e6547af4a8c96b"
+          "source_sha256": "9f33c0d2a5a1ac8d0b919fc942822a7aa167c43bef5ac4ca01c6d440ec18cbf1"
         }
       ]
     },
@@ -1418,7 +1418,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/capabilities/migration-field-crosswalk-v1.json",
           "source": "scripts/contracts/assurance.py",
-          "source_sha256": "02b85a919e86df9e167f69f586387311aa909ebc829fc26aabfc8c49c7814e07"
+          "source_sha256": "0a4851ee05fbc075ce8e2aa410e2e229e895c6d0a999a9fac39ed3744a467681"
         },
         {
           "kind": "validation-or-generation",
@@ -1436,7 +1436,7 @@
           "kind": "validation-or-generation",
           "marker": "migration-field-crosswalk-v1.json",
           "source": "scripts/contracts/check_schema.py",
-          "source_sha256": "dd82624119ac666bda0a9b7e9bcfb7df0e4661771344d5f822e6547af4a8c96b"
+          "source_sha256": "9f33c0d2a5a1ac8d0b919fc942822a7aa167c43bef5ac4ca01c6d440ec18cbf1"
         }
       ]
     },
@@ -1469,7 +1469,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/capabilities/native-security-api-registry-v1.json",
           "source": "scripts/contracts/assurance.py",
-          "source_sha256": "02b85a919e86df9e167f69f586387311aa909ebc829fc26aabfc8c49c7814e07"
+          "source_sha256": "0a4851ee05fbc075ce8e2aa410e2e229e895c6d0a999a9fac39ed3744a467681"
         },
         {
           "kind": "validation-or-generation",
@@ -1616,7 +1616,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/openapi/assurance-evidence-v1.json",
           "source": "tests/contracts/test_integrity.py",
-          "source_sha256": "91890a071a2c068df0f4cde526f03b3b14856c75ca1205848bae2d0b9fc84292"
+          "source_sha256": "b7c371838fbf209a6e7966cd97581f5c8571327c2d57bc3f87809c0e1738860b"
         }
       ]
     },
@@ -1726,7 +1726,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/openapi/assurance-qualification-v2.json",
           "source": "tests/contracts/test_integrity.py",
-          "source_sha256": "91890a071a2c068df0f4cde526f03b3b14856c75ca1205848bae2d0b9fc84292"
+          "source_sha256": "b7c371838fbf209a6e7966cd97581f5c8571327c2d57bc3f87809c0e1738860b"
         },
         {
           "kind": "validation-or-generation",
@@ -1830,7 +1830,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/openapi/catalogue-internal-v1.json",
           "source": "tests/contracts/test_integrity.py",
-          "source_sha256": "91890a071a2c068df0f4cde526f03b3b14856c75ca1205848bae2d0b9fc84292"
+          "source_sha256": "b7c371838fbf209a6e7966cd97581f5c8571327c2d57bc3f87809c0e1738860b"
         }
       ]
     },
@@ -1880,7 +1880,7 @@
           "kind": "installed-loader",
           "marker": "apps/console/resources/contracts/catalogue-v1.0.1.json",
           "source": "apps/console/app/Infrastructure/Catalogue/CatalogueClient.php",
-          "source_sha256": "35dec275aa4b2d6a1751572122e94419ec32fd396281170ace1decc64a692eee"
+          "source_sha256": "24320e4e1ba455f2885b3357dd67187055ec08bc3e472c8d0df1f5c09fefa407"
         },
         {
           "component": "console",
@@ -1894,7 +1894,7 @@
           "kind": "runtime-source-reference",
           "marker": "catalogue-v1.0.1.json",
           "source": "apps/console/app/Infrastructure/Catalogue/CatalogueClient.php",
-          "source_sha256": "35dec275aa4b2d6a1751572122e94419ec32fd396281170ace1decc64a692eee"
+          "source_sha256": "24320e4e1ba455f2885b3357dd67187055ec08bc3e472c8d0df1f5c09fefa407"
         },
         {
           "component": "console",
@@ -1962,7 +1962,7 @@
           "kind": "validation-or-generation",
           "marker": "catalogue-v1.0.1.json",
           "source": "tests/contracts/test_integrity.py",
-          "source_sha256": "91890a071a2c068df0f4cde526f03b3b14856c75ca1205848bae2d0b9fc84292"
+          "source_sha256": "b7c371838fbf209a6e7966cd97581f5c8571327c2d57bc3f87809c0e1738860b"
         },
         {
           "kind": "validation-or-generation",
@@ -2439,7 +2439,7 @@
           "kind": "wire-source",
           "marker": "/actor-delegations",
           "source": "apps/console/app/Infrastructure/Catalogue/CatalogueClient.php",
-          "source_sha256": "35dec275aa4b2d6a1751572122e94419ec32fd396281170ace1decc64a692eee"
+          "source_sha256": "24320e4e1ba455f2885b3357dd67187055ec08bc3e472c8d0df1f5c09fefa407"
         },
         {
           "component": "console",
@@ -2453,7 +2453,7 @@
           "kind": "wire-source",
           "marker": "/actor-delegations",
           "source": "apps/console/app/Infrastructure/Inventory/InventoryClient.php",
-          "source_sha256": "23347560fe6c14debef5eb47cea2cff15ba610a765b0dbbc7e26f44b56ac4b1d"
+          "source_sha256": "9e3af8a059d45cfce3f7e6393e4abf28b87ed47123c744c4c2e0458d841f2e9e"
         },
         {
           "component": "console",
@@ -3038,7 +3038,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/openapi/governance-service-checks-v1.json",
           "source": "tests/contracts/test_integrity.py",
-          "source_sha256": "91890a071a2c068df0f4cde526f03b3b14856c75ca1205848bae2d0b9fc84292"
+          "source_sha256": "b7c371838fbf209a6e7966cd97581f5c8571327c2d57bc3f87809c0e1738860b"
         }
       ]
     },
@@ -3148,21 +3148,21 @@
           "kind": "wire-source",
           "marker": "/authorization-decisions",
           "source": "apps/console/app/Infrastructure/Catalogue/CatalogueClient.php",
-          "source_sha256": "35dec275aa4b2d6a1751572122e94419ec32fd396281170ace1decc64a692eee"
+          "source_sha256": "24320e4e1ba455f2885b3357dd67187055ec08bc3e472c8d0df1f5c09fefa407"
         },
         {
           "component": "console",
           "kind": "wire-source",
           "marker": "/authorization-decisions",
           "source": "apps/console/app/Infrastructure/Inventory/InventoryClient.php",
-          "source_sha256": "23347560fe6c14debef5eb47cea2cff15ba610a765b0dbbc7e26f44b56ac4b1d"
+          "source_sha256": "9e3af8a059d45cfce3f7e6393e4abf28b87ed47123c744c4c2e0458d841f2e9e"
         },
         {
           "component": "console",
           "kind": "wire-source",
           "marker": "/v1/tenants",
           "source": "apps/console/app/Infrastructure/Catalogue/CatalogueClient.php",
-          "source_sha256": "35dec275aa4b2d6a1751572122e94419ec32fd396281170ace1decc64a692eee"
+          "source_sha256": "24320e4e1ba455f2885b3357dd67187055ec08bc3e472c8d0df1f5c09fefa407"
         },
         {
           "component": "console",
@@ -3176,7 +3176,7 @@
           "kind": "wire-source",
           "marker": "/v1/tenants",
           "source": "apps/console/app/Infrastructure/Inventory/InventoryClient.php",
-          "source_sha256": "23347560fe6c14debef5eb47cea2cff15ba610a765b0dbbc7e26f44b56ac4b1d"
+          "source_sha256": "9e3af8a059d45cfce3f7e6393e4abf28b87ed47123c744c4c2e0458d841f2e9e"
         },
         {
           "component": "console",
@@ -3431,13 +3431,13 @@
           "kind": "validation-or-generation",
           "marker": "contracts/openapi/inventory-collection-worker-v1.json",
           "source": "scripts/contracts/route_conformance.py",
-          "source_sha256": "92295f17aa2b5e57b761a3e6deebc6eb0872e1774675a9f8a79e8d9de4d182e7"
+          "source_sha256": "09ac52e849b9519f61435072df56b5e04669a00fcd1db8a4439dfb42a020b321"
         },
         {
           "kind": "validation-or-generation",
           "marker": "contracts/openapi/inventory-collection-worker-v1.json",
           "source": "tests/contracts/test_integrity.py",
-          "source_sha256": "91890a071a2c068df0f4cde526f03b3b14856c75ca1205848bae2d0b9fc84292"
+          "source_sha256": "b7c371838fbf209a6e7966cd97581f5c8571327c2d57bc3f87809c0e1738860b"
         }
       ]
     },
@@ -3577,7 +3577,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/openapi/inventory-native-input-v1.3.json",
           "source": "scripts/contracts/route_conformance.py",
-          "source_sha256": "92295f17aa2b5e57b761a3e6deebc6eb0872e1774675a9f8a79e8d9de4d182e7"
+          "source_sha256": "09ac52e849b9519f61435072df56b5e04669a00fcd1db8a4439dfb42a020b321"
         },
         {
           "kind": "validation-or-generation",
@@ -3589,7 +3589,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/openapi/inventory-native-input-v1.3.json",
           "source": "tests/contracts/test_integrity.py",
-          "source_sha256": "91890a071a2c068df0f4cde526f03b3b14856c75ca1205848bae2d0b9fc84292"
+          "source_sha256": "b7c371838fbf209a6e7966cd97581f5c8571327c2d57bc3f87809c0e1738860b"
         },
         {
           "kind": "validation-or-generation",
@@ -3634,7 +3634,7 @@
           "kind": "installed-loader",
           "marker": "apps/console/resources/contracts/inventory-v1.9.json",
           "source": "apps/console/app/Infrastructure/Inventory/InventoryClient.php",
-          "source_sha256": "23347560fe6c14debef5eb47cea2cff15ba610a765b0dbbc7e26f44b56ac4b1d"
+          "source_sha256": "9e3af8a059d45cfce3f7e6393e4abf28b87ed47123c744c4c2e0458d841f2e9e"
         },
         {
           "component": "console",
@@ -3648,7 +3648,7 @@
           "kind": "runtime-source-reference",
           "marker": "inventory-v1.9.json",
           "source": "apps/console/app/Infrastructure/Inventory/InventoryClient.php",
-          "source_sha256": "23347560fe6c14debef5eb47cea2cff15ba610a765b0dbbc7e26f44b56ac4b1d"
+          "source_sha256": "9e3af8a059d45cfce3f7e6393e4abf28b87ed47123c744c4c2e0458d841f2e9e"
         },
         {
           "component": "console",
@@ -4303,7 +4303,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/openapi/inventory-v1.9.json",
           "source": "scripts/contracts/route_conformance.py",
-          "source_sha256": "92295f17aa2b5e57b761a3e6deebc6eb0872e1774675a9f8a79e8d9de4d182e7"
+          "source_sha256": "09ac52e849b9519f61435072df56b5e04669a00fcd1db8a4439dfb42a020b321"
         },
         {
           "kind": "validation-or-generation",
@@ -4345,7 +4345,7 @@
           "kind": "validation-or-generation",
           "marker": "inventory-v1.9.json",
           "source": "tests/contracts/test_integrity.py",
-          "source_sha256": "91890a071a2c068df0f4cde526f03b3b14856c75ca1205848bae2d0b9fc84292"
+          "source_sha256": "b7c371838fbf209a6e7966cd97581f5c8571327c2d57bc3f87809c0e1738860b"
         }
       ]
     },
@@ -4517,7 +4517,7 @@
           "kind": "validation-or-generation",
           "marker": "lifecycle-internal-authority-v1.json",
           "source": "scripts/contracts/route_conformance.py",
-          "source_sha256": "92295f17aa2b5e57b761a3e6deebc6eb0872e1774675a9f8a79e8d9de4d182e7"
+          "source_sha256": "09ac52e849b9519f61435072df56b5e04669a00fcd1db8a4439dfb42a020b321"
         }
       ]
     },
@@ -4608,7 +4608,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/openapi/lifecycle-migration-boundary-v2.json",
           "source": "scripts/contracts/route_conformance.py",
-          "source_sha256": "92295f17aa2b5e57b761a3e6deebc6eb0872e1774675a9f8a79e8d9de4d182e7"
+          "source_sha256": "09ac52e849b9519f61435072df56b5e04669a00fcd1db8a4439dfb42a020b321"
         },
         {
           "kind": "validation-or-generation",
@@ -4741,7 +4741,7 @@
           "kind": "validation-or-generation",
           "marker": "lifecycle-migration-campaigns-v1.json",
           "source": "scripts/contracts/route_conformance.py",
-          "source_sha256": "92295f17aa2b5e57b761a3e6deebc6eb0872e1774675a9f8a79e8d9de4d182e7"
+          "source_sha256": "09ac52e849b9519f61435072df56b5e04669a00fcd1db8a4439dfb42a020b321"
         }
       ]
     },
@@ -4807,7 +4807,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/openapi/lifecycle-native-jobs-v1.1.json",
           "source": "scripts/contracts/route_conformance.py",
-          "source_sha256": "92295f17aa2b5e57b761a3e6deebc6eb0872e1774675a9f8a79e8d9de4d182e7"
+          "source_sha256": "09ac52e849b9519f61435072df56b5e04669a00fcd1db8a4439dfb42a020b321"
         },
         {
           "kind": "validation-or-generation",
@@ -4924,13 +4924,13 @@
           "kind": "validation-or-generation",
           "marker": "lifecycle-v1.json",
           "source": "scripts/contracts/route_conformance.py",
-          "source_sha256": "92295f17aa2b5e57b761a3e6deebc6eb0872e1774675a9f8a79e8d9de4d182e7"
+          "source_sha256": "09ac52e849b9519f61435072df56b5e04669a00fcd1db8a4439dfb42a020b321"
         },
         {
           "kind": "validation-or-generation",
           "marker": "lifecycle-v1.json",
           "source": "tests/contracts/test_assurance.py",
-          "source_sha256": "4638b14b3017b7bad7eca51f6e82bc5d5597ceeaa9d518022a6a93adae757d5a"
+          "source_sha256": "2451a782ae29f98a18a0a08d740b8b1042de2f6a5c6ac4e44d34638994c353dd"
         }
       ]
     },
@@ -5017,7 +5017,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/openapi/planning-immutable-plan-v2.json",
           "source": "scripts/contracts/route_conformance.py",
-          "source_sha256": "92295f17aa2b5e57b761a3e6deebc6eb0872e1774675a9f8a79e8d9de4d182e7"
+          "source_sha256": "09ac52e849b9519f61435072df56b5e04669a00fcd1db8a4439dfb42a020b321"
         },
         {
           "kind": "validation-or-generation",
@@ -5127,7 +5127,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/openapi/planning-lifecycle-reads-v1.json",
           "source": "scripts/contracts/route_conformance.py",
-          "source_sha256": "92295f17aa2b5e57b761a3e6deebc6eb0872e1774675a9f8a79e8d9de4d182e7"
+          "source_sha256": "09ac52e849b9519f61435072df56b5e04669a00fcd1db8a4439dfb42a020b321"
         },
         {
           "kind": "validation-or-generation",
@@ -5139,7 +5139,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/openapi/planning-lifecycle-reads-v1.json",
           "source": "tests/contracts/test_integrity.py",
-          "source_sha256": "91890a071a2c068df0f4cde526f03b3b14856c75ca1205848bae2d0b9fc84292"
+          "source_sha256": "b7c371838fbf209a6e7966cd97581f5c8571327c2d57bc3f87809c0e1738860b"
         },
         {
           "kind": "validation-or-generation",
@@ -5355,19 +5355,19 @@
           "kind": "validation-or-generation",
           "marker": "contracts/openapi/planning-migration-v2.json",
           "source": "scripts/contracts/check_schema.py",
-          "source_sha256": "dd82624119ac666bda0a9b7e9bcfb7df0e4661771344d5f822e6547af4a8c96b"
+          "source_sha256": "9f33c0d2a5a1ac8d0b919fc942822a7aa167c43bef5ac4ca01c6d440ec18cbf1"
         },
         {
           "kind": "validation-or-generation",
           "marker": "contracts/openapi/planning-migration-v2.json",
           "source": "scripts/contracts/discovery.py",
-          "source_sha256": "5f3f5f3e711ba1b9a3761c35549338d6214733ca51c24c164814d729fc8a301f"
+          "source_sha256": "0d4ba9f2d29151dc0865a5f8d9986cd747ab5399986d6b901b6bef89a70f614e"
         },
         {
           "kind": "validation-or-generation",
           "marker": "contracts/openapi/planning-migration-v2.json",
           "source": "scripts/contracts/route_conformance.py",
-          "source_sha256": "92295f17aa2b5e57b761a3e6deebc6eb0872e1774675a9f8a79e8d9de4d182e7"
+          "source_sha256": "09ac52e849b9519f61435072df56b5e04669a00fcd1db8a4439dfb42a020b321"
         },
         {
           "kind": "validation-or-generation",
@@ -5403,7 +5403,7 @@
           "kind": "validation-or-generation",
           "marker": "planning-migration-v2.json",
           "source": "tests/contracts/test_integrity.py",
-          "source_sha256": "91890a071a2c068df0f4cde526f03b3b14856c75ca1205848bae2d0b9fc84292"
+          "source_sha256": "b7c371838fbf209a6e7966cd97581f5c8571327c2d57bc3f87809c0e1738860b"
         }
       ]
     },
@@ -5451,7 +5451,7 @@
           "kind": "validation-or-generation",
           "marker": "planning-native-v1.json",
           "source": "scripts/contracts/route_conformance.py",
-          "source_sha256": "92295f17aa2b5e57b761a3e6deebc6eb0872e1774675a9f8a79e8d9de4d182e7"
+          "source_sha256": "09ac52e849b9519f61435072df56b5e04669a00fcd1db8a4439dfb42a020b321"
         },
         {
           "kind": "validation-or-generation",
@@ -5522,7 +5522,7 @@
           "kind": "validation-or-generation",
           "marker": "planning-qualification-events-v1.json",
           "source": "scripts/contracts/route_conformance.py",
-          "source_sha256": "92295f17aa2b5e57b761a3e6deebc6eb0872e1774675a9f8a79e8d9de4d182e7"
+          "source_sha256": "09ac52e849b9519f61435072df56b5e04669a00fcd1db8a4439dfb42a020b321"
         }
       ]
     },
@@ -5689,7 +5689,7 @@
           "kind": "validation-or-generation",
           "marker": "planning-v1.2.json",
           "source": "scripts/contracts/route_conformance.py",
-          "source_sha256": "92295f17aa2b5e57b761a3e6deebc6eb0872e1774675a9f8a79e8d9de4d182e7"
+          "source_sha256": "09ac52e849b9519f61435072df56b5e04669a00fcd1db8a4439dfb42a020b321"
         },
         {
           "kind": "validation-or-generation",
@@ -5707,7 +5707,7 @@
           "kind": "validation-or-generation",
           "marker": "planning-v1.2.json",
           "source": "tests/contracts/test_assurance.py",
-          "source_sha256": "4638b14b3017b7bad7eca51f6e82bc5d5597ceeaa9d518022a6a93adae757d5a"
+          "source_sha256": "2451a782ae29f98a18a0a08d740b8b1042de2f6a5c6ac4e44d34638994c353dd"
         }
       ]
     },
@@ -5771,7 +5771,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/openapi/worker-migration-effect-v2.1.json",
           "source": "scripts/contracts/route_conformance.py",
-          "source_sha256": "92295f17aa2b5e57b761a3e6deebc6eb0872e1774675a9f8a79e8d9de4d182e7"
+          "source_sha256": "09ac52e849b9519f61435072df56b5e04669a00fcd1db8a4439dfb42a020b321"
         },
         {
           "kind": "validation-or-generation",
@@ -5817,7 +5817,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/openapi/worker-migration-method-v2.json",
           "source": "tests/contracts/test_integrity.py",
-          "source_sha256": "91890a071a2c068df0f4cde526f03b3b14856c75ca1205848bae2d0b9fc84292"
+          "source_sha256": "b7c371838fbf209a6e7966cd97581f5c8571327c2d57bc3f87809c0e1738860b"
         }
       ]
     },
@@ -5948,7 +5948,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/platforms/ahv/source-profile-v1.json",
           "source": "scripts/contracts/assurance.py",
-          "source_sha256": "02b85a919e86df9e167f69f586387311aa909ebc829fc26aabfc8c49c7814e07"
+          "source_sha256": "0a4851ee05fbc075ce8e2aa410e2e229e895c6d0a999a9fac39ed3744a467681"
         },
         {
           "kind": "validation-or-generation",
@@ -5960,7 +5960,7 @@
           "kind": "validation-or-generation",
           "marker": "source-profile-v1.json",
           "source": "scripts/contracts/discovery.py",
-          "source_sha256": "5f3f5f3e711ba1b9a3761c35549338d6214733ca51c24c164814d729fc8a301f"
+          "source_sha256": "0d4ba9f2d29151dc0865a5f8d9986cd747ab5399986d6b901b6bef89a70f614e"
         },
         {
           "kind": "validation-or-generation",
@@ -6006,7 +6006,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/platforms/openstack/source-profile-v1.json",
           "source": "scripts/contracts/assurance.py",
-          "source_sha256": "02b85a919e86df9e167f69f586387311aa909ebc829fc26aabfc8c49c7814e07"
+          "source_sha256": "0a4851ee05fbc075ce8e2aa410e2e229e895c6d0a999a9fac39ed3744a467681"
         },
         {
           "kind": "validation-or-generation",
@@ -6018,7 +6018,7 @@
           "kind": "validation-or-generation",
           "marker": "source-profile-v1.json",
           "source": "scripts/contracts/discovery.py",
-          "source_sha256": "5f3f5f3e711ba1b9a3761c35549338d6214733ca51c24c164814d729fc8a301f"
+          "source_sha256": "0d4ba9f2d29151dc0865a5f8d9986cd747ab5399986d6b901b6bef89a70f614e"
         },
         {
           "kind": "validation-or-generation",
@@ -6053,7 +6053,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/schemas/capabilities/definitions-v1.json",
           "source": "scripts/contracts/assurance.py",
-          "source_sha256": "02b85a919e86df9e167f69f586387311aa909ebc829fc26aabfc8c49c7814e07"
+          "source_sha256": "0a4851ee05fbc075ce8e2aa410e2e229e895c6d0a999a9fac39ed3744a467681"
         },
         {
           "kind": "validation-or-generation",
@@ -6139,7 +6139,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/schemas/capabilities/migration-collection-manifest-v1.json",
           "source": "scripts/contracts/assurance.py",
-          "source_sha256": "02b85a919e86df9e167f69f586387311aa909ebc829fc26aabfc8c49c7814e07"
+          "source_sha256": "0a4851ee05fbc075ce8e2aa410e2e229e895c6d0a999a9fac39ed3744a467681"
         },
         {
           "kind": "validation-or-generation",
@@ -6175,7 +6175,7 @@
           "kind": "validation-or-generation",
           "marker": "migration-collection-manifest-v1.json",
           "source": "scripts/contracts/check_schema.py",
-          "source_sha256": "dd82624119ac666bda0a9b7e9bcfb7df0e4661771344d5f822e6547af4a8c96b"
+          "source_sha256": "9f33c0d2a5a1ac8d0b919fc942822a7aa167c43bef5ac4ca01c6d440ec18cbf1"
         },
         {
           "kind": "validation-or-generation",
@@ -6226,7 +6226,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/schemas/capabilities/migration-feature-policy-v1.json",
           "source": "scripts/contracts/assurance.py",
-          "source_sha256": "02b85a919e86df9e167f69f586387311aa909ebc829fc26aabfc8c49c7814e07"
+          "source_sha256": "0a4851ee05fbc075ce8e2aa410e2e229e895c6d0a999a9fac39ed3744a467681"
         },
         {
           "kind": "validation-or-generation",
@@ -6250,7 +6250,7 @@
           "kind": "validation-or-generation",
           "marker": "migration-feature-policy-v1.json",
           "source": "scripts/contracts/check_schema.py",
-          "source_sha256": "dd82624119ac666bda0a9b7e9bcfb7df0e4661771344d5f822e6547af4a8c96b"
+          "source_sha256": "9f33c0d2a5a1ac8d0b919fc942822a7aa167c43bef5ac4ca01c6d440ec18cbf1"
         }
       ]
     },
@@ -6288,7 +6288,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/schemas/capabilities/migration-field-crosswalk-v1.json",
           "source": "scripts/contracts/assurance.py",
-          "source_sha256": "02b85a919e86df9e167f69f586387311aa909ebc829fc26aabfc8c49c7814e07"
+          "source_sha256": "0a4851ee05fbc075ce8e2aa410e2e229e895c6d0a999a9fac39ed3744a467681"
         },
         {
           "kind": "validation-or-generation",
@@ -6324,7 +6324,7 @@
           "kind": "validation-or-generation",
           "marker": "migration-field-crosswalk-v1.json",
           "source": "scripts/contracts/check_schema.py",
-          "source_sha256": "dd82624119ac666bda0a9b7e9bcfb7df0e4661771344d5f822e6547af4a8c96b"
+          "source_sha256": "9f33c0d2a5a1ac8d0b919fc942822a7aa167c43bef5ac4ca01c6d440ec18cbf1"
         }
       ]
     },
@@ -6360,7 +6360,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/schemas/capabilities/native-security-api-registry-v1.json",
           "source": "scripts/contracts/assurance.py",
-          "source_sha256": "02b85a919e86df9e167f69f586387311aa909ebc829fc26aabfc8c49c7814e07"
+          "source_sha256": "0a4851ee05fbc075ce8e2aa410e2e229e895c6d0a999a9fac39ed3744a467681"
         },
         {
           "kind": "validation-or-generation",
@@ -6454,13 +6454,13 @@
           "kind": "validation-or-generation",
           "marker": "contracts/schemas/catalogue/intent-v1.json",
           "source": "scripts/contracts/check_registry.py",
-          "source_sha256": "1376a19a609f88249bd6a9449191d6fe674076c9d7d3d28150236681ff63c0a5"
+          "source_sha256": "1de0f9afe6df071aa7e6fe021c73507f3fb6f111299adfa83b74a42856800b2c"
         },
         {
           "kind": "validation-or-generation",
           "marker": "intent-v1.json",
           "source": "scripts/contracts/check_schema.py",
-          "source_sha256": "dd82624119ac666bda0a9b7e9bcfb7df0e4661771344d5f822e6547af4a8c96b"
+          "source_sha256": "9f33c0d2a5a1ac8d0b919fc942822a7aa167c43bef5ac4ca01c6d440ec18cbf1"
         },
         {
           "kind": "validation-or-generation",
@@ -6556,7 +6556,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/schemas/common/error-v1.json",
           "source": "scripts/contracts/route_conformance.py",
-          "source_sha256": "92295f17aa2b5e57b761a3e6deebc6eb0872e1774675a9f8a79e8d9de4d182e7"
+          "source_sha256": "09ac52e849b9519f61435072df56b5e04669a00fcd1db8a4439dfb42a020b321"
         }
       ]
     },
@@ -6757,7 +6757,7 @@
           "kind": "validation-or-generation",
           "marker": "catalogue-intent-v1.json",
           "source": "scripts/contracts/check_schema.py",
-          "source_sha256": "dd82624119ac666bda0a9b7e9bcfb7df0e4661771344d5f822e6547af4a8c96b"
+          "source_sha256": "9f33c0d2a5a1ac8d0b919fc942822a7aa167c43bef5ac4ca01c6d440ec18cbf1"
         },
         {
           "kind": "validation-or-generation",
@@ -6919,7 +6919,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/schemas/events/identity-change-v1.json",
           "source": "tests/contracts/test_integrity.py",
-          "source_sha256": "91890a071a2c068df0f4cde526f03b3b14856c75ca1205848bae2d0b9fc84292"
+          "source_sha256": "b7c371838fbf209a6e7966cd97581f5c8571327c2d57bc3f87809c0e1738860b"
         },
         {
           "kind": "validation-or-generation",
@@ -7189,7 +7189,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/schemas/planning/catalogue-current-v2.json",
           "source": "scripts/contracts/check_registry.py",
-          "source_sha256": "1376a19a609f88249bd6a9449191d6fe674076c9d7d3d28150236681ff63c0a5"
+          "source_sha256": "1de0f9afe6df071aa7e6fe021c73507f3fb6f111299adfa83b74a42856800b2c"
         },
         {
           "kind": "validation-or-generation",
@@ -7207,7 +7207,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/schemas/planning/catalogue-current-v2.json",
           "source": "tests/contracts/test_integrity.py",
-          "source_sha256": "91890a071a2c068df0f4cde526f03b3b14856c75ca1205848bae2d0b9fc84292"
+          "source_sha256": "b7c371838fbf209a6e7966cd97581f5c8571327c2d57bc3f87809c0e1738860b"
         }
       ]
     },
@@ -7249,7 +7249,7 @@
           "kind": "validation-or-generation",
           "marker": "catalogue-input-v1.json",
           "source": "scripts/contracts/check_schema.py",
-          "source_sha256": "dd82624119ac666bda0a9b7e9bcfb7df0e4661771344d5f822e6547af4a8c96b"
+          "source_sha256": "9f33c0d2a5a1ac8d0b919fc942822a7aa167c43bef5ac4ca01c6d440ec18cbf1"
         },
         {
           "kind": "validation-or-generation",
@@ -7267,7 +7267,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/schemas/planning/catalogue-input-v1.json",
           "source": "scripts/contracts/check_registry.py",
-          "source_sha256": "1376a19a609f88249bd6a9449191d6fe674076c9d7d3d28150236681ff63c0a5"
+          "source_sha256": "1de0f9afe6df071aa7e6fe021c73507f3fb6f111299adfa83b74a42856800b2c"
         },
         {
           "kind": "validation-or-generation",
@@ -7301,7 +7301,7 @@
           "kind": "validation-or-generation",
           "marker": "fact-v1.json",
           "source": "scripts/contracts/check_schema.py",
-          "source_sha256": "dd82624119ac666bda0a9b7e9bcfb7df0e4661771344d5f822e6547af4a8c96b"
+          "source_sha256": "9f33c0d2a5a1ac8d0b919fc942822a7aa167c43bef5ac4ca01c6d440ec18cbf1"
         }
       ]
     },
@@ -7388,7 +7388,7 @@
           "kind": "validation-or-generation",
           "marker": "inventory-input-v1.json",
           "source": "scripts/contracts/check_schema.py",
-          "source_sha256": "dd82624119ac666bda0a9b7e9bcfb7df0e4661771344d5f822e6547af4a8c96b"
+          "source_sha256": "9f33c0d2a5a1ac8d0b919fc942822a7aa167c43bef5ac4ca01c6d440ec18cbf1"
         }
       ]
     },
@@ -7440,7 +7440,7 @@
           "kind": "validation-or-generation",
           "marker": "inventory-input-v2.json",
           "source": "scripts/contracts/check_schema.py",
-          "source_sha256": "dd82624119ac666bda0a9b7e9bcfb7df0e4661771344d5f822e6547af4a8c96b"
+          "source_sha256": "9f33c0d2a5a1ac8d0b919fc942822a7aa167c43bef5ac4ca01c6d440ec18cbf1"
         }
       ]
     },
@@ -7951,7 +7951,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/schemas/platforms/source-profile-v1.json",
           "source": "scripts/contracts/assurance.py",
-          "source_sha256": "02b85a919e86df9e167f69f586387311aa909ebc829fc26aabfc8c49c7814e07"
+          "source_sha256": "0a4851ee05fbc075ce8e2aa410e2e229e895c6d0a999a9fac39ed3744a467681"
         },
         {
           "kind": "validation-or-generation",
@@ -7963,7 +7963,7 @@
           "kind": "validation-or-generation",
           "marker": "contracts/schemas/platforms/source-profile-v1.json",
           "source": "scripts/contracts/discovery.py",
-          "source_sha256": "5f3f5f3e711ba1b9a3761c35549338d6214733ca51c24c164814d729fc8a301f"
+          "source_sha256": "0d4ba9f2d29151dc0865a5f8d9986cd747ab5399986d6b901b6bef89a70f614e"
         },
         {
           "kind": "validation-or-generation",

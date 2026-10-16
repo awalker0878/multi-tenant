@@ -1,3 +1,19 @@
+## Current contract feature audit — 2026-10-16
+
+See [the active audit](docs/contracts/feature-audit.md) for capability coverage,
+seven implemented corrections, and the remaining qualification work. Current
+changes remove the duplicate ownership index, reject ambiguous contract input,
+bind Inventory/Catalogue consumer responses to the request, enforce exact path
+identities, bound response streams, and reuse inventory validation within one
+admission invocation. No canonical wire bytes or runtime compatibility paths
+are introduced. New substitution controls and existing positive journeys require
+supported-runtime CI; they do not qualify additional live boundaries by themselves.
+
+Local contract tests: 248 pass; admission policy tests: 37 pass. The last completed
+hosted baseline remains 408/1,073 claims, 27/271 consumer boundaries, 9/166 HTTP
+operations and 6/75 releases qualified. Keep PR #64 draft while internal witness
+coverage, deployment enrollment and native E3/E4 evidence remain incomplete.
+
 ## Planning consumer remediation — 2026-10-16
 
 Resumed from `cd61437b`; hosted run

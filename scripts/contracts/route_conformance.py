@@ -7,6 +7,8 @@ run in each producer's product CI.
 """
 from __future__ import annotations
 
+from contract_io import read
+
 import argparse
 import hashlib
 import json
@@ -33,7 +35,7 @@ class HttpConformance:
         self.rows: list[dict] = []
         self.lock = threading.Lock()
         self.operations = []
-        registry = json.loads((root / "architecture/contract-consumers.json").read_text())
+        registry = read(root / "architecture/contract-consumers.json")
         for release in registry["active_releases"]:
             if not release["path"].startswith("contracts/openapi/"):
                 continue
@@ -180,7 +182,7 @@ def compare_declared(spec: dict, runtime: set[tuple[str, str]], label: str) -> N
 def verify_app(app: str, runtime: set[tuple[str, str]], root: Path = ROOT) -> int:
     if app not in {"governance", "catalogue", "assurance"}:
         raise ValueError(f"Unsupported Laravel service: {app}")
-    registry = json.loads((root / "architecture/contract-consumers.json").read_text())
+    registry = read(root / "architecture/contract-consumers.json")
     releases = [
         row for row in registry["active_releases"]
         if row["owner"] == app and row["path"].startswith("contracts/openapi/")
@@ -189,7 +191,7 @@ def verify_app(app: str, runtime: set[tuple[str, str]], root: Path = ROOT) -> in
         raise ValueError(f"No active APIs registered for {app}")
     declared = set()
     for row in releases:
-        doc = json.loads((root / row["path"]).read_text())
+        doc = read(root / row["path"])
         compare_declared(doc, runtime, row["path"])
         declared |= routes_in_openapi(doc)
     # Every deployed v1/internal operation must be part of an active release.
@@ -233,15 +235,15 @@ def compare_inventory_worker_routes(runtime_routes: frozenset[str] | set[str], d
 
 def verify_inventory(root: Path = ROOT) -> int:
     from inventory.interfaces.discovery import ROUTES, WORKER_ROUTES
-    spec = json.loads((root / "contracts/openapi/inventory-v1.9.json").read_text())
+    spec = read(root / "contracts/openapi/inventory-v1.9.json")
     declared_discovery = routes_in_openapi(spec)
     compare_inventory_discovery_routes(ROUTES, declared_discovery)
-    worker_spec = json.loads((root / "contracts/openapi/inventory-collection-worker-v1.json").read_text())
+    worker_spec = read(root / "contracts/openapi/inventory-collection-worker-v1.json")
     compare_inventory_worker_routes(WORKER_ROUTES, routes_in_openapi(worker_spec))
 
     from inventory.interfaces.planning import PlanningInputApp
     import asyncio
-    owner_api = json.loads((root / "contracts/openapi/inventory-native-input-v1.3.json").read_text())
+    owner_api = read(root / "contracts/openapi/inventory-native-input-v1.3.json")
     declared_owner = routes_in_openapi(owner_api)
     expected_owner = {
         (method, f"/{prefix}/tenants/{{tenant}}/{resource}/{{application}}/{{environment}}/{{site}}/{suffix}")
@@ -266,7 +268,7 @@ def verify_inventory(root: Path = ROOT) -> int:
         ) if not (prefix == "internal" and resource == "planning-inputs")
     )
     from jsonschema import Draft202012Validator
-    common_error = json.loads((root / "contracts/schemas/common/error-v1.json").read_text())
+    common_error = read(root / "contracts/schemas/common/error-v1.json")
     error_validator = Draft202012Validator(common_error)
     for prefix in ("internal", "v1"):
         for resource, suffix in (
@@ -447,7 +449,7 @@ def verify_planning_migration(root: Path = ROOT) -> int:
     import asyncio
     from planning.interfaces.migration import MigrationPreparationApp
     app = MigrationPreparationApp(authority=None, prepare=lambda *args: {})
-    spec = json.loads((root / "contracts/openapi/planning-migration-v2.json").read_text())
+    spec = read(root / "contracts/openapi/planning-migration-v2.json")
     declared = routes_in_openapi(spec)
     from planning.bootstrap.server import MIGRATION_SUFFIXES
     contracted = {"/" + path.rsplit("/", 1)[-1] for method, path in declared if method == "POST"}
@@ -485,7 +487,7 @@ def verify_lifecycle_native(root: Path = ROOT) -> int:
     from jsonschema import Draft202012Validator, FormatChecker
     from lifecycle.interfaces.native import NativeBoundaryApp
 
-    spec = json.loads((root / "contracts/openapi/lifecycle-migration-boundary-v2.json").read_text())
+    spec = read(root / "contracts/openapi/lifecycle-migration-boundary-v2.json")
     if routes_in_openapi(spec) != {("POST", "/internal/native-grants/checks")}:
         raise ValueError("Lifecycle native-boundary OpenAPI operation changed")
     request_schema = spec["components"]["schemas"]["BoundaryRequest"]
@@ -560,7 +562,7 @@ def verify_planning_immutable(root: Path = ROOT) -> int:
     from jsonschema import Draft202012Validator, FormatChecker
     from planning.interfaces.planning import PlanningApp
 
-    spec = json.loads((root / "contracts/openapi/planning-immutable-plan-v2.json").read_text())
+    spec = read(root / "contracts/openapi/planning-immutable-plan-v2.json")
     if routes_in_openapi(spec) != {("GET", "/v1/tenants/{tenant}/plans/{plan}/revisions/{revision}")}:
         raise ValueError("Planning immutable-plan OpenAPI operation changed")
     bound = {
@@ -621,14 +623,14 @@ def verify_planning_lifecycle_reads(root: Path = ROOT) -> int:
     from planning.domain.model import Rejected
     from planning.interfaces.planning import PlanningApp
 
-    spec = json.loads((root / "contracts/openapi/planning-lifecycle-reads-v1.json").read_text())
+    spec = read(root / "contracts/openapi/planning-lifecycle-reads-v1.json")
     expected = {
         ("GET", "/v1/tenants/{tenant}/execution-plans/{plan}/revisions/{revision}"),
         ("GET", "/internal/tenants/{tenant}/placement-proposals/{plan}/revisions/{revision}"),
     }
     if routes_in_openapi(spec) != expected:
         raise ValueError("Planning Lifecycle current read operations changed")
-    fixture = json.loads((root / "contracts/fixtures/planning/synthetic-plan-v1.1.json").read_text())
+    fixture = read(root / "contracts/fixtures/planning/synthetic-plan-v1.1.json")
     content, binding = fixture["content"], fixture["binding"]
     execution = {"content": content, "binding": binding, "invalidated": False}
     placement = {
@@ -701,7 +703,7 @@ def compare_composed_routes(owner: str, runtime: set[tuple[str, str]],
                             releases: tuple[str, ...], root: Path = ROOT) -> int:
     declared = set()
     for name in releases:
-        spec = json.loads((root / "contracts/openapi" / name).read_text())
+        spec = read(root / "contracts/openapi" / name)
         declared |= routes_in_openapi(spec)
     if declared != runtime:
         raise ValueError(f"Undocumented {owner} composed runtime route: {sorted(declared ^ runtime)}")
@@ -721,7 +723,7 @@ def verify_lifecycle_native_jobs(root: Path = ROOT) -> int:
     import asyncio
     from lifecycle.interfaces.native_jobs import NativeJobsApp
 
-    spec = json.loads((root / "contracts/openapi/lifecycle-native-jobs-v1.1.json").read_text())
+    spec = read(root / "contracts/openapi/lifecycle-native-jobs-v1.1.json")
     expected = {
         ("POST", "/v1/tenants/{tenant}/native-jobs"),
         ("GET", "/v1/tenants/{tenant}/native-jobs/{job}"),
@@ -755,7 +757,7 @@ def verify_lifecycle_worker_effect_routes(root: Path = ROOT) -> int:
     import asyncio
     from lifecycle_worker.interfaces.native import NativeEffectApp
 
-    spec = json.loads((root / "contracts/openapi/worker-migration-effect-v2.1.json").read_text())
+    spec = read(root / "contracts/openapi/worker-migration-effect-v2.1.json")
     expected = {
         ("POST", "/internal/native-effects"),
         ("POST", "/internal/native-transfer-continuations"),

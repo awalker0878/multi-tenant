@@ -7,9 +7,12 @@ namespace App\Infrastructure\Inventory;
 use App\Application\Inventory\Contracts\InventoryGateway;
 use App\Domain\Identity\IdentityFailure;
 use App\Domain\Inventory\InventoryFailure;
+use App\Infrastructure\Foundation\ContractPath;
+use App\Infrastructure\Foundation\ContractResponseBody;
 use App\Infrastructure\Foundation\MountedSecret;
 use App\Infrastructure\Governance\GovernanceClient;
 use Illuminate\Support\Facades\Http;
+use InvalidArgumentException;
 use Opis\JsonSchema\Validator;
 use Throwable;
 
@@ -37,15 +40,10 @@ final class InventoryClient implements InventoryGateway
         if ($spec === null) {
             throw new InventoryFailure;
         }
-        $path = $spec['path'];
-        foreach (['tenant' => $tenant, ...$parameters] as $field => $value) {
-            if (! preg_match('/\A[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\z/', $value)) {
-                throw new InventoryFailure(422, 'invalid_identity');
-            }
-            $path = str_replace('{'.$field.'}', $value, $path);
-        }
-        if (str_contains($path, '{')) {
-            throw new InventoryFailure(422, 'missing_identity');
+        try {
+            $path = ContractPath::bind($spec['path'], $tenant, $parameters);
+        } catch (InvalidArgumentException $e) {
+            throw new InventoryFailure(422, $e->getMessage());
         }
         $base = config('inventory.url');
         $url = is_string($base) ? parse_url($base) : false;
@@ -64,18 +62,7 @@ final class InventoryClient implements InventoryGateway
             $response = Http::acceptJson()->asJson()->withToken($credential)->withHeaders(['X-Actor-Delegation' => $token, ...($key === null ? [] : ['Idempotency-Key' => $key]), ...($revision === null ? [] : ['If-Match' => '"'.$revision.'"'])])
                 ->connectTimeout(2)->timeout(10)->withOptions(['allow_redirects' => false, 'verify' => $ca, 'stream' => true])
                 ->send($spec['method'], $base.$path.($cursor === null ? '' : '?cursor='.rawurlencode($cursor)), $spec['method'] === 'GET' ? [] : ['json' => $body === [] ? (object) [] : $body]);
-            $stream = $response->toPsrResponse()->getBody();
-            $raw = '';
-            try {
-                while (! $stream->eof() && strlen($raw) <= 2097152) {
-                    $raw .= $stream->read(min(65536, 2097153 - strlen($raw)));
-                }
-            } finally {
-                $stream->close();
-            }
-            if (strlen($raw) > 2097152) {
-                throw new InventoryFailure;
-            }
+            $raw = ContractResponseBody::read($response->toPsrResponse()->getBody(), 2097152);
             $wire = json_decode($raw, true, 64, JSON_THROW_ON_ERROR);
             if ($response->status() !== $spec['status']) {
                 $reason = is_array($wire) ? ($wire['error'] ?? '') : '';
@@ -92,6 +79,8 @@ final class InventoryClient implements InventoryGateway
                 throw new InventoryFailure;
             }
 
+            $this->assertResponseBinding($operation, $tenant, $parameters, $wire);
+
             return $wire;
         } catch (InventoryFailure $e) {
             throw $e;
@@ -99,6 +88,31 @@ final class InventoryClient implements InventoryGateway
             throw new InventoryFailure(in_array($e->status, [401, 403, 404], true) ? 403 : 503);
         } catch (Throwable) {
             throw new InventoryFailure;
+        }
+    }
+
+    private function assertResponseBinding(string $operation, string $tenant, array $parameters, array $wire): void
+    {
+        $bindings = match ($operation) {
+            'renewEndpoint', 'revokeEndpoint' => [[$wire['endpoint_id'], $parameters['endpoint']]],
+            'listResources' => [[$wire['generation_id'], $parameters['generation']]],
+            'getOperatorInputs', 'getOperatorReadiness' => [[$wire['tenant_id'], $tenant], [$wire['site_id'], $parameters['site']]],
+            'getMigrationGroup' => [[$wire['group']['id'], $parameters['group']]],
+            'updateMigrationGroup' => [[$wire['id'], $parameters['group']]],
+            default => [],
+        };
+        if (in_array($operation, ['listPolicies', 'listEndpoints'], true)) {
+            foreach ($wire['items'] as $item) {
+                $bindings[] = [$item['site_id'], $parameters['site']];
+            }
+        }
+        if ($operation === 'getVmMigrationReview' && $wire['review'] !== null) {
+            $bindings[] = [$wire['review']['input']['source_profile_id'], $parameters['profile']];
+        }
+        foreach ($bindings as [$actual, $expected]) {
+            if ($actual !== $expected) {
+                throw new InventoryFailure(403, 'scope_mismatch');
+            }
         }
     }
 }

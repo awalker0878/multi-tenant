@@ -1,6 +1,8 @@
 """Guarantee every deployable owner and installed copy has a built-artifact CI job."""
 from __future__ import annotations
 
+from contract_io import read
+
 import json
 from pathlib import Path
 
@@ -50,7 +52,7 @@ def verify_required_ci_gate(root: Path) -> None:
 
 def verify(root: Path = ROOT) -> dict:
     verify_deployable_inventory(root)
-    registry = json.loads((root / "architecture/contract-consumers.json").read_text())
+    registry = read(root / "architecture/contract-consumers.json")
     active = inventory(root)
     verify_installed_usage(root, registry)
     owner_components = {owner for owner, _ in COMPONENTS.values()}

@@ -44,6 +44,8 @@ def affected(paths, base_components, head_components, base_graph, head_graph):
                 for dependent in reverse.get(pending.pop(), set()) - impacted:
                     impacted.add(dependent)
                     pending.append(dependent)
+            # Trusted Git bases may precede the release catalogue. Their original
+            # index remains input to conservative change-impact calculation.
             found = {context for graph in (base_graph, head_graph) for canonical in impacted
                      for context in graph.get('contracts', {}).get(canonical, [])}
             found.update(context for graph in (base_graph, head_graph)
@@ -78,7 +80,7 @@ def affected(paths, base_components, head_components, base_graph, head_graph):
                  'invalid_contract_consumer_record')
             # Contract-platform is a shared specification, not a runnable
             # service. Its change impact is directly captured by the
-            # contracts[path] owner/consumer listing above.
+            # release owner/consumer records above.
             if owner not in ids:
                 continue
             for consumer in consumers:

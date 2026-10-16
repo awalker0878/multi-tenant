@@ -22,8 +22,9 @@ external collection-manifest evidence. Phase 1 is not marked complete.
 and every declared HTTP operation directly from the current OpenAPI documents.
 It is independent of the owner-specific route test lists.
 
-Five **separate** executable claims are needed for each protected HTTP
-operation: route, producer, consumer, authorization denial, tenant isolation.
+Six **separate** executable claims are needed for each protected HTTP
+operation: route, producer, consumer, authentication denial, authorization denial,
+and tenant isolation.
 An anonymous operation requires route, producer, consumer. A non-HTTP release
 requires executable producer and consumer evidence. Examples, registry entries,
 and test filenames do not count as execution.

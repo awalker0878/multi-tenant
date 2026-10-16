@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 
 from assurance import assess
+from contract_io import read
 
 
 def combine(folder: Path) -> list[dict]:
@@ -16,7 +17,7 @@ def combine(folder: Path) -> list[dict]:
     # than crashing before the report can be uploaded. No proof is inferred.
     evidence = []
     for file in paths:
-        value = json.loads(file.read_text(encoding="utf-8"))
+        value = read(file)
         if not isinstance(value, list):
             raise ValueError(f"Malformed measured contract assurance evidence: {file}")
         evidence.extend(value)

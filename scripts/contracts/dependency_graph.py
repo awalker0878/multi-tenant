@@ -6,6 +6,8 @@ different relationships and may legitimately form cycles.
 """
 from __future__ import annotations
 
+from contract_io import read
+
 import argparse
 import json
 from pathlib import Path
@@ -25,8 +27,8 @@ TYPE = {
 
 
 def derive(root: Path = ROOT) -> dict:
-    registry = json.loads((root / "architecture/contract-consumers.json").read_text())
-    usage = json.loads((root / "architecture/installed-contract-usage.json").read_text())
+    registry = read(root / "architecture/contract-consumers.json")
+    usage = read(root / "architecture/installed-contract-usage.json")
     copies = {item["copy"]: item for item in usage["copies"]}
     # A declared copy is not executable loader evidence: verify real imports.
     verify_installed_usage(root, registry)

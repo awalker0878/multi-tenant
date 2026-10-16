@@ -6,6 +6,8 @@ the actual immutable image filesystem or wheel ZIP and fails closed.
 """
 from __future__ import annotations
 
+from contract_io import read
+
 import argparse
 import base64
 import csv
@@ -60,7 +62,7 @@ def current_run_provenance() -> dict[str, str | None]:
 def expected(component: str, root: Path = ROOT) -> tuple[list[dict], list[dict]]:
     if component not in COMPONENTS:
         raise ValueError(f"Unknown deployable component: {component}")
-    registry = json.loads((root / "architecture/contract-consumers.json").read_text())
+    registry = read(root / "architecture/contract-consumers.json")
     owner = COMPONENTS[component][0]
     copies = [
         {"path": path, "canonical": release["path"], "sha256": sha((root / release["path"]).read_bytes())}
@@ -81,7 +83,7 @@ def expected(component: str, root: Path = ROOT) -> tuple[list[dict], list[dict]]
 def consumed_bindings(component: str, root: Path = ROOT) -> list[dict]:
     """Declare consumer API bindings; only an installed copy proves packaged bytes."""
     owner = COMPONENTS[component][0]
-    ledger = json.loads((root / "architecture/contract-consumers.json").read_text())
+    ledger = read(root / "architecture/contract-consumers.json")
     verify_installed_usage(root, ledger)
     operation_map = inventory(root)["operations"]
     installed = {

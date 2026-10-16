@@ -13,7 +13,7 @@ import re
 from collections import Counter
 from pathlib import Path
 
-import yaml
+from contract_io import read
 from jsonschema import Draft202012Validator, FormatChecker
 from openapi_spec_validator import validate_spec
 
@@ -37,12 +37,6 @@ PROVIDER = {
     "contracts/platforms/openstack/source-profile-v1.json":
         "contracts/schemas/platforms/source-profile-v1.json",
 }
-
-
-def read(path: Path):
-    if path.suffix in {".yaml", ".yml"}:
-        return yaml.safe_load(path.read_text(encoding="utf-8"))
-    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def fingerprint(path: Path) -> str:
@@ -135,32 +129,39 @@ def inventory(root: Path = ROOT) -> dict:
     }
 
 
-def assess(root: Path = ROOT, observations: list[dict] | None = None,
-           require_provenance: bool = False) -> dict:
-    data = inventory(root)
-    operations = {r["key"]: r for r in data["operations"]}
-    releases = {r["path"]: r for r in data["releases"]}
-    proofs = {key: {} for key in [*operations, *releases]}
-    consumer_proofs = {key: {} for key in proofs}
+class EvidenceValidator:
+    """Validate receipts against one current inventory within a single invocation.
 
-    def consumers_for(key: str) -> list[str]:
-        boundary = operations[key] if key in operations else releases[key]
-        # A source-only definition needs its owner's actual validator, never
-        # an invented remote consumer. Other boundaries require every caller.
+    This is not a cross-run cache. Each command re-reads and verifies the current
+    canonical bytes; final aggregation independently loads them again after
+    journey admission. No evidence or authority is memoized.
+    """
+
+    def __init__(self, root: Path = ROOT, require_provenance: bool = False):
+        self.data = inventory(root)
+        self.operations = {row["key"]: row for row in self.data["operations"]}
+        self.releases = {row["path"]: row for row in self.data["releases"]}
+        self.require_provenance = require_provenance
+
+    def consumers_for(self, key: str) -> list[str]:
+        boundary = self.operations[key] if key in self.operations else self.releases[key]
         return boundary["consumers"] or [boundary["owner"]]
 
-    for observation in observations or []:
+    def validate(self, observation: dict) -> tuple[str, str]:
+        if not isinstance(observation, dict):
+            raise ValueError("Measured contract evidence must be an object")
         key = observation.get("key")
         claim = observation.get("claim")
-        if key not in proofs or claim not in CLAIMS:
+        if (not isinstance(key, str) or not isinstance(claim, str)
+                or (key not in self.operations and key not in self.releases) or claim not in CLAIMS):
             raise ValueError(f"Unregistered operation or evidence claim: {key} {claim}")
-        if key in operations:
-            expected_hash = operations[key]["release_sha256"]
+        if key in self.operations:
+            expected_hash = self.operations[key]["release_sha256"]
         else:
-            expected_hash = releases[key]["sha256"]
+            expected_hash = self.releases[key]["sha256"]
         if observation.get("release_sha256") != expected_hash:
             raise ValueError(f"Stale operation evidence: {key}")
-        if require_provenance:
+        if self.require_provenance:
             run_id, revision = os.environ.get("GITHUB_RUN_ID"), os.environ.get("GITHUB_SHA")
             attempt = os.environ.get("GITHUB_RUN_ATTEMPT")
             if (not run_id or not revision or not attempt
@@ -169,7 +170,7 @@ def assess(root: Path = ROOT, observations: list[dict] | None = None,
                     or observation.get("revision") != revision
                     or observation.get("run_attempt") != attempt):
                 raise ValueError(f"Unattested operation evidence for current CI run: {key}")
-        if observation.get("source") not in {"live-router", "live-producer", "live-consumer", "live-denial"}:
+        if not isinstance(observation.get("source"), str) or observation["source"] not in {"live-router", "live-producer", "live-consumer", "live-denial"}:
             raise ValueError(f"Non-executable evidence is inadmissible: {key}")
         appropriate = {
             "route": "live-router", "producer": "live-producer",
@@ -183,12 +184,14 @@ def assess(root: Path = ROOT, observations: list[dict] | None = None,
             raise ValueError(f"Missing executable test identity: {key} {claim}")
         # Missing or invalid credentials cannot prove authenticated tenant isolation.
         if claim == "authentication" and (
-            observation.get("denial_kind") not in {"missing-credential", "invalid-credential"}
+            type(observation.get("status_code")) is not int
+            or observation.get("denial_kind") not in {"missing-credential", "invalid-credential"}
             or observation.get("status_code") not in (401, 403)
         ):
             raise ValueError(f"Authentication evidence lacks a real credential denial: {key}")
         if claim == "authorization" and (
-            observation.get("authenticated") is not True
+            type(observation.get("status_code")) is not int
+            or observation.get("authenticated") is not True
             or observation.get("authority_checked") != "current-effective-authority"
             or observation.get("denial_kind") not in {
                 "revoked-membership", "revoked-role", "revoked-delegation",
@@ -200,7 +203,8 @@ def assess(root: Path = ROOT, observations: list[dict] | None = None,
         ):
             raise ValueError(f"Authorization evidence requires an authenticated current-authority denial without effects: {key}")
         if claim == "tenant_isolation" and (
-            observation.get("denial_kind") != "cross-tenant"
+            type(observation.get("status_code")) is not int
+            or observation.get("denial_kind") != "cross-tenant"
             or observation.get("authenticated") is not True
             or observation.get("status_code") not in (403, 404)
             or not isinstance(observation.get("credential_tenant"), str)
@@ -212,15 +216,29 @@ def assess(root: Path = ROOT, observations: list[dict] | None = None,
             or observation.get("unauthorized_mutation") is not False
         ):
             raise ValueError(f"Tenant isolation evidence requires an authenticated cross-tenant denial: {key}")
-        if key in releases and claim not in {"producer", "consumer"}:
+        if key in self.releases and claim not in {"producer", "consumer"}:
             raise ValueError(f"Release assurance cannot claim HTTP-only evidence: {key} {claim}")
         if claim == "consumer":
             consumer = observation.get("consumer_id")
-            boundary = operations[key] if key in operations else releases[key]
-            if (not isinstance(consumer, str) or consumer not in consumers_for(key)
+            boundary = self.operations[key] if key in self.operations else self.releases[key]
+            if (not isinstance(consumer, str) or consumer not in self.consumers_for(key)
                     or (not boundary["consumers"]
                         and observation.get("consumer_boundary") != "owner-local")):
                 raise ValueError(f"Consumer evidence must name its executed registered or owner-local boundary: {key}")
+        return key, claim
+
+
+def assess(root: Path = ROOT, observations: list[dict] | None = None,
+           require_provenance: bool = False) -> dict:
+    validator = EvidenceValidator(root, require_provenance)
+    data, operations, releases = validator.data, validator.operations, validator.releases
+    proofs = {key: {} for key in [*operations, *releases]}
+    consumer_proofs = {key: {} for key in proofs}
+    consumers_for = validator.consumers_for
+    for observation in observations or []:
+        key, claim = validator.validate(observation)
+        if claim == "consumer":
+            consumer = observation["consumer_id"]
             if consumer in consumer_proofs[key]:
                 raise ValueError(f"Duplicate operation assurance evidence: {key} consumer {consumer}")
             consumer_proofs[key][consumer] = {"source": observation["source"], "test": observation["test"]}

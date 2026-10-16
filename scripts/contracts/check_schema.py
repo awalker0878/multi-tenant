@@ -1,21 +1,21 @@
 """Canonical OpenAPI, schema identities, source parity, and route declarations."""
 from __future__ import annotations
-import json
 import re
 from pathlib import Path
 from jsonschema import Draft202012Validator, FormatChecker
 from openapi_spec_validator import validate_spec
+from contract_io import read
 ROOT = Path(__file__).resolve().parents[2]
 
 def load(name: str):
-    return json.loads((ROOT / name).read_text(encoding="utf-8"))
+    return read(ROOT / name)
 
 
 def unique_schema_ids():
     """Every retained schema has a unique identifier; no historical exceptions."""
     seen: dict[str, Path] = {}
     for path in sorted((ROOT / "contracts/schemas").rglob("*.json")):
-        document = json.loads(path.read_text(encoding="utf-8"))
+        document = read(path)
         identifier = document.get("$id")
         if not identifier:
             continue
@@ -81,7 +81,7 @@ def check_schema_dialects():
     }
     found = 0
     for path in sorted((ROOT / "contracts/schemas").rglob("*.json")):
-        schema = json.loads(path.read_text(encoding="utf-8"))
+        schema = read(path)
         relative = str(path.relative_to(ROOT / "contracts/schemas"))
         if schema.get("$schema") != "https://json-schema.org/draft/2020-12/schema":
             raise ValueError(f"Unsupported JSON Schema dialect: {path}")

@@ -1,8 +1,7 @@
 """AsyncAPI channel ownership, message discriminators and schema references."""
 from __future__ import annotations
-import json
 from pathlib import Path
-import yaml
+from contract_io import read
 from jsonschema import Draft202012Validator, FormatChecker
 from check_schema import local_refs
 ROOT = Path(__file__).resolve().parents[2]
@@ -38,7 +37,7 @@ def check_events():
     base = ROOT / "contracts/asyncapi"
     all_addresses: dict[str, str] = {}
     for path in sorted(base.glob("*.yaml")):
-        document = yaml.safe_load(path.read_text(encoding="utf-8"))
+        document = read(path)
         if not isinstance(document, dict) or document.get("asyncapi") != "3.0.0":
             raise ValueError(f"Invalid AsyncAPI release: {path}")
         if not document.get("channels") or not document.get("operations"):
@@ -68,7 +67,7 @@ def check_events():
             if (not event.is_relative_to((ROOT / "contracts/schemas/events").resolve())
                     or not event.is_file()):
                 raise ValueError(f"Unsafe/unresolved event schema reference: {path}:{reference}")
-            schema = json.loads(event.read_text(encoding="utf-8"))
+            schema = read(event)
             if schema.get("$schema") != "https://json-schema.org/draft/2020-12/schema":
                 raise ValueError(f"Wrong event JSON Schema dialect: {event}")
             Draft202012Validator.check_schema(schema)

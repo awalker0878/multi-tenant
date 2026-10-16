@@ -1,15 +1,16 @@
 """Independent runtime, packaging, generation and CI evidence for every installed copy."""
 from __future__ import annotations
 
+from contract_io import read
+
 import ast
-import json
 from pathlib import Path
 
 from runtime_inventory import executable_contract_loads
 
 
 def verify_installed_usage(root: Path, registry: dict) -> int:
-    ledger = json.loads((root / "architecture/installed-contract-usage.json").read_text())
+    ledger = read(root / "architecture/installed-contract-usage.json")
     if ledger.get("schema_version") != 1 or not isinstance(ledger.get("copies"), list):
         raise ValueError("Installed contract usage ledger is invalid")
     indexed = {
@@ -81,7 +82,7 @@ def verify_installed_usage(root: Path, registry: dict) -> int:
             if not file.is_file():
                 raise ValueError(f"Missing installed copy generator: {generator}")
             if generator.endswith("/manifest.json"):
-                manifest = json.loads(file.read_text())
+                manifest = read(file)
                 if copy not in manifest.get("copies", []) or row["canonical"] != manifest["target"]:
                     raise ValueError(f"Source assembly manifest does not generate copy: {copy}")
             elif generator.endswith(".py"):
@@ -100,5 +101,5 @@ def verify_installed_usage(root: Path, registry: dict) -> int:
 
 if __name__ == "__main__":
     root = Path(__file__).resolve().parents[2]
-    registry = json.loads((root / "architecture/contract-consumers.json").read_text())
+    registry = read(root / "architecture/contract-consumers.json")
     print(f"Verified {verify_installed_usage(root, registry)} installed contract usage records")

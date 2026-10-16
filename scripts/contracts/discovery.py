@@ -15,6 +15,7 @@ from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
 import yaml
+from contract_io import read
 
 AREAS = ("openapi", "asyncapi", "schemas", "capabilities", "platforms")
 IGNORED = {".git", ".venv", "vendor", "node_modules", "__pycache__", "build", "dist"}
@@ -25,11 +26,6 @@ REPORTS = {
 REFERENCE = re.compile(
     r"contracts/(?:openapi|asyncapi|schemas|capabilities|platforms)/[A-Za-z0-9_./-]+\.(?:json|ya?ml)"
 )
-
-
-def read(path: Path):
-    text = path.read_text(encoding="utf-8")
-    return yaml.safe_load(text) if path.suffix in {".yaml", ".yml"} else json.loads(text)
 
 
 def canonical_paths(root: Path) -> set[str]:
