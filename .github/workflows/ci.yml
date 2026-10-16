@@ -100,6 +100,24 @@ jobs:
           path: ${{ runner.temp }}/quality/evidence/
           if-no-files-found: warn
           retention-days: 7
+      - name: Execute bounded Inventory owner runtime test and verify JUnit
+        if: ${{ !cancelled() && matrix.component == 'inventory' }}
+        env:
+          P04_POSTGRES_BIN: /usr/lib/postgresql/16/bin
+        run: |
+          python3 scripts/contracts/run_owner_boundaries.py \
+            --root "$GITHUB_WORKSPACE" --service inventory \
+            --output "$RUNNER_TEMP/inventory-owner-status.json"
+      - name: Retain Inventory owner runtime receipt
+        if: ${{ always() && matrix.component == 'inventory' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: bounded-owner-inventory-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/inventory-owner-status.json
+            ${{ runner.temp }}/inventory-owner-junit.xml
+          if-no-files-found: error
+          retention-days: 14
 
   php:
     name: CI / Laravel (${{ matrix.component }})
@@ -139,6 +157,22 @@ jobs:
           path: ${{ runner.temp }}/quality/evidence/
           if-no-files-found: warn
           retention-days: 1
+      - name: Execute bounded Governance owner runtime test and verify JUnit
+        if: ${{ !cancelled() && matrix.component == 'governance' }}
+        run: |
+          python3 scripts/contracts/run_owner_boundaries.py \
+            --root "$GITHUB_WORKSPACE" --service governance \
+            --output "$RUNNER_TEMP/governance-owner-status.json"
+      - name: Retain Governance owner runtime receipt
+        if: ${{ always() && matrix.component == 'governance' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: bounded-owner-governance-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/governance-owner-status.json
+            ${{ runner.temp }}/governance-owner-junit.xml
+          if-no-files-found: error
+          retention-days: 14
 
   contracts:
     name: CI / Contracts
