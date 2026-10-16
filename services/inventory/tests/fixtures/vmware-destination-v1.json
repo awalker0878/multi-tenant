@@ -130,6 +130,15 @@
         "type": null
       }
     ],
+    "nsx_policy_observation": null,
+    "guest_options_by_host": [
+      {
+        "host": "host-1",
+        "guest_ids": ["rhel9_64Guest", "otherLinux64Guest"],
+        "hardware_versions": ["vmx-21"],
+        "native_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+      }
+    ],
     "networks": [
       {
         "network": "network-1",

@@ -4,9 +4,9 @@ import base64
 import copy
 import hashlib
 import json
-from pathlib import Path
 import subprocess
 import time
+from pathlib import Path
 
 
 def digest(value):
@@ -14,12 +14,49 @@ def digest(value):
                                     separators=(',', ':')).encode()).hexdigest()
 
 
+def composition_readiness(content, tenant, now):
+    """Current synthetic E2 resolver specimen; never enrolled E3/E4 evidence."""
+    from importlib.util import module_from_spec, spec_from_file_location
+
+    from lifecycle.domain.capability_definitions import METHOD_ALIASES
+    root = Path(__file__).resolve().parents[2]
+    locator = spec_from_file_location('_composition_readiness', root/'services/lifecycle/tests/test_migration_readiness.py')
+    if locator is None or locator.loader is None:
+        raise RuntimeError('Current Lifecycle readiness test specimen unavailable')
+    fixture = module_from_spec(locator)
+    locator.loader.exec_module(fixture)
+    value, _ = fixture.specimen()
+    migration = content['native_migration']['migration']
+    value.update(scope={'tenant_id': tenant, 'application_id': content['scope']['resource_id'],
+                        'environment_id': content['scope']['environment'], 'site_id': content['scope']['site_id']},
+                 route_sha256=content['migration_campaign']['route_sha256'],
+                 method=METHOD_ALIASES[migration['method']], evaluated_at=now, expires_at=now+100)
+    for case in value['api_compatibility']['cases']:
+        case['expires_at'] = now+100
+    for side in ('source', 'target'):
+        value[side].update(profile_sha256=migration[side]['profile_sha256'])
+        if 'outcomes' in migration:
+            value[side]['platform'] = migration['outcomes'][side+'_platform']
+    recon = value['workload_reconciliation']
+    recon.update(source_profile_sha256=migration['source']['profile_sha256'],
+                 native_review_sha256=migration['review']['digest'], expires_at=now+100)
+    recon['reconciliation_sha256'] = digest({k:v for k,v in recon.items() if k != 'reconciliation_sha256'})
+    for coverage in value['collection_coverages']:
+        side = 'target' if coverage['scope'] == 'target' else 'source'
+        coverage.update(platform=value[side]['platform'], installed_tuple_sha256=migration[side]['tuple_sha256'],
+                        evaluated_at=now, expires_at=now+100)
+        coverage['coverage_sha256'] = digest({k:v for k,v in coverage.items() if k != 'coverage_sha256'})
+    value['readiness_sha256'] = digest({k:v for k,v in value.items() if k != 'readiness_sha256'})
+    return value
+
+
 def signed_fixture(record, directory, now=None, inventory=None, snapshot=None, receiving=False):
     directory = Path(directory)
     directory.mkdir(parents=True, exist_ok=True)
     now = int(time.time()) if now is None else now
     source = Path(__file__).resolve().parents[2] / 'contracts/capabilities/definitions-v1.json'
-    definition = digest(json.loads(source.read_text()))
+    definition_data = json.loads(source.read_text())
+    definition = digest(definition_data)
     scope = record['scope']
     keys = {}
     for role in (('observer', 'reviewer', 'receiver') if receiving else ('observer', 'reviewer')):
@@ -31,7 +68,7 @@ def signed_fixture(record, directory, now=None, inventory=None, snapshot=None, r
         public = subprocess.check_output(['openssl', 'pkey', '-in', str(private), '-pubout'], text=True)
         keys[role] = {'role': role, 'subject_id': 'fixture-' + role, 'public_key_pem': public,
                       'scope': {k: scope[k] for k in ('tenant_id', 'site_id', 'endpoint_id')},
-                      'expires_at': now + 7200}
+                      'expires_at': now + 7200, 'revoked': False}
 
     def sign(payload, role):
         raw = json.dumps(payload, sort_keys=True, ensure_ascii=True, separators=(',', ':')).encode()
@@ -40,16 +77,24 @@ def signed_fixture(record, directory, now=None, inventory=None, snapshot=None, r
         return {'key_id': role, 'content_base64': base64.b64encode(raw).decode(),
                 'sha256': hashlib.sha256(raw).hexdigest(), 'signature_base64': base64.b64encode(signature).decode()}
 
+    method_modes = {
+        'method:' + method['v1_alias'] + ':' + mode: 'unsupported'
+        for method in definition_data['methods'].values()
+        for mode in definition_data['modes']
+    }
     record = copy.deepcopy(record)
     record.pop('verification', None)
-    record.update(version=2, evidence_level='E4' if receiving else 'E3')
+    record.update(version=2, evidence_level='E4' if receiving else 'E3',
+                  method_modes=method_modes)
     proof = {'kind': 'native_conformance', 'simulation': False, 'finalized': True,
              'scope_sha256': digest(scope), 'definition_sha256': definition,
              'runtime_artifacts': scope['artifacts'], 'adapter_conformant': True,
              'dimensions': record['dimensions'], 'capabilities': record['capabilities'],
+             'method_modes': dict(sorted(method_modes.items(), reverse=True)),
              'cases': ({'capability:' + k: 'passed' for k in record['capabilities']}
                        | {'dimension:' + k: 'passed' for k in record['dimensions']}
-                       | {'adapter_behavior':'passed','installed_identity':'passed','runtime_artifacts':'passed'}),
+                       | {'adapter_behavior':'passed','installed_identity':'passed','runtime_artifacts':'passed'}
+                       | method_modes),
              'observed_at': now, 'expires_at': now + 3600, 'subject_id': keys['observer']['subject_id']}
     if inventory is not None:
         proof['inventory']=copy.deepcopy(inventory)
@@ -83,7 +128,11 @@ def refresh_runtime(envelope, directory, now=None):
     snapshot=payload.get('snapshot',{})
     if snapshot:
         snapshot['isolation'].update(observed_at=now,expires_at=now+120)
-        for row in snapshot['network']['measurements']+snapshot['recovery_measurements']:
+        observations = snapshot['network']['measurements'] + snapshot['network']['return_paths']
+        observations += list(snapshot['network']['application_flow_selections'].values())
+        observations += list(snapshot['isolation']['boundary_controls'].values())
+        observations += snapshot['recovery_measurements']
+        for row in observations:
             row.update(observed_at=now,expires_at=now+120)
     raw=json.dumps(payload,sort_keys=True,ensure_ascii=True,separators=(',',':')).encode()
     signature=subprocess.check_output(['openssl','dgst','-sha256','-sign',str(Path(directory)/'observer.pem')],input=raw)
@@ -97,16 +146,18 @@ class FixtureRuntimePublisher:
         import threading
         self.path, self.registry, self.directory = Path(path), registry, Path(directory)
         self.stop=threading.Event()
+        self.lock=threading.Lock()
         self.refresh()
         self.thread=threading.Thread(target=self.run,daemon=True)
         self.thread.start()
 
     def refresh(self):
-        records={row['decision']['sha256']:refresh_runtime(row['runtime'],self.directory/('fixture-keys-'+row['record']['scope']['site_id'])) for row in self.registry['records']}
-        temporary=self.path.with_suffix('.tmp')
-        temporary.write_text(json.dumps({'schema_version':1,'records':records}))
-        temporary.chmod(0o600)
-        temporary.replace(self.path)
+        with self.lock:
+            records={row['decision']['sha256']:refresh_runtime(row['runtime'],self.directory/('fixture-keys-'+row['record']['scope']['site_id'])) for row in list(self.registry['records'])}
+            temporary=self.path.with_suffix('.tmp')
+            temporary.write_text(json.dumps({'schema_version':1,'records':records}))
+            temporary.chmod(0o600)
+            temporary.replace(self.path)
 
     def run(self):
         while not self.stop.wait(15):

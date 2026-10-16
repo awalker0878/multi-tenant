@@ -9,12 +9,14 @@ use App\Application\Foundation\Contracts\DependencyProbe;
 use App\Application\Foundation\Contracts\HealthCredential;
 use App\Application\Foundation\Contracts\SecretReader;
 use App\Application\Foundation\Contracts\SignalBuffer;
+use App\Application\Qualification\Contracts\ConfirmedInvalidationPublisher;
 use App\Infrastructure\Evidence\EvidenceOwners;
 use App\Infrastructure\Foundation\BoundedSignalBuffer;
 use App\Infrastructure\Foundation\MountedHealthCredential;
 use App\Infrastructure\Foundation\MountedSecret;
 use App\Infrastructure\Foundation\PostgresDependencyProbe;
 use App\Infrastructure\Planning\PlanningInputAuthority;
+use App\Infrastructure\Qualification\ConfirmedHttpInvalidationPublisher;
 use Illuminate\Support\ServiceProvider;
 
 final class AppServiceProvider extends ServiceProvider
@@ -26,6 +28,7 @@ final class AppServiceProvider extends ServiceProvider
         $this->app->bind(SignalBuffer::class, BoundedSignalBuffer::class);
         $this->app->bind(HealthCredential::class, MountedHealthCredential::class);
         $this->app->bind(SecretReader::class, MountedSecret::class);
+        $this->app->bind(ConfirmedInvalidationPublisher::class, ConfirmedHttpInvalidationPublisher::class);
         $this->app->bind(DependencyProbe::class, PostgresDependencyProbe::class);
     }
 }

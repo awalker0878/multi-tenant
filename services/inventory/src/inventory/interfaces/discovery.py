@@ -12,6 +12,7 @@ from uvicorn._types import ASGIReceiveCallable, ASGISendCallable, Scope
 from inventory.application.configuration import PortingConfiguration
 from inventory.application.discovery import Discovery
 from inventory.application.fleet import MigrationFleet
+from inventory.application.migration_collection_ledger import MigrationCollectionLedger
 from inventory.application.operator_inputs import OperatorInputs
 from inventory.application.ports import Authority
 from inventory.application.profile_collection import authorize_read
@@ -20,6 +21,15 @@ from inventory.application.workload import WorkloadProfiles
 from inventory.domain.discovery import Rejected
 
 UUID = "[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}"
+WORKER_ROUTES = frozenset(
+    {
+        "/internal/collections/claim",
+        "/internal/collections/pages",
+        "/internal/collections/profile-reads",
+        "/internal/collections/receipts",
+    }
+)
+
 ROUTES = (
     (
         "GET",
@@ -212,7 +222,8 @@ class InventoryApp:
         self,
         discovery: Discovery,
         authority: Authority,
-        evidence: Callable[..., dict[str, Any]] | None = None,
+        evidence: Callable[..., dict[str, Any]] | None,
+        collection_reader: Callable[..., list[dict[str, Any]]],
     ) -> None:
         self.discovery = discovery
         self.authority = authority
@@ -220,6 +231,7 @@ class InventoryApp:
         self.configuration = PortingConfiguration(discovery)
         self.operator_inputs = OperatorInputs(discovery, evidence)
         self.workloads = WorkloadProfiles(discovery)
+        self.collection_ledger = MigrationCollectionLedger(discovery, collection_reader)
         self.fleet = MigrationFleet(discovery)
 
     async def __call__(
@@ -232,15 +244,13 @@ class InventoryApp:
         try:
             if len(scope["query_string"]) > 200 or len(headers) > 40:
                 raise Rejected("request_bound", 413)
-            header = single(headers, b"authorization")
+            # Missing credentials are an authentication denial, not malformed
+            # request syntax. Duplicated/non-ASCII headers still fail closed.
+            header = single(headers, b"authorization", optional=True)
             if not re.fullmatch(r"Bearer [A-Za-z0-9_-]{32,4096}", header):
                 raise Rejected("invalid_workload", 401)
             credential = header[7:]
-            worker_route = scope["path"] in {
-                "/internal/collections/claim",
-                "/internal/collections/pages",
-                "/internal/collections/profile-reads",
-            }
+            worker_route = scope["path"] in WORKER_ROUTES
             selected = next(
                 (
                     (m, op, action)
@@ -269,9 +279,9 @@ class InventoryApp:
                 raise Rejected("not_found", 404)
             body: dict[str, Any] = {}
             if scope["method"] == "POST":
-                if single(headers, b"content-type").split(";")[0] != "application/json" or single(
-                    headers, b"content-encoding", True
-                ):
+                if single(headers, b"content-type", True).split(";")[
+                    0
+                ] != "application/json" or single(headers, b"content-encoding", True):
                     raise Rejected("unsupported_content_type", 415)
                 chunks = bytearray()
                 async with asyncio.timeout(5):
@@ -281,7 +291,11 @@ class InventoryApp:
                             raise Rejected("request_interrupted", 400)
                         chunks.extend(event["body"])
                         maximum = (
-                            2097152 if scope["path"] == "/internal/collections/pages" else 262144
+                            2097152
+                            if scope["path"] == "/internal/collections/pages"
+                            else 524288
+                            if scope["path"] == "/internal/collections/receipts"
+                            else 262144
                         )
                         if len(chunks) > maximum:
                             raise Rejected("request_bound", 413)
@@ -297,6 +311,8 @@ class InventoryApp:
                     payload = await asyncio.to_thread(self.discovery.claim, worker)
                 elif scope["path"].endswith("/profile-reads"):
                     payload = await asyncio.to_thread(authorize_read, self.discovery, worker, body)
+                elif scope["path"].endswith("/receipts"):
+                    payload = await asyncio.to_thread(self.collection_ledger.publish, worker, body)
                 else:
                     payload = await asyncio.to_thread(self.discovery.submit, worker, body)
             else:

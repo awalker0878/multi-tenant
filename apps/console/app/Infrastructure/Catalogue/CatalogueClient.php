@@ -7,9 +7,12 @@ namespace App\Infrastructure\Catalogue;
 use App\Application\Catalogue\Contracts\CatalogueGateway;
 use App\Domain\Catalogue\CatalogueFailure;
 use App\Domain\Identity\IdentityFailure;
+use App\Infrastructure\Foundation\ContractPath;
+use App\Infrastructure\Foundation\ContractResponseBody;
 use App\Infrastructure\Foundation\MountedSecret;
 use App\Infrastructure\Governance\GovernanceClient;
 use Illuminate\Support\Facades\Http;
+use InvalidArgumentException;
 use Opis\JsonSchema\Validator;
 use Throwable;
 
@@ -36,15 +39,10 @@ final class CatalogueClient implements CatalogueGateway
         if ($spec === null) {
             throw new CatalogueFailure(503);
         }
-        $parameters = ['tenant' => $tenant, ...$parameters];
-        $path = $spec['path'];
-        foreach ($parameters as $field => $value) {
-            if (! preg_match('/\A[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\z/', $value)) {
-                throw new CatalogueFailure(422, 'invalid_identity');
-            }$path = str_replace('{'.$field.'}', $value, $path);
-        }
-        if (str_contains($path, '{')) {
-            throw new CatalogueFailure(422, 'missing_identity');
+        try {
+            $path = ContractPath::bind($spec['path'], $tenant, $parameters);
+        } catch (InvalidArgumentException $e) {
+            throw new CatalogueFailure(422, $e->getMessage());
         }
         $base = config('catalogue.url');
         $url = is_string($base) ? parse_url($base) : false;
@@ -75,33 +73,76 @@ final class CatalogueClient implements CatalogueGateway
         $query = array_filter(['environment' => $environment, 'cursor' => $cursor], fn ($v) => $v !== null);
         try {
             $response = Http::acceptJson()->asJson()->withToken($credential)->withHeaders(['X-Actor-Delegation' => $token, ...($key === null ? [] : ['Idempotency-Key' => $key]), ...($etag === null ? [] : ['If-Match' => $etag])])
-                ->connectTimeout(2)->timeout(10)->withOptions(['allow_redirects' => false, 'verify' => $ca ?? true])
+                ->connectTimeout(2)->timeout(10)->withOptions(['allow_redirects' => false, 'verify' => $ca ?? true, 'stream' => true])
                 ->send($spec['method'], $base.$path.($spec['method'] === 'GET' && $query !== [] ? '?'.http_build_query($query) : ''), $spec['method'] === 'GET' ? [] : ['json' => $body === [] ? (object) [] : $body]);
-            if (strlen($response->body()) > 310000) {
-                throw new CatalogueFailure(503);
-            }
+            $raw = ContractResponseBody::read($response->toPsrResponse()->getBody(), 310000);
+            $wire = json_decode($raw, true, 64, JSON_THROW_ON_ERROR);
             if ($response->status() !== $spec['status']) {
-                $reason = $response->json('error');
-                $field = $response->json('field');
+                $reason = is_array($wire) ? ($wire['error'] ?? null) : null;
+                $field = is_array($wire) ? ($wire['field'] ?? null) : null;
                 throw new CatalogueFailure(in_array($response->status(), [403, 404, 409, 412, 413, 422, 428, 429], true) ? $response->status() : 503,
                     is_string($reason) && preg_match('/\A[a-z_]{1,80}\z/', $reason) ? $reason : 'catalogue_unavailable', is_string($field) && preg_match('/\A[a-zA-Z0-9_.]{1,200}\z/', $field) ? $field : 'intent');
             }
-            $wire = $response->json();
-            $source = file_get_contents(resource_path('contracts/catalogue-v1.json'));
+            $source = file_get_contents(resource_path('contracts/catalogue-v1.0.1.json'));
             if ($source === false) {
                 throw new CatalogueFailure(503);
             }
             $api = json_decode($source, true, 512, JSON_THROW_ON_ERROR);
             $schema = ['$ref' => '#/components/schemas/'.$spec['schema'], 'components' => $api['components']];
-            if (! is_array($wire) || ! (new Validator)->validate(json_decode($response->body()), json_decode(json_encode($schema, JSON_THROW_ON_ERROR)))->isValid()) {
+            if (! is_array($wire) || ! (new Validator)->validate(json_decode($raw), json_decode(json_encode($schema, JSON_THROW_ON_ERROR)))->isValid()) {
                 throw new CatalogueFailure(503);
             }
+
+            $this->assertResponseBinding($operation, $parameters, $wire, $body, $environment);
 
             return $wire;
         } catch (CatalogueFailure $e) {
             throw $e;
         } catch (Throwable) {
             throw new CatalogueFailure(503);
+        }
+    }
+
+    /**
+     * @param  array<string, mixed>  $parameters
+     * @param  array<string, mixed>  $wire
+     * @param  array<string, mixed>  $body
+     */
+    private function assertResponseBinding(string $operation, array $parameters, array $wire, array $body, ?string $environment): void
+    {
+        $bindings = match ($operation) {
+            'getApplication' => [[$wire['id'], $parameters['application']]],
+            'getRevision' => [[$wire['id'], $parameters['revision']], [$wire['application_id'], $parameters['application']], [$wire['deployment_id'], $wire['intent']['deployment_id']]],
+            'publishRevision' => [[$wire['application_id'], $parameters['application']], [$wire['deployment_id'], $body['intent']['deployment_id'] ?? null]],
+            'createApplication' => [[$wire['deployment_id'], $body['intent']['deployment_id'] ?? null]],
+            default => [],
+        };
+        if ($operation === 'getApplication' && $environment !== null) {
+            foreach ($wire['deployments'] as $deployment) {
+                $bindings[] = [$deployment['environment_id'], $environment];
+            }
+        }
+        if ($operation === 'getRevision' && $environment !== null) {
+            $bindings[] = [$wire['intent']['environment']['id'], $environment];
+        }
+        $kind = match (true) {
+            str_contains($operation, 'Environment') => 'environment',
+            str_contains($operation, 'Wsd') => 'wsd',
+            str_contains($operation, 'SecurityDomain') => 'security-domain',
+            default => null,
+        };
+        if ($kind !== null) {
+            foreach (str_starts_with($operation, 'list') ? $wire['references'] : [$wire] as $reference) {
+                $bindings[] = [$reference['kind'], $kind];
+                if (isset($parameters['reference'])) {
+                    $bindings[] = [$reference['id'], $parameters['reference']];
+                }
+            }
+        }
+        foreach ($bindings as [$actual, $expected]) {
+            if ($actual !== $expected) {
+                throw new CatalogueFailure(403, 'scope_mismatch');
+            }
         }
     }
 }

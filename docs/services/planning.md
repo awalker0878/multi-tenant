@@ -27,7 +27,7 @@ Plan inputs pin catalogue revision, inventory generations, policy/profile revisi
 
 ## Implemented P05 API surface
 
-The [published API](../../contracts/openapi/planning-v1.json) uses
+The [published API](../../contracts/openapi/planning-v1.2.json) uses
 `/v1/tenants/{tenant}/applications/{application}/environments/{environment}`.
 Commands are synchronous and bounded to three destinations, 50 workloads,
 800 requirements, 500 graph nodes, a 256 KiB request, a 900 KiB stored result
@@ -44,15 +44,17 @@ would require a separately versioned contract; no computation worker is implied.
 | `POST /plans/{id}/validity` | Current direct owner checks and conservative event invalidation holds. |
 | `POST /plans/{id}/diff` | Material paths changed; both plans' destinations are currently authorized. |
 
-Governance alone reads `/v1/plans/{id}/revisions/1` with a distinct workload
-credential. The [owner read contract](../../contracts/openapi/planning-inputs-v1.json)
+Governance alone reads `/v1/tenants/{tenant}/plans/{id}/revisions/1` with a distinct workload
+credential. Planning binds the tenant to its database lookup, verifies
+the persisted and issued plan tenants, and rejects the former unscoped route.
+The owner read contract
 requires each source to recheck the original request-bound delegation. Versioned
 profiles and policies are mounted in Planning custody; qualifications are read
 from Assurance custody. No list, profile mutation or native dispatch route is exposed.
 
 ## Authorization and bootstrap
 
-P08's [migration preparation API](../../contracts/openapi/planning-migration-v1.json)
+P08's [migration preparation API](../../contracts/openapi/planning-migration-v2.json)
 re-reads an exact current confirmed Inventory review under the request's `plan.create`
 delegation. It derives native identities, profile digests, capacities, method,
 owner-input digest and complete datasets, and accepts only explicit target keys and

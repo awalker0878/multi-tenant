@@ -33,6 +33,8 @@ from lifecycle_worker.infrastructure.native_json import NativeJson
 from lifecycle_worker.infrastructure.vmware_capture import NICS, devices, moref, reference
 from lifecycle_worker.infrastructure.vmware_ovf import descriptor
 
+MIGRATION_API_CAPABILITIES = frozenset({"vm.disk.import"})
+
 
 class ImportJournal(NativeJournal, Protocol):
     def import_lease(self, binding: NativeBinding) -> str: ...

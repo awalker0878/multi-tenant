@@ -33,7 +33,23 @@ class TlsProxy:
                     connection.request(self.command, self.path, body, dict(self.headers))
                     response = connection.getresponse()
                     wire = response.read()
+                    response_status = response.status
                     peer.forwarded += 1
+                    # Mutate a real successful owner response after upstream
+                    # processing. This challenges the shipped consumer over TLS;
+                    # no fake client or substitute producer earns positive proof.
+                    if peer.fault_file and peer.fault_file.exists() and 200 <= response.status < 300:
+                        rule=json.loads(peer.fault_file.read_text())
+                        if rule.get('mode')=='poison_response' and rule.get('path')==self.path and rule.get('method')==self.command:
+                            data=json.loads(wire)
+                            if rule.get('field')=='uncontracted':data['uncontracted']=True
+                            elif rule.get('field') in {'id','tenant_id','job_id','command_id','plan_id','approval_id'}:data[rule['field']]=str(uuid.uuid4())
+                            elif rule.get('field')=='plan_digest':data['plan_digest']='0'*64
+                            elif rule.get('field')=='action':data['action']='stop' if data['action']!='stop' else 'pause'
+                            elif rule.get('field')=='status_code':response_status=202 if response.status==200 else 200
+                            else:raise ValueError('unknown_response_fault')
+                            wire=json.dumps(data).encode()
+                            peer.fault_file.unlink();peer.injected+=1
                     inject = False
                     if peer.fault_file and peer.fault_file.exists() and self.command == 'POST' and response.status in {201,202}:
                         rule = json.loads(peer.fault_file.read_text())
@@ -43,7 +59,7 @@ class TlsProxy:
                             peer.injected += 1
                     if inject:
                         wire = b'{"error":"synthetic_response_loss"}'
-                    self.send_response(503 if inject else response.status)
+                    self.send_response(503 if inject else response_status)
                     for name, value in response.getheaders():
                         if name.lower() not in ['content-length', 'transfer-encoding', 'connection']:
                             self.send_header(name, value)

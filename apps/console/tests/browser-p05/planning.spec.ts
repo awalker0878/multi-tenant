@@ -30,8 +30,10 @@ test('compare exact destinations, retain uncertain command, review bound approva
   await expect(page.getByRole('status').first()).toContainText('Approval requested');
   const qualified=JSON.parse(readFileSync(fixture.qualification_file,'utf8'));
   qualified.records[0].record.revoked=true;writeFileSync(fixture.qualification_file,JSON.stringify(qualified));
-  await expect(page.getByRole('button',{name:'Request independent approval for this digest'})).toBeDisabled({timeout:35_000});
-  await expect(page.getByText('exact tuple qualification missing or stale',{exact:true})).toBeVisible();
+  // Approval submission can already disable the button. Wait for the current
+  // authority poll to explain the revocation before checking the held control.
+  await expect(page.getByText('exact tuple qualification missing or stale',{exact:true})).toBeVisible({timeout:35_000});
+  await expect(page.getByRole('button',{name:'Request independent approval for this digest'})).toBeDisabled();
   const originalURL=page.url();
   const data=JSON.stringify({revision:fixture.membership.revision,subject:'p03-author',role:'author',state:'revoked',site_id:null,environment:null,expires_at:null});
   await new Promise<void>((resolve,reject)=>{

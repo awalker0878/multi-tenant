@@ -66,6 +66,7 @@ final class LocalIdentityController
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         $request->session()->put('identity.token', $session->token);
+        $request->session()->put('identity.expires_at', $session->expiresAt);
 
         return redirect($session->actor->passwordChangeRequired ? '/password' : '/setup');
     }

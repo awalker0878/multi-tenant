@@ -17,7 +17,12 @@
 !public/index.php
 !routes/
 !routes/**
+!database/
+!database/**
 !resources/
 !resources/**
 !build/
 !build/snapshot.sh
+
+!build/apk-cache/
+!build/apk-cache/*.apk

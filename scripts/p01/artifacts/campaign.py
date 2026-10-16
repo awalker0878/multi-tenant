@@ -49,7 +49,7 @@ def main():
               'scope': 'P01 real-image development scan/signature/transfer; no operated trust or deployment',
               'build_report_sha256': digest(args.build_report), 'started_at': datetime.now(timezone.utc).isoformat(),
               'commands': [], 'denials': []}
-    bound = [ROOT / p for p in ['.github/workflows/p01-images.yml', 'release/artifact-tools.lock.json',
+    bound = [ROOT / p for p in ['.github/workflows/qualification.yml', 'release/artifact-tools.lock.json',
              'release/development-signing.json', 'scripts/p01/run_images.py', 'scripts/p01/python_lock.py',
              'deploy/build/components.json', 'deploy/build/inputs.lock.json']]
     bound += sorted((ROOT / 'scripts/p01/artifacts').glob('*.py'))

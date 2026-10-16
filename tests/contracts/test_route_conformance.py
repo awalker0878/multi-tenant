@@ -1,0 +1,247 @@
+"""Synthetic canaries for actual HTTP router vs immutable published OpenAPI."""
+from copy import deepcopy
+import hashlib
+import json
+import tempfile
+from pathlib import Path
+import sys
+import unittest
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "scripts/contracts"))
+from route_conformance import HttpConformance, compare_declared, compare_inventory_discovery_routes, compare_inventory_worker_routes, routes_in_laravel, routes_in_openapi, verify_app, verify_lifecycle_native, verify_lifecycle_native_jobs, verify_lifecycle_worker_effect_routes
+
+
+class HttpWireMeasurementTests(unittest.TestCase):
+    """Admission negative controls, never service qualification receipts."""
+
+    def setUp(self):
+        folder = tempfile.TemporaryDirectory()
+        self.addCleanup(folder.cleanup)
+        self.root = Path(folder.name)
+        path = self.root/'contracts/openapi/probe.json'
+        path.parent.mkdir(parents=True)
+        self.api = {'openapi': '3.1.0', 'paths': {'/v1/tenants/{tenant}/records': {'post': {
+            'operationId': 'createRecord',
+            'parameters': [
+                {'in': 'path', 'name': 'tenant', 'required': True, 'schema': {'type': 'string', 'format': 'uuid'}},
+                {'in': 'header', 'name': 'Idempotency-Key', 'required': True, 'schema': {'type': 'string', 'pattern': '^[a-f0-9]{32}$'}},
+            ],
+            'requestBody': {'required': True, 'content': {'application/json': {'schema': {
+                'type': 'object', 'additionalProperties': False, 'properties': {'name': {'type': 'string'}}, 'required': ['name']}}}},
+            'responses': {str(status): {'content': {'application/json': {'schema': {
+                '$ref': '#/components/schemas/Result'}}}} for status in (201, 422)},
+        }}}, 'components': {'schemas': {'Result': {'type': 'object', 'additionalProperties': False,
+            'properties': {'value': {'type': 'integer', 'minimum': 1}}, 'required': ['value']}}}}
+        path.write_text(json.dumps(self.api, indent=2)+'\n')
+        registry = self.root/'architecture/contract-consumers.json'
+        registry.parent.mkdir()
+        registry.write_text(json.dumps({'active_releases': [{'path': 'contracts/openapi/probe.json', 'owner': 'probe', 'consumers': []}]}))
+        self.output = self.root/'observed.json'
+        self.probe = HttpConformance(self.root, self.output, {'https://probe.invalid': 'probe'}, 'unit:measurement-controls')
+
+    def observe(self, **changed):
+        fields = {'origin': 'https://probe.invalid', 'path': '/v1/tenants/10000000-0000-4000-8000-000000000001/records',
+                  'method': 'POST', 'body': {'name': 'Valid'}, 'headers': {'Idempotency-Key': 'a'*32, 'Authorization': 'Bearer NEVER_RETAIN_ME'},
+                  'status': 201, 'response': {'value': 1}, 'response_headers': {'Content-Type': 'application/json; charset=utf-8'}}
+        self.probe.observe(**(fields | changed))
+
+    def test_measured_success_has_exact_release_bytes_and_no_authority_or_secrets(self):
+        self.observe()
+        row = json.loads(self.output.read_text())[0]
+        self.assertEqual(row['release_sha256'], hashlib.sha256((self.root/'contracts/openapi/probe.json').read_bytes()).hexdigest())
+        self.assertTrue(row['positive_conformance'])
+        self.assertFalse(row['security_qualified'])
+        self.assertFalse(row['installed_runtime_identity_verified'])
+        self.assertNotIn('NEVER_RETAIN_ME', self.output.read_text())
+        self.assertNotIn('Valid', self.output.read_text())
+
+    def test_unknown_operation_method_and_status_cannot_earn_evidence(self):
+        for fields in ({'method': 'GET'}, {'path': '/v1/unknown'}, {'status': 202}):
+            with self.subTest(fields=fields), self.assertRaises(ValueError):
+                self.observe(**fields)
+
+    def test_success_with_invalid_request_or_payload_fails_closed(self):
+        for fields in ({'headers': {}}, {'body': {'name': 'x', 'unexpected': True}},
+                       {'response': {'value': 0}}, {'response': {'value': 1, 'grant': True}},
+                       {'response_headers': {'Content-Type': 'text/html'}},
+                       {'path': '/v1/tenants/foreign/records'}):
+            with self.subTest(fields=fields), self.assertRaisesRegex(ValueError, 'contract mismatch'):
+                self.observe(**fields)
+            self.assertFalse(json.loads(self.output.read_text())[-1]['positive_conformance'])
+
+    def test_contract_valid_denial_is_not_positive_or_security_qualification(self):
+        self.observe(status=422, body={'unexpected': True}, response={'value': 1})
+        row = json.loads(self.output.read_text())[0]
+        self.assertTrue(row['response_valid'])
+        self.assertFalse(row['positive_conformance'])
+        self.assertFalse(row['security_qualified'])
+
+    def test_errors_use_the_exact_active_operation_instead_of_an_unrelated_error_version(self):
+        probe = HttpConformance(ROOT, self.output, {'https://governance.invalid': 'governance'}, 'unit:active-error-versions')
+        headers = {'Content-Type': 'application/json'}
+        error_v2 = {'code': 'invalid_session', 'message': 'Denied',
+                    'correlation_id': '10000000-0000-4000-8000-000000000001', 'retryable': False}
+        probe.observe('https://governance.invalid', '/identity/session', 'GET', None, {}, 401, error_v2, headers)
+        probe.observe('https://governance.invalid', '/identity/oidc/flows', 'POST', {}, {}, 503,
+                      {'error': 'identity_recovery_required'}, headers)
+        with self.assertRaisesRegex(ValueError, 'contract mismatch'):
+            probe.observe('https://governance.invalid', '/identity/session', 'GET', None, {}, 401,
+                          {'error': 'identity_recovery_required'}, headers)
+        self.assertTrue(all(not row['security_qualified'] for row in json.loads(self.output.read_text())))
+
+    def test_installed_contract_drift_prevents_measurement(self):
+        registry = self.root/'architecture/contract-consumers.json'
+        value = json.loads(registry.read_text())
+        value['active_releases'][0]['copies'] = ['private/probe.json']
+        registry.write_text(json.dumps(value))
+        copy = self.root/'private/probe.json'
+        copy.parent.mkdir()
+        copy.write_text(json.dumps(deepcopy(self.api)))
+        with self.assertRaisesRegex(ValueError, 'Installed contract differs'):
+            HttpConformance(self.root, self.output, {}, 'unit:drift')
+
+
+class HttpRouteConformanceTests(unittest.TestCase):
+    def test_must_match_method_and_full_path(self):
+        spec = {"paths": {
+            "/v1/tenants/{tenant}/approvals": {
+                "post": {"operationId": "requestApproval", "responses": {"200": {}}}
+            }
+        }}
+        runtime = routes_in_laravel([{
+            "method": "POST", "uri": "v1/tenants/{tenant}/approvals"
+        }])
+        self.assertEqual(runtime, {("POST", "/v1/tenants/{tenant}/approvals")})
+        compare_declared(spec, runtime, "synthetic")
+        with self.assertRaisesRegex(ValueError, "without implemented routes"):
+            compare_declared(spec, {("GET", "/v1/tenants/{tenant}/approvals")}, "synthetic")
+        with self.assertRaisesRegex(ValueError, "without implemented routes"):
+            compare_declared(spec, {("POST", "/v1/tenants/{tenant}/approval")}, "synthetic")
+
+    def test_get_head_and_optional_path_handling(self):
+        actual = routes_in_laravel([{
+            "method": "GET|HEAD",
+            "uri": "v1/tenants/{tenant}/approvals/{approval?}",
+        }])
+        self.assertEqual(actual, {("GET", "/v1/tenants/{tenant}/approvals/{approval}")})
+
+    def test_unregistered_runtime_operations_fail_in_every_laravel_owner(self):
+        for owner in ("governance", "catalogue", "assurance"):
+            with self.subTest(owner=owner), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                (root / "architecture").mkdir()
+                path = f"contracts/openapi/{owner}-test-v1.json"
+                target = root / path
+                target.parent.mkdir(parents=True)
+                route = ("GET", "/v1/tenants/{tenant}/current-owner-read")
+                doc = {"paths": {route[1]: {"get": {"operationId": "readCurrentOwner",
+                        "responses": {"200": {"description": "OK"}}}}}}
+                target.write_text(json.dumps(doc))
+                (root / "architecture/contract-consumers.json").write_text(json.dumps(
+                    {"active_releases": [{"path": path, "owner": owner}]}))
+                self.assertEqual(verify_app(owner, {route}, root), 1)
+                with self.assertRaisesRegex(ValueError, f"Undocumented {owner}"):
+                    verify_app(owner, {route, ("GET", "/internal/tenants/{tenant}/x")}, root)
+                with self.assertRaisesRegex(ValueError, f"Undocumented {owner}"):
+                    verify_app(owner, {route, ("POST", "/v1/tenants/{tenant}/surprise")}, root)
+
+    def test_retired_unversioned_qualification_alias_is_not_exempt(self):
+        spec = json.loads((ROOT / "contracts/openapi/assurance-qualification-v2.json").read_text())
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "architecture").mkdir()
+            path = "contracts/openapi/assurance-qualification-v2.json"
+            target = root / path
+            target.parent.mkdir(parents=True)
+            target.write_text(json.dumps(spec))
+            (root / "architecture/contract-consumers.json").write_text(json.dumps(
+                {"active_releases": [{"path": path, "owner": "assurance"}]}))
+            with self.assertRaisesRegex(ValueError, "Undocumented assurance"):
+                verify_app("assurance", routes_in_openapi(spec) | {
+                    ("POST", "/v1/tenants/{tenant}/planning-qualification")}, root)
+
+    def test_inventory_reverse_route_negative_injection(self):
+        segment = r"[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}"
+        real = ("GET", rf"/v1/tenants/({segment})/sites", "sites", "inventory.read")
+        declared = {("GET", "/v1/tenants/{tenant}/sites")}
+        compare_inventory_discovery_routes((real,), declared)
+        dummy = ("GET", rf"/internal/tenants/({segment})/x", "undocumented", "inventory.read")
+        with self.assertRaisesRegex(ValueError, "Undocumented Inventory"):
+            compare_inventory_discovery_routes((real, dummy), declared)
+
+    def test_immutable_governance_read_has_no_unscoped_route(self):
+        source = (ROOT / "contracts/openapi/planning-immutable-plan-v2.json").read_text()
+        self.assertIn('"/v1/tenants/{tenant}/plans/{plan}/revisions/{revision}"', source)
+        self.assertNotIn('"/v1/plans/{plan}/revisions/{revision}"', source)
+        actual = (ROOT / "services/planning/src/planning/bootstrap/server.py").read_text()
+        self.assertNotIn('"/v1/plans/{plan}/revisions/{revision}"', actual)
+
+    def test_unregistered_inventory_worker_route_fails(self):
+        declared = {("POST", "/internal/collections/claim")}
+        compare_inventory_worker_routes(frozenset({"/internal/collections/claim"}), declared)
+        with self.assertRaisesRegex(ValueError, "Undocumented Inventory worker"):
+            compare_inventory_worker_routes(frozenset({"/internal/collections/claim", "/internal/collections/hidden"}), declared)
+
+    def test_planning_migration_suffix_catalogue_is_exact(self):
+        import ast
+        from route_conformance import routes_in_openapi
+        source = ast.parse((ROOT / "services/planning/src/planning/bootstrap/server.py").read_text())
+        variants = next(ast.literal_eval(assignment.value)
+                        for assignment in source.body
+                        if isinstance(assignment, ast.Assign)
+                        and any(isinstance(t, ast.Name) and t.id == "MIGRATION_SUFFIXES"
+                                for t in assignment.targets))
+        api = json.loads((ROOT / "contracts/openapi/planning-migration-v2.json").read_text())
+        contracted = {"/" + path.rsplit("/", 1)[-1]
+                      for method, path in routes_in_openapi(api) if method == "POST"}
+        self.assertEqual(set(variants), contracted)
+        self.assertNotIn("/legacy-migration-inputs", variants)
+
+    def test_composed_python_route_negative_injection(self):
+        from route_conformance import compare_composed_routes
+        base = {("GET", "/v1/tenants/{tenant}/jobs")}
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            (root / "contracts/openapi").mkdir(parents=True)
+            (root / "contracts/openapi/example.json").write_text(json.dumps({
+                "paths": {"/v1/tenants/{tenant}/jobs": {"get": {"responses": {"200": {}}}}}
+            }))
+            self.assertEqual(compare_composed_routes("Lifecycle", base, ("example.json",), root), 1)
+            with self.assertRaisesRegex(ValueError, "Undocumented Lifecycle"):
+                compare_composed_routes("Lifecycle", base | {("POST", "/internal/hidden")}, ("example.json",), root)
+
+    def test_actual_native_job_and_worker_effect_route_handlers(self):
+        from assurance_routes import prove
+
+        self.assertEqual(verify_lifecycle_native(ROOT), 1)
+        self.assertEqual(verify_lifecycle_native_jobs(ROOT), 4)
+        self.assertEqual(verify_lifecycle_worker_effect_routes(ROOT), 2)
+        for app, expected in (("lifecycle-native", 1),
+                              ("lifecycle-native-jobs", 4),
+                              ("lifecycle-worker-effects", 2)):
+            observations = prove(app, root=ROOT)
+            denials = [row for row in observations if row["claim"] == "authentication"]
+            self.assertEqual(len(denials), expected)
+            self.assertEqual(len([row for row in observations if row["claim"] == "route"]),
+                             expected)
+            for denial in denials:
+                self.assertEqual(denial["source"], "live-denial")
+                self.assertEqual(
+                    denial["denial_kind"],
+                    "missing-credential" if app == "lifecycle-native" else "invalid-credential",
+                )
+                self.assertEqual(denial["status_code"], 401)
+            self.assertFalse(any(row["claim"] == "tenant_isolation"
+                                 for row in observations))
+
+
+    def test_declared_paths_include_each_method(self):
+        spec = {"paths": {"/v1/example": {"get": {}, "post": {}}}}
+        self.assertEqual(routes_in_openapi(spec), {
+            ("GET", "/v1/example"), ("POST", "/v1/example"),
+        })
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -15,8 +15,10 @@ from lifecycle.domain.execution import Rejected, decode, identity, shape
 UUID = r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[89ab][0-9a-f]{3}-[0-9a-f]{12}"
 
 
-def single(headers: list[tuple[bytes, bytes]], key: bytes) -> str:
+def single(headers: list[tuple[bytes, bytes]], key: bytes, optional: bool = False) -> str:
     values = [v for k, v in headers if k.lower() == key]
+    if not values and optional:
+        return ""
     if len(values) != 1:
         raise Rejected("invalid_headers", 400)
     return values[0].decode("ascii")
@@ -36,7 +38,7 @@ class ExecutionApp:
             headers = list(scope["headers"])
             if len(headers) > 40 or scope["query_string"]:
                 raise Rejected("request_bound", 413)
-            token = single(headers, b"authorization")
+            token = single(headers, b"authorization", optional=True)
             if not re.fullmatch(r"Bearer [A-Za-z0-9_-]{32,4096}", token):
                 raise Rejected("invalid_workload", 401)
             body: dict[str, Any] = {}
@@ -62,7 +64,9 @@ class ExecutionApp:
                 and scope["method"] == "POST"
             ):
                 await asyncio.to_thread(self.authority.caller, token[7:], "simulator")
-                payload = await asyncio.to_thread(self.execution.redeem, body, "sim-worker")
+                payload = await asyncio.to_thread(
+                    self.execution.redeem, body, identity(body["worker_id"])
+                )
                 status = 200
             else:
                 internal = re.fullmatch(

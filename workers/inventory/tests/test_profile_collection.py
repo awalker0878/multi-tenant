@@ -87,6 +87,8 @@ def test_target_uses_enrolled_origins_and_observed_version_roots(
             return {"volume_types": []}
         if route == "/extensions":
             return {"extensions": []}
+        if route.startswith("/security-groups?project_id=project-a&limit=100"):
+            return {"security_groups": []}
         version = "v2.1" if "compute" in connection["base_url"] else "v3.0"
         return {
             "versions": [
@@ -107,4 +109,4 @@ def test_target_uses_enrolled_origins_and_observed_version_roots(
         ("https://compute.example", "/", True),
         ("https://volume.example", "/", True),
     ]
-    assert len(calls) == 7
+    assert len(calls) == 8

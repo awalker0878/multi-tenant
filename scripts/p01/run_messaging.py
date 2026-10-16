@@ -31,7 +31,7 @@ class MessagingCampaign(StatefulCampaign):
     def run(self):
         self.report['scope']='P01 Catalogue/Planning reference messaging; no product API, authority or native effects'
         self.check('exact-source',self.command('source-revision',['git','rev-parse','HEAD']).decode().strip()==self.revision)
-        paths=['services/catalogue','services/planning','scripts/p01','contracts','tests/contracts','deploy','.github/workflows/p01-messaging.yml']
+        paths=['services/catalogue','services/planning','scripts/p01','contracts','tests/contracts','deploy','.github/workflows/qualification.yml']
         self.check('clean-inputs',not self.command('source-clean',['git','status','--porcelain','--untracked-files=all','--',*paths]).strip())
         self.report['source_sha256']={str(p.relative_to(self.root)):digest(p.read_bytes()) for prefix in ('scripts/p01/messaging','contracts','tests/contracts') for p in (self.root/prefix).rglob('*') if p.is_file() and '__pycache__' not in p.parts}
         def build(name):

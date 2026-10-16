@@ -130,7 +130,7 @@
         "recovery": {
           "rpo_seconds": 0,
           "rto_seconds": 3600,
-          "method": "native_api_export_import",
+          "method": "VM_COLD_EXPORT",
           "strength": "required"
         }
       }
@@ -343,7 +343,7 @@
       "recovery.method": {
         "status": "observed",
         "values": [
-          "native_api_export_import"
+          "VM_COLD_EXPORT"
         ],
         "expires_at": 2000001800,
         "dependencies": []
@@ -909,7 +909,7 @@
       "recovery.method": {
         "status": "supported",
         "values": [
-          "native_api_export_import"
+          "VM_COLD_EXPORT"
         ],
         "expires_at": 2000001800,
         "dependencies": []

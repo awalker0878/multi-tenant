@@ -1,0 +1,899 @@
+[
+  {
+    "canonical_id": "target.api.versions",
+    "scope": "target",
+    "relationship": "conditional",
+    "normalization": "per_api_release_set",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "target.api_release"
+        ],
+        "api_fields": [
+          "ServiceInstance.content.about.apiVersion + selected VI/JSON release"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 3600,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "target.aos_and_ahv_versions"
+        ],
+        "api_fields": [
+          "data.config.buildInfo + clusterSoftwareMap + hypervisorTypes"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 3600,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": {
+        "manifest_attribute_ids": [
+          "target.compute_api_bounds",
+          "target.volume_api_bounds",
+          "target.image_api_versions"
+        ],
+        "api_fields": [
+          "GET versions.min_version + version",
+          "GET versions.min_version + version",
+          "GET versions"
+        ],
+        "owner_evidence_fields": [
+          null,
+          null,
+          null
+        ],
+        "methods": [
+          "native_get",
+          "native_get",
+          "native_get"
+        ],
+        "max_age_seconds": 3600,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 3600,
+    "semantic_constraints": "Capabilities must be negotiated per API family; never require matching cross-vendor version.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "target.compute.placement",
+    "scope": "target",
+    "relationship": "conditional",
+    "normalization": "qualified_placement_and_shape",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "target.resource_pool",
+          "target.compute_host"
+        ],
+        "api_fields": [
+          "/api/vcenter/resource-pool",
+          "/api/vcenter/host"
+        ],
+        "owner_evidence_fields": [
+          null,
+          null
+        ],
+        "methods": [
+          "native_list",
+          "native_list"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "target.cluster_identity",
+          "target.cluster_availability"
+        ],
+        "api_fields": [
+          "clusters/{id}.data.extId",
+          "data.config.isAvailable"
+        ],
+        "owner_evidence_fields": [
+          null,
+          null
+        ],
+        "methods": [
+          "native_get",
+          "native_get"
+        ],
+        "max_age_seconds": 30,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": {
+        "manifest_attribute_ids": [
+          "target.availability_zones",
+          "target.flavors"
+        ],
+        "api_fields": [
+          "GET /os-availability-zone.availabilityZoneInfo[*].zoneState",
+          "GET /flavors/detail.flavors[*].vcpus + ram + disk"
+        ],
+        "owner_evidence_fields": [
+          null,
+          null
+        ],
+        "methods": [
+          "native_list",
+          "native_list"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 30,
+    "semantic_constraints": "Resource pool/cluster/AZ/flavor do not have identical placement semantics.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "target.compute.capacity",
+    "scope": "target",
+    "relationship": "platform_specific",
+    "normalization": "no_direct_equivalent",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "target.compute_capacity"
+        ],
+        "api_fields": [
+          "ResourcePool.summary + HostSystem.summary"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 15,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": null,
+      "openstack": null
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 15,
+    "semantic_constraints": "VMware resource pool / host compute capacity is not interchangeable with OpenStack qualitative resource-provider traits; owner-exclusive measured capacity must be separately verified.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "target.storage.backend",
+    "scope": "target",
+    "relationship": "conditional",
+    "normalization": "qualified_storage_class",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "target.datastore"
+        ],
+        "api_fields": [
+          "/api/vcenter/datastore"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_list"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "target.storage_containers",
+          "target.storage_container_state"
+        ],
+        "api_fields": [
+          "storage-containers[*].extId + clusterExtId",
+          "storage-containers[*].isMarkedForRemoval + isInternal"
+        ],
+        "owner_evidence_fields": [
+          null,
+          null
+        ],
+        "methods": [
+          "native_list",
+          "native_list"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": {
+        "manifest_attribute_ids": [
+          "target.volume_types",
+          "target.image_stores"
+        ],
+        "api_fields": [
+          "GET /types.volume_types[*].extra_specs + is_public",
+          "GET /v2/info/stores.stores[*]"
+        ],
+        "owner_evidence_fields": [
+          null,
+          null
+        ],
+        "methods": [
+          "native_list",
+          "native_list"
+        ],
+        "max_age_seconds": 120,
+        "severity": "critical",
+        "conditions": [
+          "when:volume_target",
+          "when:multistore"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 60,
+    "semantic_constraints": "Datastore/container/volume type availability is not per-VM free capacity.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "target.storage.capacity_indicators",
+    "scope": "target",
+    "relationship": "conditional",
+    "normalization": "physical_owner_allocation",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "target.storage_capacity"
+        ],
+        "api_fields": [
+          "Datastore.summary.freeSpace"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 15,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "target.storage_capacity"
+        ],
+        "api_fields": [
+          "storage-containers[*].maxCapacityBytes"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_list"
+        ],
+        "max_age_seconds": 15,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": {
+        "manifest_attribute_ids": [
+          "target.placement_inventory",
+          "target.provider_allocations"
+        ],
+        "api_fields": [
+          "GET /resource_providers/{uuid}/inventories",
+          "GET /allocations/{consumer_uuid}"
+        ],
+        "owner_evidence_fields": [
+          null,
+          null
+        ],
+        "methods": [
+          "native_get",
+          "native_get"
+        ],
+        "max_age_seconds": 15,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 15,
+    "semantic_constraints": "VMware datastore freeSpace is not a reservation; AHV maxCapacityBytes is total capacity, and OpenStack Placement inventories/allocations are different resources. No canonical free-byte value may be inferred. Independent physical reservations and current per-storage backend availability must be evidenced.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "target.network.segment",
+    "scope": "target",
+    "relationship": "conditional",
+    "normalization": "qualified_network_intent",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "target.network_backing"
+        ],
+        "api_fields": [
+          "/api/vcenter/network"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_list"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "target.subnets",
+          "target.vpc_mapping",
+          "target.ip_configuration"
+        ],
+        "api_fields": [
+          "subnets[*].extId + subnetType + clusterReference",
+          "vpcs[*].extId + projectExtId",
+          "subnets[*].ipConfig"
+        ],
+        "owner_evidence_fields": [
+          null,
+          null,
+          null
+        ],
+        "methods": [
+          "native_list",
+          "native_list",
+          "native_list"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always",
+          "when:vpc_required"
+        ]
+      },
+      "openstack": {
+        "manifest_attribute_ids": [
+          "target.network_subnets",
+          "target.network_ports",
+          "target.network_routers"
+        ],
+        "api_fields": [
+          "GET /subnets.subnets[*].cidr + ip_version + gateway_ip",
+          "GET /ports.ports[*].fixed_ips + security_groups + port_security_enabled",
+          "GET /routers.routers[*].routes + external_gateway_info"
+        ],
+        "owner_evidence_fields": [
+          null,
+          null,
+          null
+        ],
+        "methods": [
+          "native_list",
+          "native_list",
+          "native_list"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always",
+          "when:routed"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 60,
+    "semantic_constraints": "VLANs, subnets, VPCs and routes must be mapped by owner intent.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "target.network.security_policy",
+    "scope": "target",
+    "relationship": "conditional",
+    "normalization": "security_rule_semantics",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "target.security_policies"
+        ],
+        "api_fields": [
+          null
+        ],
+        "owner_evidence_fields": [
+          "approved_network_policy_observer"
+        ],
+        "methods": [
+          "independent"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "target.security_policy"
+        ],
+        "api_fields": [
+          "policies[*].scope + securedGroups + state"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_list"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": {
+        "manifest_attribute_ids": [
+          "target.security_group_rules",
+          "target.security_stateful"
+        ],
+        "api_fields": [
+          "GET /security-groups.security_groups[*].security_group_rules",
+          "security_groups[*].stateful"
+        ],
+        "owner_evidence_fields": [
+          null,
+          null
+        ],
+        "methods": [
+          "native_list",
+          "native_list"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 60,
+    "semantic_constraints": "Security groups, NSX/vSphere and microseg policies need independent allow/deny evidence.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "target.network.isolation",
+    "scope": "target",
+    "relationship": "conditional",
+    "normalization": "independent_negative_path_proof",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "target.boot_and_isolation"
+        ],
+        "api_fields": [
+          null
+        ],
+        "owner_evidence_fields": [
+          "quarantine_native_allow_deny_test"
+        ],
+        "methods": [
+          "independent"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "target.allowed_denied_flows"
+        ],
+        "api_fields": [
+          null
+        ],
+        "owner_evidence_fields": [
+          "native_allow_and_deny_policy_measurement"
+        ],
+        "methods": [
+          "independent"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": {
+        "manifest_attribute_ids": [
+          "target.network_isolation"
+        ],
+        "api_fields": [
+          null
+        ],
+        "owner_evidence_fields": [
+          "verified_negative_ingress_egress_paths"
+        ],
+        "methods": [
+          "independent"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 60,
+    "semantic_constraints": "Required firewall/isolation policies are never optional.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "target.guest.boot_drivers",
+    "scope": "target",
+    "relationship": "conditional",
+    "normalization": "qualified_guest_boot_rehearsal",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "target.guest_device_support"
+        ],
+        "api_fields": [
+          null
+        ],
+        "owner_evidence_fields": [
+          "guest_firmware_driver_target_profile"
+        ],
+        "methods": [
+          "independent"
+        ],
+        "max_age_seconds": 3600,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "target.guest_driver_compat"
+        ],
+        "api_fields": [
+          null
+        ],
+        "owner_evidence_fields": [
+          "guest_driver_and_boot_certification"
+        ],
+        "methods": [
+          "independent"
+        ],
+        "max_age_seconds": 3600,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": {
+        "manifest_attribute_ids": [
+          "target.boot_guest_drivers"
+        ],
+        "api_fields": [
+          null
+        ],
+        "owner_evidence_fields": [
+          "tested_guest_boot_device_driver_matrix"
+        ],
+        "methods": [
+          "independent"
+        ],
+        "max_age_seconds": 3600,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 3600,
+    "semantic_constraints": "Firmware and boot drivers must be tested on destination.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "target.image.ingest",
+    "scope": "target",
+    "relationship": "conditional",
+    "normalization": "qualified_image_import",
+    "platforms": {
+      "vmware": null,
+      "ahv": {
+        "manifest_attribute_ids": [
+          "target.image_import"
+        ],
+        "api_fields": [
+          "POST images + task.status + image URL readback"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "probe"
+        ],
+        "max_age_seconds": 300,
+        "severity": "critical",
+        "conditions": [
+          "when:import"
+        ]
+      },
+      "openstack": {
+        "manifest_attribute_ids": [
+          "target.image_import_probe"
+        ],
+        "api_fields": [
+          "POST /v2/images + import + GET /v2/images/{id}"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "probe"
+        ],
+        "max_age_seconds": 300,
+        "severity": "critical",
+        "conditions": [
+          "when:import"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 300,
+    "semantic_constraints": "Prism image import vs Glance direct import differ; VMware OVF includes import/provision.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "target.vm.create",
+    "scope": "target",
+    "relationship": "conditional",
+    "normalization": "qualified_vm_create",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "target.ovf_import"
+        ],
+        "api_fields": [
+          "ResourcePool.ImportVApp + HttpNfcLease"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "probe"
+        ],
+        "max_age_seconds": 300,
+        "severity": "critical",
+        "conditions": [
+          "when:import"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "target.vm_creation"
+        ],
+        "api_fields": [
+          "POST vms + task.status + VM readback"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "probe"
+        ],
+        "max_age_seconds": 300,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": {
+        "manifest_attribute_ids": [
+          "target.vm_create_probe"
+        ],
+        "api_fields": [
+          "POST /servers + GET /servers/{id}"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "probe"
+        ],
+        "max_age_seconds": 300,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 300,
+    "semantic_constraints": "vSphere ImportVApp vs Prism/Nova create need separate qualification.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "target.permissions.entitlements",
+    "scope": "target",
+    "relationship": "conditional",
+    "normalization": "owner_entitlement_evaluation",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "target.privileges_and_license"
+        ],
+        "api_fields": [
+          null
+        ],
+        "owner_evidence_fields": [
+          "vcenter_permissions_and_product_entitlements"
+        ],
+        "methods": [
+          "operator"
+        ],
+        "max_age_seconds": 300,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "target.project_authorization",
+          "target.quotas_and_fences"
+        ],
+        "api_fields": [
+          "subnets[*].projectExtId + sharedWithProjects",
+          null
+        ],
+        "owner_evidence_fields": [
+          null,
+          "reserved_capacity_and_api_entitlements"
+        ],
+        "methods": [
+          "native_list",
+          "operator"
+        ],
+        "max_age_seconds": 15,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": {
+        "manifest_attribute_ids": [
+          "target.project_quotas"
+        ],
+        "api_fields": [
+          null
+        ],
+        "owner_evidence_fields": [
+          "project_quotas_and_policy_grants"
+        ],
+        "methods": [
+          "operator"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 15,
+    "semantic_constraints": "Roles, project scope, licensing and quotas require installed-time owner evidence.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "target.optional.categories",
+    "scope": "target",
+    "relationship": "conditional",
+    "normalization": "nonessential_metadata_mapping",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "target.optional_tags"
+        ],
+        "api_fields": [
+          "/api/cis/tagging/tag-association"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 3600,
+        "severity": "optional",
+        "conditions": [
+          "when:present"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "target.categories"
+        ],
+        "api_fields": [
+          "categories[*].key + value"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_list"
+        ],
+        "max_age_seconds": 3600,
+        "severity": "optional",
+        "conditions": [
+          "when:present"
+        ]
+      },
+      "openstack": null
+    },
+    "criticality": "optional",
+    "maximum_age_seconds": 3600,
+    "semantic_constraints": "VMware tags and Nutanix categories can differ in policy semantics; never silently omit functional labels.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  }
+]

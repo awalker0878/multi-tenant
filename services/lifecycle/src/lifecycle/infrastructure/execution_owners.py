@@ -8,13 +8,102 @@ import re
 import ssl
 import time
 from datetime import datetime
+from importlib.resources import files
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlsplit
 
+from jsonschema import Draft202012Validator, FormatChecker
+
 from lifecycle.domain.admission import digest
 from lifecycle.domain.execution import Rejected, decode, identity
 from lifecycle.infrastructure.foundation import mounted_secret
+
+# Actual owner operations, each resolved to one immutable installed OpenAPI response.
+OWNER_OPERATIONS = (
+    (
+        "GOVERNANCE",
+        "POST",
+        r"/v1/tenants/[^/]+/delegated-authorizations",
+        "governance-delegation-v2.json",
+        "CurrentDelegation",
+        200,
+    ),
+    (
+        "GOVERNANCE",
+        "POST",
+        r"/v1/tenants/[^/]+/execution-approval-checks",
+        "governance-service-checks-v1.json",
+        "SimulationConsent",
+        200,
+    ),
+    (
+        "PLANNING",
+        "GET",
+        r"/v1/tenants/[^/]+/execution-plans/[^/]+/revisions/[1-9][0-9]*",
+        "planning-lifecycle-reads-v1.json",
+        "ExecutionPlan",
+        200,
+    ),
+    (
+        "ASSURANCE",
+        "POST",
+        r"/v1/tenants/[^/]+/evidence-uploads",
+        "assurance-evidence-v1.json",
+        "UploadReceipt",
+        201,
+    ),
+    (
+        "ASSURANCE",
+        "POST",
+        r"/v1/tenants/[^/]+/evidence-uploads/[^/]+/finalization",
+        "assurance-evidence-v1.json",
+        "Evidence",
+        200,
+    ),
+    ("SIMULATOR", "POST", r"/v1/effects", "worker-simulation-v1.json", "EffectReceipt", 200),
+    (
+        "SIMULATOR",
+        "POST",
+        r"/v1/reconciliations",
+        "worker-simulation-v1.json",
+        "ObservationReceipt",
+        200,
+    ),
+    ("ALERTS", "POST", r"/v1/lifecycle-alerts", "alert-delivery-v1.json", "Receipt", 200),
+)
+
+# Named immutable snapshots are packaged in the Lifecycle wheel/image.
+OWNER_APIS = {
+    "governance-delegation-v2.json": json.loads(
+        files("lifecycle.infrastructure.contracts")
+        .joinpath("governance-delegation-v2.json")
+        .read_text()
+    ),
+    "governance-service-checks-v1.json": json.loads(
+        files("lifecycle.infrastructure.contracts")
+        .joinpath("governance-service-checks-v1.json")
+        .read_text()
+    ),
+    "planning-lifecycle-reads-v1.json": json.loads(
+        files("lifecycle.infrastructure.contracts")
+        .joinpath("planning-lifecycle-reads-v1.json")
+        .read_text()
+    ),
+    "assurance-evidence-v1.json": json.loads(
+        files("lifecycle.infrastructure.contracts")
+        .joinpath("assurance-evidence-v1.json")
+        .read_text()
+    ),
+    "worker-simulation-v1.json": json.loads(
+        files("lifecycle.infrastructure.contracts")
+        .joinpath("worker-simulation-v1.json")
+        .read_text()
+    ),
+    "alert-delivery-v1.json": json.loads(
+        files("lifecycle.infrastructure.contracts").joinpath("alert-delivery-v1.json").read_text()
+    ),
+}
 
 
 def request(
@@ -25,6 +114,13 @@ def request(
     delegation: str | None = None,
 ) -> dict[str, Any]:
     try:
+        selected = [
+            item
+            for item in OWNER_OPERATIONS
+            if item[0] == owner and item[1] == method and re.fullmatch(item[2], path)
+        ]
+        if len(selected) != 1:
+            raise ValueError("owner_operation_uncontracted")
         url = urlsplit(os.environ[owner + "_URL"])
         ca = os.environ[owner + "_CA_FILE"]
         if (
@@ -45,6 +141,27 @@ def request(
             "Content-Type": "application/json",
             "Accept-Encoding": "identity",
         }
+        if owner == "ALERTS":
+            schema = OWNER_APIS["alert-delivery-v1.json"]
+            if body is None or not Draft202012Validator(
+                {"$ref": "#/$defs/Command", "$defs": schema["$defs"]},
+                format_checker=FormatChecker(),
+            ).is_valid(body):
+                raise ValueError("alert_command_contract_invalid")
+        if owner == "GOVERNANCE":
+            import hashlib
+
+            raw_key = json.dumps(
+                {"path": path, "body": body}, sort_keys=True, separators=(",", ":"), allow_nan=False
+            )
+            headers["Idempotency-Key"] = hashlib.sha256(raw_key.encode()).hexdigest()
+        if owner == "SIMULATOR":
+            import hashlib
+
+            raw_key = json.dumps(
+                {"path": path, "body": body}, sort_keys=True, separators=(",", ":"), allow_nan=False
+            )
+            headers["Idempotency-Key"] = hashlib.sha256(raw_key.encode()).hexdigest()
         if delegation:
             headers["X-Actor-Delegation"] = delegation
         connection = http.client.HTTPSConnection(
@@ -62,7 +179,68 @@ def request(
                 or response.getheader("Content-Encoding", "identity") != "identity"
             ):
                 raise ValueError
-            return decode(raw)
+            result = decode(raw)
+            if selected:
+                _, _, _, document_name, response_name, expected_status = selected[0]
+                api = OWNER_APIS[document_name]
+                wire = (
+                    {"$ref": "#/$defs/" + response_name, "$defs": api["$defs"]}
+                    if owner == "ALERTS"
+                    else {
+                        "$ref": "#/components/schemas/" + response_name,
+                        "components": api["components"],
+                    }
+                )
+                if response.status != expected_status or not Draft202012Validator(
+                    wire, format_checker=FormatChecker()
+                ).is_valid(result):
+                    raise ValueError("owner_response_contract_invalid")
+                # Reject structurally valid cross-tenant authority from an upstream service.
+                tenant_route = re.fullmatch(r"/v1/tenants/([^/]+)/.*", path)
+                if (
+                    tenant_route
+                    and "tenant_id" in result
+                    and result["tenant_id"] != tenant_route[1]
+                ):
+                    raise ValueError("owner_response_tenant_mismatch")
+                if owner == "PLANNING":
+                    requested = re.fullmatch(
+                        r"/v1/tenants/([^/]+)/execution-plans/([^/]+)/revisions/([1-9][0-9]*)",
+                        path,
+                    )
+                    if requested is None:
+                        raise ValueError("planning_operation_not_request_bound")
+                    tenant, plan, revision = requested.groups()
+                    scope = result["content"]["scope"]
+                    binding = result["binding"]
+                    if (
+                        scope["tenant_id"] != tenant
+                        or binding["tenant_id"] != tenant
+                        or binding["plan_id"] != plan
+                        or binding["revision"] != int(revision)
+                        or any(
+                            binding[field] != scope[field]
+                            for field in ("site_id", "environment", "resource_id")
+                        )
+                    ):
+                        raise ValueError("planning_response_scope_mismatch")
+                if owner == "SIMULATOR" and path == "/v1/reconciliations":
+                    if body is None or any(
+                        result.get(field) != body.get(field)
+                        for field in (
+                            "tenant_id",
+                            "job_id",
+                            "operation_id",
+                            "attempt_id",
+                            "plan_digest",
+                            "epoch",
+                            "simulation",
+                        )
+                    ):
+                        raise ValueError("simulation_receipt_scope_mismatch")
+                if owner == "ALERTS" and (body is None or result.get("event_id") != body["id"]):
+                    raise ValueError("alert_receipt_scope_mismatch")
+            return result
         finally:
             connection.close()
     except Rejected:
@@ -92,13 +270,22 @@ class ExecutionOwners:
         if not re.fullmatch(r"[0-9a-f]{64}", delegation):
             raise Rejected("invalid_delegation", 403)
         scope = {k: scope[k] for k in ("site_id", "environment", "resource_id")}
-        result = request(
-            "GOVERNANCE",
-            "POST",
-            f"/v1/tenants/{tenant}/delegated-authorizations",
-            {"action": action, "scope": scope},
-            delegation,
-        )
+        try:
+            result = request(
+                "GOVERNANCE",
+                "POST",
+                f"/v1/tenants/{tenant}/delegated-authorizations",
+                {"action": action, "scope": scope},
+                delegation,
+            )
+        except Rejected as error:
+            # The caller workload was already authenticated by ExecutionApp.
+            # Governance rejects a delegation bound to another scope with 401;
+            # that is an actor-authority denial at this service boundary, not
+            # a request to authenticate the accepted service credential again.
+            if error.status == 401:
+                raise Rejected("delegation_denied", 403) from None
+            raise
         expected = {
             "allowed": True,
             "audience": "lifecycle",

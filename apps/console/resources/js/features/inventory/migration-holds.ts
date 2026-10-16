@@ -10,6 +10,9 @@ export function migrationHold(reason: string): string {
     target_profile_stale: 'Refresh the destination profile and review its current capabilities.',
     target_format_unavailable: 'Choose an observed destination disk format and save the migration group.',
     group_source_identity_requires_review: 'Review the changed source identity and save this group again.',
+    source_security_policy_observation_required: 'Collect a complete source-native security policy and required-traffic observation before approving destination mappings.',
+    destination_security_policy_catalog_required: 'No destination policy API catalogue is available for the required source security flows. Commission a target-native policy observer and verify its rules.',
+    destination_security_flow_equivalence_unproven: 'An enforced destination policy has been selected, but its required allowed/denied traffic has not been independently qualified as equivalent.',
     confirmed_vm_review_required: 'Open this VM’s readiness review, map every disk, supply the owner references and confirm it.',
     review_profile_pair_changed: 'Update this VM’s review to the exact source and destination profiles selected for the group.',
   };

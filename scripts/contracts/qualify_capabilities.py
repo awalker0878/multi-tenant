@@ -1,0 +1,213 @@
+"""Fail-closed Phase 4 E2 capability qualification from executed worker JUnit.
+
+A catalogue entry, handler filename, string literal or generated type does not
+qualify support. All method×mode runtime tests, every native data-operation
+dispatch, cold capture, revocation and independent readback tests must pass.
+
+E2 uses synthetic owner/platform peers and DOES NOT grant installed-version E3,
+provider credentials, execution authority, or a production-ready migration.
+"""
+from __future__ import annotations
+
+import argparse
+import ast
+import hashlib
+import json
+import re
+import subprocess
+from pathlib import Path
+from xml.etree import ElementTree as ET
+
+ROOT = Path(__file__).resolve().parents[2]
+READBACK_VARIANTS = frozenset({
+    "fault0", "partial", "stale", "identity", "lag", "loss",
+    "integrity", "metadata", "source_writer", "target_writer",
+    "deadline", "boundary",
+})
+
+MANDATORY = (
+    "test_current_definition_has_no_unqualified_method_mode_and_no_unknown_stage",
+    "test_data_loss_budget_applies_to_all_datasets_together",
+    "test_cold_capture_includes_root_and_every_volume_without_uploading_production_volume",
+    "test_capture_failure_retains_partial_receipts_and_never_replays",
+    "test_mismatched_data_method_is_held_before_native_submission",
+    "test_independent_dataset_readback_enforces_every_limit",
+    "test_data_method_tls_effect_and_independent_readback_are_separate",
+    "test_inflight_registry_revocation_stops_the_next_effect_boundary",
+)
+
+
+def tests_from_xml(path: Path) -> list[dict]:
+    if not path.is_file():
+        raise ValueError("Worker JUnit execution evidence missing: " + str(path))
+    tree = ET.parse(path)
+    root = tree.getroot()
+    if root.tag not in {"testsuite", "testsuites"}:
+        raise ValueError("Unexpected JUnit root element")
+    items = []
+    seen = set()
+    suites = list(root.iter("testsuite"))
+    if not suites:
+        raise ValueError("JUnit contains no executed test suite")
+    # A testcase outside a testsuite has no execution owner. It must not be
+    # counted as an independently executed qualification, even if its name
+    # matches an otherwise missing positive or denial case.
+    if sum(len(suite.findall("testcase")) for suite in suites) != len(list(root.iter("testcase"))):
+        raise ValueError("Unowned JUnit testcase outside executed suite")
+    for suite in suites:
+        for status in ("failures", "errors", "skipped"):
+            if int(suite.get(status, "0")):
+                raise ValueError("E2 qualification JUnit suite reports " + status)
+        # Reported totals are evidence too: a truncated or edited report must
+        # not qualify the tests that happen to remain in its testcase elements.
+        if suite.get("tests") is not None:
+            actual_count = len(list(suite.iter("testcase")))
+            if int(suite.get("tests")) != actual_count:
+                raise ValueError("JUnit suite test total differs from executed testcases")
+    for testcase in tree.iter("testcase"):
+        name = testcase.get("name")
+        classname = testcase.get("classname")
+        if not name or not classname:
+            raise ValueError("JUnit contains unnamed or unowned test result")
+        if any(testcase.find(tag) is not None for tag in ("failure", "error", "skipped")):
+            raise ValueError("E2 capability qualification has failed/skipped test: " + name)
+        identity = (classname, name)
+        if identity in seen:
+            raise ValueError("Duplicate JUnit execution identity: " + name)
+        seen.add(identity)
+        items.append({"name": name, "classname": classname})
+    if not items:
+        raise ValueError("JUnit has no actual executed tests")
+    if tree.getroot().tag == "testsuites" and tree.getroot().get("tests") is not None:
+        if int(tree.getroot().get("tests")) != len(items):
+            raise ValueError("JUnit root test total differs from executed testcases")
+    return items
+
+
+def qualify(root: Path, xml: Path) -> dict:
+    source = root / "contracts/capabilities/definitions-v1.json"
+    data = json.loads(source.read_text(encoding="utf-8"))
+    observed = tests_from_xml(xml)
+    methods = data["methods"]
+    modes = data["modes"]
+    expected = [(method, mode) for method in methods for mode in modes]
+    matrix = {}
+    for method, mode in expected:
+        marker = "test_current_capability_method_mode_execution_and_denial[MATRIX_" + method + "__" + mode + "]"
+        hits = [case for case in observed if case["name"] == marker]
+        if len(hits) != 1 or "test_capability_qualification" not in hits[0]["classname"]:
+            raise ValueError("Missing executed method/mode qualification: " + method + "/" + mode)
+        matrix[method + ":" + mode] = {
+            "method": method, "mode": mode, "test": marker,
+            "stages": data["methods"][method]["stages"][mode],
+            "positive_native_contract": True,
+            "negative_native_contract": True,
+            "installed_provider_qualified": False,
+        }
+    for required in MANDATORY:
+        if not any(case["name"].split("[", 1)[0] == required
+                   and "test_" in case["classname"] for case in observed):
+            raise ValueError("Missing mandatory native qualification execution: " + required)
+    # Independently prove every typed operation across ALL nine native
+    # source/target platform directions. A substring match is not evidence.
+    fault_cases = {
+        "test_mismatched_data_method_is_held_before_native_submission": {
+            "operation", "platform", "same_environment", "mechanism",
+            "dataset", "predecessor", "reverse", "parameters",
+        },
+    }
+    for test, expected_faults in fault_cases.items():
+        actual = {
+            case["name"].removeprefix(test + "[").removesuffix("]")
+            for case in observed
+            if case["name"].startswith(test + "[")
+            and "test_method_protocol" in case["classname"]
+        }
+        if actual != expected_faults:
+            raise ValueError("Incomplete native negative cases: " + test)
+    readback_prefix = "test_independent_dataset_readback_enforces_every_limit["
+    readback = [
+        case["name"][len(readback_prefix):-1]
+        for case in observed
+        if case["name"].startswith(readback_prefix)
+        and case["name"].endswith("]")
+        and "test_method_protocol" in case["classname"]
+    ]
+    if len(readback) != len(READBACK_VARIANTS) or set(readback) != READBACK_VARIANTS:
+        raise ValueError("Incomplete independent readback denial matrix")
+    native_methods = {
+        row["v1_alias"] for row in methods.values()
+        if row["implementation"]["handler"].endswith("/migration_method.py")
+    }
+    native_source = root / "workers/lifecycle/src/lifecycle_worker/infrastructure/migration_method.py"
+    native_module = ast.parse(native_source.read_text())
+    native_node = next((item.value for item in native_module.body
+                        if isinstance(item, ast.Assign)
+                        and any(isinstance(target, ast.Name) and target.id == "OPERATIONS"
+                                for target in item.targets)), None)
+    if native_node is None:
+        raise ValueError("Missing canonical typed native dispatch table")
+    native_operations = ast.literal_eval(native_node)
+    if set(native_operations) != native_methods:
+        raise ValueError("Missing or undeclared typed native method implementation: "
+                         + repr(sorted(native_methods ^ set(native_operations))))
+    for method, record in methods.items():
+        handler_path = record["implementation"]["handler"]
+        if not handler_path.endswith("/migration_method.py"):
+            continue
+        alias = record["v1_alias"]
+        if not native_operations[alias]:
+            raise ValueError("Native method has no executable operations: " + method)
+        for stage in native_operations[alias]:
+            if not any(stage in rows for rows in record["stages"].values()):
+                raise ValueError("Unreachable native stage implementation: " + method + "/" + stage)
+            for source_platform in data["platforms"]:
+                for target_platform in data["platforms"]:
+                    case_name = (
+                        "test_protected_runtime_dispatches_exact_data_mechanism_in_every_direction"
+                        f"[{alias}-{stage}-{source_platform}-{target_platform}]"
+                    )
+                    hits = [case for case in observed
+                            if case["name"] == case_name
+                            and "test_method_protocol" in case["classname"]]
+                    if len(hits) != 1:
+                        raise ValueError("Native stage dispatch lacks executed evidence: "
+                                         + method + "/" + stage + "/"
+                                         + source_platform + "/" + target_platform)
+    revision = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root,
+                                        text=True, timeout=15).strip()
+    if not re.fullmatch(r"[a-f0-9]{40}", revision):
+        raise ValueError("Invalid source revision for qualification")
+    return {
+        "schema_version": 1,
+        "evidence_level": "E2",
+        "source_revision": revision,
+        "definition_sha256": hashlib.sha256(source.read_bytes()).hexdigest(),
+        "worker_junit_sha256": hashlib.sha256(xml.read_bytes()).hexdigest(),
+        "all_tests_passed": True,
+        "method_count": len(methods), "mode_count": len(modes),
+        "qualified_method_modes": len(matrix),
+        "expected_method_modes": len(expected),
+        "native_platforms_tested": [],
+        "installed_provider_qualified": False,
+        "native_write_authorized": False,
+        "matrix": matrix,
+    }
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--worker-junit", required=True, type=Path)
+    parser.add_argument("--output", required=True, type=Path)
+    args = parser.parse_args()
+    result = qualify(ROOT, args.worker_junit)
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    args.output.write_text(json.dumps(result, indent=2) + "\n")
+    print(json.dumps({k: result[k] for k in (
+        "evidence_level", "method_count", "mode_count",
+        "qualified_method_modes", "installed_provider_qualified"
+    )}, sort_keys=True))
+
+
+if __name__ == "__main__":
+    main()

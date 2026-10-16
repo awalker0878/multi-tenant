@@ -37,7 +37,7 @@ profiles are synthetic; no real workload appears in these checks.
 
 ## Correction and regression
 
-The [original architecture failure](context-policy-original-failure.log) and
+The original architecture failure and
 [correction record](correction.json) preserve the first failed run. The owner
 infrastructure imported immutable-plan validation from an HTTP interface. The
 correction moves that canonical function to the domain layer and updates every

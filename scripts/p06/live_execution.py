@@ -14,21 +14,133 @@ import uuid
 from temporal_fixture import TemporalFixture
 
 
+def effect_headers(grant, credential):
+    material={'path':'/v1/effects','body':grant}
+    replay=hashlib.sha256(json.dumps(material,sort_keys=True,separators=(',',':'),allow_nan=False).encode()).hexdigest()
+    return {'Authorization':'Bearer '+credential,'Idempotency-Key':replay}
+
+
+def epoch_isolation(grant, lifecycle_epoch, simulator_epoch, send, effect_count, check):
+    """Use the same fresh durable grant for two independent fences and a positive control.
+
+    This is an isolated simulation fault injection before the restore exercise.
+    Never use it to re-enable a restored journal or extend a grant's authority.
+    """
+    original=grant['epoch']
+    if lifecycle_epoch.read_text()!=original or simulator_epoch.read_text()!=original:
+        raise RuntimeError('epoch_probe_requires_current_custody')
+    before=effect_count()
+    rows=[]
+    try:
+        for name,file in [('effect-owner',simulator_epoch),('journal-owner',lifecycle_epoch)]:
+            file.write_text(str(uuid.uuid4()))
+            check('p06-'+name+'-epoch-probe-unexpired-before',grant['expires_at']>int(time.time()))
+            status=send(grant)[0]
+            check('p06-'+name+'-epoch-probe-unexpired-after',grant['expires_at']>int(time.time()))
+            after=effect_count()
+            check('p06-'+name+'-epoch-alone-denies',status==403 and after==before)
+            rows.append({'owner':name,'status_code':status,'unexpired':True,'effects_before':before,'effects_after':after})
+            file.write_text(original)
+        check('p06-same-grant-positive-control-unexpired',grant['expires_at']>int(time.time()))
+        positive=send(grant)
+        check('p06-same-grant-positive-control',positive[0]==200 and positive[1]=={'accepted':True,'duplicate':False} and effect_count()==before+1)
+        duplicate=send(grant)
+        check('p06-same-grant-duplicate-control',duplicate[0]==200 and duplicate[1]=={'accepted':True,'duplicate':True} and effect_count()==before+1)
+        return {'simulation':True,'grant_sha256':hashlib.sha256(json.dumps(grant,sort_keys=True,separators=(',',':')).encode()).hexdigest(),
+                'negative_controls':rows,'same_grant_positive_status':positive[0],'same_grant_duplicate_status':duplicate[0],
+                'effects_after_positive':effect_count(),'restore_reenable_authorized':False}
+    finally:
+        lifecycle_epoch.write_text(original)
+        simulator_epoch.write_text(original)
+
+
+def security_probes(c, base, tenant, foreign, scope, job, admission, admission_key):
+    """Execute authenticated current-authority denials with unchanged durable state.
+
+    Positive controls use these exact requests and the same service credential.
+    Every negative request is also validated by the independent wire observer.
+    """
+    from assurance import inventory, operation_key
+    operations={op['key']:op for op in inventory(c['root'])['operations']}
+    wire,gov,check=c['wire'],c['gov'],c['check']
+    prefix='/v1/tenants/'+tenant
+    tables=['execution_jobs','execution_projection','execution_operations','execution_dispatch',
+            'execution_holds','execution_commands','execution_events','execution_alerts']
+    def state():
+        return [c['sql']("SELECT md5(coalesce(jsonb_agg(to_jsonb(t) ORDER BY to_jsonb(t)::text)::text,'[]')) FROM app."+table+' t;','lifecycle') for table in tables]+[
+            c['sql']("SELECT md5(coalesce(jsonb_agg(to_jsonb(t) ORDER BY to_jsonb(t)::text)::text,'[]')) FROM sim.observations t;",'simulation')]
+    def grant(action, requested_scope):
+        reply=gov(prefix+'/actor-delegations',{'audience':'lifecycle','action':action,'scope':{k:requested_scope[k] for k in ['site_id','environment','resource_id']}},token=c['fixture']['operator_token'])
+        c['private_values'].append(reply['delegation_token'])
+        return {'Authorization':'Bearer '+c['credentials']['console-lifecycle'][0],
+                'X-Actor-Delegation':reply['delegation_token']}
+    rows=[]
+    # Read a current revision before the positive command changes it.
+    read_path=prefix+'/jobs/'+job['id']
+    current=wire(base,read_path,headers=grant('operation.read',scope))[1]
+    cases=[('POST',prefix+'/jobs','/v1/tenants/{tenant}/jobs','operation.admit',admission,admission_key,202),
+           ('GET',read_path,'/v1/tenants/{tenant}/jobs/{job}','operation.read',None,None,200),
+           ('POST',read_path+'/commands','/v1/tenants/{tenant}/jobs/{job}/commands','operation.control',
+            {'action':'reconcile','expected_revision':current['revision']},str(uuid.uuid4()),202)]
+    for method,path,template,action,body,key,expected in cases:
+        headers=grant(action,scope)
+        if key:headers['Idempotency-Key']=key
+        positive=wire(base,path,method,body,headers)
+        check('p06-security-positive-'+action,positive[0]==expected)
+        wrong_scope=dict(scope,resource_id=str(uuid.uuid4()))
+        for kind,target,denied_headers in [
+            ('wrong-scope',path,grant(action,wrong_scope)),
+            ('cross-tenant',path.replace('/tenants/'+tenant+'/', '/tenants/'+foreign+'/'),grant(action,scope)),
+        ]:
+            if key:denied_headers['Idempotency-Key']=key
+            before=state()
+            reply=wire(base,target,method,body,denied_headers)
+            measured=c['conformance'].rows[-1]
+            after=state()
+            # Errors may contain a correlation ID, but never the protected job,
+            # immutable plan binding, or its owner scope.
+            disclosed=any(value in json.dumps(reply[1]) for value in [job['id'],admission['plan_id'],admission['plan_digest']])
+            check('p06-security-'+kind+'-'+action,
+                  reply[0] in (403,404) and not disclosed and before==after
+                  and measured['request_valid'] is True and measured['response_valid'] is True
+                  and measured['owner']=='lifecycle' and measured['path']==template)
+            op=operations[operation_key('lifecycle',method,template)]
+            rows.append({'key':op['key'],'claim':'authorization' if kind=='wrong-scope' else 'tenant_isolation',
+                         'source':'live-denial','result':'PASS','release_sha256':op['release_sha256'],
+                         'test':'scripts/p06/live_execution.py:security_probes','denial_kind':kind,
+                         'authenticated':True,'authority_checked':'current-effective-authority',
+                         'status_code':reply[0],'positive_status_code':positive[0],
+                         'credential_tenant':tenant,'requested_tenant':foreign if kind=='cross-tenant' else tenant,
+                         'unauthorized_disclosure':False,'unauthorized_mutation':False,
+                         'request_valid':True,'response_valid':True,
+                         'state_before_sha256':hashlib.sha256(json.dumps(before).encode()).hexdigest(),
+                         'state_after_sha256':hashlib.sha256(json.dumps(after).encode()).hexdigest(),
+                         'revision':os.environ['GITHUB_SHA'],'run_id':os.environ['GITHUB_RUN_ID'],
+                         'run_attempt':os.environ['GITHUB_RUN_ATTEMPT']})
+    (c['out']/'security-conformance.json').write_text(json.dumps(rows,indent=2)+'\n')
+    return [{'method':method,'tail':path.removeprefix(prefix+'/'),'path':template,
+             'body':body or {},'key':key} for method,path,template,_,body,key,_ in cases]
+
+
 def _campaign(c,p):
     from fault_peers import TlsProxy, AlertReceiver
     root,private,out=c['root'],c['private'],c['out']
     run,sql,gov,wire,check=c['run'],c['sql'],c['gov'],c['wire'],c['check']
     fixture,credentials,envs=c['fixture'],c['credentials'],c['envs'];tenant=fixture['tenant']
     report=c['report'];report['phase']='P06';report['evidence_level']='E2'
+    c['conformance'].register_origin('https://127.0.0.1:8450', 'lifecycle')
+    c['conformance'].register_origin('https://127.0.0.1:8449', 'lifecycle-workers')
     report['limitations'].append('P06 uses the shipped simulation adapter and separate PostgreSQL effect owner. No native execution, E3 qualification, operated dependency acceptance or human G06 receiving is claimed.')
     links=['lifecycle-governance','console-lifecycle','lifecycle-planning','lifecycle-assurance','assurance-lifecycle','console-assurance','lifecycle-simulator','assurance-simulator','simulator-lifecycle','lifecycle-alerts']
     for name in links:
         value=secrets.token_urlsafe(32);path=private/(name+'.secret');path.write_text(value);path.chmod(0o600)
         credentials[name]=(value,str(path));c['private_values'].append(value)
     epoch=str(uuid.uuid4());epoch_file=private/'execution-epoch';epoch_file.write_text(epoch);epoch_file.chmod(0o600)
+    simulator_epoch_file=private/'simulation-epoch';simulator_epoch_file.write_text(epoch);simulator_epoch_file.chmod(0o600)
+    simulation_worker_id=str(uuid.uuid4())
     registry_file=private/'simulation-campaigns.json';registry={'schema_version':1,'records':[]};registry_file.write_text(json.dumps(registry))
     common={'LIFECYCLE_URL':'https://127.0.0.1:8450','LIFECYCLE_CA_FILE':str(c['certificate']),'SIMULATOR_URL':'https://127.0.0.1:8449','SIMULATOR_CA_FILE':str(c['certificate']),
-        'LIFECYCLE_CUSTODY_EPOCH_FILE':str(epoch_file),'SIMULATION_CUSTODY_EPOCH_FILE':str(epoch_file),'LIFECYCLE_SOURCE_REVISION':os.environ['GITHUB_SHA'],'LIFECYCLE_SIMULATION_CAMPAIGNS_FILE':str(registry_file),
+        'LIFECYCLE_CUSTODY_EPOCH_FILE':str(epoch_file),'SIMULATION_CUSTODY_EPOCH_FILE':str(simulator_epoch_file),'LIFECYCLE_SOURCE_REVISION':os.environ['GITHUB_SHA'],'LIFECYCLE_SIMULATION_CAMPAIGNS_FILE':str(registry_file),'LIFECYCLE_SIMULATION_WORKER_ID':simulation_worker_id,
         'GOVERNANCE_URL':'https://127.0.0.1:8442','GOVERNANCE_CA_FILE':str(c['certificate']),'PLANNING_URL':'https://127.0.0.1:8446','PLANNING_CA_FILE':str(c['certificate']),'ASSURANCE_URL':'https://127.0.0.1:8447','ASSURANCE_CA_FILE':str(c['certificate'])}
     for name in links:common[name.upper().replace('-','_')+'_CREDENTIAL_FILE']=credentials[name][1]
     common.update(LIFECYCLE_CONSOLE_CALLER_FILE=credentials['console-lifecycle'][1],LIFECYCLE_SIMULATOR_CALLER_FILE=credentials['simulator-lifecycle'][1],LIFECYCLE_ASSURANCE_CALLER_FILE=credentials['assurance-lifecycle'][1],PLANNING_LIFECYCLE_READER_CREDENTIAL_FILE=credentials['lifecycle-planning'][1],ASSURANCE_GOVERNANCE_CREDENTIAL_FILE=credentials['assurance-governance'][1])
@@ -93,18 +205,24 @@ def _campaign(c,p):
     def command(index,action):
         view=current(index)
         return lifecycle('jobs/'+view['id']+'/commands',view['scope'],{'action':action,'expected_revision':view['revision']},expected=202)
+    def simulator_effect(grant):
+        return wire(common['SIMULATOR_URL'],'/v1/effects','POST',grant,
+                    effect_headers(grant,credentials['lifecycle-simulator'][0]))
     for action,method in [('provision','native_api'),('migrate','native_api_export_import'),('recover','forward_recovery'),('retire','owned_retirement')]:
         dest=copy.deepcopy(p['a']);dest.update(site_id=str(uuid.uuid4()),endpoint_id=str(uuid.uuid4()),generation_id=str(uuid.uuid4()))
         p['peer'].destinations[dest['endpoint_id']]=dest
         p['registry']['assignments'].append({'tenant_id':tenant,'site_id':dest['site_id'],'endpoint_id':dest['endpoint_id'],'profile':'synthetic','policy':'synthetic'})
         p['registry_file'].write_text(json.dumps(p['registry']))
-        q=copy.deepcopy(p['original_qual']['records'][0]);q['scope'].update({k:dest[k] for k in ['site_id','endpoint_id']});q['scope'].update(action='application.'+action,method=method)
-        quals=json.loads(p['qualification_file'].read_text());quals['records'].append(q);p['qualification_file'].write_text(json.dumps(quals))
+        p['publish_qualification'](dest,'application.'+action,method)
         body={'revision_id':p['revision'],'action':'application.'+action,'method':method,'candidates':[{k:dest[k] for k in ['site_id','endpoint_id','generation_id']}]}
         assessment=p['planning']('assessments',body,sites=[dest['site_id']],expected=201)
         req={'action':body['action'],'method':method,'lane':'isolated_campaign','executor_ids':[fixture['operator_id']],'valid_until':int(time.time())+900}
         created=p['planning']('plans',{'assessment_id':assessment['id'],'candidate':0,'request':req},sites=[dest['site_id']],expected=201)
         plan=p['planning']('plans/'+created['id'],sites=[dest['site_id']]);content,binding=plan['content'],plan['binding'];plans.append(plan)
+        (out/('p06-'+action+'-plan-inputs.json')).write_text(json.dumps({
+            'holds':content['holds'],'validity':plan['validity'],'action':content['action'],
+            'method':content['method'],'evidence_level':'E2',
+        },indent=2)+'\n')
         approval=gov('/v1/tenants/'+tenant+'/approvals',{'plan_id':plan['id'],'plan_revision':1,'plan_digest':binding['digest'],'expires_at':datetime.datetime.fromtimestamp(req['valid_until'],datetime.UTC).isoformat()},token=fixture['author_token'])
         gov('/v1/tenants/'+tenant+'/approvals/'+approval['id']+'/approve',{'revision':1,'reason':'Independent isolated P06 simulation review.'},token=fixture['reviewer_token'],expected=200)
         campaign_id=str(uuid.uuid4());scope=content['scope'];expires=int(time.time())+900
@@ -113,7 +231,7 @@ def _campaign(c,p):
             'actor_id':fixture['operator_id'],'endpoints':[common['SIMULATOR_URL']],'credential_scope_refs':['isolated-p06-simulator'],
             'reservations':[dict(r,state='reserved',plan_digest=binding['digest'],expires_at=expires,receipt_id=str(uuid.uuid4())) for r in content['reservation_intents']]}
         snapshot['campaign']={k:snapshot[k] for k in ['scope','actor_id','environment_class','credential_scope_refs']}
-        snapshot['campaign'].update(id=campaign_id,adapter='p06-simulator-v1',custody_epoch=epoch,worker_ids=['sim-worker'],action=content['action'],method=content['method'],installed_tuple=content['installed_tuple'],artifacts=content['artifacts'],plan_digest=binding['digest'],expires_at=expires,revoked=False,endpoint_allowlist=snapshot['endpoints'],data_scope=['synthetic-data'],cleanup_owner='disposable-campaign-owner',max_effects=32)
+        snapshot['campaign'].update(id=campaign_id,adapter='p06-simulator-v1',custody_epoch=epoch,worker_ids=[simulation_worker_id],action=content['action'],method=content['method'],installed_tuple=content['installed_tuple'],artifacts=content['artifacts'],plan_digest=binding['digest'],expires_at=expires,revoked=False,endpoint_allowlist=snapshot['endpoints'],data_scope=['synthetic-data'],cleanup_owner='disposable-campaign-owner',max_effects=32)
         registry['records'].append(snapshot);registry_file.write_text(json.dumps(registry))
         admission={'plan_id':plan['id'],'plan_revision':1,'plan_digest':binding['digest'],'approval_id':approval['id'],'campaign_id':campaign_id}
         idem=str(uuid.uuid4())
@@ -123,6 +241,16 @@ def _campaign(c,p):
             check('p06-admission-response-lost-after-commit',proxy.injected==1)
         job=lifecycle('jobs',scope,admission,key=idem,expected=202);jobs.append(job);workflows.append(job['workflow_id'])
         check('p06-'+action+'-one-logical-job',lifecycle('jobs',scope,admission,key=idem,expected=202)['id']==job['id'])
+    consumer_calls=security_probes(c,common['LIFECYCLE_URL'],tenant,fixture['foreign_tenant'],scope,jobs[-1],admission,idem)
+    consumer_input=private/'console-consumer.json'
+    consumer_input.write_text(json.dumps({'session':fixture['operator_token'],'tenant':tenant,
+                                        'scope':{k:scope[k] for k in ['site_id','environment','resource_id']},
+                                        'job_id':jobs[-1]['id'],'fault_file':str(fault_file),'calls':consumer_calls}))
+    consumer_input.chmod(0o600)
+    injected_before=proxy.injected
+    run(['php','scripts/p06/verify_console_consumers.php',str(consumer_input),str(out/'consumer-conformance.json')],
+        env=envs['console'],label='p06-real-console-contract-consumers')
+    check('p06-console-rejects-twelve-substituted-owner-responses',proxy.injected-injected_before==12 and not fault_file.exists())
     check('p06-distinct-services-own-stores',sql("SELECT has_table_privilege('assurance_runtime','app.evidence_uploads','UPDATE') OR has_table_privilege('assurance_runtime','app.evidence_records','DELETE');",'assurance')=='f')
     backup=private/'lifecycle-before-effects.sql'
     with backup.open('wb') as stream:
@@ -136,8 +264,19 @@ def _campaign(c,p):
     c['stop']('lifecycle');spawn('lifecycle',lifecycle_command);wait_for('lifecycle_restart',lambda:ready(common['LIFECYCLE_URL']),15)
     run([*witness,'reconcile',tenant,jobs[0]['id']],env=envs['lifecycle'],label='p06-new-process-seals-absence')
     late=json.loads(grant_file.read_text())
-    check('p06-delayed-worker-cannot-cross-seal',wire(common['SIMULATOR_URL'],'/v1/effects','POST',late,{'Authorization':'Bearer '+credentials['lifecycle-simulator'][0]})[0]==403)
+    check('p06-delayed-worker-probe-is-still-unexpired',late['expires_at']>int(time.time()))
+    check('p06-delayed-worker-cannot-cross-seal',simulator_effect(late)[0]==403)
     command(0,'retry_unstarted')
+    # The original attempt was sealed; use a new, actually acquired grant.
+    # Each owner sees the other owner's epoch unchanged, then the exact same
+    # grant succeeds. A timeout, expiry, malformed transport or revoked grant
+    # cannot masquerade as isolated epoch enforcement.
+    run([*witness,'crash_before',tenant,jobs[0]['id'],'reserve',str(grant_file)],env=envs['lifecycle'],expected=75,label='p06-fresh-epoch-control-grant')
+    fresh=json.loads(grant_file.read_text())
+    isolated=epoch_isolation(fresh,epoch_file,simulator_epoch_file,simulator_effect,
+                            lambda:int(sql('SELECT count(*) FROM sim.observations WHERE effect_count=1;','simulation')),check)
+    (out/'epoch-isolation-observations.json').write_text(json.dumps(isolated,indent=2)+'\n')
+    run([*witness,'reconcile',tenant,jobs[0]['id']],env=envs['lifecycle'],label='p06-epoch-control-reconciles-acceptance')
     # Process dies after target write acceptance. Journal remains uncertain; no source return.
     for effect in plans[1]['content']['effects']:
         if effect['id']=='activate_target':break
@@ -215,14 +354,15 @@ def _campaign(c,p):
     (out/'execution-observations.json').write_text(json.dumps({'simulation':True,'jobs':[current(i) for i in range(4)],'effect_count':int(sql('SELECT count(*) FROM sim.observations WHERE effect_count=1;','simulation'))},indent=2)+'\n')
     # Restore an older journal while Temporal and the independent effect owner retain acceptance.
     c['stop']('workflow');c['stop']('lifecycle')
-    recovered_epoch=str(uuid.uuid4());epoch_file.write_text(recovered_epoch)
+    recovered_epoch=str(uuid.uuid4());epoch_file.write_text(recovered_epoch);simulator_epoch_file.write_text(recovered_epoch)
     before_restore_count=sql('SELECT count(*) FROM sim.observations WHERE effect_count=1;','simulation')
     run(['psql','-X','-v','ON_ERROR_STOP=1','-d','lifecycle','-f',str(backup)],env=c['pg_env'],label='p06-restore-older-journal')
     spawn('lifecycle',lifecycle_command);wait_for('restored_lifecycle',lambda:ready(common['LIFECYCLE_URL']),15)
     run([*witness,'effect',tenant,jobs[0]['id'],'reserve'],env=envs['lifecycle'],expected=1,label='p06-restored-worker-denied')
     check('p06-old-database-starts-without-new-write-authority',current(0)['state']=='held' and current(0)['resources_retained'])
     late=json.loads(grant_file.read_text())
-    check('p06-pre-restore-worker-cannot-write-new-epoch',wire(common['SIMULATOR_URL'],'/v1/effects','POST',late,{'Authorization':'Bearer '+credentials['lifecycle-simulator'][0]})[0]==403)
+    check('p06-old-worker-grant-remains-denied-after-restore',simulator_effect(late)[0]==403)
+    report['limitations'].append('The post-restore old-grant denial proves continued denial and may include expiry. Separate pre-restore, fresh-grant controls isolate the effect-owner and journal-owner epoch fences; neither authorizes re-enabling the restored journal.')
     check('p06-restore-independent-accepted-effects-preserved',sql('SELECT count(*) FROM sim.observations WHERE effect_count=1;','simulation')==before_restore_count)
     check('p06-restore-does-not-invent-completion',sql("SELECT count(*) FROM app.execution_projection WHERE state='completed';",'lifecycle')=='0')
     (out/'restore-observations.json').write_text(json.dumps({'backup_sha256':backup_hash,'restored_jobs':4,'independent_effect_count':int(before_restore_count),'external_epoch_changed':True,'read_only_hold':True,'re_enable_decision':'DENIED: restored journal and current epoch require independent reconciliation and newly bound authority; no automatic release or old-epoch restoration'},indent=2)+'\n')

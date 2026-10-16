@@ -1,0 +1,18 @@
+[
+  {
+    "id": "security.scope",
+    "label": "RBAC, tenants, licenses and credentials",
+    "mapping": "owner_and_native",
+    "criticality": "critical",
+    "crosswalk_groups": [
+      "target.permissions.entitlements",
+      "owner.security.credential_scope",
+      "target.openstack.target.identity_catalog"
+    ],
+    "operator_attributes": [
+      "security.credential_scope"
+    ],
+    "qualification": "unqualified",
+    "notes": "Installed entitlement, RBAC and isolation cannot be operator assertions alone."
+  }
+]

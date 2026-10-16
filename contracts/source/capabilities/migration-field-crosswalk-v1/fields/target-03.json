@@ -1,0 +1,138 @@
+[
+  {
+    "canonical_id": "target.ahv.target.prism_identity",
+    "scope": "target",
+    "relationship": "platform_specific",
+    "normalization": "no_direct_equivalent",
+    "platforms": {
+      "vmware": null,
+      "ahv": {
+        "manifest_attribute_ids": [
+          "target.prism_identity"
+        ],
+        "api_fields": [
+          "domain-managers/{id}.data.extId"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 3600,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": null
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 3600,
+    "semantic_constraints": "No safe field-level equivalent currently established in the other platforms; treat destination support as unknown and qualify a method or adapter.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "target.ahv.target.storage_encryption",
+    "scope": "target",
+    "relationship": "platform_specific",
+    "normalization": "no_direct_equivalent",
+    "platforms": {
+      "vmware": null,
+      "ahv": {
+        "manifest_attribute_ids": [
+          "target.storage_encryption"
+        ],
+        "api_fields": [
+          "storage-containers[*].isEncrypted + replicationFactor"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_list"
+        ],
+        "max_age_seconds": 300,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": null
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 300,
+    "semantic_constraints": "No safe field-level equivalent currently established in the other platforms; treat destination support as unknown and qualify a method or adapter.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "target.ahv.target.subnet_external",
+    "scope": "target",
+    "relationship": "platform_specific",
+    "normalization": "no_direct_equivalent",
+    "platforms": {
+      "vmware": null,
+      "ahv": {
+        "manifest_attribute_ids": [
+          "target.subnet_external"
+        ],
+        "api_fields": [
+          "subnets[*].isExternal"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_list"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "when:external_connectivity"
+        ]
+      },
+      "openstack": null
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 60,
+    "semantic_constraints": "No safe field-level equivalent currently established in the other platforms; treat destination support as unknown and qualify a method or adapter.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "target.ahv.target.subnet_vpc",
+    "scope": "target",
+    "relationship": "platform_specific",
+    "normalization": "no_direct_equivalent",
+    "platforms": {
+      "vmware": null,
+      "ahv": {
+        "manifest_attribute_ids": [
+          "target.subnet_vpc"
+        ],
+        "api_fields": [
+          "subnets[*].vpcReference"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_list"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "when:vpc_required"
+        ]
+      },
+      "openstack": null
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 60,
+    "semantic_constraints": "No safe field-level equivalent currently established in the other platforms; treat destination support as unknown and qualify a method or adapter.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  }
+]

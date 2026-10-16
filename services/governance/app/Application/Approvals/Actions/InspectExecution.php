@@ -65,7 +65,7 @@ final class InspectExecution
             $reviewer = $this->authority->handle(new FederatedIdentity($approval->decided_by, false), $tenant, 'approval.decide', $plan->scope());
             if (! hash_equals($approval->request_authority, AuthorizeTenant::fingerprint($requester))
                 || ! hash_equals($approval->decision_authority, AuthorizeTenant::fingerprint($reviewer))
-                || ! hash_equals($plan->digest, BoundPlan::fromArray($this->plans->fetch($approval->plan_id, $approval->plan_revision))->digest)) {
+                || ! hash_equals($plan->digest, BoundPlan::fromArray($this->plans->fetch($tenant, $approval->plan_id, $approval->plan_revision))->digest)) {
                 throw new IdentityDenied('approval_authority_changed', 403);
             }
 

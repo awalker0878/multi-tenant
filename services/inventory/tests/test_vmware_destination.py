@@ -13,7 +13,12 @@ from inventory.domain.workload import profile_payload, review_input
 
 
 def values() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
-    source = {"firmware": "efi", "disks": [{"key": 1}, {"key": 2}], "nics": [{"key": 3}]}
+    source = {
+        "firmware": "efi",
+        "guest_id": "otherLinux64Guest",
+        "disks": [{"key": 1}, {"key": 2}],
+        "nics": [{"key": 3}],
+    }
     target: dict[str, Any] = {
         "platform": "vmware",
         "project_id": "datacenter-1",
@@ -29,6 +34,14 @@ def values() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
         target[plural] = [{key: key + "-1"}, {key: key + "-2"}]
     for row in target["folders"]:
         row["type"] = "VIRTUAL_MACHINE"
+    target["guest_options_by_host"] = [
+        {
+            "host": "host-1",
+            "guest_ids": ["windows2022srv_64Guest"],
+            "hardware_versions": ["vmx-21"],
+            "native_sha256": "d" * 64,
+        }
+    ]
     selection = {
         "platform": "vmware",
         "project_id": "datacenter-1",

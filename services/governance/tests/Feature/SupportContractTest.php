@@ -7,7 +7,7 @@ use Opis\JsonSchema\Validator;
 
 beforeEach(function (): void {
     initializeSupportFixture($this);
-    $api = json_decode(file_get_contents(resource_path('contracts/governance-support-v1.json')), true);
+    $api = json_decode(file_get_contents(dirname(__DIR__, 4).'/contracts/openapi/governance-support-v1.json'), true);
     $this->validateSupport = function (string $name, array $body) use ($api): bool {
         $schema = json_decode(json_encode(['$schema' => 'https://json-schema.org/draft/2020-12/schema',
             '$ref' => '#/components/schemas/'.$name, 'components' => $api['components']]));

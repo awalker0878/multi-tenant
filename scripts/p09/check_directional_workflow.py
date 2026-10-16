@@ -21,11 +21,13 @@ sys.path[:0] = [
         "services/planning/src",
         "services/planning/tests",
         "services/lifecycle/src",
+        "tests/contracts",
     )
 ]
 
 from test_expansion import RETEST, route_for
 from test_migration_plans import values
+from native_qualification_fixture import composition_readiness
 
 from planning.application.migration_support import METHODS, MigrationSupport
 from planning.domain.compilation import bind
@@ -42,10 +44,12 @@ MODES = ("rehearsal", "cutover", "rollback", "forward_recovery", "reverse_recove
 NOW = 1000
 
 
-def denied(call, error):
+def denied(call, error, reason=None):
     try:
         call()
-    except error:
+    except error as held:
+        if reason is not None:
+            assert str(held) == reason
         return
     raise AssertionError("Unsafe cross-owner admission unexpectedly succeeded")
 
@@ -64,7 +68,7 @@ def resolve(content):
     }
     # An independently approved synthetic owner record feeds the production resolver.
     config, transport = Mock(), Mock()
-    config.load.return_value = {"expires_at": 2000}
+    config.load.return_value = {"expires_at": 2000, "owners": {"catalogue": {}}}
     config.assignment.return_value = assignment
     approval = {
         "allowed": True,
@@ -89,10 +93,16 @@ def resolve(content):
             "scope": {k: binding[k] for k in ("site_id", "environment", "resource_id")},
         },
     }
-    transport.request.side_effect = [
-        {"content": content, "binding": binding, "invalidated": False},
-        approval,
-    ]
+    readiness = composition_readiness(content, binding['tenant_id'], NOW)
+    reconciliation = readiness['workload_reconciliation']
+    replies = {
+        'planning': {'content': content, 'binding': binding, 'invalidated': False, 'migration_readiness': readiness},
+        'catalogue': {'revision_id': reconciliation['catalogue_revision_id'], 'intent_sha256': reconciliation['catalogue_sha256'],
+                      'intent': {'environment': {'id': content['scope']['environment']},
+                                 'workloads': [{'id': w['workload_id']} for w in reconciliation['workloads']]}},
+        'governance': approval,
+    }
+    transport.request.side_effect = lambda owner, *_: copy.deepcopy(replies[owner])
     result = NativeOwners(config, transport, lambda: NOW).resolve(binding["tenant_id"], assignment)
     validate_plan(result, NOW)
     return result
@@ -223,11 +233,13 @@ def main():
         )
         support = MigrationSupport(lambda *_: selected, lambda *_: proofs, lambda: NOW)
         site = base["scope"]["site_id"]
-        support.require(actor, site, bound)
+        # Route-only synthetic proof lacks full application enrollment. The
+        # production boundary must hold, even when this E2 route looks qualified.
+        denied(lambda: support.require(actor, site, bound), PlanningHeld, 'migration_workload_admission_not_commissioned')
         content = compose_migration(base, bound, recipe, NOW)
         content["native_migration"].update(recipe_id=str(uuid4()), base_plan_id=str(uuid4()))
         migration = content["native_migration"]["migration"]
-        support.require(actor, site, migration)
+        denied(lambda: support.require(actor, site, migration), PlanningHeld, 'migration_workload_admission_not_commissioned')
         # One direction's proof neither qualifies its inverse nor supplies E4 acceptance.
         matrix = support.read(actor, site)
         assert len(matrix["directions"]) == 9 and matrix["native_write_authorized"] is False
@@ -242,7 +254,7 @@ def main():
             {"route_sha256": digest("other-direction")},
         ):
             proofs[:] = [proof | changed]
-            denied(lambda: support.require(actor, site, migration), PlanningHeld)
+            assert not any(r['native_qualified'] for d in support.read(actor, site)['directions'] for r in d['routes'])
             denied_support += 1
         proofs[:] = [proof]
         plan = resolve(content)

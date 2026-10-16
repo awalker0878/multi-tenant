@@ -56,7 +56,7 @@ retirement does not grant authority to reprovision or destroy retained storage.
 
 ## Worker boundary contract
 
-The [native boundary OpenAPI](../../../contracts/openapi/lifecycle-native-boundary-v1.json)
+The [native boundary OpenAPI](../../../contracts/openapi/lifecycle-migration-boundary-v2.json)
 and [golden request](../../../contracts/fixtures/lifecycle/native-stage-grant-v1.json)
 define a separate internal check route. The ASGI handler resolves tenant and worker
 from its authenticated caller port; neither identity can be supplied in JSON.
@@ -126,7 +126,7 @@ It makes one POST, follows no redirect and performs no retry. The bounded receip
 must bind the exact grant and explicitly deny readiness and retry authority.
 Uncertain transport outcomes enter the same reconciliation hold.
 
-The [worker effect contract](../../../contracts/openapi/worker-native-effect-v1.json)
+The worker effect contract
 is implemented by `NativeEffectApp` and `NativeApiEffect`. Caller trust supplies
 tenant and worker independently from JSON. The use case checks current authority
 before resolving tooling, then uses the existing native-plan journal and one-time

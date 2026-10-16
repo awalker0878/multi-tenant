@@ -7,6 +7,7 @@ from uuid import uuid4
 from planning.application.planning import Planning
 from planning.application.validation import MigrationValidation
 from planning.domain.compilation import bind
+from planning.domain.migration_api_selection import pin as pin_api_selection
 from planning.domain.migration_plan import compose_migration
 from planning.domain.model import Actor, Rejected, digest, identifier, integer, sha, shape
 
@@ -118,7 +119,7 @@ class MigrationPlans:
             }
         )
         with self.planning.database.transaction() as tx:
-            prior = self.planning.retry(tx, actor, key, fingerprint)
+            prior = self.planning.retry(tx, actor, key, fingerprint, max_age=604800)
             if prior:
                 return prior
         base = self.planning.get(
@@ -145,7 +146,10 @@ class MigrationPlans:
         self.validation.support(actor, site, bound)
         recipe = self.validation.recipes(actor, site, body["recipe_id"])
         content = compose_migration(base["content"], bound, recipe, self.planning.clock())
-        self.validation.support(actor, site, content["native_migration"]["migration"])
+        admitted = self.validation.support(actor, site, content["native_migration"]["migration"])
+        content["native_migration"]["api_selection"] = pin_api_selection(
+            admitted, self.planning.clock()
+        )
         content["native_migration"].update(base_plan_id=base["id"], recipe_id=body["recipe_id"])
         plan_id = str(uuid4())
         payload = {

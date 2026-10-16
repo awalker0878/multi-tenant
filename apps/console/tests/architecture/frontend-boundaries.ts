@@ -4,6 +4,7 @@ import path from 'node:path';
 import ts from 'typescript';
 
 const root = path.resolve('resources/js');
+const contractRoot = path.resolve('resources/contracts');
 const manifest = JSON.parse(readFileSync('package.json', 'utf8')) as {
   dependencies: Record<string, string>;
   devDependencies: Record<string, string>;
@@ -17,6 +18,9 @@ function checkImport(file: string, specifier: string): string | null {
   }
   const target = path.resolve(path.dirname(file), specifier);
   if (file === path.join(root, 'app.ts') && target === path.resolve('resources/css/app.css')) return null;
+  // Reviewed JSON contracts are owned Console build inputs alongside CSS.
+  // Permit static, direct JSON imports within that component-owned directory.
+  if (path.dirname(target) === contractRoot && target.endsWith('.json')) return null;
   if (!target.startsWith(`${root}${path.sep}`)) return `Import leaves Console frontend: ${specifier}`;
   const from = path.relative(root, file).split(path.sep);
   const to = path.relative(root, target).split(path.sep);
@@ -68,6 +72,9 @@ function walk(directory: string): string[] {
 
 const fixtures: [string, string, boolean][] = [
   ['pages/Operations.vue', "import x from '../contexts/planning/index'", true],
+  ['pages/inventory/Migration.vue', "import policy from '../../../contracts/migration-feature-policy-v1.json'", true],
+  ['pages/inventory/Migration.vue', "import policy from '../../../contracts/private.ts'", false],
+  ['pages/inventory/Migration.vue', "import policy from '../../../contracts/hidden/private.json'", false],
   ['contexts/planning/features/summary.ts', "import x from './private'", true],
   ['shared/ui/button.ts', "import x from '../../pages/Foundation.vue'", false],
   ['contexts/planning/index.ts', "export { x } from '../inventory/index'", false],

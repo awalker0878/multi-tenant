@@ -1,6 +1,6 @@
 # Planning
 
-This independently owned Python service implements bounded P05 destination assessments, immutable plan compilation, current owner reads, review validity and confirmed facts. See the [P05 implementation](../../docs/implementation/p05-planning.md), [wire contract](../../contracts/openapi/planning-v1.json) and [operating runbook](../../docs/operations/runbooks/planning-review.md). Native execution remains unavailable; Lifecycle owns admission and reservation acquisition.
+This independently owned Python service implements bounded P05 destination assessments, immutable plan compilation, current owner reads, review validity and confirmed facts. See the [P05 implementation](../../docs/implementation/p05-planning.md), [wire contract](../../contracts/openapi/planning-v1.2.json) and [operating runbook](../../docs/operations/runbooks/planning-review.md). Native execution remains unavailable; Lifecycle owns admission and reservation acquisition.
 
 Required capability observations and qualification records bound plan freshness to their earliest expiry. Plan comparisons require the same actor across every compared destination. Migration preparation rejects ambiguous disk identities and dataset references to missing disks. Mount `PLANNING_REGISTRY_FILE` as an absolute regular file, without symlinks or group/world write permissions, containing at most 512 KiB; unsafe policy files fail closed before remote owner reads.
 

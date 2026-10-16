@@ -77,7 +77,7 @@ def main():
                '$id': 'urn:multi-tenant:adapter-package:v1', 'title': 'Signed installed adapter package',
                **obj({'manifest': manifest, 'key_id': label,
                       'signature': {'type': 'string', 'pattern': '^[A-Za-z0-9+/]{86}==$'}})}
-    for name, document in [('tranche-v1', schema()), ('tranche-v1.1', schema('1.1')), ('adapter-package-v1', package)]:
+    for name, document in [('tranche-v1.1', schema('1.1')), ('adapter-package-v1', package)]:
         path = ROOT / f'contracts/schemas/expansion/{name}.json'
         rendered = json.dumps(document, indent=2) + '\n'
         if args.check:

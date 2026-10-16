@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 beforeEach(function (): void {
+    $this->qualificationCommands();
     $this->id = '10000000-0000-4000-8000-000000000001';
     $this->caller = tempnam(sys_get_temp_dir(), 'migration-caller-');
     $this->outgoing = tempnam(sys_get_temp_dir(), 'migration-outgoing-');
@@ -19,8 +20,12 @@ afterEach(function (): void {
 });
 
 it('requires the service caller and returns no invented native evidence', function (): void {
-    $this->postJson($this->path, $this->body)->assertForbidden();
-    $this->withToken(str_repeat('a', 64))->postJson($this->path, $this->body)->assertOk()->assertJsonPath('records', [])->assertJsonPath('native_write_authorized', false)->assertHeader('Cache-Control', 'no-store, private');
+    $this->postJson($this->path, $this->body)->assertUnauthorized();
+    $this->withToken(str_repeat('a', 64))->postJson($this->path, $this->body)
+        ->assertOk()->assertJsonPath('records', [])
+        ->assertJsonPath('api_evidence', [])
+        ->assertJsonPath('native_write_authorized', false)
+        ->assertHeader('Cache-Control', 'no-store, private');
     $this->postJson($this->path, $this->body + ['records' => []])->assertUnprocessable();
 });
 
@@ -30,15 +35,26 @@ it('binds every scope dimension and rejects ambiguous or writable custody', func
     $this->withToken(str_repeat('a', 64));
     $record = $this->body + ['records' => [['level' => 'E3']]];
     try {
+        $record['api_evidence'] = [
+            str_repeat('e', 64) => [
+                'route_sha256' => str_repeat('e', 64),
+                'environments' => [],
+                'observations' => [],
+                'omissions' => [],
+            ],
+        ];
         file_put_contents($file, json_encode(['schema_version' => 1, 'assignments' => [$record]], JSON_THROW_ON_ERROR));
-        $this->postJson($this->path, $this->body)->assertOk()->assertJsonPath('records', []);
+        $this->postJson($this->path, $this->body)
+            ->assertOk()->assertJsonPath('records', [])
+            ->assertJsonPath('api_evidence', []);
         $other = $this->body;
         $other['scope']['site_id'] = '10000000-0000-4000-8000-000000000002';
+        $this->withHeader('Idempotency-Key', bin2hex(random_bytes(32)));
         $this->postJson($this->path, $other)->assertOk()->assertJsonPath('records', []);
         $other['scope']['tenant_id'] = $other['scope']['site_id'];
         $this->postJson($this->path, $other)->assertForbidden();
         file_put_contents($file, json_encode(['schema_version' => 1, 'assignments' => [$record, $record]], JSON_THROW_ON_ERROR));
-        $this->postJson($this->path, $this->body)->assertStatus(503);
+        $this->withHeader('Idempotency-Key', bin2hex(random_bytes(32)))->postJson($this->path, $this->body)->assertStatus(503);
         chmod($file, 0666);
         $this->postJson($this->path, $this->body)->assertStatus(503);
     } finally {

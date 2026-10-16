@@ -229,7 +229,7 @@ class PermitCampaign(Campaign):
 
     def run(self):
         self.check('exact-source', self.command('source', ['git', 'rev-parse', 'HEAD']).decode().strip() == self.revision)
-        prefixes = ['scripts/p01', 'deploy/fixtures/permit-desk', 'deploy/dependencies/inputs.lock.json', '.github/workflows/p01-permit-desk-recovery.yml']
+        prefixes = ['scripts/p01', 'deploy/fixtures/permit-desk', 'deploy/dependencies/inputs.lock.json', '.github/workflows/qualification.yml']
         self.check('clean-inputs', not self.command('source-clean', ['git', 'status', '--porcelain', '--untracked-files=all', '--', *prefixes]).strip())
         self.report['source_sha256'] = {str(p.relative_to(self.root)): digest(p.read_bytes()) for prefix in prefixes for p in ([self.root/prefix] if (self.root/prefix).is_file() else sorted((self.root/prefix).rglob('*'))) if p.is_file() and '__pycache__' not in p.parts}
         self.command('docker-version', ['docker', 'version'])

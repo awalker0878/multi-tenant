@@ -1,0 +1,80 @@
+{
+  "/v1/tenants/{tenant}/sites/{site}/endpoints/{endpoint}/configuration-pulls": {
+    "post": {
+      "operationId": "pullPortingConfiguration",
+      "x-inventory-action": "inventory.admin",
+      "x-response-schema": "DiscoveryCommand",
+      "x-status": 202,
+      "parameters": [
+        {
+          "name": "tenant",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "site",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "endpoint",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "Idempotency-Key",
+          "in": "header",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "responses": {
+        "202": {
+          "description": "Authorized result",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DiscoveryCommand"
+              }
+            }
+          }
+        },
+        "default": {
+          "description": "No disclosed operational details",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Error"
+              }
+            }
+          }
+        }
+      },
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Empty"
+            }
+          }
+        }
+      }
+    }
+  }
+}

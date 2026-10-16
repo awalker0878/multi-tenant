@@ -1,0 +1,1059 @@
+{
+  "intent": {
+    "schema_version": 1,
+    "deployment_id": "00000000-0000-4000-8000-000000000003",
+    "environment": {
+      "id": "00000000-0000-4000-8000-000000000010",
+      "version": 1
+    },
+    "service_owner_id": "00000000-0000-4000-8000-000000000002",
+    "acceptance_criteria": [
+      "Submit and retrieve a permit with its attachment"
+    ],
+    "workloads": [
+      {
+        "id": "00000000-0000-4000-8000-000000000100",
+        "name": "Web",
+        "role": "web",
+        "wsd": {
+          "id": "00000000-0000-4000-8000-000000000011",
+          "version": 1
+        },
+        "security_domain": {
+          "id": "00000000-0000-4000-8000-000000000021",
+          "version": 1
+        },
+        "compute": {
+          "vcpus": 2,
+          "memory_mib": 4096,
+          "architecture": "x86_64"
+        },
+        "guest": {
+          "os": "linux",
+          "image": "approved-image-v1",
+          "firmware": "uefi",
+          "secure_boot": true,
+          "hardening_profile": "linux-baseline-v1"
+        },
+        "disks": [
+          {
+            "id": "00000000-0000-4000-8000-000000000200",
+            "order": 0,
+            "size_gib": 40,
+            "storage_class": "standard",
+            "boot": true,
+            "dataset_id": null,
+            "encryption": "required"
+          }
+        ],
+        "nics": [
+          {
+            "id": "00000000-0000-4000-8000-000000000400",
+            "order": 0,
+            "security_domain_id": "00000000-0000-4000-8000-000000000021",
+            "address_families": [
+              "ipv4"
+            ],
+            "address_intent": "reserved",
+            "network_class": "private"
+          }
+        ],
+        "requirements": [
+          {
+            "key": "security.unsupported_control",
+            "strength": "required",
+            "value": true,
+            "reason": "Must be assessed explicitly"
+          }
+        ],
+        "failure_domain": {
+          "group": "permit",
+          "mode": "anti_affinity",
+          "strength": "required"
+        }
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000101",
+        "name": "Database",
+        "role": "database",
+        "wsd": {
+          "id": "00000000-0000-4000-8000-000000000012",
+          "version": 1
+        },
+        "security_domain": {
+          "id": "00000000-0000-4000-8000-000000000022",
+          "version": 1
+        },
+        "compute": {
+          "vcpus": 2,
+          "memory_mib": 4096,
+          "architecture": "x86_64"
+        },
+        "guest": {
+          "os": "linux",
+          "image": "approved-image-v1",
+          "firmware": "uefi",
+          "secure_boot": true,
+          "hardening_profile": "linux-baseline-v1"
+        },
+        "disks": [
+          {
+            "id": "00000000-0000-4000-8000-000000000201",
+            "order": 0,
+            "size_gib": 40,
+            "storage_class": "standard",
+            "boot": true,
+            "dataset_id": "00000000-0000-4000-8000-000000000300",
+            "encryption": "required"
+          }
+        ],
+        "nics": [
+          {
+            "id": "00000000-0000-4000-8000-000000000401",
+            "order": 0,
+            "security_domain_id": "00000000-0000-4000-8000-000000000022",
+            "address_families": [
+              "ipv4"
+            ],
+            "address_intent": "reserved",
+            "network_class": "private"
+          }
+        ],
+        "requirements": [
+          {
+            "key": "security.unsupported_control",
+            "strength": "required",
+            "value": true,
+            "reason": "Must be assessed explicitly"
+          }
+        ],
+        "failure_domain": {
+          "group": "permit",
+          "mode": "anti_affinity",
+          "strength": "required"
+        }
+      }
+    ],
+    "datasets": [
+      {
+        "id": "00000000-0000-4000-8000-000000000300",
+        "name": "Permit data",
+        "owner_id": "00000000-0000-4000-8000-000000000002",
+        "consistency_group": "permit",
+        "consistency": "application",
+        "recovery": {
+          "rpo_seconds": 0,
+          "rto_seconds": 3600,
+          "method": "native_api_export_import",
+          "strength": "required"
+        }
+      }
+    ],
+    "dependencies": [
+      {
+        "from": "00000000-0000-4000-8000-000000000100",
+        "to": "00000000-0000-4000-8000-000000000101",
+        "kind": "startup",
+        "readiness": "Database accepts queries",
+        "protocol": "none",
+        "port": null,
+        "controlled_interface": false,
+        "dataset_id": "00000000-0000-4000-8000-000000000300",
+        "strength": "required"
+      },
+      {
+        "from": "00000000-0000-4000-8000-000000000100",
+        "to": "00000000-0000-4000-8000-000000000101",
+        "kind": "communication",
+        "readiness": "Database accepts application connection",
+        "protocol": "tcp",
+        "port": 5432,
+        "controlled_interface": true,
+        "dataset_id": "00000000-0000-4000-8000-000000000300",
+        "strength": "required"
+      }
+    ],
+    "services": [
+      {
+        "name": "backup",
+        "owner_id": "00000000-0000-4000-8000-000000000002",
+        "workload_id": "00000000-0000-4000-8000-000000000101",
+        "requirements": [
+          {
+            "key": "service.backup",
+            "strength": "required",
+            "value": "commvault",
+            "reason": "Protect the application data"
+          }
+        ]
+      }
+    ],
+    "requirements": []
+  },
+  "responses": {
+    "response1": {
+      "endpoint_id": "10000000-0000-4000-8000-000000000001",
+      "revision": 0,
+      "state": "registered",
+      "native_write_authorized": false
+    },
+    "response2": {
+      "items": [],
+      "next_cursor": "10000000-0000-4000-8000-000000000001",
+      "generation_id": "10000000-0000-4000-8000-000000000001",
+      "completion": "a",
+      "reason": "a",
+      "endpoint_id": "10000000-0000-4000-8000-000000000001",
+      "policy_digest": "a",
+      "consistency": "bounded_observation_window"
+    },
+    "response3": {
+      "items": [
+        {
+          "policy_id": "10000000-0000-4000-8000-000000000001",
+          "site_id": "10000000-0000-4000-8000-000000000001",
+          "owner_id": "10000000-0000-4000-8000-000000000001",
+          "platform": "openstack",
+          "native_scope": "a",
+          "epoch": "10000000-0000-4000-8000-000000000001",
+          "profile": {
+            "platform": "openstack",
+            "dimensions": {
+              "installed_identity": {
+                "state": "UNASSESSED",
+                "reason": "a",
+                "facts": {
+                  "synthetic_e2_only": true
+                },
+                "provenance": "a"
+              },
+              "compute_placement": {
+                "state": "UNASSESSED",
+                "reason": "a",
+                "facts": {
+                  "synthetic_e2_only": true
+                },
+                "provenance": "a"
+              },
+              "storage_datasets": {
+                "state": "UNASSESSED",
+                "reason": "a",
+                "facts": {
+                  "synthetic_e2_only": true
+                },
+                "provenance": "a"
+              },
+              "network_vpc": {
+                "state": "UNASSESSED",
+                "reason": "a",
+                "facts": {
+                  "synthetic_e2_only": true
+                },
+                "provenance": "a"
+              },
+              "security_edge": {
+                "state": "UNASSESSED",
+                "reason": "a",
+                "facts": {
+                  "synthetic_e2_only": true
+                },
+                "provenance": "a"
+              },
+              "guest_image": {
+                "state": "UNASSESSED",
+                "reason": "a",
+                "facts": {
+                  "synthetic_e2_only": true
+                },
+                "provenance": "a"
+              },
+              "lifecycle_adoption": {
+                "state": "UNASSESSED",
+                "reason": "a",
+                "facts": {
+                  "synthetic_e2_only": true
+                },
+                "provenance": "a"
+              },
+              "mobility": {
+                "state": "UNASSESSED",
+                "reason": "a",
+                "facts": {
+                  "synthetic_e2_only": true
+                },
+                "provenance": "a"
+              },
+              "shared_services": {
+                "state": "UNASSESSED",
+                "reason": "a",
+                "facts": {
+                  "synthetic_e2_only": true
+                },
+                "provenance": "a"
+              },
+              "resilience_operations": {
+                "state": "UNASSESSED",
+                "reason": "a",
+                "facts": {
+                  "synthetic_e2_only": true
+                },
+                "provenance": "a"
+              },
+              "assurance_sovereignty": {
+                "state": "UNASSESSED",
+                "reason": "a",
+                "facts": {
+                  "synthetic_e2_only": true
+                },
+                "provenance": "a"
+              }
+            },
+            "native_write_authorized": false
+          },
+          "coverage_reference": "a",
+          "policy_digest": "a"
+        }
+      ],
+      "next_cursor": "10000000-0000-4000-8000-000000000001"
+    },
+    "response4": {
+      "items": [
+        {
+          "endpoint_id": "10000000-0000-4000-8000-000000000001",
+          "site_id": "10000000-0000-4000-8000-000000000001",
+          "label": "a",
+          "platform": "a",
+          "native_scope": "a",
+          "revision": 0,
+          "generation_id": "10000000-0000-4000-8000-000000000001",
+          "expires_at": 0,
+          "state": "held",
+          "reason": "a",
+          "coverage_reference": "a",
+          "profile": {
+            "platform": "openstack",
+            "dimensions": {
+              "installed_identity": {
+                "state": "UNASSESSED",
+                "reason": "a",
+                "facts": {
+                  "synthetic_e2_only": true
+                },
+                "provenance": "a"
+              },
+              "compute_placement": {
+                "state": "UNASSESSED",
+                "reason": "a",
+                "facts": {
+                  "synthetic_e2_only": true
+                },
+                "provenance": "a"
+              },
+              "storage_datasets": {
+                "state": "UNASSESSED",
+                "reason": "a",
+                "facts": {
+                  "synthetic_e2_only": true
+                },
+                "provenance": "a"
+              },
+              "network_vpc": {
+                "state": "UNASSESSED",
+                "reason": "a",
+                "facts": {
+                  "synthetic_e2_only": true
+                },
+                "provenance": "a"
+              },
+              "security_edge": {
+                "state": "UNASSESSED",
+                "reason": "a",
+                "facts": {
+                  "synthetic_e2_only": true
+                },
+                "provenance": "a"
+              },
+              "guest_image": {
+                "state": "UNASSESSED",
+                "reason": "a",
+                "facts": {
+                  "synthetic_e2_only": true
+                },
+                "provenance": "a"
+              },
+              "lifecycle_adoption": {
+                "state": "UNASSESSED",
+                "reason": "a",
+                "facts": {
+                  "synthetic_e2_only": true
+                },
+                "provenance": "a"
+              },
+              "mobility": {
+                "state": "UNASSESSED",
+                "reason": "a",
+                "facts": {
+                  "synthetic_e2_only": true
+                },
+                "provenance": "a"
+              },
+              "shared_services": {
+                "state": "UNASSESSED",
+                "reason": "a",
+                "facts": {
+                  "synthetic_e2_only": true
+                },
+                "provenance": "a"
+              },
+              "resilience_operations": {
+                "state": "UNASSESSED",
+                "reason": "a",
+                "facts": {
+                  "synthetic_e2_only": true
+                },
+                "provenance": "a"
+              },
+              "assurance_sovereignty": {
+                "state": "UNASSESSED",
+                "reason": "a",
+                "facts": {
+                  "synthetic_e2_only": true
+                },
+                "provenance": "a"
+              }
+            },
+            "native_write_authorized": false
+          },
+          "native_write_authorized": false,
+          "observed_capacity_reserved": false
+        }
+      ],
+      "next_cursor": "10000000-0000-4000-8000-000000000001"
+    },
+    "response5": {
+      "tenant_id": "10000000-0000-4000-8000-000000000001",
+      "site_id": "10000000-0000-4000-8000-000000000001",
+      "groups": [],
+      "fields": [],
+      "record": null,
+      "configuration": null,
+      "missing_fields": [],
+      "holds": [],
+      "collection_complete": false,
+      "native_write_authorized": false
+    },
+    "response6": {
+      "tenant_id": "10000000-0000-4000-8000-000000000001",
+      "site_id": "10000000-0000-4000-8000-000000000001",
+      "groups": [],
+      "fields": [],
+      "record": null,
+      "configuration": null,
+      "missing_fields": [],
+      "holds": [],
+      "collection_complete": false,
+      "native_write_authorized": false,
+      "context": null,
+      "operations": [],
+      "methods": [],
+      "platforms": {
+        "source": "vmware",
+        "target": "vmware"
+      },
+      "checks": [],
+      "contexts": [],
+      "evidence_current": false
+    },
+    "response7": {
+      "id": "10000000-0000-4000-8000-000000000001",
+      "revision": 1,
+      "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "native_write_authorized": false
+    },
+    "response8": {
+      "group": {
+        "id": "10000000-0000-4000-8000-000000000001",
+        "revision": 1,
+        "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "input": {
+          "name": "a",
+          "application_id": "10000000-0000-4000-8000-000000000001",
+          "environment_id": "10000000-0000-4000-8000-000000000001",
+          "target_profile_id": "10000000-0000-4000-8000-000000000001",
+          "format": "raw",
+          "members": []
+        }
+      },
+      "members": [],
+      "native_write_authorized": false
+    },
+    "response9": {
+      "id": "10000000-0000-4000-8000-000000000001",
+      "name": "a",
+      "etag": "a",
+      "deployments": [
+        {
+          "id": "10000000-0000-4000-8000-000000000001",
+          "environment_id": "10000000-0000-4000-8000-000000000001",
+          "current_revision_id": "10000000-0000-4000-8000-000000000001"
+        }
+      ]
+    },
+    "response10": {
+      "id": "10000000-0000-4000-8000-000000000001",
+      "application_id": "10000000-0000-4000-8000-000000000001",
+      "deployment_id": "00000000-0000-4000-8000-000000000003",
+      "sequence": 0,
+      "parent_id": "a",
+      "actor_id": "10000000-0000-4000-8000-000000000001",
+      "digest": "a",
+      "created_at": "a",
+      "include_intent": true
+    },
+    "response11": {
+      "application_id": "10000000-0000-4000-8000-000000000001",
+      "revision_id": "10000000-0000-4000-8000-000000000001",
+      "deployment_id": "00000000-0000-4000-8000-000000000003",
+      "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "etag": "a",
+      "sequence": 1
+    },
+    "response12": {
+      "id": "10000000-0000-4000-8000-000000000001",
+      "kind": "environment",
+      "version": 0,
+      "retired": false,
+      "etag": "a",
+      "definition": {
+        "name": "a",
+        "owner_id": "10000000-0000-4000-8000-000000000001"
+      }
+    },
+    "response13": {
+      "references": [
+        {
+          "id": "10000000-0000-4000-8000-000000000001",
+          "kind": "environment",
+          "version": 0,
+          "retired": false,
+          "etag": "a",
+          "definition": {
+            "name": "a",
+            "owner_id": "10000000-0000-4000-8000-000000000001"
+          }
+        }
+      ],
+      "next_cursor": "a"
+    },
+    "response14": {
+      "id": "10000000-0000-4000-8000-000000000001",
+      "kind": "wsd",
+      "version": 0,
+      "retired": false,
+      "etag": "a",
+      "definition": {
+        "name": "a",
+        "owner_id": "10000000-0000-4000-8000-000000000001"
+      }
+    },
+    "response15": {
+      "references": [
+        {
+          "id": "10000000-0000-4000-8000-000000000001",
+          "kind": "wsd",
+          "version": 0,
+          "retired": false,
+          "etag": "a",
+          "definition": {
+            "name": "a",
+            "owner_id": "10000000-0000-4000-8000-000000000001"
+          }
+        }
+      ],
+      "next_cursor": "a"
+    },
+    "response16": {
+      "id": "10000000-0000-4000-8000-000000000001",
+      "kind": "security-domain",
+      "version": 0,
+      "retired": false,
+      "etag": "a",
+      "definition": {
+        "name": "a",
+        "owner_id": "10000000-0000-4000-8000-000000000001"
+      }
+    },
+    "response17": {
+      "references": [
+        {
+          "id": "10000000-0000-4000-8000-000000000001",
+          "kind": "security-domain",
+          "version": 0,
+          "retired": false,
+          "etag": "a",
+          "definition": {
+            "name": "a",
+            "owner_id": "10000000-0000-4000-8000-000000000001"
+          }
+        }
+      ],
+      "next_cursor": "a"
+    }
+  },
+  "cases": {
+    "inventory:renewEndpoint:endpoint_id": {
+      "family": "inventory",
+      "operation": "renewEndpoint",
+      "parameters": {
+        "site": "10000000-0000-4000-8000-000000000001",
+        "endpoint": "10000000-0000-4000-8000-000000000001"
+      },
+      "environment": null,
+      "field": "endpoint_id",
+      "poison": "20000000-0000-4000-8000-000000000002",
+      "response": "response1",
+      "status": 201
+    },
+    "inventory:revokeEndpoint:endpoint_id": {
+      "family": "inventory",
+      "operation": "revokeEndpoint",
+      "parameters": {
+        "site": "10000000-0000-4000-8000-000000000001",
+        "endpoint": "10000000-0000-4000-8000-000000000001"
+      },
+      "environment": null,
+      "field": "endpoint_id",
+      "poison": "20000000-0000-4000-8000-000000000002",
+      "response": "response1",
+      "status": 201
+    },
+    "inventory:listResources:generation_id": {
+      "family": "inventory",
+      "operation": "listResources",
+      "parameters": {
+        "site": "10000000-0000-4000-8000-000000000001",
+        "generation": "10000000-0000-4000-8000-000000000001"
+      },
+      "environment": null,
+      "field": "generation_id",
+      "poison": "20000000-0000-4000-8000-000000000002",
+      "response": "response2",
+      "status": 200
+    },
+    "inventory:listPolicies:items.0.site_id": {
+      "family": "inventory",
+      "operation": "listPolicies",
+      "parameters": {
+        "site": "10000000-0000-4000-8000-000000000001"
+      },
+      "environment": null,
+      "field": "items.0.site_id",
+      "poison": "20000000-0000-4000-8000-000000000002",
+      "response": "response3",
+      "status": 200
+    },
+    "inventory:listEndpoints:items.0.site_id": {
+      "family": "inventory",
+      "operation": "listEndpoints",
+      "parameters": {
+        "site": "10000000-0000-4000-8000-000000000001"
+      },
+      "environment": null,
+      "field": "items.0.site_id",
+      "poison": "20000000-0000-4000-8000-000000000002",
+      "response": "response4",
+      "status": 200
+    },
+    "inventory:getOperatorInputs:tenant_id": {
+      "family": "inventory",
+      "operation": "getOperatorInputs",
+      "parameters": {
+        "site": "10000000-0000-4000-8000-000000000001"
+      },
+      "environment": null,
+      "field": "tenant_id",
+      "poison": "20000000-0000-4000-8000-000000000002",
+      "response": "response5",
+      "status": 200
+    },
+    "inventory:getOperatorInputs:site_id": {
+      "family": "inventory",
+      "operation": "getOperatorInputs",
+      "parameters": {
+        "site": "10000000-0000-4000-8000-000000000001"
+      },
+      "environment": null,
+      "field": "site_id",
+      "poison": "20000000-0000-4000-8000-000000000002",
+      "response": "response5",
+      "status": 200
+    },
+    "inventory:getOperatorReadiness:tenant_id": {
+      "family": "inventory",
+      "operation": "getOperatorReadiness",
+      "parameters": {
+        "site": "10000000-0000-4000-8000-000000000001"
+      },
+      "environment": null,
+      "field": "tenant_id",
+      "poison": "20000000-0000-4000-8000-000000000002",
+      "response": "response6",
+      "status": 200
+    },
+    "inventory:getOperatorReadiness:site_id": {
+      "family": "inventory",
+      "operation": "getOperatorReadiness",
+      "parameters": {
+        "site": "10000000-0000-4000-8000-000000000001"
+      },
+      "environment": null,
+      "field": "site_id",
+      "poison": "20000000-0000-4000-8000-000000000002",
+      "response": "response6",
+      "status": 200
+    },
+    "inventory:updateMigrationGroup:id": {
+      "family": "inventory",
+      "operation": "updateMigrationGroup",
+      "parameters": {
+        "site": "10000000-0000-4000-8000-000000000001",
+        "group": "10000000-0000-4000-8000-000000000001"
+      },
+      "environment": null,
+      "field": "id",
+      "poison": "20000000-0000-4000-8000-000000000002",
+      "response": "response7",
+      "status": 201
+    },
+    "inventory:getMigrationGroup:group.id": {
+      "family": "inventory",
+      "operation": "getMigrationGroup",
+      "parameters": {
+        "site": "10000000-0000-4000-8000-000000000001",
+        "group": "10000000-0000-4000-8000-000000000001"
+      },
+      "environment": null,
+      "field": "group.id",
+      "poison": "20000000-0000-4000-8000-000000000002",
+      "response": "response8",
+      "status": 200
+    },
+    "catalogue:getApplication:id": {
+      "family": "catalogue",
+      "operation": "getApplication",
+      "parameters": {
+        "application": "10000000-0000-4000-8000-000000000001"
+      },
+      "environment": "10000000-0000-4000-8000-000000000001",
+      "field": "id",
+      "poison": "20000000-0000-4000-8000-000000000002",
+      "response": "response9",
+      "status": 200
+    },
+    "catalogue:getApplication:deployments.0.environment_id": {
+      "family": "catalogue",
+      "operation": "getApplication",
+      "parameters": {
+        "application": "10000000-0000-4000-8000-000000000001"
+      },
+      "environment": "10000000-0000-4000-8000-000000000001",
+      "field": "deployments.0.environment_id",
+      "poison": "20000000-0000-4000-8000-000000000002",
+      "response": "response9",
+      "status": 200
+    },
+    "catalogue:getRevision:id": {
+      "family": "catalogue",
+      "operation": "getRevision",
+      "parameters": {
+        "application": "10000000-0000-4000-8000-000000000001",
+        "revision": "10000000-0000-4000-8000-000000000001"
+      },
+      "environment": "00000000-0000-4000-8000-000000000010",
+      "field": "id",
+      "poison": "20000000-0000-4000-8000-000000000002",
+      "response": "response10",
+      "status": 200
+    },
+    "catalogue:getRevision:application_id": {
+      "family": "catalogue",
+      "operation": "getRevision",
+      "parameters": {
+        "application": "10000000-0000-4000-8000-000000000001",
+        "revision": "10000000-0000-4000-8000-000000000001"
+      },
+      "environment": "00000000-0000-4000-8000-000000000010",
+      "field": "application_id",
+      "poison": "20000000-0000-4000-8000-000000000002",
+      "response": "response10",
+      "status": 200
+    },
+    "catalogue:getRevision:deployment_id": {
+      "family": "catalogue",
+      "operation": "getRevision",
+      "parameters": {
+        "application": "10000000-0000-4000-8000-000000000001",
+        "revision": "10000000-0000-4000-8000-000000000001"
+      },
+      "environment": "00000000-0000-4000-8000-000000000010",
+      "field": "deployment_id",
+      "poison": "20000000-0000-4000-8000-000000000002",
+      "response": "response10",
+      "status": 200
+    },
+    "catalogue:getRevision:intent.environment.id": {
+      "family": "catalogue",
+      "operation": "getRevision",
+      "parameters": {
+        "application": "10000000-0000-4000-8000-000000000001",
+        "revision": "10000000-0000-4000-8000-000000000001"
+      },
+      "environment": "00000000-0000-4000-8000-000000000010",
+      "field": "intent.environment.id",
+      "poison": "20000000-0000-4000-8000-000000000002",
+      "response": "response10",
+      "status": 200
+    },
+    "catalogue:createApplication:deployment_id": {
+      "family": "catalogue",
+      "operation": "createApplication",
+      "parameters": {},
+      "environment": null,
+      "field": "deployment_id",
+      "poison": "20000000-0000-4000-8000-000000000002",
+      "response": "response11",
+      "include_intent": true,
+      "status": 201
+    },
+    "catalogue:publishRevision:deployment_id": {
+      "family": "catalogue",
+      "operation": "publishRevision",
+      "parameters": {
+        "application": "10000000-0000-4000-8000-000000000001"
+      },
+      "environment": null,
+      "field": "deployment_id",
+      "poison": "20000000-0000-4000-8000-000000000002",
+      "response": "response11",
+      "include_intent": true,
+      "status": 201
+    },
+    "catalogue:publishRevision:application_id": {
+      "family": "catalogue",
+      "operation": "publishRevision",
+      "parameters": {
+        "application": "10000000-0000-4000-8000-000000000001"
+      },
+      "environment": null,
+      "field": "application_id",
+      "poison": "20000000-0000-4000-8000-000000000002",
+      "response": "response11",
+      "include_intent": true,
+      "status": 201
+    },
+    "catalogue:createEnvironment:kind": {
+      "family": "catalogue",
+      "operation": "createEnvironment",
+      "parameters": {},
+      "environment": null,
+      "field": "kind",
+      "poison": "wsd",
+      "response": "response12",
+      "status": 201
+    },
+    "catalogue:updateEnvironment:kind": {
+      "family": "catalogue",
+      "operation": "updateEnvironment",
+      "parameters": {
+        "reference": "10000000-0000-4000-8000-000000000001"
+      },
+      "environment": null,
+      "field": "kind",
+      "poison": "wsd",
+      "response": "response12",
+      "status": 201
+    },
+    "catalogue:updateEnvironment:id": {
+      "family": "catalogue",
+      "operation": "updateEnvironment",
+      "parameters": {
+        "reference": "10000000-0000-4000-8000-000000000001"
+      },
+      "environment": null,
+      "field": "id",
+      "poison": "20000000-0000-4000-8000-000000000002",
+      "response": "response12",
+      "status": 201
+    },
+    "catalogue:retireEnvironment:kind": {
+      "family": "catalogue",
+      "operation": "retireEnvironment",
+      "parameters": {
+        "reference": "10000000-0000-4000-8000-000000000001"
+      },
+      "environment": null,
+      "field": "kind",
+      "poison": "wsd",
+      "response": "response12",
+      "status": 201
+    },
+    "catalogue:retireEnvironment:id": {
+      "family": "catalogue",
+      "operation": "retireEnvironment",
+      "parameters": {
+        "reference": "10000000-0000-4000-8000-000000000001"
+      },
+      "environment": null,
+      "field": "id",
+      "poison": "20000000-0000-4000-8000-000000000002",
+      "response": "response12",
+      "status": 201
+    },
+    "catalogue:listEnvironments:references.0.kind": {
+      "family": "catalogue",
+      "operation": "listEnvironments",
+      "parameters": {},
+      "environment": null,
+      "field": "references.0.kind",
+      "poison": "wsd",
+      "response": "response13",
+      "status": 200
+    },
+    "catalogue:createWsd:kind": {
+      "family": "catalogue",
+      "operation": "createWsd",
+      "parameters": {},
+      "environment": null,
+      "field": "kind",
+      "poison": "environment",
+      "response": "response14",
+      "status": 201
+    },
+    "catalogue:updateWsd:kind": {
+      "family": "catalogue",
+      "operation": "updateWsd",
+      "parameters": {
+        "reference": "10000000-0000-4000-8000-000000000001"
+      },
+      "environment": null,
+      "field": "kind",
+      "poison": "environment",
+      "response": "response14",
+      "status": 201
+    },
+    "catalogue:updateWsd:id": {
+      "family": "catalogue",
+      "operation": "updateWsd",
+      "parameters": {
+        "reference": "10000000-0000-4000-8000-000000000001"
+      },
+      "environment": null,
+      "field": "id",
+      "poison": "20000000-0000-4000-8000-000000000002",
+      "response": "response14",
+      "status": 201
+    },
+    "catalogue:retireWsd:kind": {
+      "family": "catalogue",
+      "operation": "retireWsd",
+      "parameters": {
+        "reference": "10000000-0000-4000-8000-000000000001"
+      },
+      "environment": null,
+      "field": "kind",
+      "poison": "environment",
+      "response": "response14",
+      "status": 201
+    },
+    "catalogue:retireWsd:id": {
+      "family": "catalogue",
+      "operation": "retireWsd",
+      "parameters": {
+        "reference": "10000000-0000-4000-8000-000000000001"
+      },
+      "environment": null,
+      "field": "id",
+      "poison": "20000000-0000-4000-8000-000000000002",
+      "response": "response14",
+      "status": 201
+    },
+    "catalogue:listWsds:references.0.kind": {
+      "family": "catalogue",
+      "operation": "listWsds",
+      "parameters": {},
+      "environment": null,
+      "field": "references.0.kind",
+      "poison": "environment",
+      "response": "response15",
+      "status": 200
+    },
+    "catalogue:createSecurityDomain:kind": {
+      "family": "catalogue",
+      "operation": "createSecurityDomain",
+      "parameters": {},
+      "environment": null,
+      "field": "kind",
+      "poison": "environment",
+      "response": "response16",
+      "status": 201
+    },
+    "catalogue:updateSecurityDomain:kind": {
+      "family": "catalogue",
+      "operation": "updateSecurityDomain",
+      "parameters": {
+        "reference": "10000000-0000-4000-8000-000000000001"
+      },
+      "environment": null,
+      "field": "kind",
+      "poison": "environment",
+      "response": "response16",
+      "status": 201
+    },
+    "catalogue:updateSecurityDomain:id": {
+      "family": "catalogue",
+      "operation": "updateSecurityDomain",
+      "parameters": {
+        "reference": "10000000-0000-4000-8000-000000000001"
+      },
+      "environment": null,
+      "field": "id",
+      "poison": "20000000-0000-4000-8000-000000000002",
+      "response": "response16",
+      "status": 201
+    },
+    "catalogue:retireSecurityDomain:kind": {
+      "family": "catalogue",
+      "operation": "retireSecurityDomain",
+      "parameters": {
+        "reference": "10000000-0000-4000-8000-000000000001"
+      },
+      "environment": null,
+      "field": "kind",
+      "poison": "environment",
+      "response": "response16",
+      "status": 201
+    },
+    "catalogue:retireSecurityDomain:id": {
+      "family": "catalogue",
+      "operation": "retireSecurityDomain",
+      "parameters": {
+        "reference": "10000000-0000-4000-8000-000000000001"
+      },
+      "environment": null,
+      "field": "id",
+      "poison": "20000000-0000-4000-8000-000000000002",
+      "response": "response16",
+      "status": 201
+    },
+    "catalogue:listSecurityDomains:references.0.kind": {
+      "family": "catalogue",
+      "operation": "listSecurityDomains",
+      "parameters": {},
+      "environment": null,
+      "field": "references.0.kind",
+      "poison": "environment",
+      "response": "response17",
+      "status": 200
+    }
+  }
+}

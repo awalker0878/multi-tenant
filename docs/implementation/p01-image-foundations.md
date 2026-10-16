@@ -41,11 +41,11 @@ The identities below are runner-local image configuration digests, not published
 
 | Component | Image configuration digest | Image bytes | Raw report |
 | --- | --- | --- | --- |
-| Planning | `sha256:a142a20e5366fd1f5d9d266bbbffa5a747d984d21c9e52b946098e8c95acb7dd` | 124,376,376 | [Report](../../verification/p01/images/run-37238148501/planning/report.json) |
-| Inventory | `sha256:3d768c3f42f40fbf289f882f490f34f396cf0ded85e8a48ff513578541e39cbd` | 124,376,442 | [Report](../../verification/p01/images/run-37238148501/inventory/report.json) |
-| Lifecycle | `sha256:1429951f2c3d98874b753510338e5f0aed487504697618ea5c01170d7ba3fcb8` | 124,376,463 | [Report](../../verification/p01/images/run-37238148501/lifecycle/report.json) |
-| Inventory workers | `sha256:4a19676e471c21d45ff773beb29ab749e808d72b9cdf5a46f9cbbe8b829cbd3b` | 124,377,077 | [Report](../../verification/p01/images/run-37238148501/inventory-workers/report.json) |
-| Lifecycle workers | `sha256:3176fa6493a06e2ba18a4ea3009814f082375326003cf0f76d2b7cc2d12b3228` | 124,377,118 | [Report](../../verification/p01/images/run-37238148501/lifecycle-workers/report.json) |
+| Planning | `sha256:a142a20e5366fd1f5d9d266bbbffa5a747d984d21c9e52b946098e8c95acb7dd` | 124,376,376 | Report |
+| Inventory | `sha256:3d768c3f42f40fbf289f882f490f34f396cf0ded85e8a48ff513578541e39cbd` | 124,376,442 | Report |
+| Lifecycle | `sha256:1429951f2c3d98874b753510338e5f0aed487504697618ea5c01170d7ba3fcb8` | 124,376,463 | Report |
+| Inventory workers | `sha256:4a19676e471c21d45ff773beb29ab749e808d72b9cdf5a46f9cbbe8b829cbd3b` | 124,377,077 | Report |
+| Lifecycle workers | `sha256:3176fa6493a06e2ba18a4ea3009814f082375326003cf0f76d2b7cc2d12b3228` | 124,377,118 | Report |
 
 The [retrieval index](../../verification/p01/images/run-37238148501/retrieval.json), SHA-256 `748d01cc160321c1cb409d34fbc417897559255493e2e061f85964fec8d2e1c3`, binds every report and its per-component retrieval record. It records the successful workflow identity, archive identities, source revision, image identities and totals. Raw reports were retained without rewriting their bytes.
 

@@ -4,6 +4,7 @@ FROM ${COMPOSER_BASE} AS composer-tool
 
 FROM ${PHP_BASE} AS php-base
 COPY build/download-apks.php build/apk.lock.json /tmp/service-build/
+COPY build/apk-cache/ /tmp/service-build/apk-cache/
 RUN : > /etc/apk/repositories \
     && php /tmp/service-build/download-apks.php build \
     && apk add --no-network --repositories-file /dev/null --virtual .phpize-deps /tmp/service-apks/*.apk \
@@ -40,6 +41,7 @@ COPY --from=dependencies /app/bootstrap/ ./bootstrap/
 COPY --from=dependencies /app/config/ ./config/
 COPY --from=dependencies /app/public/ ./public/
 COPY --from=dependencies /app/routes/ ./routes/
+COPY --from=dependencies /app/database/ ./database/
 COPY --from=dependencies /app/artisan /app/composer.json /app/composer.lock ./
 COPY --from=dependencies /app/resources/ ./resources/
 # These directories are the only application paths that require writable mounts.

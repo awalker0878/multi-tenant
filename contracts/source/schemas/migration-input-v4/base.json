@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "tenant_id",
+    "site_id",
+    "revision",
+    "digest",
+    "method",
+    "source",
+    "target",
+    "datasets",
+    "disks",
+    "owner_inputs",
+    "objectives",
+    "confirmed_by",
+    "current",
+    "native_write_authorized",
+    "target_disk_formats"
+  ],
+  "$id": "urn:multi-tenant:planning:migration-input:v4"
+}

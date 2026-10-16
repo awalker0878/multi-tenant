@@ -21,7 +21,7 @@ and 89 documentation tests also passed locally.
 The initial browser check looked for a verified field while another section was
 selected after the save remounted the form. The correction selects Operating
 targets before testing verification/expiry. Its original failure remains in
-[the log](reports/initial-console/browser-failure.log). The final increment also
+the log. The final increment also
 restricts enrolled producers to explicit tenant/site scopes and rejects shared
 producer keys; new denial tests pass. No assertion or admission rule was weakened.
 

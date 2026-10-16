@@ -27,7 +27,7 @@ final class ManageApproval
         $actor = $this->authority->actor($token);
         $this->authority->handle($actor, $tenant, 'tenant.read');
         if ($operation === 'request') {
-            $plan = $this->fetch($input['plan_id'], $input['plan_revision'], $input['plan_digest']);
+            $plan = $this->fetch($tenant, $input['plan_id'], $input['plan_revision'], $input['plan_digest']);
             if ($plan->binding['tenant_id'] !== $tenant) {
                 throw new IdentityDenied('not_found', 404);
             }
@@ -58,7 +58,7 @@ final class ManageApproval
                     throw new IdentityDenied('independent_approver_required', 403);
                 }
                 if ($operation === 'approve') {
-                    $this->fetch($approval->plan_id, $approval->plan_revision, $approval->plan_digest);
+                    $this->fetch($tenant, $approval->plan_id, $approval->plan_revision, $approval->plan_digest);
                 }
                 $state = match ($operation) {
                     'approve' => 'approved', 'reject' => 'rejected', 'revoke' => 'revoked', default => throw new IdentityDenied('forbidden', 403)
@@ -99,10 +99,10 @@ final class ManageApproval
         return $result;
     }
 
-    private function fetch(string $id, int $revision, string $digest): BoundPlan
+    private function fetch(string $tenant, string $id, int $revision, string $digest): BoundPlan
     {
-        $plan = BoundPlan::fromArray($this->plans->fetch($id, $revision));
-        if ($plan->binding['plan_id'] !== $id || $plan->binding['revision'] !== $revision || ! hash_equals($plan->digest, $digest)
+        $plan = BoundPlan::fromArray($this->plans->fetch($tenant, $id, $revision));
+        if ($plan->binding['tenant_id'] !== $tenant || $plan->binding['plan_id'] !== $id || $plan->binding['revision'] !== $revision || ! hash_equals($plan->digest, $digest)
             || $plan->binding['valid_until'] <= now()->getTimestamp()) {
             throw new IdentityDenied('plan_binding_changed', 409);
         }

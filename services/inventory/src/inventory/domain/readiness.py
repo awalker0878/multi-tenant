@@ -2,11 +2,11 @@
 
 from typing import Any
 
-from inventory.domain.capability_definitions import LEGACY_METHODS
+from inventory.domain.capability_definitions import WIRE_METHODS
 from inventory.domain.discovery import Rejected, shape
 from inventory.domain.operator_inputs import FIELDS, GROUPS
 
-METHODS = LEGACY_METHODS
+METHODS = WIRE_METHODS
 OPERATIONS = [
     {"id": "discover", "label": "Discover an environment"},
     {"id": "provision", "label": "Provision an application"},

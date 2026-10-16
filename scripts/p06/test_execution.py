@@ -18,6 +18,9 @@ from lifecycle.infrastructure.store import Postgres
 from lifecycle_worker.application.simulation import Simulation
 
 
+WORKER = "30000000-0000-4000-8000-000000000001"
+
+
 class Current:
     def __init__(self, snapshot: dict[str, Any], epoch: str, clock: list[int]) -> None:
         self.snapshot, self.epoch, self.clock = snapshot, epoch, clock
@@ -47,7 +50,7 @@ def world(database: Postgres, postgres: dict[str, Any]) -> dict[str, Any]:
     epoch, campaign, approval = str(uuid4()), str(uuid4()), str(uuid4())
     clock = [NOW]
     snapshot.update(simulation=True)
-    snapshot["campaign"].update(id=campaign, adapter="p06-simulator-v1", custody_epoch=epoch, worker_ids=["sim-worker"])
+    snapshot["campaign"].update(id=campaign, adapter="p06-simulator-v1", custody_epoch=epoch, worker_ids=[WORKER])
     current, evidence = Current(snapshot, epoch, clock), Custody()
     with psycopg.connect(**postgres, autocommit=True) as connection:
         connection.execute("INSERT INTO app.execution_control VALUES(1,%s,false)", (epoch,))
@@ -63,7 +66,7 @@ def world(database: Postgres, postgres: dict[str, Any]) -> dict[str, Any]:
     def connect() -> Any:
         return psycopg.connect(**(postgres | {"user": "simulation_runtime"}), row_factory=dict_row)
     def redeem(grant: dict[str, Any]) -> dict[str, Any]:
-        return service.redeem(grant, "sim-worker")
+        return service.redeem(grant, WORKER)
     peer = Simulation(connect, redeem, lambda: clock[0], current.custody)
     service = Execution(database, current, peer, evidence, lambda: clock[0])
     tenant, actor = c["scope"]["tenant_id"], b["executor_ids"][0]
@@ -87,11 +90,75 @@ def test_atomic_admission_idempotency_collision_and_immutable_history(world: dic
         w['service'].admit(w['tenant'], w['actor'], key, w['c'], w['b'], str(uuid4()), w['campaign'])
 
 
+def test_actual_durable_grant_passes_worker_http_contract(world: dict[str, Any]) -> None:
+    import asyncio
+    import hashlib
+    import json
+    from jsonschema import Draft202012Validator, FormatChecker
+    from lifecycle_worker.interfaces.simulation import SimulationApp
+    from lifecycle.interfaces.execution import ExecutionApp
+    w=world;job=w['admit']()
+    grant=w['service'].acquire(w['tenant'],job['id'],'reserve',WORKER)
+    body={k:v for k,v in grant.items() if k!='completed'}
+    root=Path(__file__).resolve().parents[2]
+    api=json.loads((root/'contracts/openapi/worker-simulation-v1.json').read_text())
+    Draft202012Validator({'$ref':'#/components/schemas/SimulationGrant','components':api['components']},
+                        format_checker=FormatChecker()).validate(body)
+    credentials={'LIFECYCLE_SIMULATOR_CREDENTIAL_FILE':'effect-only',
+                 'ASSURANCE_SIMULATOR_CREDENTIAL_FILE':'observer-only',
+                 'SIMULATOR_LIFECYCLE_CREDENTIAL_FILE':'callback-only'}
+    class Caller:
+        def caller(self, credential, audience):
+            assert credential=='r'*64 and audience=='simulator'
+    def redeem_over_http(value):
+        replies=[]
+        async def receive():return {'type':'http.request','body':json.dumps(value).encode(),'more_body':False}
+        async def send(message):replies.append(message)
+        scope={'type':'http','method':'POST','path':'/internal/simulation-grants/redemptions',
+               'query_string':b'','headers':[(b'authorization',b'Bearer '+b'r'*64),
+                                           (b'content-type',b'application/json')]}
+        asyncio.run(ExecutionApp(w['service'],Caller())(scope,receive,send))
+        if replies[0]['status']!=200:
+            raise ValueError('authority_denied')
+        return json.loads(replies[-1]['body'])
+    w['peer'].redeem=redeem_over_http
+    key=hashlib.sha256(json.dumps({'path':'/v1/effects','body':body},sort_keys=True,
+                                separators=(',',':'),allow_nan=False).encode()).hexdigest()
+    async def exchange():
+        sent=[]
+        async def receive():return {'type':'http.request','body':json.dumps(body).encode(),'more_body':False}
+        async def send(message):sent.append(message)
+        scope={'type':'http','method':'POST','path':'/v1/effects','query_string':b'',
+               'headers':[(b'authorization',b'Bearer effect-only'),(b'content-type',b'application/json'),
+                          (b'idempotency-key',key.encode())]}
+        await SimulationApp(w['peer'],credentials.__getitem__)(scope,receive,send)
+        return sent[0]['status'],json.loads(sent[-1]['body'])
+    # Vary each independently owned custody epoch while keeping the exact
+    # unexpired durable grant, transport and current authority unchanged.
+    original_epoch=w['current'].epoch
+    simulator_epoch=[original_epoch]
+    w['peer'].custody=lambda:simulator_epoch[0]
+    for owner in ('effect-owner','journal-owner'):
+        if owner=='effect-owner':simulator_epoch[0]=str(uuid4())
+        else:w['current'].epoch=str(uuid4())
+        assert body['expires_at']>w['clock'][0]
+        assert asyncio.run(exchange())[0]==403
+        with w['connect']() as connection:
+            assert connection.execute('SELECT count(*) n FROM sim.observations').fetchone()['n']==0
+        with w['database'].transaction() as tx:
+            assert tx.one('SELECT redeemed FROM app.execution_operations WHERE id=%s',(body['operation_id'],))['redeemed'] is False
+        simulator_epoch[0]=original_epoch;w['current'].epoch=original_epoch
+    assert asyncio.run(exchange())==(200,{'accepted':True,'duplicate':False})
+    assert asyncio.run(exchange())==(200,{'accepted':True,'duplicate':True})
+    with w['connect']() as connection:
+        assert connection.execute('SELECT count(*) n FROM sim.observations WHERE effect_count=1').fetchone()['n']==1
+
+
 def test_simulated_journey_independent_readback_and_evidence(world: dict[str, Any]) -> None:
     w = world; job = w['admit'](); service = w['service']
     assert service.checkpoint(w['tenant'], job['id'])['state'] == 'ready'
     for effect in w['c']['effects']:
-        assert service.activity(w['tenant'],job['id'],effect['id'],'sim-worker')['state'] == 'confirmed_succeeded'
+        assert service.activity(w['tenant'],job['id'],effect['id'],WORKER)['state'] == 'confirmed_succeeded'
     result = service.checkpoint(w['tenant'], job['id'])
     assert result['state'] == 'completed'
     public = service.read(w['tenant'],job['id'])
@@ -110,9 +177,9 @@ def test_lost_acknowledgement_holds_until_readback_and_no_blind_retry(world: dic
         original(grant)
         raise TimeoutError
     w['peer'].execute=lost
-    assert service.activity(w['tenant'],job['id'],'reserve','sim-worker')['state']=='outcome_unknown'
-    assert service.activity(w['tenant'],job['id'],'reserve','sim-worker')['state']=='held'
-    assert service.activity(w['tenant'],job['id'],'preflight','sim-worker')['state']=='held'
+    assert service.activity(w['tenant'],job['id'],'reserve',WORKER)['state']=='outcome_unknown'
+    assert service.activity(w['tenant'],job['id'],'reserve',WORKER)['state']=='held'
+    assert service.activity(w['tenant'],job['id'],'preflight',WORKER)['state']=='held'
     assert service.reconcile(w['tenant'],job['id'])['operations'][0]['outcome']=='confirmed_succeeded'
     with w['connect']() as connection:
         assert connection.execute('SELECT count(*) n FROM sim.observations WHERE effect_count=1').fetchone()['n']==1
@@ -120,19 +187,19 @@ def test_lost_acknowledgement_holds_until_readback_and_no_blind_retry(world: dic
 
 def test_crash_before_acceptance_seals_late_worker_before_retry(world: dict[str, Any]) -> None:
     w=world; job=w['admit'](); service=w['service']
-    grant=service.acquire(w['tenant'],job['id'],'reserve','sim-worker')
+    grant=service.acquire(w['tenant'],job['id'],'reserve',WORKER)
     public=service.reconcile(w['tenant'],job['id'])
     assert public['operations'][0]['outcome']=='confirmed_failed'
     with pytest.raises(ValueError,match='sealed_absent'):
         w['peer'].execute(grant)
     service.command(w['tenant'],job['id'],w['actor'],str(uuid4()),'retry_unstarted',public['revision'])
-    assert service.activity(w['tenant'],job['id'],'reserve','sim-worker')['state']=='confirmed_succeeded'
+    assert service.activity(w['tenant'],job['id'],'reserve',WORKER)['state']=='confirmed_succeeded'
 
 
 @pytest.mark.parametrize('fault',['epoch','expiry','worker','revoked','stop','owner_partition','plan_input','snapshot_scope','ownership'])
 def test_boundary_denials(world: dict[str, Any], fault: str) -> None:
     w=world; job=w['admit'](); service=w['service']
-    grant=service.acquire(w['tenant'],job['id'],'reserve','sim-worker')
+    grant=service.acquire(w['tenant'],job['id'],'reserve',WORKER)
     if fault=='ownership':
         with w['database'].transaction() as tx:tx.execute('UPDATE app.execution_holds SET retained=false')
     if fault=='epoch': w['current'].epoch=str(uuid4())
@@ -151,16 +218,16 @@ def test_boundary_denials(world: dict[str, Any], fault: str) -> None:
 
 def test_revocation_keeps_committed_observation_and_custody(world: dict[str, Any]) -> None:
     w=world; job=w['admit'](); service=w['service']
-    grant=service.acquire(w['tenant'],job['id'],'reserve','sim-worker'); w['peer'].execute(grant)
+    grant=service.acquire(w['tenant'],job['id'],'reserve',WORKER); w['peer'].execute(grant)
     w['snapshot']['approval']['revoked']=True
     result=service.reconcile(w['tenant'],job['id'])
     assert result['operations'][0]['outcome']=='confirmed_succeeded'
-    assert service.activity(w['tenant'],job['id'],'preflight','sim-worker')['state']=='held'
+    assert service.activity(w['tenant'],job['id'],'preflight',WORKER)['state']=='held'
 
 
 def test_cancel_does_not_undo_accepted_effect_or_release_holds(world: dict[str, Any]) -> None:
     w=world; job=w['admit'](); service=w['service']
-    grant=service.acquire(w['tenant'],job['id'],'reserve','sim-worker'); w['peer'].execute(grant)
+    grant=service.acquire(w['tenant'],job['id'],'reserve',WORKER); w['peer'].execute(grant)
     public=service.read(w['tenant'],job['id']); key=str(uuid4())
     first=service.command(w['tenant'],job['id'],w['actor'],key,'cancel',public['revision'])
     assert first==service.command(w['tenant'],job['id'],w['actor'],key,'cancel',public['revision'])
@@ -172,7 +239,7 @@ def test_cancel_does_not_undo_accepted_effect_or_release_holds(world: dict[str, 
 
 def test_missing_evidence_cannot_complete_and_current_epoch_required_after_restore(world: dict[str, Any]) -> None:
     w=world; job=w['admit'](); service=w['service']
-    for effect in w['c']['effects']:service.activity(w['tenant'],job['id'],effect['id'],'sim-worker')
+    for effect in w['c']['effects']:service.activity(w['tenant'],job['id'],effect['id'],WORKER)
     w['evidence'].available=False
     assert service.checkpoint(w['tenant'],job['id'])['state']=='held'
     assert service.read(w['tenant'],job['id'])['reason']=='evidence_pending'
@@ -191,7 +258,7 @@ def test_operational_lane_and_wrong_tenant_are_denied(world: dict[str, Any]) -> 
 
 def test_stale_ui_cannot_resume_or_retry_unknown(world: dict[str, Any]) -> None:
     w=world; job=w['admit'](); service=w['service']
-    service.acquire(w['tenant'],job['id'],'reserve','sim-worker')
+    service.acquire(w['tenant'],job['id'],'reserve',WORKER)
     with pytest.raises(Rejected,match='stale_revision'):
         service.command(w['tenant'],job['id'],w['actor'],str(uuid4()),'resume',job['revision'])
     with pytest.raises(Rejected,match='reconciliation_required'):
@@ -204,10 +271,10 @@ def test_each_effect_boundary_has_sealed_certainty_before_further_work(world: di
     w=world;job=w['admit']();service=w['service']
     for effect in w['c']['effects']:
         if effect['id']==step:break
-        assert service.activity(w['tenant'],job['id'],effect['id'],'sim-worker')['state']=='confirmed_succeeded'
-    grant=service.acquire(w['tenant'],job['id'],step,'sim-worker')
+        assert service.activity(w['tenant'],job['id'],effect['id'],WORKER)['state']=='confirmed_succeeded'
+    grant=service.acquire(w['tenant'],job['id'],step,WORKER)
     if accepted:w['peer'].execute(grant)
-    assert service.activity(w['tenant'],job['id'],step,'sim-worker')['state']=='held'
+    assert service.activity(w['tenant'],job['id'],step,WORKER)['state']=='held'
     observed=service.reconcile(w['tenant'],job['id'])
     operation=next(o for o in observed['operations'] if o['step']==step)
     assert operation['observation']['sealed'] and operation['observation']['effect_count']==int(accepted)
@@ -220,7 +287,7 @@ def test_each_effect_boundary_has_sealed_certainty_before_further_work(world: di
 def test_committed_facts_finish_custody_after_executor_revocation(world: dict[str, Any]) -> None:
     w=world;job=w['admit']();service=w['service']
     for effect in w['c']['effects']:
-        assert service.activity(w['tenant'],job['id'],effect['id'],'sim-worker')['state']=='confirmed_succeeded'
+        assert service.activity(w['tenant'],job['id'],effect['id'],WORKER)['state']=='confirmed_succeeded'
     w['snapshot']['approval']['revoked']=True
     assert service.checkpoint(w['tenant'],job['id'])['state']=='completed'
     assert service.read(w['tenant'],job['id'])['evidence']['native_support'] is False
@@ -232,7 +299,7 @@ def test_accepted_receipt_can_be_recovered_after_inputs_expire_without_new_autho
     assert w['service'].prior_admission(w['tenant'],key)['binding']==w['b']
     recovered=w['admit'](key)
     assert recovered['id']==first['id'] and recovered['state']=='admitted'
-    assert w['service'].activity(w['tenant'],first['id'],'reserve','sim-worker')['state']=='held'
+    assert w['service'].activity(w['tenant'],first['id'],'reserve',WORKER)['state']=='held'
 
 
 @pytest.mark.parametrize('step',['reserve','execute_native_api_plan','activate_target'])
@@ -242,8 +309,8 @@ def test_operator_controls_at_each_safe_boundary(world: dict[str, Any],step: str
     w=world;job=w['admit']();service=w['service']
     for effect in w['c']['effects']:
         if effect['id']==step:break
-        assert service.activity(w['tenant'],job['id'],effect['id'],'sim-worker')['state']=='confirmed_succeeded'
-    grant=service.acquire(w['tenant'],job['id'],step,'sim-worker')
+        assert service.activity(w['tenant'],job['id'],effect['id'],WORKER)['state']=='confirmed_succeeded'
+    grant=service.acquire(w['tenant'],job['id'],step,WORKER)
     if accepted:w['peer'].execute(grant)
     current=service.read(w['tenant'],job['id'])
     receipt=service.command(w['tenant'],job['id'],w['actor'],str(uuid4()),action,current['revision'])
@@ -255,12 +322,12 @@ def test_operator_controls_at_each_safe_boundary(world: dict[str, Any],step: str
     assert observed['observation']['effect_count']==int(accepted)
     assert service.checkpoint(w['tenant'],job['id'])['state']==('cancelled' if action=='cancel' else 'held')
     assert service.read(w['tenant'],job['id'])['resources_retained']
-    with pytest.raises(Rejected):service.acquire(w['tenant'],job['id'],step,'sim-worker')
+    with pytest.raises(Rejected):service.acquire(w['tenant'],job['id'],step,WORKER)
 
 
 def test_journal_connection_loss_prevents_independent_acceptance(world: dict[str, Any]) -> None:
     w=world;job=w['admit']();service=w['service']
-    grant=service.acquire(w['tenant'],job['id'],'reserve','sim-worker')
+    grant=service.acquire(w['tenant'],job['id'],'reserve',WORKER)
     # A bound, non-listening port supplies a real refused connection to the journal;
     # the separately owned simulator remains available through its original endpoint.
     with socket.socket() as closed:

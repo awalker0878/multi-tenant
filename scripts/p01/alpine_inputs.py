@@ -1,4 +1,5 @@
 """Validate the exact APK closure before handing it to independent build contexts."""
+import hashlib
 import json
 from pathlib import Path
 import re
@@ -33,3 +34,23 @@ def validate_apks(path: Path, base_reference: str) -> dict:
     if set(runtime) != {'libpq', 'libcrypto3', 'libssl3', 'musl', 'openssl'}:
         raise ValueError('Unmeasured runtime APK closure')
     return runtime
+
+
+def validate_cache(directory: Path, lock: dict) -> dict[str, str]:
+    """A retained current APK is a source input, never a new dependency identity."""
+    if directory.is_symlink() or not directory.is_dir():
+        raise ValueError('Missing or symlinked reviewed APK cache')
+    files = list(directory.iterdir())
+    if not files:
+        raise ValueError('Reviewed APK cache is empty')
+    verified = {}
+    for file in files:
+        package = lock['packages'].get(file.name)
+        if (file.is_symlink() or not file.is_file() or package is None
+                or file.stat().st_size != package['bytes']):
+            raise ValueError('APK cache identity or size differs from reviewed lock')
+        digest = hashlib.sha256(file.read_bytes()).hexdigest()
+        if digest != package['sha256']:
+            raise ValueError('APK cache bytes differ from reviewed lock')
+        verified[file.name] = digest
+    return verified

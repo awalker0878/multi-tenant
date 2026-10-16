@@ -5,6 +5,7 @@ import fcntl
 import hashlib
 import json
 import os
+import re
 import tempfile
 from collections.abc import Callable
 from pathlib import Path
@@ -14,7 +15,12 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
 
 from lifecycle_worker.application.native import NativeHeld, decode, digest
-from lifecycle_worker.domain.capability_definitions import DEFINITION_SHA256, DIMENSIONS
+from lifecycle_worker.domain.capability_definitions import (
+    DEFINITION_SHA256,
+    DIMENSIONS,
+    MODES,
+    WIRE_METHODS,
+)
 from lifecycle_worker.infrastructure.evidence_probes import ProbeJson, fresh_measurement, matches
 from lifecycle_worker.infrastructure.native_files import protected_read
 
@@ -79,9 +85,38 @@ class ConformancePublisher:
                 or not 0 <= now - observed["observed_at"] <= 30
             ):
                 raise NativeHeld("conformance_native_scope_changed")
+            # The signed Inventory projection must describe the same native
+            # installation as the independently probed conformance outcome.
+            # An independently valid top-level tuple must not conceal a
+            # conflicting nested inventory identity.
+            inventory = observed.get("inventory")
+            if not isinstance(inventory, dict) or any(
+                inventory.get(name) != scope[name]
+                for name in (
+                    "installed_tuple",
+                    "tenant_id",
+                    "site_id",
+                    "endpoint_id",
+                    "native_scope",
+                )
+                if name in scope
+            ):
+                raise NativeHeld("conformance_inventory_scope_changed")
             required = {"adapter_behavior", "installed_identity", "runtime_artifacts"}
             required.update("dimension:" + d for d in DIMENSIONS)
             required.update("capability:" + c for c in observed["capabilities"])
+            # Every active wire method and recovery mode is assessed for the
+            # EXACT installed tuple. Unsupported is an explicit negative
+            # outcome, never a qualified capability or inherited E2 result.
+            method_keys = {
+                "method:" + method + ":" + mode for method in WIRE_METHODS for mode in MODES
+            }
+            declared_method_modes = observed["method_modes"]
+            if (
+                not isinstance(declared_method_modes, dict)
+                or set(declared_method_modes) != method_keys
+            ):
+                raise NativeHeld("installed_method_mode_matrix_incomplete")
             cases = observed["cases"]
             for name in required:
                 case = cases.get(name, {})
@@ -97,23 +132,79 @@ class ConformancePublisher:
                     observed["capabilities"][name[11:]]["values"]
                 ):
                     raise NativeHeld("conformance_native_values_changed")
-            latest_restores: dict[str, dict[str, Any]] = {}
-            for sample in observed["snapshot"].get("recovery_measurements", []):
-                prior = latest_restores.get(sample["dataset_id"])
+            method_modes: dict[str, str] = {}
+            for name in sorted(method_keys):
+                case = cases.get(name, {})
+                outcome = case.get("outcome") if isinstance(case, dict) else None
+                if (
+                    outcome not in {"passed", "unsupported"}
+                    or declared_method_modes[name] != outcome
+                    or case.get("scope_sha256") != digest(scope)
+                    or case.get("artifacts") != artifacts
+                    or type(case.get("observed_at")) is not int
+                    or not 0 <= now - case["observed_at"] <= 30
+                ):
+                    raise NativeHeld("installed_method_mode_not_observed")
+                if outcome == "unsupported" and (
+                    not isinstance(case.get("reason"), str) or not 1 <= len(case["reason"]) <= 160
+                ):
+                    raise NativeHeld("installed_method_mode_unsupported_reason_required")
+                method_modes[name] = outcome
+            snapshot = observed["snapshot"]
+            if not isinstance(snapshot, dict):
+                raise NativeHeld("conformance_recovery_readback_invalid")
+            measurements = snapshot.get("recovery_measurements", [])
+            if not isinstance(measurements, list):
+                raise NativeHeld("conformance_recovery_readback_invalid")
+            latest_restores: dict[tuple[str, str, str], dict[str, Any]] = {}
+            seen_sequences: set[tuple[str, str, str, int]] = set()
+            for sample in measurements:
+                if (
+                    not isinstance(sample, dict)
+                    or sample.get("method") not in WIRE_METHODS
+                    or sample.get("mode") not in MODES
+                    or not isinstance(sample.get("dataset_id"), str)
+                    or not 1 <= len(sample["dataset_id"]) <= 160
+                    or type(sample.get("sequence")) is not int
+                    or sample["sequence"] < 1
+                    or type(sample.get("observed_at")) is not int
+                    or not 0 <= now - sample["observed_at"] <= 30
+                    or sample.get("scope_sha256") != digest(scope)
+                    or sample.get("artifacts") != artifacts
+                    or not isinstance(sample.get("readback_sha256"), str)
+                    or re.fullmatch(r"[0-9a-f]{64}", sample["readback_sha256"]) is None
+                ):
+                    raise NativeHeld("conformance_recovery_readback_invalid")
+                key = (sample["method"], sample["mode"], sample["dataset_id"])
+                identity = (*key, sample["sequence"])
+                if identity in seen_sequences:
+                    raise NativeHeld("conformance_recovery_sequence_conflict")
+                seen_sequences.add(identity)
+                prior = latest_restores.get(key)
                 if prior is None or sample["sequence"] > prior["sequence"]:
-                    latest_restores[sample["dataset_id"]] = sample
+                    latest_restores[key] = sample
             if any(
-                r["outcome"] != "passed" or r["consistency_passed"] is not True
-                for r in latest_restores.values()
+                row.get("outcome") != "passed" or row.get("consistency_passed") is not True
+                for row in latest_restores.values()
             ):
                 raise NativeHeld("conformance_latest_restore_failed")
+            # A positive readback cannot qualify a different native method/mode.
+            for name, outcome in method_modes.items():
+                _, method, mode = name.split(":")
+                if (
+                    outcome == "passed"
+                    and mode in {"rollback", "forward_recovery", "reverse_recovery"}
+                    and not any(key[:2] == (method, mode) for key in latest_restores)
+                ):
+                    raise NativeHeld("conformance_recovery_readback_required")
             payload.update(
                 adapter_conformant=True,
                 dimensions=list(DIMENSIONS),
                 capabilities=observed["capabilities"],
                 inventory=observed["inventory"],
                 snapshot=observed["snapshot"],
-                cases={name: "passed" for name in required},
+                method_modes=method_modes,
+                cases={**{name: "passed" for name in required}, **method_modes},
                 observed_at=observed["observed_at"],
                 expires_at=observed["observed_at"] + 30,
             )

@@ -100,5 +100,6 @@ it('uses migration delegation and distinguishes denied authority from a definite
     }
 })->with([
     [200, ['binding' => [], 'native_write_authorized' => true], 503],
-    [423, ['error' => 'migration_recipe_changed'], 423],
+    [423, ['code' => 'migration_recipe_changed', 'message' => 'The reviewed recipe changed.', 'correlation_id' => '00000000-0000-4000-8000-000000000001', 'retryable' => false], 423],
+    [423, ['error' => 'migration_recipe_changed'], 503],
 ]);

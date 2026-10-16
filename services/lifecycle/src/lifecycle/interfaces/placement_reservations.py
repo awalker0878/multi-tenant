@@ -4,8 +4,10 @@ import asyncio
 import json
 import re
 from collections.abc import Callable
+from importlib.resources import files
 from typing import Any
 
+from jsonschema import Draft202012Validator, FormatChecker
 from uvicorn._types import ASGIReceiveCallable, ASGISendCallable, Scope
 
 from lifecycle.application.placement_reservations import PlacementReservations
@@ -13,9 +15,7 @@ from lifecycle.application.reservations import Held
 
 
 class PlacementReservationApp:
-    def __init__(
-        self, service: PlacementReservations, authorize: Callable[[str], None]
-    ) -> None:
+    def __init__(self, service: PlacementReservations, authorize: Callable[[str], None]) -> None:
         self.service, self.authorize = service, authorize
 
     async def __call__(
@@ -23,6 +23,8 @@ class PlacementReservationApp:
     ) -> None:
         payload: dict[str, Any]
         try:
+            if scope["type"] != "http":
+                raise Held("placement_route_invalid")
             route = re.fullmatch(
                 r"/internal/tenants/([0-9a-f-]{36})/placement-reservations/"
                 r"(reserve|checks|confirm|renew|release)",
@@ -46,6 +48,17 @@ class PlacementReservationApp:
                 if not message.get("more_body"):
                     break
             body = json.loads(raw)
+            # The same canonical installed contract validates commands and receipts.
+            schema = json.loads(
+                files("lifecycle.infrastructure.contracts")
+                .joinpath("placement-reservation-v1.json")
+                .read_text()
+            )
+            command = "ReserveCommand" if operation == "reserve" else "DigestCommand"
+            if not Draft202012Validator(
+                schema["$defs"][command], format_checker=FormatChecker()
+            ).is_valid(body):
+                raise Held("placement_request_invalid")
             if operation == "reserve":
                 payload = await asyncio.to_thread(self.service.reserve, tenant, body)
             elif operation == "checks":
@@ -54,18 +67,39 @@ class PlacementReservationApp:
                 payload = await asyncio.to_thread(
                     self.service.transition, tenant, body["plan_digest"], operation
                 )
+            # Validate the real owner response before it crosses a service boundary.
+            # A malformed receipt must never authorize a capacity decision.
+            schema = json.loads(
+                files("lifecycle.infrastructure.contracts")
+                .joinpath("placement-reservation-v1.json")
+                .read_text()
+            )
+            if (
+                not Draft202012Validator(schema, format_checker=FormatChecker()).is_valid(payload)
+                or payload["tenant_id"] != tenant
+                or payload["plan_digest"] != body["plan_digest"]
+            ):
+                raise ValueError("placement_receipt_contract_invalid")
+            # A structurally valid receipt for another tenant or another plan
+            # is never admissible as this caller's authoritative result.
             status = 200
         except Held as error:
-            status, payload = 423, {"error": str(error)}
+            # Authentication denials must not be disguised as reservation
+            # holds. No unauthenticated request can reach a reservation read.
+            status = 401 if str(error) == "placement_caller_denied" else 423
+            payload = {"error": str(error)}
         except Exception:
             status, payload = 503, {"error": "placement_owner_unavailable"}
         raw_response = json.dumps(payload, separators=(",", ":")).encode()
-        await send({
-            "type": "http.response.start", "status": status,
-            "headers": [
-                (b"content-type", b"application/json"),
-                (b"cache-control", b"no-store, private"),
-                (b"content-length", str(len(raw_response)).encode()),
-            ],
-        })
+        await send(
+            {
+                "type": "http.response.start",
+                "status": status,
+                "headers": [
+                    (b"content-type", b"application/json"),
+                    (b"cache-control", b"no-store, private"),
+                    (b"content-length", str(len(raw_response)).encode()),
+                ],
+            }
+        )
         await send({"type": "http.response.body", "body": raw_response})

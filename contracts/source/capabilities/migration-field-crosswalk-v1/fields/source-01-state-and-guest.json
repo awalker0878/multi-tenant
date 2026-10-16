@@ -1,0 +1,520 @@
+[
+  {
+    "canonical_id": "source.vm.power_state",
+    "scope": "source",
+    "relationship": "normalize",
+    "normalization": "power_state_to_on_off",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "compute.power_state"
+        ],
+        "api_fields": [
+          "VirtualMachine.runtime.powerState"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 10,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "compute.power_state"
+        ],
+        "api_fields": [
+          "data.powerState"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 10,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": {
+        "manifest_attribute_ids": [
+          "compute.power_state"
+        ],
+        "api_fields": [
+          "server.status"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 10,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 10,
+    "semantic_constraints": "OFF/poweredOff/SHUTOFF normalization needs explicit transitional-state rejection.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.vm.vcpu_total",
+    "scope": "source",
+    "relationship": "normalize",
+    "normalization": "ahv_cpu_topology_product",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "compute.cpu_count"
+        ],
+        "api_fields": [
+          "VirtualMachine.config.hardware.numCPU"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 120,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "compute.sockets",
+          "compute.cores_per_socket",
+          "compute.threads_per_core"
+        ],
+        "api_fields": [
+          "data.numSockets",
+          "data.numCoresPerSocket",
+          "data.numThreadsPerCore"
+        ],
+        "owner_evidence_fields": [
+          null,
+          null,
+          null
+        ],
+        "methods": [
+          "native_get",
+          "native_get",
+          "native_get"
+        ],
+        "max_age_seconds": 120,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": {
+        "manifest_attribute_ids": [
+          "compute.vcpus"
+        ],
+        "api_fields": [
+          "flavor.vcpus"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 120,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 120,
+    "semantic_constraints": "AHV sockets × cores/socket × threads/core; preserve hardware topology separately.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.vm.memory_mib",
+    "scope": "source",
+    "relationship": "normalize",
+    "normalization": "bytes_to_mib_exact",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "compute.memory_mib"
+        ],
+        "api_fields": [
+          "VirtualMachine.config.hardware.memoryMB"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 120,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "compute.memory_bytes"
+        ],
+        "api_fields": [
+          "data.memorySizeBytes"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 120,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": {
+        "manifest_attribute_ids": [
+          "compute.memory_mib"
+        ],
+        "api_fields": [
+          "flavor.ram"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 120,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 120,
+    "semantic_constraints": "AHV byte count must divide exactly by 1048576; no silent rounding.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.guest.os_identity",
+    "scope": "source",
+    "relationship": "conditional",
+    "normalization": "guest_os_owner_verified",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "guest.guest_id"
+        ],
+        "api_fields": [
+          "VirtualMachine.config.guestId"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 300,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "guest.os_identity"
+        ],
+        "api_fields": [
+          null
+        ],
+        "owner_evidence_fields": [
+          "guest_identity_and_drivers"
+        ],
+        "methods": [
+          "operator"
+        ],
+        "max_age_seconds": 3600,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": {
+        "manifest_attribute_ids": [
+          "guest.os_metadata"
+        ],
+        "api_fields": [
+          "server.metadata.os_distro"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 300,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 300,
+    "semantic_constraints": "OpenStack image metadata/VMware guestId are declarations, not running OS proof.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.guest.firmware",
+    "scope": "source",
+    "relationship": "conditional",
+    "normalization": "firmware_family",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "guest.firmware"
+        ],
+        "api_fields": [
+          "VirtualMachine.config.firmware"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 120,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "guest.boot_mode"
+        ],
+        "api_fields": [
+          "data.bootConfig.$objectType"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 120,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": {
+        "manifest_attribute_ids": [
+          "guest.firmware_metadata"
+        ],
+        "api_fields": [
+          "server.metadata.hw_firmware_type"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 120,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 120,
+    "semantic_constraints": "Map BIOS/UEFI; OpenStack metadata is unverified without guest evidence.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.guest.secure_boot",
+    "scope": "source",
+    "relationship": "conditional",
+    "normalization": "secure_boot_boolean",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "guest.secure_boot"
+        ],
+        "api_fields": [
+          "VirtualMachine.config.bootOptions.efiSecureBootEnabled"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 120,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "guest.secure_boot"
+        ],
+        "api_fields": [
+          "data.bootConfig.isSecureBootEnabled"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 120,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": null
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 120,
+    "semantic_constraints": "Missing OpenStack secure boot source field means unknown, not disabled.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.guest.vtpm",
+    "scope": "source",
+    "relationship": "conditional",
+    "normalization": "vtpm_presence_and_key_custody",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "guest.vtpm"
+        ],
+        "api_fields": [
+          "VirtualMachine.config.hardware.device[*]._typeName=VirtualTPM"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "derive"
+        ],
+        "max_age_seconds": 120,
+        "severity": "critical",
+        "conditions": [
+          "when:vtpm_present"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "guest.vtpm"
+        ],
+        "api_fields": [
+          "data.vtpmConfig"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 120,
+        "severity": "critical",
+        "conditions": [
+          "when:present"
+        ]
+      },
+      "openstack": null
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 120,
+    "semantic_constraints": "Virtual TPM is key-bearing: preserve state only through qualified support.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.guest.tools",
+    "scope": "source",
+    "relationship": "conditional",
+    "normalization": "vendor_agent_requirements",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "guest.tools_status",
+          "guest.tools_version"
+        ],
+        "api_fields": [
+          "VirtualMachine.guest.toolsRunningStatus",
+          "VirtualMachine.guest.toolsVersion"
+        ],
+        "owner_evidence_fields": [
+          null,
+          null
+        ],
+        "methods": [
+          "native_get",
+          "native_get"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "when:guest_dependent_method"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "guest.tools"
+        ],
+        "api_fields": [
+          "data.guestTools"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 300,
+        "severity": "critical",
+        "conditions": [
+          "when:guest_dependent_method"
+        ]
+      },
+      "openstack": null
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 60,
+    "semantic_constraints": "Tools and guest agents are vendor-specific; cannot be directly transplanted.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  }
+]

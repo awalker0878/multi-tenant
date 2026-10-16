@@ -6,6 +6,7 @@ import http.client
 import json
 import os
 import re
+import secrets
 import ssl
 import stat
 import time
@@ -22,6 +23,7 @@ from planning.domain.model import Actor, Rejected, decode, digest, identifier, p
 from planning.domain.placement import fit
 from planning.domain.qualification import binding_digest, verified
 from planning.infrastructure.foundation import mounted_secret
+from planning.infrastructure.owner_contracts import contract_for_operation
 from planning.infrastructure.store import Postgres
 
 
@@ -35,6 +37,7 @@ def request(
     schema_name: str | None = None,
 ) -> dict[str, Any]:
     try:
+        resolved_contract = contract_for_operation(owner, method, path, schema_name)
         u = urlsplit(os.environ[owner + "_URL"])
         ca = os.environ[owner + "_CA_FILE"]
         if (
@@ -55,6 +58,19 @@ def request(
             "Accept-Encoding": "identity",
             "Content-Type": "application/json",
         }
+        if owner == "GOVERNANCE":
+            headers["Idempotency-Key"] = hashlib.sha256(
+                json.dumps(
+                    {"path": path, "body": body},
+                    sort_keys=True,
+                    separators=(",", ":"),
+                    allow_nan=False,
+                ).encode()
+            ).hexdigest()
+        elif owner == "ASSURANCE" and method == "POST":
+            # Each call is a current read, with no response cache or automatic
+            # transport retry. A new query gets a new strong command identity.
+            headers["Idempotency-Key"] = secrets.token_hex(32)
         if delegation:
             headers["X-Actor-Delegation"] = delegation
         if action:
@@ -66,6 +82,18 @@ def request(
             connection.request(method, path, None if body is None else json.dumps(body), headers)
             response = connection.getresponse()
             raw = response.read(524289)
+            if owner == "ASSURANCE" and response.status != 200:
+                error_schema = json.loads(
+                    files("planning.infrastructure.inputs").joinpath("error-v2.json").read_text()
+                )
+                if (
+                    len(raw) > 524288
+                    or response.getheader("Content-Encoding", "identity") != "identity"
+                    or not Draft202012Validator(
+                        error_schema, format_checker=FormatChecker()
+                    ).is_valid(decode(raw))
+                ):
+                    raise ValueError
             if response.status in {401, 403, 404}:
                 raise Rejected("source_access_denied", 403)
             if (
@@ -77,25 +105,32 @@ def request(
             result = decode(raw)
             if not isinstance(result, dict):
                 raise ValueError
-            if owner in {"CATALOGUE", "INVENTORY", "ASSURANCE"}:
-                name = {
-                    "CATALOGUE": "catalogue-input-v1",
-                    "INVENTORY": "inventory-input-v2",
-                    "ASSURANCE": "qualification-v2",
-                }[owner]
-                if schema_name is not None:
-                    if (owner, schema_name) not in {
-                        ("INVENTORY", "migration-input-v3"),
-                        ("ASSURANCE", "migration-support-v1"),
-                        ("ASSURANCE", "qualification-v2"),
-                    }:
-                        raise ValueError
-                    name = schema_name
-                schema = json.loads(
-                    files("planning.infrastructure.inputs").joinpath(name + ".json").read_text()
-                )
-                if not Draft202012Validator(schema, format_checker=FormatChecker()).is_valid(
-                    result
+            name = resolved_contract
+            schema = json.loads(
+                files("planning.infrastructure.inputs").joinpath(name + ".json").read_text()
+            )
+            if not Draft202012Validator(schema, format_checker=FormatChecker()).is_valid(result):
+                raise ValueError
+            # A valid JSON shape must also belong to the actual request scope.
+            # Never let an authorized service credential substitute for tenant authority.
+            if owner == "LIFECYCLE":
+                tenant = path.split("/")[3]
+                if (
+                    result["tenant_id"] != tenant
+                    or body is None
+                    or result["plan_digest"] != body["plan_digest"]
+                ):
+                    raise ValueError
+            elif owner == "GOVERNANCE":
+                tenant = path.split("/")[3]
+                if (
+                    result["tenant_id"] != tenant
+                    or body is None
+                    or result["scope"] != body["scope"]
+                    or result["action"] != body["action"]
+                    or result["audience"] != "planning"
+                    or result["delegating_service"] != "console"
+                    or result["authority_use"] != "request_bound"
                 ):
                     raise ValueError
             return result
@@ -279,6 +314,37 @@ class OwnerSources:
                     delegations[site],
                     actor.action,
                 )
+                current_snapshot = destination.get("capability_snapshot")
+                if (
+                    verified(qualification, int(time.time()))
+                    and isinstance(current_snapshot, dict)
+                    and current_snapshot.get("source_sha256")
+                    != qualification["verification"].get("runtime_sha256")
+                ):
+                    # The observer can publish between the two independent reads.
+                    # Reread once; never relax exact proof equality or reuse a
+                    # qualification for a changed installed identity/native scope.
+                    refreshed = request(
+                        "INVENTORY",
+                        "GET",
+                        base.replace("/planning-inputs/", "/planning-capability-inputs/")
+                        + f"/{site}/{candidate['endpoint_id']}/{candidate['generation_id']}",
+                        delegation=delegations[site],
+                        action=actor.action,
+                    )
+                    if any(
+                        refreshed[k] != destination[k]
+                        for k in (
+                            "tenant_id",
+                            "site_id",
+                            "endpoint_id",
+                            "generation_id",
+                            "native_scope",
+                            "installed_tuple",
+                        )
+                    ):
+                        raise Rejected("inventory_identity_changed", 503)
+                    destination = refreshed
                 results.append(
                     {
                         "destination": destination,
@@ -317,7 +383,7 @@ def qualification_current(plan: dict[str, Any]) -> None:
         "POST",
         f"/internal/tenants/{scope['tenant_id']}/qualification-checks",
         {"qualification_scope": pinned["scope"]},
-        schema_name="qualification-v2",
+        schema_name="qualification-v3",
     )
     if (
         not verified(current, int(time.time()))
@@ -334,7 +400,8 @@ def placement_current(plan: dict[str, Any], current: dict[str, Any]) -> None:
     content, pinned = plan["content"], plan["inputs"][0]
     scope = content["scope"]
     destination = request(
-        "INVENTORY", "GET",
+        "INVENTORY",
+        "GET",
         f"/internal/tenants/{scope['tenant_id']}/planning-capability-inputs/"
         f"{scope['resource_id']}/{scope['environment']}/{scope['site_id']}/"
         f"{scope['endpoint_id']}/{content['inventory_generation']}",
@@ -345,23 +412,49 @@ def placement_current(plan: dict[str, Any], current: dict[str, Any]) -> None:
         intent = plan.get("source_intent")
     if not isinstance(intent, dict):
         raise Rejected("placement_intent_unavailable", 423)
+    now = int(time.time())
     result = assess(
-        intent, destination, pinned["profile"], pinned["policy"], current,
-        content["action"], content["method"], int(time.time()),
+        intent,
+        destination,
+        pinned["profile"],
+        pinned["policy"],
+        current,
+        content["action"],
+        content["method"],
+        now,
     )
+    # Capacity is a mandatory current observation, not an exception to revalidation.
     if any(
-        f["mandatory"] and f["status"] != "eligible"
-        for f in result["findings"] if not f["requirement"].startswith("capacity.")
+        finding["mandatory"] and finding["status"] != "eligible" for finding in result["findings"]
     ):
         raise Rejected("current_native_measurement_required", 423)
-    placed = fit(
-        intent, pinned["destination"]["capability_snapshot"]["data"]["pools"],
-        pinned["policy"], int(time.time()),
-    )
-    if placed["status"] != "eligible":
+    try:
+        pinned_placement = fit(
+            intent,
+            pinned["destination"]["capability_snapshot"]["data"]["pools"],
+            pinned["policy"],
+            now,
+        )
+        current_placement = fit(
+            intent,
+            destination["capability_snapshot"]["data"]["pools"],
+            pinned["policy"],
+            now,
+        )
+    except (KeyError, TypeError, ValueError) as error:
+        raise Rejected("placement_binding_invalid", 423) from error
+    if (
+        pinned_placement["status"] != "eligible"
+        or current_placement["status"] != "eligible"
+        or current_placement["allocations"] != pinned_placement["allocations"]
+    ):
+        # A valid older witness cannot survive a changed pool ledger revision,
+        # class limit, fault domain, resource headroom or placement decision.
         raise Rejected("placement_binding_invalid", 423)
+    placed = current_placement
     receipt = request(
-        "CAPACITY", "POST",
+        "LIFECYCLE",
+        "POST",
         f"/internal/tenants/{scope['tenant_id']}/placement-reservations/checks",
         {"plan_digest": plan["binding"]["digest"]},
     )
@@ -382,7 +475,5 @@ def placement_current(plan: dict[str, Any], current: dict[str, Any]) -> None:
     pools = destination["capability_snapshot"]["data"]["pools"]
     for allocation in placed["allocations"]:
         pool = next((p for p in pools if p["id"] == allocation["pool_id"]), None)
-        if pool is None or any(
-            pool[k] != allocation[k] for k in ("native_ref", "failure_domain")
-        ):
+        if pool is None or any(pool[k] != allocation[k] for k in ("native_ref", "failure_domain")):
             raise Rejected("reserved_placement_topology_changed", 423)

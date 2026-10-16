@@ -3,6 +3,7 @@
 import time
 from collections.abc import Callable
 from typing import Any
+from urllib.parse import urlencode
 
 from inventory_worker.infrastructure.generated_configuration_streams import configuration_streams
 from inventory_worker.infrastructure.native import CollectionFailure, exchange, secret
@@ -65,6 +66,12 @@ def collect_profile(
             ("flavors", by_kind["server"], "/flavors/detail?limit=100"),
             ("volume_types", by_kind["volume"], "/types?limit=100"),
             ("network_extensions", by_kind["network"], "/extensions"),
+            (
+                "security_groups",
+                by_kind["network"],
+                "/security-groups?"
+                + urlencode({"project_id": policy["native_scope"], "limit": 100}),
+            ),
             ("compute_version", by_kind["config_compute_versions"], "/"),
             ("volume_version", by_kind["config_volume_versions"], "/"),
         )

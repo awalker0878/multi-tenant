@@ -172,6 +172,11 @@
         "value": "Quarantine"
       }
     ],
+    "security_references": {
+      "entity_groups": [],
+      "address_groups": [],
+      "service_groups": []
+    },
     "policies": [
       {
         "extId": "00000000-0000-0000-0000-00000000006c",

@@ -6,6 +6,7 @@ use App\Application\Identity\Actions\BootstrapAdministrator;
 use App\Application\Identity\Actions\ResolveIdentitySession;
 use App\Domain\Identity\IdentityDenied;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 beforeEach(function (): void {
     initializeIdentityFixture($this);
@@ -40,8 +41,11 @@ it('fails closed for missing malformed held or changed external custody without 
         };
         file_put_contents($this->admissionFile, json_encode($value));
     }
-    $this->withHeader('X-Console-Session', $token)->getJson('/identity/session')->assertStatus(503)
-        ->assertExactJson(['error' => 'identity_recovery_required'])->assertHeader('Cache-Control', 'no-store, private');
+    $response = $this->withHeader('X-Console-Session', $token)->getJson('/identity/session')->assertStatus(503)
+        ->assertJsonStructure(['code', 'message', 'correlation_id', 'retryable'])->assertJsonCount(4)
+        ->assertJsonPath('code', 'identity_recovery_required')->assertJsonPath('retryable', true)
+        ->assertHeader('Cache-Control', 'no-store, private');
+    expect(Str::isUuid($response->json('correlation_id')))->toBeTrue();
     $this->postJson('/identity/local-sessions', ['username' => 'admin', 'password' => $this->temporary])->assertStatus(503);
     $this->postJson('/identity/oidc/flows', ['purpose' => 'login', 'browser_binding' => str_repeat('a', 64)])->assertStatus(503);
     expect(fn () => app(ResolveIdentitySession::class)->handle($token))->toThrow(IdentityDenied::class)

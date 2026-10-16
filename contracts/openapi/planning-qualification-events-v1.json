@@ -1,0 +1,258 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Planning independently authorized qualification-event inbox",
+    "version": "1.0.0",
+    "description": "Assurance revocation/publication hint custody and conservative plan holds. Not an authorization to execute."
+  },
+  "security": [
+    {
+      "WorkloadBearer": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "WorkloadBearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "error": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "message": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "field": {
+            "type": "string"
+          }
+        },
+        "anyOf": [
+          {
+            "required": [
+              "error"
+            ]
+          },
+          {
+            "required": [
+              "message"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "paths": {
+    "/internal/qualification-events": {
+      "post": {
+        "operationId": "acceptQualificationInvalidation",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "event_id",
+                  "tenant_id",
+                  "scope_sha256",
+                  "authority_epoch",
+                  "operation",
+                  "state",
+                  "decision_sha256",
+                  "event_sha256"
+                ],
+                "properties": {
+                  "event_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                  },
+                  "tenant_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                  },
+                  "scope_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "authority_epoch": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "operation": {
+                    "enum": [
+                      "publish",
+                      "restore",
+                      "suspend",
+                      "revoke"
+                    ]
+                  },
+                  "state": {
+                    "enum": [
+                      "qualified",
+                      "suspended",
+                      "revoked"
+                    ]
+                  },
+                  "decision_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "event_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Authorized bounded response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "persisted",
+                    "event_id",
+                    "scope_sha256",
+                    "authority_epoch",
+                    "event_sha256"
+                  ],
+                  "properties": {
+                    "persisted": {
+                      "const": true
+                    },
+                    "event_id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                    },
+                    "scope_sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "authority_epoch": {
+                      "type": "integer"
+                    },
+                    "event_sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Owner rejection 400",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Owner rejection 401",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Owner rejection 404",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Owner rejection 405",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Owner rejection 409",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Owner rejection 413",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Owner rejection 415",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Owner rejection 422",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Owner rejection 503",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

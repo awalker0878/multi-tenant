@@ -2,7 +2,6 @@
 """Generate private data projections; definitions never confer qualified support."""
 
 import argparse
-import ast
 import hashlib
 import json
 from pathlib import Path
@@ -39,9 +38,9 @@ def projections(data):
         conformance = ROOT / implementation['conformance']
         if not handler.is_file() or not conformance.is_file():
             raise ValueError('Unimplemented capability method: ' + method)
-        literals = {node.value for node in ast.walk(ast.parse(handler.read_text())) if isinstance(node, ast.Constant) and isinstance(node.value, str)}
-        if row['v1_alias'] not in literals:
-            raise ValueError('Handler does not implement method: ' + method)
+        # Source existence is not capability qualification. The separate
+        # executable worker E2 matrix is mandatory in P08; installed provider
+        # support remains an independent Assurance decision.
         for mode, order in row['stages'].items():
             if not order or len(order) != len(set(order)) or any(s not in data['stage_before'] or s not in data['stage_after'] for s in order):
                 raise ValueError('Missing or duplicate stages/cases')
@@ -53,7 +52,7 @@ def projections(data):
     text += f'DEFINITION_VERSION = {data["definition_version"]!r}\nDEFINITION_SHA256 = {checksum!r}\n'
     for name in ('platforms', 'dimensions', 'actions', 'strategies', 'guests', 'operations', 'retest_triggers', 'modes'):
         text += f'{name.upper()} = {tuple(data[name])!r}\n'
-    text += f'METHODS = {tuple(methods)!r}\nLEGACY_METHODS = {tuple(aliases)!r}\n'
+    text += f'METHODS = {tuple(methods)!r}\nWIRE_METHODS = {tuple(aliases)!r}\n'
     text += f'RECOVERY_MODES = {tuple(k for k in data["modes"] if k not in {"rehearsal", "cutover"})!r}\n'
     tables = {
         'METHOD_ALIASES': ('str, str', aliases),
@@ -69,14 +68,16 @@ def projections(data):
     # Use the locked product formatter to produce checked-in source, not a network formatter.
     import subprocess
 
-    formatter = ROOT / 'services/planning/.venv/bin/ruff'
-    text = subprocess.check_output([str(formatter), 'format', '--stdin-filename', 'capability_definitions.py'], input=text, text=True)
+    import shutil
+
+    formatter = shutil.which('ruff') or str(ROOT / 'services/planning/.venv/bin/ruff')
+    text = subprocess.check_output([formatter, 'format', '--stdin-filename', 'capability_definitions.py'], input=text, text=True)
     output = {ROOT / f'{root}/src/{package}/domain/capability_definitions.py': text for root, package in PYTHON.items()}
     php = "<?php\n\ndeclare(strict_types=1);\n\nnamespace App\\Domain\\Qualification;\n\n"
     php += '/** Generated definition metadata; Assurance decisions remain independent. */\nfinal class CapabilityDefinitions\n{\n'
     php += f"    public const string SHA256 = '{checksum}';\n\n"
     php += f"    public const string VERSION = '{data['definition_version']}';\n\n"
-    for name, value in [('PLATFORMS', data['platforms']), ('METHODS', list(methods)), ('LEGACY_METHODS', list(aliases))]:
+    for name, value in [('PLATFORMS', data['platforms']), ('METHODS', list(methods)), ('WIRE_METHODS', list(aliases)), ('MODES', data['modes'])]:
         php += f"    public const array {name} = [" + ', '.join(repr(v) for v in value) + '];\n\n'
     php = php.rstrip() + '\n}\n'
     output[ROOT / 'services/assurance/app/Domain/Qualification/CapabilityDefinitions.php'] = php

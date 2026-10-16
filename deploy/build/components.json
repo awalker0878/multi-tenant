@@ -204,7 +204,8 @@
         "routes",
         "database/migrations",
         "build/apk.lock.json",
-        "build/download-apks.php"
+        "build/download-apks.php",
+        "build/apk-cache"
       ]
     },
     {
@@ -229,7 +230,8 @@
         "routes",
         "resources",
         "build/apk.lock.json",
-        "build/download-apks.php"
+        "build/download-apks.php",
+        "build/apk-cache"
       ]
     },
     {
@@ -253,7 +255,8 @@
         "public/index.php",
         "routes",
         "build/apk.lock.json",
-        "build/download-apks.php"
+        "build/download-apks.php",
+        "build/apk-cache"
       ]
     },
     {
@@ -282,7 +285,8 @@
         "tsconfig.json",
         "vite.config.ts",
         "build/apk.lock.json",
-        "build/download-apks.php"
+        "build/download-apks.php",
+        "build/apk-cache"
       ]
     }
   ]

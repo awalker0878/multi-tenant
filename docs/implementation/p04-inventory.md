@@ -29,7 +29,7 @@ generation. Native retry continuations contain identifiers, never returned URLs.
 
 ## Engineering qualification
 
-The new [P04 workflow](../../.github/workflows/p04-inventory.yml) executes real
+The [on-demand platform qualification](../../.github/workflows/qualification.yml) executes real
 PostgreSQL/TLS, immutable-role, competing-tenant, restart, revocation and hostile
 page cases and retains logs/source bindings. Local unit checks run in the locked
 package. The current local user namespace maps only UID 0; PostgreSQL correctly

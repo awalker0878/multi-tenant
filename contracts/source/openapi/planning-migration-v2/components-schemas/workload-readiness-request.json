@@ -1,0 +1,34 @@
+{
+  "MigrationWorkloadReadinessRequest": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "site_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "review": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "digest": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "required": [
+          "revision",
+          "digest"
+        ]
+      }
+    },
+    "required": [
+      "site_id",
+      "review"
+    ]
+  }
+}

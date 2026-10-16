@@ -1,29 +1,155 @@
 """Compose the persistent synthetic diagnostic service without product operations."""
 
 import argparse
+import re
 import time
 from collections.abc import Sequence
 
 import uvicorn
 from uvicorn._types import ASGIReceiveCallable, ASGISendCallable, Scope
 
+from planning.application.migration_flows import MigrationFlows
 from planning.application.migration_plans import MigrationPlans
 from planning.application.migration_support import MigrationSupport
 from planning.application.native_plans import NativePlans
 from planning.application.planning import Planning
+from planning.application.qualification_invalidations import QualificationInvalidations
 from planning.application.validation import MigrationValidation, NativeValidation, PlanValidation
-from planning.infrastructure.foundation import database_ready
+from planning.infrastructure.foundation import database_ready, mounted_secret
 from planning.infrastructure.migration import prepare_migration
+from planning.infrastructure.migration_collection_manifest import (
+    binding as collection_manifest_binding,
+)
+from planning.infrastructure.migration_readiness_contract import validate_workload_contract
 from planning.infrastructure.migration_recipes import recipe_for, visible_recipes
-from planning.infrastructure.migration_support import qualification_records, selected_tranche
+from planning.infrastructure.migration_support import (
+    api_capability_records,
+    current_application_flow_proof,
+    qualification_records,
+    selected_tranche,
+)
 from planning.infrastructure.owners import GovernanceAuthority, OwnerSources, qualification_current
 from planning.infrastructure.store import Postgres
 from planning.infrastructure.telemetry import BoundedSignalBuffer
+from planning.infrastructure.workload_reconciliation import (
+    current_review_binding,
+    current_workload_reconciliation,
+)
 from planning.interfaces.http import FoundationApp
 from planning.interfaces.migration import MigrationPreparationApp
 from planning.interfaces.native_plans import NativePlansApp
 from planning.interfaces.planning import PlanningApp
+from planning.interfaces.qualification_invalidations import QualificationInvalidationApp
 from planning.interfaces.telemetry import RequestTelemetry
+
+MIGRATION_SUFFIXES = (
+    "/migration-preparations",
+    "/migration-plans",
+    "/migration-plan-options",
+    "/migration-support",
+    "/migration-flow-choices",
+    "/migration-flow-selections",
+    "/migration-workload-readiness",
+)
+
+HTTP_OPERATIONS = (
+    ("POST", "/internal/qualification-events"),
+    ("GET", "/internal/tenants/{tenant}/placement-proposals/{plan}/revisions/{revision}"),
+    ("GET", "/v1/tenants/{tenant}/plans/{plan}/revisions/{revision}"),
+    (
+        "POST",
+        "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/assessments",
+    ),
+    (
+        "GET",
+        "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/assessments/{record}",
+    ),
+    (
+        "POST",
+        "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/migration-flow-choices",
+    ),
+    (
+        "POST",
+        "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/migration-flow-selections",
+    ),
+    (
+        "POST",
+        "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/migration-plan-options",
+    ),
+    (
+        "POST",
+        "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/migration-plans",
+    ),
+    (
+        "POST",
+        "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/migration-preparations",
+    ),
+    (
+        "POST",
+        "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/migration-support",
+    ),
+    (
+        "POST",
+        "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/migration-workload-readiness",
+    ),
+    (
+        "POST",
+        "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/native-plans",
+    ),
+    ("POST", "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/plans"),
+    (
+        "GET",
+        "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/plans/{record}",
+    ),
+    (
+        "POST",
+        "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/plans/{record}/diff",
+    ),
+    (
+        "POST",
+        "/v1/tenants/{tenant}/applications/{application}/environments/{environment}/plans/{record}/validity",
+    ),
+    ("GET", "/v1/tenants/{tenant}/execution-plans/{plan}/revisions/{revision}"),
+)
+
+
+def _parameter_pattern(match: re.Match[str]) -> str:
+    name = match.group()[1:-1]
+    if name == "revision":
+        return r"[1-9][0-9]{0,8}"
+    if name == "digest":
+        return r"[0-9a-f]{64}"
+    return r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+
+
+HTTP_ROUTE_PATTERNS = tuple(
+    (verb, re.compile(re.sub(r"\{[a-z_]+\}", _parameter_pattern, path)))
+    for verb, path in HTTP_OPERATIONS
+)
+
+
+async def reject_unpublished_route(scope: Scope, send: ASGISendCallable) -> bool:
+    if scope["type"] != "http" or not scope["path"].startswith(("/v1/", "/internal/")):
+        return False
+    if any(
+        verb == scope["method"] and pat.fullmatch(scope["path"])
+        for verb, pat in HTTP_ROUTE_PATTERNS
+    ):
+        return False
+    body = b'{"error":"not_found"}'
+    await send(
+        {
+            "type": "http.response.start",
+            "status": 404,
+            "headers": [
+                (b"content-type", b"application/json"),
+                (b"cache-control", b"no-store"),
+                (b"content-length", str(len(body)).encode()),
+            ],
+        }
+    )
+    await send({"type": "http.response.body", "body": body})
+    return True
 
 
 class PlanningRouter:
@@ -31,7 +157,13 @@ class PlanningRouter:
         def clock() -> int:
             return int(time.time())
 
-        self.support = MigrationSupport(selected_tranche, qualification_records, clock)
+        self.support = MigrationSupport(
+            selected_tranche,
+            qualification_records,
+            clock,
+            api_capability_records,
+            validate_readiness=validate_workload_contract,
+        )
         validation = PlanValidation(
             NativeValidation(
                 lambda actor, site, recipe: recipe_for(
@@ -45,10 +177,23 @@ class PlanningRouter:
         self.planning = PlanningApp(
             Planning(Postgres(), OwnerSources(), clock, validation), GovernanceAuthority()
         )
+        self.flows = MigrationFlows(self.planning.planning, current_application_flow_proof)
+        self.support.flow_require = self.flows.require
+        self.support.workload_current = current_workload_reconciliation
+        self.support.workload_review = current_review_binding
+        self.support.collection_manifest = collection_manifest_binding
         self.foundation = FoundationApp(database_ready)
+        self.invalidations = QualificationInvalidationApp(
+            QualificationInvalidations(Postgres()), mounted_secret
+        )
         migrations = MigrationPlans(self.planning.planning, validation.migration, visible_recipes)
         self.migration = MigrationPreparationApp(
-            self.planning.authority, prepare_migration, migrations, self.support
+            self.planning.authority,
+            prepare_migration,
+            migrations,
+            self.support,
+            self.flows,
+            register_query=self.planning.planning.register_query,
         )
         native = NativePlans(self.planning.planning, validation.native)
         self.native = NativePlansApp(self.planning.authority, native)
@@ -56,18 +201,21 @@ class PlanningRouter:
     async def __call__(
         self, scope: Scope, receive: ASGIReceiveCallable, send: ASGISendCallable
     ) -> None:
-        if scope["type"] == "http" and scope["path"].endswith("/native-plans"):
+        if await reject_unpublished_route(scope, send):
+            return
+        if scope["type"] == "http" and scope["path"] == "/internal/qualification-events":
+            await self.invalidations(scope, receive, send)
+        elif scope["type"] == "http" and scope["path"].endswith("/native-plans"):
             await self.native(scope, receive, send)
-        elif scope["type"] == "http" and scope["path"].endswith(
-            (
-                "/migration-preparations",
-                "/migration-plans",
-                "/migration-plan-options",
-                "/migration-support",
+        elif scope["type"] == "http" and scope["path"].endswith(MIGRATION_SUFFIXES):
+            await self.migration(scope, receive, send)
+        elif scope["type"] == "http" and (
+            scope["path"].startswith("/v1/")
+            or (
+                scope["path"].startswith("/internal/tenants/")
+                and "/placement-proposals/" in scope["path"]
             )
         ):
-            await self.migration(scope, receive, send)
-        elif scope["type"] == "http" and scope["path"].startswith("/v1/"):
             await self.planning(scope, receive, send)
         else:
             await self.foundation(scope, receive, send)

@@ -90,10 +90,23 @@ class PolicyTests(unittest.TestCase):
         self.snapshot['unresolved_threads']=0;self.impact['unknown_paths']=['services/unknown/source.py']
         with self.assertRaisesRegex(Denied,'^unclassified_or_removed_component$'):self.run_review()
 
-    def test_deleted_dependency_edge_still_selects_old_consumer(self):
-        owners={'catalogue':{'path':'services/catalogue'},'planning':{'path':'services/planning'}}
-        old={'dependencies':{'planning':['catalogue']}};new={'dependencies':{'planning':[]}}
-        self.assertEqual(affected(['services/catalogue/app/fact.php'],owners,owners,old,new)['components'],['catalogue','planning'])
+    def test_deleted_canonical_consumer_edge_still_selects_old_consumer(self):
+        owners = {
+            'catalogue': {'path': 'services/catalogue'},
+            'planning': {'path': 'services/planning'},
+        }
+        old = {'active_releases': [{
+            'path': 'contracts/openapi/catalogue-current-v2.json',
+            'owner': 'catalogue',
+            'consumers': ['planning'],
+        }]}
+        new = {'active_releases': [{
+            'path': 'contracts/openapi/catalogue-current-v2.json',
+            'owner': 'catalogue',
+            'consumers': [],
+        }]}
+        impact = affected(['services/catalogue/app/fact.php'], owners, owners, old, new)
+        self.assertEqual(impact['components'], ['catalogue', 'planning'])
 
     def test_rename_uses_both_owner_inventories(self):
         old={'catalogue':{'path':'services/old'}};new={'catalogue':{'path':'services/catalogue'}}

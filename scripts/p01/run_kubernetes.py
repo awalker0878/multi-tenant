@@ -320,7 +320,7 @@ class KubernetesCampaign(Campaign):
         self.check("full-source-revision", bool(re.fullmatch(r"[0-9a-f]{40}", self.revision)))
         measured = self.command("source-revision", ["git", "rev-parse", "HEAD"]).decode().strip()
         self.check("exact-source-revision", measured == self.revision)
-        changed = self.command("source-clean", ["git", "status", "--porcelain", "--untracked-files=all", "--", "scripts/p01", "deploy", "services", "apps/console", ".github/workflows/p01-kubernetes-integration.yml"])
+        changed = self.command("source-clean", ["git", "status", "--porcelain", "--untracked-files=all", "--", "scripts/p01", "deploy", "services", "apps/console", ".github/workflows/qualification.yml"])
         self.check("no-modified-or-untracked-inputs", not changed.strip())
         self.report["installation_source_sha256"] = {str(path.relative_to(self.root)): digest(path.read_bytes())
             for folder in ("scripts/p01", "deploy/integration", "deploy/dependencies") for path in sorted((self.root / folder).rglob("*"))

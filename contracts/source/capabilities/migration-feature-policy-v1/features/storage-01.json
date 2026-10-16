@@ -1,0 +1,95 @@
+[
+  {
+    "id": "storage.disks",
+    "label": "Complete root, local and attached disks",
+    "mapping": "qualified_adapter",
+    "criticality": "critical",
+    "crosswalk_groups": [
+      "source.disks.complete",
+      "source.disk.capacity_bytes",
+      "source.disk.backing",
+      "source.vmware.storage.disk_mode",
+      "source.vmware.storage.datastore",
+      "source.vmware.storage.snapshots",
+      "source.vmware.storage.snapshot_supported",
+      "source.vmware.storage.clone_from_snapshot",
+      "source.openstack.storage.bootable",
+      "source.disk.native_identity",
+      "source.openstack.compute.swap_and_ephemeral"
+    ],
+    "operator_attributes": [],
+    "qualification": "unqualified",
+    "notes": "All authoritative disks must be enumerated, including local/ephemeral and shared volumes."
+  },
+  {
+    "id": "storage.controller",
+    "label": "Disk controllers and boot ordering",
+    "mapping": "qualified_adapter",
+    "criticality": "critical",
+    "crosswalk_groups": [
+      "source.disk.controller"
+    ],
+    "operator_attributes": [],
+    "qualification": "unqualified",
+    "notes": "Rebuild native bus and controller layout with guest boot validation."
+  },
+  {
+    "id": "storage.sharing",
+    "label": "Shared disks and multiwriter semantics",
+    "mapping": "owner_and_native",
+    "criticality": "critical",
+    "crosswalk_groups": [
+      "source.disk.sharing"
+    ],
+    "operator_attributes": [],
+    "qualification": "unqualified",
+    "notes": "Shared and multiattach disks require explicit fencing and special qualification."
+  },
+  {
+    "id": "storage.encryption",
+    "label": "Storage encryption and key custody",
+    "mapping": "owner_and_native",
+    "criticality": "critical",
+    "crosswalk_groups": [
+      "source.disk.encryption",
+      "owner.storage.encryption_key_custody",
+      "target.openstack.target.secret_key_backends"
+    ],
+    "operator_attributes": [
+      "storage.encryption_key_custody"
+    ],
+    "qualification": "unqualified",
+    "notes": "Encryption handling and key custody must be independently verified."
+  },
+  {
+    "id": "storage.target",
+    "label": "Destination storage backend and capacity",
+    "mapping": "qualified_adapter",
+    "criticality": "critical",
+    "crosswalk_groups": [
+      "target.storage.backend",
+      "target.storage.capacity_indicators",
+      "target.ahv.target.storage_encryption",
+      "target.openstack.target.image_formats"
+    ],
+    "operator_attributes": [],
+    "qualification": "unqualified",
+    "notes": "Datastore, container and Cinder volume type are not interchangeable storage types."
+  },
+  {
+    "id": "storage.transfer",
+    "label": "Capture, image conversion, import and VM creation",
+    "mapping": "qualified_adapter",
+    "criticality": "critical",
+    "crosswalk_groups": [
+      "source.disk.capture_method",
+      "target.image.ingest",
+      "target.vm.create",
+      "source.vmware.storage.ovf_descriptor",
+      "target.openstack.target.image_import_methods"
+    ],
+    "operator_attributes": [],
+    "qualification": "unqualified",
+    "notes": "Per platform and selected API version native effect tests are mandatory."
+  }
+]

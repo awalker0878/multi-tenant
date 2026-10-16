@@ -22,11 +22,25 @@ it('requires typed authority scope values and accepts reordered keys', function 
     $id = '10000000-0000-4000-8000-000000000001';
     $scope = ['site_id' => $id, 'environment' => $id, 'resource_id' => $id];
     $headers = ['authorization' => ['Bearer '.str_repeat('a', 64)], 'x-actor-delegation' => [str_repeat('c', 64)], 'x-planning-action' => ['plan.read']];
-    $response = ['allowed' => true, 'audience' => $caller === 'planning' ? 'planning' : 'assurance',
-        'source_owner' => 'assurance', 'source_use' => 'planning_read_only', 'tenant_id' => $id,
-        'action' => $caller === 'planning' ? 'plan.read' : 'evidence.read', 'scope' => array_reverse($scope, true),
-        'authority_use' => 'request_bound', 'expires_at' => now()->addSeconds(60)->toIso8601String(),
-        'evaluated_at' => now()->toIso8601String()];
+    $response = [
+        'allowed' => true,
+        'audience' => $caller === 'planning' ? 'planning' : 'assurance',
+        'tenant_id' => $id,
+        'action' => $caller === 'planning' ? 'plan.read' : 'evidence.read',
+        'scope' => array_reverse($scope, true),
+        'authority_use' => 'request_bound',
+        'expires_at' => now()->addSeconds(60)->toIso8601String(),
+        'evaluated_at' => now()->toIso8601String(),
+    ];
+    if ($caller === 'planning') {
+        $response['source_owner'] = 'assurance';
+        $response['source_use'] = 'planning_read_only';
+    } else {
+        // The exact delegated-authority response includes actor identity.
+        $response['delegation_id'] = $id;
+        $response['actor_id'] = $id;
+        $response['delegating_service'] = 'console';
+    }
     $check = static function () use ($caller, $headers, $id, $scope): array {
         $secrets = new MountedSecret;
 

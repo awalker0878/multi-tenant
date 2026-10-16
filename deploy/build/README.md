@@ -28,10 +28,30 @@ Every runtime probe uses the image's default UID/GID 10001, a read-only root, no
 
 ## Evidence and limits
 
-The [image workflow](../../.github/workflows/p01-images.yml) runs affected components separately. Its selector uses base/head changes and declared owner-to-worker dependencies; shared control changes select all registered images, and documentation-only changes select none. The always-run `Foundation images` aggregate accepts a skipped matrix only for an empty selection and fails when a selected build fails, is cancelled or is missing. Repository rules must still be configured to require this check; producing the check does not enable enforcement by itself. Each report records the exact Git source revision, SHA-256 of copied source and control files, base-image identities, command arguments, elapsed times, exit outcomes, raw stdout/stderr hashes, image configuration digest and runtime inventory. Expected readiness and invalid-input failures are asserted rather than suppressed. Failed build/probe logs are retained with the report. The workflow uploads evidence for 14 days; accepted permanent evidence is retained and indexed through the implementation register after examination.
+The image workflow runs affected components separately. Its selector uses base/head changes and declared owner-to-worker dependencies; shared control changes select all registered images, and documentation-only changes select none. The always-run `Foundation images` aggregate accepts a skipped matrix only for an empty selection and fails when a selected build fails, is cancelled or is missing. Repository rules must still be configured to require this check; producing the check does not enable enforcement by itself. Each report records the exact Git source revision, SHA-256 of copied source and control files, base-image identities, command arguments, elapsed times, exit outcomes, raw stdout/stderr hashes, image configuration digest and runtime inventory. Expected readiness and invalid-input failures are asserted rather than suppressed. Failed build/probe logs are retained with the report. The workflow uploads evidence for 14 days; accepted permanent evidence is retained and indexed through the implementation register after examination.
 
 An image configuration digest identifies the locally loaded image; it is not a pushed registry manifest digest or an OCI signature. The workflow does not publish images. SBOM generation, advisory scanning, signed publication, promotion controls, persistent service readiness and integration deployment remain their P01 work packages. An image build alone does not pass G01.01: complete registered source/contract boundary checks and examined evidence across every required image are also required. G01 integration, dependency and recovery criteria remain separate.
 
 ## Changing a build input
 
 Change an owning package manifest and lock together and run its source-quality checks before the image workflow. A new runtime dependency requires changing the installation and inventory rules; the recorder refuses to silently omit it. A base-image update requires an explicit candidate measurement and a reviewed update of this input lock and affected Dockerfile defaults. Do not replace digest pins with moving tags, resolve new bases during ordinary replay, or reuse evidence from a different source or lock. A release manifest will eventually compose accepted immutable service identities; this development registry is a build-input declaration, not that release authorization.
+
+
+### Retained current Alpine artifact
+
+`build/apk-cache/zlib-1.3.2-r0.apk` in each owned PHP context preserves the
+previously downloaded, currently locked Alpine artifact after the public CDN
+and official mirror URLs began returning 404. All four paths contain the same
+56,195 bytes and SHA-256
+`b636306cbf8a0c15493b38de608ba11605fd8f11ade631f5ece6f7fdf5a1e09e`.
+The package version, original upstream URL, closure lock, image base and trusted
+Alpine signing keys are unchanged. This is a copy of the original Alpine
+package (license metadata: Zlib), not a rebuilt or repackaged library.
+
+The build-context inventory includes these exact bytes. Both preflight and
+the PHP downloader reject missing/unregistered, symlinked, truncated or
+modified cache content as appropriate; the downloader applies the same locked
+length and digest to local and downloaded inputs. The existing offline APK
+installation still verifies distribution signatures. Build inputs are removed
+before the runtime stage. Missing upstream packages without a retained,
+reviewed exact copy continue to fail closed; no floating update is permitted.

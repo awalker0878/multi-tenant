@@ -1,5 +1,6 @@
 "Pinned TLS, fixed read routes and bounded normalization for selected native APIs."
 
+import hashlib
 import http.client
 import ipaddress
 import json
@@ -8,10 +9,27 @@ import re
 import socket
 import ssl
 import time
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
+from contextlib import contextmanager
+from contextvars import ContextVar
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlencode, urlsplit
+
+# A scoped, lease-local audit sink. ContextVar prevents evidence escaping a
+# collection job; it never signs or promotes raw GETs to E3/E4 qualification.
+_READ_WITNESS_SINK: ContextVar[Callable[[dict[str, Any]], None] | None] = ContextVar(
+    "inventory_native_read_witness_sink", default=None
+)
+
+
+@contextmanager
+def capture_native_reads(sink: Callable[[dict[str, Any]], None]) -> Iterator[None]:
+    token = _READ_WITNESS_SINK.set(sink)
+    try:
+        yield
+    finally:
+        _READ_WITNESS_SINK.reset(token)
 
 
 class CollectionFailure(Exception):
@@ -129,7 +147,25 @@ def exchange(
                 raise CollectionFailure("invalid_response")
             if not chunk:
                 break
-        return strict_json(bytes(data))
+        observed = strict_json(bytes(data))
+        witness = _READ_WITNESS_SINK.get()
+        if method == "GET" and witness is not None and len(path) <= 400:
+            # The transport has already checked status, TLS peer, scope, and
+            # response encoding. This response digest is an audit witness,
+            # NOT proof that every manifest field exists inside the document.
+            witness(
+                {
+                    "native_operation": "GET " + path,
+                    "api_version": str(stream.get("api_version", "")),
+                    "response_sha256": hashlib.sha256(
+                        json.dumps(
+                            observed, sort_keys=True, separators=(",", ":"), allow_nan=False
+                        ).encode()
+                    ).hexdigest(),
+                    "observed_at": int(time.time()),
+                }
+            )
+        return observed
     except (OSError, http.client.HTTPException):
         raise CollectionFailure("transport_unavailable") from None
     finally:
@@ -173,7 +209,7 @@ def collect(
         raise CollectionFailure("unsafe_destination")
     token = secret(stream["credential_file"])
     if platform == "ahv" and kind == "server":
-        if stream["api_version"] != "v4.3":
+        if stream["api_version"] not in {"v4.2", "v4.3"}:
             raise CollectionFailure("unsupported_api")
         from inventory_worker.infrastructure.ahv_workload import read_vm
 

@@ -1,0 +1,633 @@
+[
+  {
+    "canonical_id": "source.disk.capture_method",
+    "scope": "source",
+    "relationship": "conditional",
+    "normalization": "qualified_platform_capture",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "storage.nfc_export"
+        ],
+        "api_fields": [
+          "VirtualMachine.ExportVm + HttpNfcLease.info.deviceUrl"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "probe"
+        ],
+        "max_age_seconds": 300,
+        "severity": "critical",
+        "conditions": [
+          "when:export"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "storage.image_capture"
+        ],
+        "api_fields": [
+          "POST images + task status + source disk readback"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "probe"
+        ],
+        "max_age_seconds": 300,
+        "severity": "critical",
+        "conditions": [
+          "when:export"
+        ]
+      },
+      "openstack": {
+        "manifest_attribute_ids": [
+          "storage.local_image_capture",
+          "storage.volume_snapshot_capture"
+        ],
+        "api_fields": [
+          "POST createImage + Glance readback",
+          "POST snapshots + clone + volume-to-image readback"
+        ],
+        "owner_evidence_fields": [
+          null,
+          null
+        ],
+        "methods": [
+          "probe",
+          "probe"
+        ],
+        "max_age_seconds": 300,
+        "severity": "critical",
+        "conditions": [
+          "when:image_backed",
+          "when:volume_backed"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 300,
+    "semantic_constraints": "Per-platform export and snapshot operations have different scopes.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.nic.inventory",
+    "scope": "source",
+    "relationship": "conditional",
+    "normalization": "complete_nic_enumeration",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "network.nic_inventory"
+        ],
+        "api_fields": [
+          "VirtualMachine.config.hardware.device[*].macAddress"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "network.nic_inventory"
+        ],
+        "api_fields": [
+          "data.nics[*].extId"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": {
+        "manifest_attribute_ids": [
+          "network.port_ids",
+          "network.ports_complete"
+        ],
+        "api_fields": [
+          "ports[*].id",
+          "GET ports?device_id={id}&project_id={project} + ports_links"
+        ],
+        "owner_evidence_fields": [
+          null,
+          null
+        ],
+        "methods": [
+          "native_list",
+          "native_list"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 60,
+    "semantic_constraints": "OpenStack ports must have complete paging and tenant ownership.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.nic.guest_model",
+    "scope": "source",
+    "relationship": "conditional",
+    "normalization": "guest_nic_driver_mapping",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "network.nic_model"
+        ],
+        "api_fields": [
+          "VirtualEthernetCard._typeName"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 120,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "network.nic_model"
+        ],
+        "api_fields": [
+          "data.nics[*].backingInfo.model"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 120,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": {
+        "manifest_attribute_ids": [
+          "network.nic_model"
+        ],
+        "api_fields": [
+          "ports[*].binding:vnic_type"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_list"
+        ],
+        "max_age_seconds": 120,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 120,
+    "semantic_constraints": "Neutron binding:vnic_type is not the virtual guest hardware model.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.nic.mac",
+    "scope": "source",
+    "relationship": "normalize",
+    "normalization": "canonical_mac_and_collision_check",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "network.nic_mac"
+        ],
+        "api_fields": [
+          "VirtualEthernetCard.macAddress"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "network.nic_mac"
+        ],
+        "api_fields": [
+          "data.nics[*].backingInfo.macAddress"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": {
+        "manifest_attribute_ids": [
+          "network.nic_mac"
+        ],
+        "api_fields": [
+          "ports[*].mac_address"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_list"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 60,
+    "semantic_constraints": "MAC continuity requires authorization and collision detection.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.nic.connected",
+    "scope": "source",
+    "relationship": "conditional",
+    "normalization": "connected_and_enabled_state",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "network.nic_connection"
+        ],
+        "api_fields": [
+          "VirtualEthernetCard.connectable.connected + startConnected"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 30,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "network.nic_connection"
+        ],
+        "api_fields": [
+          "data.nics[*].backingInfo.isConnected"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 30,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": {
+        "manifest_attribute_ids": [
+          "network.port_status"
+        ],
+        "api_fields": [
+          "ports[*].status + admin_state_up"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_list"
+        ],
+        "max_age_seconds": 30,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 30,
+    "semantic_constraints": "Admin state and native attachment states have different semantics.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.nic.attachment",
+    "scope": "source",
+    "relationship": "conditional",
+    "normalization": "destination_network_intent",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "network.nic_backing"
+        ],
+        "api_fields": [
+          "VirtualEthernetCard.backing"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "network.nic_backing"
+        ],
+        "api_fields": [
+          "data.nics[*].backingInfo"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": {
+        "manifest_attribute_ids": [
+          "network.port_network",
+          "network.fixed_ips"
+        ],
+        "api_fields": [
+          "ports[*].network_id",
+          "ports[*].fixed_ips"
+        ],
+        "owner_evidence_fields": [
+          null,
+          null
+        ],
+        "methods": [
+          "native_list",
+          "native_list"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 60,
+    "semantic_constraints": "No direct portgroup/VPC/network UUID translation.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.nic.security",
+    "scope": "source",
+    "relationship": "platform_specific",
+    "normalization": "security_intent_review",
+    "platforms": {
+      "vmware": null,
+      "ahv": null,
+      "openstack": {
+        "manifest_attribute_ids": [
+          "network.security_groups",
+          "network.port_security",
+          "network.declared_security_groups"
+        ],
+        "api_fields": [
+          "ports[*].security_groups",
+          "ports[*].port_security_enabled",
+          "server.security_groups"
+        ],
+        "owner_evidence_fields": [
+          null,
+          null,
+          null
+        ],
+        "methods": [
+          "native_list",
+          "native_list",
+          "native_get"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 60,
+    "semantic_constraints": "Neutron security-group metadata is not a portable firewall policy.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.passthrough",
+    "scope": "source",
+    "relationship": "conditional",
+    "normalization": "specialized_device_qualification",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "compute.passthrough_devices"
+        ],
+        "api_fields": [
+          "VirtualMachine.config.hardware.device[*]._typeName"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "derive"
+        ],
+        "max_age_seconds": 120,
+        "severity": "critical",
+        "conditions": [
+          "when:present"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "compute.gpu_passthrough"
+        ],
+        "api_fields": [
+          "data.gpus[*] + data.pcieDevices[*]"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 120,
+        "severity": "critical",
+        "conditions": [
+          "when:present"
+        ]
+      },
+      "openstack": null
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 120,
+    "semantic_constraints": "PCI/GPU passthrough requires explicit support or migration is blocked.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.vm.display_name",
+    "scope": "source",
+    "relationship": "conditional",
+    "normalization": "display_label",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "identity.display_name"
+        ],
+        "api_fields": [
+          "VirtualMachine.config.name"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 300,
+        "severity": "optional",
+        "conditions": [
+          "when:present"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "identity.display_name"
+        ],
+        "api_fields": [
+          "data.name"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 300,
+        "severity": "optional",
+        "conditions": [
+          "when:present"
+        ]
+      },
+      "openstack": null
+    },
+    "criticality": "optional",
+    "maximum_age_seconds": 300,
+    "semantic_constraints": "A label is never a stable VM ID.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.vm.creation_time",
+    "scope": "source",
+    "relationship": "conditional",
+    "normalization": "informational_timestamp",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "identity.create_date"
+        ],
+        "api_fields": [
+          "VirtualMachine.config.createDate"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 3600,
+        "severity": "optional",
+        "conditions": [
+          "when:present"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "identity.create_time"
+        ],
+        "api_fields": [
+          "data.createTime"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 3600,
+        "severity": "optional",
+        "conditions": [
+          "when:present"
+        ]
+      },
+      "openstack": null
+    },
+    "criticality": "optional",
+    "maximum_age_seconds": 3600,
+    "semantic_constraints": "Creation time does not imply VM incarnation identity.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  }
+]

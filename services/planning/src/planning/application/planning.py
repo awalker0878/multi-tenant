@@ -9,9 +9,9 @@ from uuid import uuid4
 from planning.application.ports import Database, Sources, Transaction
 from planning.application.validation import PlanValidation
 from planning.domain.assessment import assess
-from planning.domain.placement import fit
 from planning.domain.compilation import bind, compile_plan
 from planning.domain.model import Actor, Rejected, canonical, digest, identifier, integer, shape
+from planning.domain.placement import fit
 
 
 class Planning:
@@ -49,11 +49,11 @@ class Planning:
             return dict(row["payload"])
 
     def retry(
-        self, tx: Transaction, actor: Actor, key: str, fingerprint: str
+        self, tx: Transaction, actor: Actor, key: str, fingerprint: str, max_age: int | None = None
     ) -> dict[str, Any] | None:
         row = tx.one(
             (
-                "SELECT fingerprint,response FROM app.planning_commands WHERE "
+                "SELECT fingerprint,response,created_at FROM app.planning_commands WHERE "
                 "tenant=%s AND actor=%s AND command_key=%s"
             ),
             (actor.tenant, actor.actor, identifier(key)),
@@ -61,8 +61,56 @@ class Planning:
         if row:
             if row["fingerprint"] != fingerprint:
                 raise Rejected("command_key_conflict", 409)
+            if max_age is not None and not 0 <= self.clock() - row["created_at"] < max_age:
+                raise Rejected("command_key_expired", 409)
             return dict(row["response"])
         return None
+
+    def register_query(self, actor: Actor, key: str, operation: str, body: dict[str, Any]) -> None:
+        """Bind query retries without caching owner authority or readiness.
+
+        The existing command ledger owns all key conflicts. Query receipt bytes
+        contain no returned data and cannot grant permission. Every HTTP retry
+        authenticates, authorizes and recomputes the query before this check.
+        """
+        if operation not in {
+            "migration-preparations",
+            "migration-plan-options",
+            "migration-support",
+            "migration-flow-choices",
+            "migration-workload-readiness",
+        }:
+            raise Rejected("migration_query_operation_invalid", 422)
+        fingerprint = digest(
+            {
+                "operation": operation,
+                "application": actor.application,
+                "environment": actor.environment,
+                "body": body,
+            }
+        )
+        now = int(self.clock())
+        with self.database.transaction() as tx:
+            tx.execute("SELECT pg_advisory_xact_lock(7504001)")
+            row = tx.one(
+                "SELECT fingerprint,response,created_at FROM app.planning_commands "
+                "WHERE tenant=%s AND actor=%s AND command_key=%s",
+                (actor.tenant, actor.actor, identifier(key)),
+            )
+            if row is not None:
+                if (
+                    row["fingerprint"] != fingerprint
+                    or row["response"].get("read_only") is not True
+                ):
+                    raise Rejected("command_key_conflict", 409)
+                if not 0 <= now - row["created_at"] < 604800:
+                    raise Rejected("command_key_expired", 409)
+                return
+            tx.execute(
+                "INSERT INTO app.planning_commands(tenant,actor,command_key,fingerprint,"
+                "response,created_at) VALUES(%s,%s,%s,%s,%s::jsonb,%s)",
+                (actor.tenant, actor.actor, key, fingerprint, canonical({"read_only": True}), now),
+            )
 
     def save(
         self, actor: Actor, key: str, fingerprint: str, kind: str, payload: dict[str, Any]
@@ -76,7 +124,8 @@ class Planning:
             if prior:
                 return prior
             count = tx.one(
-                "SELECT count(*) AS n FROM app.planning_commands WHERE tenant=%s AND created_at>%s",
+                "SELECT count(*) AS n FROM app.planning_commands WHERE tenant=%s "
+                "AND created_at>%s AND NOT (response ? 'read_only')",
                 (actor.tenant, self.clock() - 60),
             )
             if count and count["n"] >= 30:
@@ -108,6 +157,55 @@ class Planning:
                     self.clock(),
                 ),
             )
+            if kind == "plan":
+                retained = tx.one(
+                    "SELECT payload FROM app.planning_records "
+                    "WHERE id=%s AND tenant=%s AND kind='assessment'",
+                    (payload["assessment_id"], actor.tenant),
+                )
+                scope_sha256: str | None = None
+                try:
+                    if retained is not None:
+                        qualification_scope = retained["payload"]["inputs"][payload["candidate"]][
+                            "qualification"
+                        ]["scope"]
+                        if (
+                            isinstance(qualification_scope, dict)
+                            and qualification_scope.get("tenant_id") == actor.tenant
+                        ):
+                            scope_sha256 = digest(qualification_scope)
+                except (KeyError, IndexError, TypeError, Rejected):
+                    # A scope with insufficient provenance must never escape
+                    # invalidation. The nullable index forces a tenant hold.
+                    pass
+                if scope_sha256 is not None:
+                    # Serialize plan creation with incoming negative authority.
+                    # Otherwise a commit can race an invalidation's plan scan.
+                    tx.execute(
+                        "SELECT pg_advisory_xact_lock(hashtext(%s))",
+                        (scope_sha256,),
+                    )
+                tx.execute(
+                    "INSERT INTO app.planning_plan_qualification_scopes"
+                    "(plan,tenant,scope_sha256) VALUES(%s,%s,%s)",
+                    (payload["id"], actor.tenant, scope_sha256),
+                )
+                if scope_sha256 is not None:
+                    head = tx.one(
+                        "SELECT e.event_id FROM app.planning_qualification_heads h "
+                        "JOIN app.planning_qualification_inbox e "
+                        "ON e.scope_sha256=h.scope_sha256 "
+                        "AND e.authority_epoch=h.authority_epoch "
+                        "WHERE h.scope_sha256=%s AND h.tenant=%s "
+                        "AND h.state IN ('suspended','revoked')",
+                        (scope_sha256, actor.tenant),
+                    )
+                    if head is not None:
+                        tx.execute(
+                            "INSERT INTO app.planning_invalidations(tenant,plan,event_id) "
+                            "VALUES(%s,%s,%s)",
+                            (actor.tenant, payload["id"], head["event_id"]),
+                        )
             tx.execute(
                 (
                     "INSERT INTO "
@@ -220,6 +318,29 @@ class Planning:
         }
         return self.save(actor, key, fingerprint, "plan", payload)
 
+    @staticmethod
+    def qualification_hold(tx: Transaction, tenant: str, plan_id: str) -> str | None:
+        """An absent pin or an unseen negative epoch can never imply eligible."""
+        row = tx.one(
+            "SELECT s.scope_sha256, h.state, "
+            "EXISTS(SELECT 1 FROM app.planning_invalidations i "
+            "WHERE i.tenant=p.tenant AND i.plan=p.id) AS invalidated "
+            "FROM app.planning_records p "
+            "LEFT JOIN app.planning_plan_qualification_scopes s "
+            "ON s.plan=p.id AND s.tenant=p.tenant "
+            "LEFT JOIN app.planning_qualification_heads h "
+            "ON h.scope_sha256=s.scope_sha256 AND h.tenant=p.tenant "
+            "WHERE p.id=%s AND p.tenant=%s AND p.kind='plan'",
+            (identifier(plan_id), identifier(tenant)),
+        )
+        if row is None or row["scope_sha256"] is None:
+            return "qualification_scope_unverified"
+        if row["state"] in {"suspended", "revoked"}:
+            return "qualification_authority_withdrawn"
+        if row["invalidated"]:
+            return "owner_change_requires_new_assessment"
+        return None
+
     def validity(
         self, actor: Actor, plan: dict[str, Any], delegations: dict[str, str]
     ) -> dict[str, Any]:
@@ -273,15 +394,9 @@ class Planning:
         if min(content["valid_until"], content["input_fresh_until"]) <= self.clock():
             holds.append("plan_or_facts_expired")
         with self.database.transaction() as tx:
-            invalidations = tx.all(
-                (
-                    "SELECT event_id FROM app.planning_invalidations WHERE "
-                    "tenant=%s AND plan=%s LIMIT 100"
-                ),
-                (actor.tenant, plan["id"]),
-            )
-        if invalidations:
-            holds.append("owner_change_requires_new_assessment")
+            qualification_hold = self.qualification_hold(tx, actor.tenant, plan["id"])
+        if qualification_hold is not None:
+            holds.append(qualification_hold)
         return {
             "current": not holds,
             "holds": sorted(set(holds)),
@@ -290,7 +405,8 @@ class Planning:
             "native_write_authorized": False,
         }
 
-    def check_native_recipe(self, record: dict[str, Any]) -> None:
+    def check_native_recipe(self, record: dict[str, Any]) -> dict[str, Any] | None:
+        readiness = None
         if record["content"]["lane"] == "operational" and (
             "native_provisioning" in record["content"] or "native_migration" in record["content"]
         ):
@@ -298,34 +414,38 @@ class Planning:
         if "native_provisioning" in record["content"]:
             self.validation.native.current(record)
         if "native_migration" in record["content"]:
-            self.validation.migration.execution_current(record)
+            readiness = self.validation.migration.execution_current(record)
             if (
                 min(record["content"]["valid_until"], record["content"]["input_fresh_until"])
                 <= self.clock()
             ):
                 raise Rejected("migration_plan_expired", 423)
+        return readiness
 
-    def placement_proposal(
-        self, tenant: str, identity: str, revision: int
-    ) -> dict[str, Any]:
+    def placement_proposal(self, tenant: str, identity: str, revision: int) -> dict[str, Any]:
         """Expose a deterministic witness; a proposal is never an owner receipt."""
         if revision != 1:
             raise Rejected("not_found", 404)
         with self.database.transaction() as tx:
             row = tx.one(
                 "SELECT payload FROM app.planning_records WHERE id=%s AND tenant=%s "
-                "AND kind='plan'", (identifier(identity), identifier(tenant)),
+                "AND kind='plan'",
+                (identifier(identity), identifier(tenant)),
             )
             if row is None:
                 raise Rejected("not_found", 404)
+            if self.qualification_hold(tx, tenant, identity) is not None:
+                raise Rejected("placement_proposal_held", 423)
             plan = row["payload"]
             retained = tx.one(
                 "SELECT payload FROM app.planning_records WHERE id=%s AND tenant=%s "
-                "AND kind='assessment'", (plan["assessment_id"], tenant),
+                "AND kind='assessment'",
+                (plan["assessment_id"], tenant),
             )
         content = plan["content"]
         if (
-            retained is None or content["execution_ready"] is not True
+            retained is None
+            or content["execution_ready"] is not True
             or content["lane"] != "operational"
             or min(content["valid_until"], content["input_fresh_until"]) <= self.clock()
         ):
@@ -336,7 +456,8 @@ class Planning:
             placed = fit(
                 assessment["intent"]["intent"],
                 inputs["destination"]["capability_snapshot"]["data"]["pools"],
-                inputs["policy"], self.clock(),
+                inputs["policy"],
+                self.clock(),
             )
         except (KeyError, TypeError, ValueError):
             raise Rejected("placement_proposal_unverified", 423) from None
@@ -354,16 +475,26 @@ class Planning:
             "native_write_authorized": False,
         }
 
-    def bound_plan(self, identity: str, revision: int) -> dict[str, Any]:
+    def bound_plan(self, tenant: str, identity: str, revision: int) -> dict[str, Any]:
         if revision != 1:
             raise Rejected("not_found", 404)
         with self.database.transaction() as tx:
             row = tx.one(
-                "SELECT payload FROM app.planning_records WHERE id=%s AND kind='plan'",
-                (identifier(identity),),
+                "SELECT tenant,payload FROM app.planning_records "
+                "WHERE tenant=%s AND id=%s AND kind='plan'",
+                (identifier(tenant), identifier(identity)),
             )
             if row is None:
                 raise Rejected("not_found", 404)
+            try:
+                pinned_tenant = row["payload"]["content"]["scope"]["tenant_id"]
+                bound_tenant = row["payload"]["binding"]["tenant_id"]
+            except (KeyError, TypeError):
+                raise Rejected("plan_tenant_mismatch", 423) from None
+            if pinned_tenant != tenant or bound_tenant != tenant or str(row["tenant"]) != tenant:
+                raise Rejected("plan_tenant_mismatch", 423)
+            if self.qualification_hold(tx, tenant, identity) is not None:
+                raise Rejected("qualification_invalidation_held", 423)
             self.check_native_recipe(row["payload"])
             return dict(row["payload"]["binding"])
 
@@ -378,16 +509,22 @@ class Planning:
             )
             if row is None:
                 raise Rejected("not_found", 404)
-            self.check_native_recipe(row["payload"])
-            invalidated = tx.one(
-                "SELECT event_id FROM app.planning_invalidations WHERE plan=%s LIMIT 1",
-                (identity_value,),
-            )
-            return {
+            hold = self.qualification_hold(tx, tenant, identity_value)
+            # Fail closed even when the downstream caller reads this field as
+            # advisory only. A positive hint never cancels a historical hold.
+            if hold is not None:
+                raise Rejected(hold, 423)
+            readiness = self.check_native_recipe(row["payload"])
+            result = {
                 "content": row["payload"]["content"],
                 "binding": row["payload"]["binding"],
-                "invalidated": invalidated is not None,
+                "invalidated": False,
             }
+            if "native_migration" in row["payload"]["content"]:
+                if readiness is None or readiness.get("status") != "eligible":
+                    raise Rejected("migration_readiness_held", 423)
+                result["migration_readiness"] = readiness
+            return result
 
     def invalidate(self, event: dict[str, Any]) -> bool:
         """Broker hints invalidate only; direct owner reads still decide current validity."""

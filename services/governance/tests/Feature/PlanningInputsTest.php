@@ -23,7 +23,7 @@ beforeEach(function (): void {
     }
     $this->scope = ['site_id' => (string) Str::uuid(), 'environment' => (string) Str::uuid(), 'resource_id' => (string) Str::uuid()];
     $grant = $this->withHeader('Authorization', 'Bearer '.$this->workload)->withHeader('X-Console-Session', $this->author)
-        ->postJson('/v1/tenants/'.$this->tenant.'/actor-delegations', ['audience' => 'planning', 'action' => 'plan.create', 'scope' => $this->scope])->assertCreated()->json();
+        ->withHeader('Idempotency-Key', bin2hex(random_bytes(16)))->postJson('/v1/tenants/'.$this->tenant.'/actor-delegations', ['audience' => 'planning', 'action' => 'plan.create', 'scope' => $this->scope])->assertCreated()->json();
     $this->delegation = $grant['delegation_token'];
     $this->input = ['action' => 'plan.create', 'scope' => $this->scope];
     $this->path = '/v1/tenants/'.$this->tenant.'/planning-input-checks';

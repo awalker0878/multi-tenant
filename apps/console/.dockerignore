@@ -17,6 +17,9 @@
 !public/index.php
 !routes/
 !routes/**
+!database/
+!database/migrations/
+!database/migrations/**
 !resources/
 !resources/**
 !build/
@@ -25,3 +28,6 @@
 !package-lock.json
 !tsconfig.json
 !vite.config.ts
+
+!build/apk-cache/
+!build/apk-cache/*.apk

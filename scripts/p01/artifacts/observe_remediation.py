@@ -26,7 +26,7 @@ def main():
                   'deploy/build/remediation-candidates.json', 'scripts/p01/artifacts/observe_remediation.py',
                   'scripts/p01/artifacts/bundle.py', 'scripts/p01/artifacts/campaign.py',
                   'scripts/p01/artifacts/tools.py', 'release/artifact-tools.lock.json',
-                  '.github/workflows/p01-image-remediation.yml']},
+                  '.github/workflows/qualification.yml']},
               'started_at': datetime.now(timezone.utc).isoformat(), 'images': {}}
 
     def run(argv, timeout=240):

@@ -16,14 +16,6 @@
     "job_id": 112976000836
   },
   {
-    "kind": "restored-contract-compatibility",
-    "file": "restored-contract-compatibility.json",
-    "sha256": "07fcae03cd05292df3ccd6f420833f5cfaf53c988eefe5e0caa508932784c025",
-    "source_revision": "7860616293cc0be7a1983ca7bc38529aed5e5b7f",
-    "run_id": null,
-    "job_id": null
-  },
-  {
     "kind": "restoration-parent-comparison",
     "file": "archives/p08-contract-restoration-comparison.zip",
     "sha256": "27657c562fe35747854b2551a9ac5c679c034e6d6240eec012188790a6e09b64",

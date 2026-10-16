@@ -22,6 +22,30 @@ def test_two_destinations_explain_constraints() -> None:
     assert all(f["remediation"] and f["source"] for f in bad["findings"])
 
 
+def test_dual_stack_nic_consumes_two_address_allocations() -> None:
+    """Aggregate capacity must use IP-family allocations, not NIC count."""
+    intent, destination, profile, policy, qualification = inputs()
+    intent["workloads"][0]["nics"][0]["address_families"].append("ipv6")
+    assert sum(len(w["nics"]) for w in intent["workloads"]) == 2
+    result = assess(
+        intent,
+        destination,
+        profile,
+        policy,
+        qualification,
+        "application.provision",
+        "native_api",
+        NOW,
+    )
+    assert result["demand"]["addresses"] == 3
+    assert any(
+        row["requirement"] == "capacity.addresses"
+        and row["reason"] == "observed_capacity_insufficient"
+        and row["mandatory"]
+        for row in result["findings"]
+    )
+
+
 @pytest.mark.parametrize("dimension", DIMENSIONS)
 def test_each_missing_dimension_holds(dimension: str) -> None:
     i, d, p, policy, q = inputs()

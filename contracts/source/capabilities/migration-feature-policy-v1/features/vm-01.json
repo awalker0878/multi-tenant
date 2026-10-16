@@ -1,0 +1,70 @@
+[
+  {
+    "id": "vm.identity",
+    "label": "VM identity and source scope",
+    "mapping": "qualified_adapter",
+    "criticality": "critical",
+    "crosswalk_groups": [
+      "source.vm.id",
+      "source.vm.incarnation",
+      "source.vm.bios_uuid",
+      "source.scope.project",
+      "source.vm.host",
+      "source.vm.creation_time",
+      "source.ahv.identity.cluster",
+      "source.vmware.identity.vcenter_uuid"
+    ],
+    "operator_attributes": [],
+    "qualification": "unqualified",
+    "notes": "Native IDs and source generation never copy to destination."
+  },
+  {
+    "id": "vm.power",
+    "label": "Power state and fencing",
+    "mapping": "normalize_with_recheck",
+    "criticality": "critical",
+    "crosswalk_groups": [
+      "source.vm.power_state"
+    ],
+    "operator_attributes": [],
+    "qualification": "unqualified",
+    "notes": "Off/on values normalize but source fence must be rechecked at capture."
+  },
+  {
+    "id": "vm.compute",
+    "label": "vCPU, RAM, CPU topology",
+    "mapping": "normalize_with_recheck",
+    "criticality": "critical",
+    "crosswalk_groups": [
+      "source.vm.vcpu_total",
+      "source.vm.memory_mib",
+      "target.compute.capacity",
+      "source.vmware.compute.memory_hot_add",
+      "target.openstack.placement_traits",
+      "source.vmware.compute.cpu_hot_add",
+      "source.openstack.compute.flavor_id",
+      "source.vmware.compute.hardware_version"
+    ],
+    "operator_attributes": [],
+    "qualification": "unqualified",
+    "notes": "CPU counts and RAM can normalize; topology and guest support require qualification."
+  },
+  {
+    "id": "vm.placement",
+    "label": "Host/cluster placement, capacity, quota",
+    "mapping": "owner_and_native",
+    "criticality": "critical",
+    "crosswalk_groups": [
+      "target.compute.placement",
+      "owner.placement.native_reserved_capacity",
+      "target.vmware.target.datacenter_scope",
+      "target.vmware.target.vm_folder",
+      "source.openstack.compute.availability_zone"
+    ],
+    "operator_attributes": [
+      "placement.native_reserved_capacity"
+    ],
+    "qualification": "unqualified",
+    "notes": "Advertised capacity cannot establish exclusive resource reservations."
+  }
+]

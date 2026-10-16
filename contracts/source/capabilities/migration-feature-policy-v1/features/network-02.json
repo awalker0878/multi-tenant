@@ -1,0 +1,15 @@
+[
+  {
+    "id": "network.qos",
+    "label": "Nonessential network QoS and bandwidth settings",
+    "mapping": "conditional_optional",
+    "criticality": "optional",
+    "crosswalk_groups": [
+      "source.openstack.network.qos_policy",
+      "target.openstack.target.qos_policies"
+    ],
+    "operator_attributes": [],
+    "qualification": "unqualified",
+    "notes": "QoS can be optional only when its loss does not breach application performance, rate-limit or security requirements. Otherwise classify the actual flow and policy as critical."
+  }
+]

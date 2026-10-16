@@ -10,6 +10,7 @@ use App\Application\Authorization\Contracts\OwnerDirectory;
 use App\Application\Authorization\Data\ActorContext;
 use App\Application\Foundation\Contracts\DependencyProbe;
 use App\Application\Foundation\Contracts\HealthCredential;
+use App\Application\Foundation\Contracts\SecretReader;
 use App\Application\Foundation\Contracts\SignalBuffer;
 use App\Application\IntentRevisions\Contracts\IntentValidator;
 use App\Application\Messaging\Contracts\CataloguePublisher;
@@ -19,6 +20,7 @@ use App\Infrastructure\Authorization\MountedConsoleCaller;
 use App\Infrastructure\Catalogue\SchemaIntentValidator;
 use App\Infrastructure\Foundation\BoundedSignalBuffer;
 use App\Infrastructure\Foundation\MountedHealthCredential;
+use App\Infrastructure\Foundation\MountedSecret;
 use App\Infrastructure\Foundation\PostgresDependencyProbe;
 use App\Infrastructure\Messaging\RabbitCataloguePublisher;
 use App\Infrastructure\Planning\PlanningInputAuthority;
@@ -50,6 +52,7 @@ final class AppServiceProvider extends ServiceProvider
         $this->app->bind(DelegatedAuthority::class, GovernanceDelegatedAuthority::class);
         $this->app->bind(SignalBuffer::class, BoundedSignalBuffer::class);
         $this->app->bind(HealthCredential::class, MountedHealthCredential::class);
+        $this->app->bind(SecretReader::class, MountedSecret::class);
         $this->app->bind(DependencyProbe::class, PostgresDependencyProbe::class);
     }
 }

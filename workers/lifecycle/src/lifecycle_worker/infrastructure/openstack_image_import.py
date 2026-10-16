@@ -25,6 +25,8 @@ from lifecycle_worker.infrastructure.migration_custody import ArtifactCustody
 from lifecycle_worker.infrastructure.native_files import protected_read
 from lifecycle_worker.infrastructure.openstack_image_transport import GlanceImport
 
+MIGRATION_API_CAPABILITIES = frozenset({"vm.disk.import"})
+
 
 class OpenStackImageImport:
     def __init__(

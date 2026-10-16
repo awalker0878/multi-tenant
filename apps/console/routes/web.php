@@ -71,6 +71,7 @@ Route::prefix('/tenants/{tenant}/inventory')->whereUuid('tenant')->middleware(Re
     Route::get('/sites/{site}/migration/profiles/{profile}', [MigrationReviewController::class, 'show'])->whereUuid(['site', 'profile']);
     Route::get('/sites/{site}/migration/profiles/{profile}/status', [MigrationReviewController::class, 'status'])->whereUuid(['site', 'profile']);
     Route::post('/sites/{site}/migration/profiles/{profile}', [MigrationReviewController::class, 'command'])->whereUuid(['site', 'profile']);
+    Route::get('/sites/{site}/migration/catalogue-options', [MigrationReviewController::class, 'catalogueOptions'])->whereUuid('site');
     Route::get('/sites/{site}/migration', [MigrationReviewController::class, 'show'])->whereUuid('site');
     Route::get('/sites/{site}/migration/status', [MigrationReviewController::class, 'status'])->whereUuid('site');
     Route::post('/sites/{site}/migration', [MigrationReviewController::class, 'command'])->whereUuid('site');
@@ -92,6 +93,9 @@ Route::prefix('/tenants/{tenant}/applications/{application}/environments/{enviro
     $c = PlanningController::class;
     Route::get('/migration-support/{site}', [MigrationSupportController::class, 'show'])->whereUuid('site');
     Route::get('/migration-support/{site}/status', [MigrationSupportController::class, 'status'])->whereUuid('site');
+    Route::get('/migration-support/{site}/workload-readiness', [MigrationSupportController::class, 'workloadReadiness'])->whereUuid('site');
+    Route::get('/migration-support/{site}/flow-choices', [MigrationSupportController::class, 'flowChoices'])->whereUuid('site');
+    Route::post('/migration-support/{site}/flow-selections', [MigrationSupportController::class, 'saveFlows'])->whereUuid('site');
     Route::get('/', [$c, 'index']);
     Route::get('/destinations/{site}', [$c, 'destinations'])->whereUuid('site');
     Route::get('/{kind}/{record}', [$c, 'show'])->whereIn('kind', ['assessments', 'plans'])->whereUuid('record');

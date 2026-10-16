@@ -186,6 +186,47 @@ def test_worker_cannot_attach_configuration_to_resource_stream(campaign: Campaig
         c.service.submit(c.worker, body)
 
 
+def test_root_version_discovery_witness_commits_and_malformed_reads_do_not(
+    campaign: Campaign,
+) -> None:
+    c = campaign
+    c.service.configuration_streams = configuration_streams
+    job = c.service.command(c.actor, "configuration_pull", {}, uid(), c.endpoint)["discovery_id"]
+    for _ in c.policy.streams:
+        c.now += 2
+        lease = c.service.claim(c.worker)["job"]
+        c.service.submit(c.worker, c.page(lease, []))
+    c.now += 2
+    lease = c.service.claim(c.worker)["job"]
+    body = c.page(lease, [])
+    body["configuration"] = {"query": "compute_versions", "status": "observed", "items": []}
+    body["native_read_receipts"] = [
+        {
+            "native_operation": "GET /",
+            "api_version": "discovery-v1",
+            "response_sha256": "a" * 64,
+            "observed_at": int(c.now),
+        }
+    ]
+    for invalid in ("GET ", "POST /", "GET /\r\nInjected: grant", "GET /" + "a" * 400):
+        rejected = copy.deepcopy(body)
+        rejected["native_read_receipts"][0]["native_operation"] = invalid
+        with pytest.raises(Rejected, match="native_read_witness_invalid"):
+            c.service.submit(c.worker, rejected)
+        with c.database.transaction() as tx:
+            assert row(tx, "SELECT count(*) AS n FROM inventory.pages")["n"] == len(
+                c.policy.streams
+            )
+    assert c.service.submit(c.worker, body)["accepted"] is True
+    with c.database.transaction() as tx:
+        saved = tx.one(
+            "SELECT payload FROM inventory.pages WHERE job=%s ORDER BY sequence DESC LIMIT 1",
+            (job,),
+        )
+        assert saved is not None
+        assert saved["payload"]["native_read_receipts"][0]["native_operation"] == "GET /"
+
+
 def test_source_only_vmware_review_does_not_require_destination_permissions(
     campaign: Campaign,
 ) -> None:

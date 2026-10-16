@@ -30,6 +30,8 @@ from lifecycle_worker.infrastructure.native_json import NativeJson
 from lifecycle_worker.infrastructure.openstack_api import NativeWrites
 from lifecycle_worker.infrastructure.openstack_source_contract import configuration
 
+MIGRATION_API_CAPABILITIES = frozenset({"vm.disk.export"})
+
 
 def validate_capture(p: dict[str, Any], binding: NativeBinding) -> dict[str, Any]:
     shape(

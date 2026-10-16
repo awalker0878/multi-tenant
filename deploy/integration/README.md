@@ -86,7 +86,7 @@ owning-component label, OS and architecture; matching names alone are insufficie
 own unique cluster/namespace, private runtime directory and dedicated kubeconfig;
 the operator's current Kubernetes context is not used.
 
-The [Kubernetes integration workflow](../../.github/workflows/p01-kubernetes-integration.yml)
+The Kubernetes integration workflow
 runs installer tests before the campaign, has a 55-minute job limit and uploads
 the separate evidence directory even after failure. Its current artifact retention
 is 14 days. A failed or incomplete campaign remains a failure; the renderer's
@@ -106,7 +106,7 @@ pulled Cilium 1.20.2 with `mode: first_observed_candidate`, required exactly one
 digest in Helm's output, hashed the downloaded archive, rejected rendered images
 without immutable `@sha256` references and installed that same archive. Cilium
 installation completed before a later application health-contract assertion
-failed. Its [observed chart identities](../../verification/p01/kubernetes/run-37245679773/cilium-observed-lock.json)
+failed. Its observed chart identities
 are now recorded as `chart_sha256` and `chart_oci_digest` in `candidates.json`, with
 the source revision, workflow and retained artifact provenance. Subsequent
 campaigns must verify both and report `locked_replay`. The first observation was

@@ -255,7 +255,11 @@ def assess(
         "vcpus": sum(w["compute"]["vcpus"] for w in intent["workloads"]),
         "memory_mib": sum(w["compute"]["memory_mib"] for w in intent["workloads"]),
         "storage_gib": sum(d["size_gib"] for w in intent["workloads"] for d in w["disks"]),
-        "addresses": sum(len(w["nics"]) for w in intent["workloads"]),
+        "addresses": sum(
+            len(nic["address_families"])
+            for workload in intent["workloads"]
+            for nic in workload["nics"]
+        ),
     }
     for kind, amount in demand.items():
         capacity = destination["capacity"].get(kind)
@@ -289,11 +293,15 @@ def assess(
     )
     if native_snapshot is None:
         finding(
-            "network.native_policy", "unknown", "network_native_snapshot_missing",
+            "network.native_policy",
+            "unknown",
+            "network_native_snapshot_missing",
             "Measure required and forbidden paths on the exact native topology.",
         )
         finding(
-            "placement.native_isolation", "unknown", "isolation_native_snapshot_missing",
+            "placement.native_isolation",
+            "unknown",
+            "isolation_native_snapshot_missing",
             "Verify native project, domain bindings and negative traffic controls.",
         )
     else:
@@ -301,33 +309,64 @@ def assess(
             try:
                 checks = evaluator(intent, native_snapshot, policy, now)
                 for key, status, reason, mandatory in checks:
-                    finding(key, status, reason, "Refresh native route and firewall evidence.",
-                            mandatory=mandatory)
+                    finding(
+                        key,
+                        status,
+                        reason,
+                        "Refresh native route and firewall evidence.",
+                        mandatory=mandatory,
+                    )
             except (KeyError, TypeError, ValueError):
-                finding("network.native_policy", "unknown", "network_evidence_incomplete",
-                        "Commission native route, policy and measurement evidence.")
+                finding(
+                    "network.native_policy",
+                    "unknown",
+                    "network_evidence_incomplete",
+                    "Commission native route, policy and measurement evidence.",
+                )
         try:
             for key, status, reason, mandatory in isolation_checks(
                 intent, destination, native_snapshot, policy, now
             ):
-                finding(key, status, reason, "Refresh native isolation and negative controls.",
-                        mandatory=mandatory)
+                finding(
+                    key,
+                    status,
+                    reason,
+                    "Refresh native isolation and negative controls.",
+                    mandatory=mandatory,
+                )
         except (KeyError, TypeError, ValueError):
-            finding("placement.native_isolation", "unknown", "isolation_evidence_incomplete",
-                    "Commission native identity, policy and isolation measurements.")
+            finding(
+                "placement.native_isolation",
+                "unknown",
+                "isolation_evidence_incomplete",
+                "Commission native identity, policy and isolation measurements.",
+            )
     if native_snapshot is None and intent["datasets"]:
-        finding("recovery.native_measurement", "unknown", "restore_native_snapshot_missing",
-                "Measure a representative restore and application readiness.")
+        finding(
+            "recovery.native_measurement",
+            "unknown",
+            "restore_native_snapshot_missing",
+            "Measure a representative restore and application readiness.",
+        )
     elif native_snapshot is not None:
         try:
             for key, status, reason, mandatory in recovery_checks(
                 intent, destination, profile, policy, native_snapshot, now
             ):
-                finding(key, status, reason, "Run and review a representative native restore.",
-                        mandatory=mandatory)
+                finding(
+                    key,
+                    status,
+                    reason,
+                    "Run and review a representative native restore.",
+                    mandatory=mandatory,
+                )
         except (KeyError, TypeError, ValueError):
-            finding("recovery.native_measurement", "unknown", "restore_evidence_incomplete",
-                    "Commission dataset profiles, load and restore timing evidence.")
+            finding(
+                "recovery.native_measurement",
+                "unknown",
+                "restore_evidence_incomplete",
+                "Commission dataset profiles, load and restore timing evidence.",
+            )
     mandatory_states = {f["status"] for f in findings if f["mandatory"]}
     state = next(
         (s for s in ("blocked", "unknown", "conditional") if s in mandatory_states), "eligible"

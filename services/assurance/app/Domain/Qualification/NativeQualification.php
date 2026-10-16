@@ -20,6 +20,8 @@ final class NativeQualification
             && ($record['status'] ?? null) === 'qualified' && ($record['revoked'] ?? null) === false
             && in_array($record['evidence_level'] ?? null, ['E3', 'E4'], true) && ($record['expires_at'] ?? 0) > $now
             && self::canonical($record['scope'] ?? null) === self::canonical($scope), 'qualification_unverified');
+        // Reviewer-signed record input never owns the verifier's result field.
+        $this->require(! array_key_exists('verification', $record), 'qualification_reserved_field');
         $decision = $this->verify($bundle['decision'] ?? [], $keys, 'reviewer', $scope, $now);
         $this->require(($decision['kind'] ?? null) === 'qualification_decision'
             && ($decision['decision'] ?? null) === 'accepted_native'
@@ -37,6 +39,7 @@ final class NativeQualification
             $receipt = $this->verify($proof, $keys, 'observer', $scope, $now);
             $this->native($receipt, $scope);
             $this->require(($receipt['adapter_conformant'] ?? null) === true, 'adapter_runtime_mismatch');
+            $this->require(self::canonical($receipt['method_modes'] ?? null) === self::canonical($record['method_modes'] ?? null), 'installed_method_mode_evidence_drift');
             $evidence[] = $proof['sha256'];
             $observers[] = $receipt['subject_id'];
             $observerKeys[] = $receipt['_key_sha256'];
@@ -61,6 +64,7 @@ final class NativeQualification
         $this->require($now - $runtime['observed_at'] <= 60
             && $runtime['expires_at'] <= $runtime['observed_at'] + 120, 'runtime_observation_stale');
         $this->require(($runtime['adapter_conformant'] ?? null) === true, 'adapter_runtime_mismatch');
+        $this->require(self::canonical($runtime['method_modes'] ?? null) === self::canonical($record['method_modes'] ?? null), 'installed_method_mode_review_drift');
         $this->require(($runtime['decision_sha256'] ?? null) === $bundle['decision']['sha256'], 'runtime_decision_unbound');
         $expiry = min($expiry, $runtime['expires_at']);
         $this->require(($record['dimensions'] ?? []) === ($runtime['dimensions'] ?? null), 'runtime_dimensions_changed');
@@ -93,10 +97,10 @@ final class NativeQualification
             $expiry = min($expiry, $acceptance['expires_at']);
         }
 
-        return $record + ['verification' => ['valid' => true, 'definition_sha256' => CapabilityDefinitions::SHA256,
+        return array_replace($record, ['verification' => ['valid' => true, 'definition_sha256' => CapabilityDefinitions::SHA256,
             'decision_sha256' => $bundle['decision']['sha256'], 'runtime_sha256' => $bundle['runtime']['sha256'],
             'record_sha256' => self::digest($record), 'resolved_at' => $now, 'expires_at' => $expiry,
-            'acceptance_sha256' => $record['evidence_level'] === 'E4' ? $bundle['acceptance']['sha256'] : null]];
+            'acceptance_sha256' => $record['evidence_level'] === 'E4' ? $bundle['acceptance']['sha256'] : null]]);
     }
 
     /** @param array<string, mixed> $value
@@ -107,7 +111,7 @@ final class NativeQualification
     {
         $key = $keys[$value['key_id'] ?? ''] ?? null;
         $this->require(is_array($key) && ($key['role'] ?? null) === $role && ($key['expires_at'] ?? 0) > $now
-            && ($key['revoked'] ?? false) === false, 'evidence_key_unenrolled');
+            && ($key['revoked'] ?? null) === false, 'evidence_key_unenrolled');
         foreach (['tenant_id', 'site_id', 'endpoint_id'] as $field) {
             $this->require(($key['scope'][$field] ?? null) === ($scope[$field] ?? null), 'evidence_key_scope_denied');
         }
@@ -126,7 +130,13 @@ final class NativeQualification
             && is_int($receipt['observed_at'] ?? null) && $receipt['observed_at'] <= $now
             && ($receipt['expires_at'] ?? 0) > $now && $receipt['expires_at'] <= $key['expires_at'], 'evidence_scope_or_freshness_invalid');
 
-        return $receipt + ['_key_sha256' => hash('sha256', $details['key'])];
+        // Signed payload fields must not impersonate verifier-owned metadata.
+        // PHP array union would otherwise preserve an attacker-supplied key
+        // fingerprint and bypass independent observer/reviewer/receiver checks.
+        $this->require(! array_key_exists('_key_sha256', $receipt), 'evidence_reserved_field');
+        $receipt['_key_sha256'] = hash('sha256', $details['key']);
+
+        return $receipt;
     }
 
     /** @param array<string, mixed> $receipt
@@ -140,6 +150,72 @@ final class NativeQualification
             && ($receipt['cases']['adapter_behavior'] ?? null) === 'passed'
             && ($receipt['cases']['installed_identity'] ?? null) === 'passed'
             && ($receipt['cases']['runtime_artifacts'] ?? null) === 'passed', 'native_evidence_required');
+        $matrix = $receipt['method_modes'] ?? null;
+        $this->require(is_array($matrix), 'installed_method_mode_matrix_required');
+        $expected = [];
+        foreach (CapabilityDefinitions::WIRE_METHODS as $method) {
+            foreach (CapabilityDefinitions::MODES as $mode) {
+                $key = 'method:'.$method.':'.$mode;
+                $state = $matrix[$key] ?? null;
+                $this->require(in_array($state, ['passed', 'unsupported'], true)
+                    && ($receipt['cases'][$key] ?? null) === $state,
+                    'installed_method_mode_unverified');
+                $expected[$key] = true;
+            }
+        }
+        $this->require(count($matrix) === count($expected), 'installed_method_mode_matrix_incomplete');
+
+        // A generic successful restoration cannot qualify another method or
+        // mode. Verify current, exact-scope dataset readbacks independently of
+        // the producer-supplied overall adapter_conformant flag.
+        $measurements = $receipt['snapshot']['recovery_measurements'] ?? [];
+        $this->require(is_array($measurements) && array_is_list($measurements), 'native_recovery_readback_invalid');
+        $latest = [];
+        $seenSequences = [];
+        foreach ($measurements as $sample) {
+            $this->require(is_array($sample)
+                && in_array($sample['method'] ?? null, CapabilityDefinitions::WIRE_METHODS, true)
+                && in_array($sample['mode'] ?? null, CapabilityDefinitions::MODES, true)
+                && is_string($sample['dataset_id'] ?? null)
+                && strlen($sample['dataset_id']) >= 1 && strlen($sample['dataset_id']) <= 160
+                && is_int($sample['sequence'] ?? null) && $sample['sequence'] >= 1
+                && is_int($sample['observed_at'] ?? null)
+                && $sample['observed_at'] <= ($receipt['observed_at'] ?? -1)
+                && ($receipt['observed_at'] - $sample['observed_at']) <= 30
+                && ($sample['scope_sha256'] ?? null) === self::digest($scope)
+                && self::canonical($sample['artifacts'] ?? null) === self::canonical($scope['artifacts'] ?? null)
+                && is_string($sample['readback_sha256'] ?? null)
+                && preg_match('/^[0-9a-f]{64}$/D', $sample['readback_sha256']) === 1,
+                'native_recovery_readback_invalid');
+            $slot = $sample['method'].':'.$sample['mode'].':'.$sample['dataset_id'];
+            // Every sequence is unique within a dataset/method/mode, not
+            // merely distinct from the latest (highest) observed sequence.
+            $sequenceKey = $slot.':'.$sample['sequence'];
+            $this->require(! isset($seenSequences[$sequenceKey]), 'native_recovery_sequence_conflict');
+            $seenSequences[$sequenceKey] = true;
+            if (! isset($latest[$slot]) || $sample['sequence'] > $latest[$slot]['sequence']) {
+                $latest[$slot] = $sample;
+            }
+        }
+        foreach ($latest as $sample) {
+            $this->require(($sample['outcome'] ?? null) === 'passed'
+                && ($sample['consistency_passed'] ?? null) === true, 'native_latest_recovery_failed');
+        }
+        foreach (CapabilityDefinitions::WIRE_METHODS as $method) {
+            foreach (['rollback', 'forward_recovery', 'reverse_recovery'] as $mode) {
+                if (($matrix['method:'.$method.':'.$mode] ?? null) !== 'passed') {
+                    continue;
+                }
+                $covered = false;
+                foreach ($latest as $sample) {
+                    if ($sample['method'] === $method && $sample['mode'] === $mode) {
+                        $covered = true;
+                        break;
+                    }
+                }
+                $this->require($covered, 'native_recovery_readback_missing');
+            }
+        }
     }
 
     public static function digest(mixed $value): string

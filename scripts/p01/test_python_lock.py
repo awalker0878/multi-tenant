@@ -35,7 +35,10 @@ class PythonLockTest(unittest.TestCase):
                     expected.update({"pika": "1.4.4", "cryptography": "50.0.2",
                                      "cffi": "2.1.1", "pycparser": "3.0"})
                 if service == "lifecycle":
-                    expected.update({"temporalio": "1.34.0", "nexus-rpc": "1.4.0", "protobuf": "7.36.2", "types-protobuf": "7.35.1.20260906"})
+                    expected.update({"temporalio": "1.34.0", "nexus-rpc": "1.4.0", "protobuf": "7.36.2", "types-protobuf": "7.35.1.20260906",
+                                     "attrs": "26.1.0", "jsonschema": "4.26.0",
+                                     "jsonschema-specifications": "2025.9.1",
+                                     "referencing": "0.37.0", "rpds-py": "2026.9.1"})
                 self.assertEqual(inventory, expected)
 
     def test_workers_keep_only_owned_distribution_and_declared_runtime(self):

@@ -8,7 +8,7 @@ from openapi_spec_validator import validate_spec
 
 ROOT = Path(__file__).resolve().parents[2]
 fixture = json.loads((ROOT / 'contracts/fixtures/lifecycle/migration-stage-grant-v2.json').read_text())
-for name,request in [('lifecycle-migration-boundary-v2.json','BoundaryRequest'),('worker-migration-effect-v2.json','EffectRequest')]:
+for name,request in [('lifecycle-migration-boundary-v2.json','BoundaryRequest'),('worker-migration-effect-v2.1.json','EffectRequest')]:
     spec=json.loads((ROOT / 'contracts/openapi' / name).read_text())
     validate_spec(spec)
     validator=Draft202012Validator(spec['components']['schemas'][request],format_checker=FormatChecker())
@@ -32,12 +32,12 @@ from lifecycle.domain.migration import stages
 for method in DELTA:
     for mode in ('rehearsal', 'cutover', 'rollback', 'forward_recovery', 'reverse_recovery', 'cleanup'):
         assert stage_order(mode, method) == stages({'mode': mode, 'method': method})
-composition = json.loads((ROOT / 'contracts/openapi/planning-migration-v1.1.json').read_text())
-validate_spec(composition)
-for name in ('planning-v1.1.json', 'planning-migration-v1.1.json', 'planning-migration-v1.2.json'):
-    validate_spec(json.loads((ROOT / 'contracts/openapi' / name).read_text()))
-    assert (ROOT / 'contracts/openapi' / name).read_bytes() == (ROOT / 'apps/console/resources/contracts' / name).read_bytes()
-print('All thirty Planning method/mode stage orders match Lifecycle; composition v1.1 validates.')
+for name in ("planning-v1.2.json", "planning-migration-v2.json"):
+    spec = ROOT / "contracts/openapi" / name
+    validate_spec(json.loads(spec.read_text()))
+    if name == "planning-migration-v2.json":
+        assert spec.read_bytes() == (ROOT / "apps/console/resources/contracts" / name).read_bytes()
+print("Current Planning method/mode contracts validate; stage ordering matches Lifecycle.")
 
 campaign = json.loads((ROOT / 'contracts/openapi/lifecycle-migration-campaigns-v1.json').read_text())
 validate_spec(campaign)
@@ -47,6 +47,6 @@ for negative in ({'action': 'force', 'expected_revision': 1}, {'action': 'schedu
     assert list(validator.iter_errors(negative))
 print('Migration campaign contract is valid; bypass commands are denied.')
 
-for name in ('governance-native-approval-v1.json', 'inventory-native-input-v1.json'):
+for name in ('governance-native-approval-v1.1.json', 'inventory-native-input-v1.3.json'):
     validate_spec(json.loads((ROOT / 'contracts/openapi' / name).read_text()))
 print('Native consent and exact Inventory read contracts validate; consent never grants writes.')

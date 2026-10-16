@@ -13,7 +13,7 @@ beforeEach(function (): void {
     $this->author = federatedLogin($this, 'delegated-author');
     $this->serviceFiles = [];
     $this->serviceTokens = [];
-    foreach (['catalogue', 'planning', 'assurance'] as $service) {
+    foreach (['catalogue', 'planning', 'assurance', 'lifecycle'] as $service) {
         $this->serviceFiles[$service] = tempnam(sys_get_temp_dir(), 'p02-service-');
         $this->serviceTokens[$service] = bin2hex(random_bytes(32));
         file_put_contents($this->serviceFiles[$service], $this->serviceTokens[$service]);
@@ -22,6 +22,7 @@ beforeEach(function (): void {
     $this->input = ['audience' => 'catalogue', 'action' => 'application.read', 'scope' => ['site_id' => 'site-a', 'environment' => 'development', 'resource_id' => 'app-a']];
     $this->issuePath = '/v1/tenants/'.$this->tenant.'/actor-delegations';
     $this->inspectPath = '/v1/tenants/'.$this->tenant.'/delegated-authorizations';
+    $this->withHeader('Idempotency-Key', bin2hex(random_bytes(16)));
 });
 
 afterEach(function (): void {
@@ -36,7 +37,8 @@ afterEach(function (): void {
 
 function issueDelegation(object $test): array
 {
-    return $test->withHeader('Authorization', 'Bearer '.$test->workload)->withHeader('X-Console-Session', $test->author)
+    return $test->withHeader('Idempotency-Key', bin2hex(random_bytes(16)))
+        ->withHeader('Authorization', 'Bearer '.$test->workload)->withHeader('X-Console-Session', $test->author)
         ->postJson($test->issuePath, $test->input)->assertCreated()->json();
 }
 
@@ -145,4 +147,50 @@ it('fails closed on missing or shared service credentials and rolls back issuanc
     $this->withoutExceptionHandling();
     expect(fn () => $this->postJson($this->issuePath, $this->input))->toThrow(QueryException::class);
     expect(DB::table('app.actor_delegations')->count())->toBe(0);
+});
+
+it('issues lifecycle-scoped authority and rejects an authenticated foreign tenant', function (): void {
+    $operator = tenantMember($this, $this->tenant, 'delegated-operator', 'operator');
+    $session = federatedLogin($this, 'delegated-operator');
+    $scope = ['site_id' => 'site-a', 'environment' => 'development', 'resource_id' => 'app-a'];
+    $this->input = ['audience' => 'lifecycle', 'action' => 'operation.read', 'scope' => $scope];
+    $this->withHeader('Authorization', 'Bearer '.$this->workload)->withHeader('X-Console-Session', $session)
+        ->withHeader('Idempotency-Key', bin2hex(random_bytes(16)));
+    $grant = $this->postJson($this->issuePath, $this->input)->assertCreated()
+        ->assertJsonPath('audience', 'lifecycle')->json();
+    $this->withHeader('Authorization', 'Bearer '.$this->serviceTokens['lifecycle'])
+        ->withHeader('X-Console-Session', '')
+        ->withHeader('X-Actor-Delegation', $grant['delegation_token']);
+    $payload = ['action' => 'operation.read', 'scope' => $scope];
+    $result = $this->postJson($this->inspectPath, $payload)->assertOk()
+        ->assertJsonPath('actor_id', $operator['actor_id'])
+        ->assertJsonPath('audience', 'lifecycle')
+        ->assertJsonPath('tenant_id', $this->tenant)->json();
+    // Response fields are checked against the current contract in CI / Contracts.
+    // This isolated feature suite verifies actual authenticated actor authority.
+    expect(array_keys($result))->toContain('delegation_id', 'scope', 'expires_at', 'evaluated_at');
+    $foreignTenant = '550e8400-e29b-41d4-a716-446655440222';
+    $this->postJson('/v1/tenants/'.$foreignTenant.'/delegated-authorizations', $payload)->assertUnauthorized();
+    $this->postJson($this->inspectPath, ['action' => 'operation.read',
+        'scope' => array_replace($scope, ['resource_id' => 'other'])])->assertUnauthorized();
+});
+
+it('binds issuance keys to one grant without retaining or replaying bearer credentials', function (): void {
+    $key = bin2hex(random_bytes(16));
+    $this->withHeader('Idempotency-Key', $key);
+    $first = $this->withHeader('Authorization', 'Bearer '.$this->workload)
+        ->withHeader('X-Console-Session', $this->author)
+        ->postJson($this->issuePath, $this->input)->assertCreated()->json();
+    $this->postJson($this->issuePath, $this->input)->assertStatus(409)
+        ->assertJsonStructure(['code', 'message', 'correlation_id', 'retryable']);
+    expect(DB::table('app.actor_delegations')->count())->toBe(1)
+        ->and(DB::table('app.delegation_command_keys')->count())->toBe(1)
+        ->and(DB::table('app.delegation_audit')->where('event', 'issued')->count())->toBe(1)
+        ->and(json_encode(DB::table('app.delegation_command_keys')->get()))->not->toContain($first['delegation_token']);
+    $this->withHeader('Idempotency-Key', bin2hex(random_bytes(16)));
+    $this->postJson($this->issuePath, $this->input)->assertCreated();
+    expect(DB::table('app.actor_delegations')->count())->toBe(2);
+    $this->withHeader('Idempotency-Key', 'short');
+    $this->postJson($this->issuePath, $this->input)->assertUnprocessable()
+        ->assertJsonStructure(['code', 'message', 'correlation_id', 'retryable']);
 });

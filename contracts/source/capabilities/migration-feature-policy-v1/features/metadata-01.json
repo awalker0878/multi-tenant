@@ -1,0 +1,22 @@
+[
+  {
+    "id": "metadata.optional",
+    "label": "Nonessential labels, tags and conveniences",
+    "mapping": "conditional_optional",
+    "criticality": "optional",
+    "crosswalk_groups": [
+      "source.vm.display_name",
+      "target.optional.categories",
+      "owner.application.optional_tags",
+      "owner.operations.optional_integrations",
+      "source.ahv.identity.categories",
+      "source.openstack.storage.volume_metadata"
+    ],
+    "operator_attributes": [
+      "application.optional_tags",
+      "operations.optional_integrations"
+    ],
+    "qualification": "unqualified",
+    "notes": "Only proven nonfunctional optional omissions with E4 suppression are permitted."
+  }
+]

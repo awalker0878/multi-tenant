@@ -33,7 +33,7 @@ remain in progress or queued under [the phase card](phases/p02.md).
   Outbox transport/delivery is still future work; durable rows are not a claim
   that a consumer has received events.
 
-The implemented [HTTP contract](../../contracts/openapi/governance-local-identity-v1.json)
+The implemented [HTTP contract](../../contracts/openapi/governance-local-identity-v2.json)
 belongs to Governance, with Console as its consumer. Browser authority never
 substitutes for the mounted Console workload identity. Replacing/removing that
 file revokes the workload credential on the next request. Service trust uses
@@ -78,7 +78,7 @@ transaction-failure cases, actual-route CSRF/Host tests, frontend checks, and a
 dedicated PostgreSQL/browser workflow. The latter uses the pinned disposable
 PostgreSQL image, two simultaneous deployment terminals, runtime role denials,
 migration replay, real HTTP contract validation and the compiled Console journey.
-[EV-P02-001](../../verification/p02/identity/run-37324210957/report.json) records
+EV-P02-001 records
 32 passing checks at source `007cb7e4fe63ac3a851793682258ffe1d7fb6a57`:
 nine PostgreSQL feature tests (82 assertions), one compiled Chromium journey,
 verified database TLS, simultaneous terminal bootstrap, replay/role denials,
@@ -88,7 +88,7 @@ artifact digests match; all 165 bound source files match the delivered applicati
 The [retrieval record](../../verification/p02/identity/retrieval.json) identifies
 both immutable archives. The first run stopped before Console startup because
 its database fixture lacked Console's required TLS/mounted-password bindings;
-that failure remains [retained](../../verification/p02/identity/run-37323186027/report.json).
+that failure remains retained.
 
 Local full suites passed 46 Governance and 60 Console tests, both language-boundary
 and type checks, the frontend build/type checks, and 89 documentation/control tests.

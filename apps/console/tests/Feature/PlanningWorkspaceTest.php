@@ -71,3 +71,33 @@ it('binds request delegation and rejects extra response fields', function (): vo
         unlink($plan);
     }
 });
+
+it('validates migration Error v2 and binds query keys through the installed client', function (): void {
+    $gov = tempnam(sys_get_temp_dir(), 'migration-gov-');
+    $plan = tempnam(sys_get_temp_dir(), 'migration-plan-');
+    file_put_contents($gov, str_repeat('b', 64));
+    file_put_contents($plan, str_repeat('c', 64));
+    config(['identity.governance_url' => 'https://governance.example.test', 'identity.credential_file' => $gov, 'planning.url' => 'https://planning.example.test', 'planning.credential_file' => $plan, 'planning.ca_file' => $plan]);
+    $error = ['code' => 'revoked_membership', 'message' => 'revoked membership', 'correlation_id' => $this->id, 'retryable' => false];
+    Http::preventStrayRequests();
+    Http::fake(['governance.example.test/*' => Http::response(['delegation_token' => str_repeat('d', 64), 'audience' => 'planning', 'authority_use' => 'request_bound'], 201), 'planning.example.test/*' => Http::sequence()->push($error, 403)->push(['error' => 'revoked_membership'], 403)]);
+    try {
+        $client = app(PlanningClient::class);
+        try {
+            $client->call(str_repeat('a', 64), $this->id, $this->id, $this->id, 'POST', 'migration-support', [$this->id], ['site_id' => $this->id]);
+            $this->fail('A denied query cannot return a result.');
+        } catch (PlanningFailure $denied) {
+            expect($denied->status)->toBe(403)->and($denied->reason)->toBe('revoked_membership');
+        }
+        Http::assertSent(fn ($request) => str_contains($request->url(), 'planning.example.test') && $request->hasHeader('X-Actor-Delegation', str_repeat('d', 64)) && preg_match('/\A[0-9a-f-]{36}\z/', $request->header('Idempotency-Key')[0] ?? '') === 1);
+        try {
+            $client->call(str_repeat('a', 64), $this->id, $this->id, $this->id, 'POST', 'migration-support', [$this->id], ['site_id' => $this->id]);
+            $this->fail('An incompatible error envelope cannot be consumed.');
+        } catch (PlanningFailure $denied) {
+            expect($denied->status)->toBe(503)->and($denied->reason)->toBe('planning_unavailable');
+        }
+    } finally {
+        unlink($gov);
+        unlink($plan);
+    }
+});

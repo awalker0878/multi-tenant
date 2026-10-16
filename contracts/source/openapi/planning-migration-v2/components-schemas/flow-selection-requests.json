@@ -1,0 +1,96 @@
+{
+  "MigrationFlowChoiceRequest": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "site_id": {
+        "type": "string",
+        "format": "uuid"
+      }
+    },
+    "required": [
+      "site_id"
+    ]
+  },
+  "MigrationFlowSelectionRequest": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "site_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "revision": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 1000000
+      },
+      "context_sha256": {
+        "type": "string",
+        "pattern": "^[a-f0-9]{64}$"
+      },
+      "selections": {
+        "type": "array",
+        "maxItems": 512,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "source_flow_id": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "rule_native_ref": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "route_native_ref": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            }
+          },
+          "required": [
+            "source_flow_id",
+            "rule_native_ref",
+            "route_native_ref"
+          ]
+        }
+      },
+      "omissions": {
+        "type": "array",
+        "maxItems": 512,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "source_flow_id": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "reason_code": {
+              "enum": [
+                "retired_dependency",
+                "not_required_at_destination",
+                "replaced_by_native_service",
+                "accepted_service_limitation"
+              ]
+            }
+          },
+          "required": [
+            "source_flow_id",
+            "reason_code"
+          ]
+        }
+      }
+    },
+    "required": [
+      "site_id",
+      "revision",
+      "context_sha256",
+      "selections",
+      "omissions"
+    ]
+  }
+}

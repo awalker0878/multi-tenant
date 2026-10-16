@@ -75,7 +75,7 @@ Test partial page sets, hidden permissions, rate-limited endpoints, stale clocks
 ## Context source ownership and code control
 
 P08 adds immutable workload profiles and administrator migration reviews under
-[Inventory v1.2](../../contracts/openapi/inventory-v1.2.json). The scoped leased
+[Inventory v1.2](../../contracts/openapi/inventory-v1.9.json). The scoped leased
 collector authorizes and budgets every profile read, and publishes only a complete
 generation. Review revisions separate observed API facts from complete dataset maps,
 explicit method, owner-only references/objectives and reasoned interpretations.

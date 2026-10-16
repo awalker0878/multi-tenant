@@ -54,7 +54,7 @@ def main():
 
     try:
         check('disposable-postgres-only', os.environ.get('P02_TEST_POSTGRES') == '1')
-        paths = ['services/governance', 'contracts/schemas/events/governance-change-v1.json', 'contracts/asyncapi/governance.yaml', 'contracts/schemas/events/identity-change-v1.json', 'contracts/asyncapi/identity.yaml', 'contracts/schemas/events/support-change-v1.json', 'contracts/asyncapi/support.yaml', 'scripts/p02', '.github/workflows/p02-governance-events.yml']
+        paths = ['services/governance', 'contracts/schemas/events/governance-change-v1.json', 'contracts/asyncapi/governance.yaml', 'contracts/schemas/events/identity-change-v1.json', 'contracts/asyncapi/identity.yaml', 'contracts/schemas/events/support-change-v1.json', 'contracts/asyncapi/support.yaml', 'scripts/p02', '.github/workflows/qualification.yml']
         tracked = subprocess.check_output(['git', 'ls-files', '--', *paths], cwd=root, text=True).splitlines()
         report['source_sha256'] = {p: hashlib.sha256((root / p).read_bytes()).hexdigest() for p in tracked}
         check('clean-campaign-source', not subprocess.check_output(['git', 'status', '--porcelain', '--untracked-files=all', '--', *paths], cwd=root).strip())
@@ -93,7 +93,7 @@ def main():
                 mounts += ['-v', str(private / file) + ':/config/' + file + ':ro']
             run('broker-start', ['docker', 'run', '-d', '--name', name, '--hostname', 'p02-broker', '-p', '127.0.0.1:5679:5671',
                 '-e', 'RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=+S 2:2', '-e', 'RABBITMQ_CTL_ERL_ARGS=+S 2:2',
-                '--health-cmd', 'rabbitmq-diagnostics -q check_running', '--health-interval', '2s', '--health-retries', '45',
+                '--health-cmd', 'gosu rabbitmq rabbitmq-diagnostics -q check_running', '--health-interval', '2s', '--health-retries', '45',
                 '-v', str(private / 'rabbitmq.conf') + ':/etc/rabbitmq/rabbitmq.conf:ro', *mounts, reference], timeout=180)
             deadline = time.monotonic() + 90
             while True:
@@ -104,7 +104,7 @@ def main():
                     run('broker-startup-diagnostic', ['docker', 'logs', name])
                     raise RuntimeError('broker_not_ready')
                 time.sleep(1)
-            run('broker-ready', ['docker', 'exec', name, 'rabbitmq-diagnostics', '-q', 'check_port_connectivity', '--address', '127.0.0.1'], timeout=20)
+            run('broker-ready', ['docker', 'exec', '--user', 'rabbitmq', name, 'rabbitmq-diagnostics', '-q', 'check_port_connectivity', '--address', '127.0.0.1'], timeout=20)
             environment = os.environ | {'P02_TEST_BROKER': '1', 'GOVERNANCE_BROKER_HOST': '127.0.0.1', 'GOVERNANCE_BROKER_PORT': '5679',
                 'GOVERNANCE_BROKER_PASSWORD_FILE': str(private / 'governance.password'), 'GOVERNANCE_BROKER_CA_FILE': str(private / 'broker.crt'),
                 'P02_CONSOLE_PASSWORD_FILE': str(private / 'console.password'), 'P02_SUPPORT_AUDIT_PASSWORD_FILE': str(private / 'support-audit.password'),

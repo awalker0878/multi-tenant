@@ -2,6 +2,7 @@
 
 import argparse
 import os
+import re
 import time
 from collections.abc import Sequence
 from pathlib import Path
@@ -41,6 +42,66 @@ def execution_service() -> Execution:
     )
 
 
+HTTP_OPERATIONS = (
+    ("GET", "/internal/evidence-bindings/{tenant}/{job}"),
+    ("POST", "/internal/simulation-grants/redemptions"),
+    ("POST", "/internal/tenants/{tenant}/migration-observations/capacity"),
+    ("POST", "/internal/tenants/{tenant}/migration-observations/performance"),
+    ("POST", "/internal/tenants/{tenant}/migration-observations/release"),
+    ("POST", "/internal/tenants/{tenant}/placement-reservations/checks"),
+    ("POST", "/internal/tenants/{tenant}/placement-reservations/confirm"),
+    ("POST", "/internal/tenants/{tenant}/placement-reservations/release"),
+    ("POST", "/internal/tenants/{tenant}/placement-reservations/renew"),
+    ("POST", "/internal/tenants/{tenant}/placement-reservations/reserve"),
+    ("POST", "/v1/tenants/{tenant}/jobs"),
+    ("GET", "/v1/tenants/{tenant}/jobs/{job}"),
+    ("POST", "/v1/tenants/{tenant}/jobs/{job}/commands"),
+    ("GET", "/v1/tenants/{tenant}/migration-campaigns"),
+    ("POST", "/v1/tenants/{tenant}/migration-campaigns"),
+    ("GET", "/v1/tenants/{tenant}/migration-campaigns/{campaign}"),
+    ("POST", "/v1/tenants/{tenant}/migration-campaigns/{campaign}/commands"),
+)
+
+
+def _parameter_pattern(match: re.Match[str]) -> str:
+    name = match.group()[1:-1]
+    if name == "revision":
+        return r"[1-9][0-9]{0,8}"
+    if name == "digest":
+        return r"[0-9a-f]{64}"
+    return r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+
+
+HTTP_ROUTE_PATTERNS = tuple(
+    (verb, re.compile(re.sub(r"\{[a-z_]+\}", _parameter_pattern, path)))
+    for verb, path in HTTP_OPERATIONS
+)
+
+
+async def reject_unpublished_route(scope: Scope, send: ASGISendCallable) -> bool:
+    if scope["type"] != "http" or not scope["path"].startswith(("/v1/", "/internal/")):
+        return False
+    if any(
+        verb == scope["method"] and pat.fullmatch(scope["path"])
+        for verb, pat in HTTP_ROUTE_PATTERNS
+    ):
+        return False
+    body = b'{"error":"not_found"}'
+    await send(
+        {
+            "type": "http.response.start",
+            "status": 404,
+            "headers": [
+                (b"content-type", b"application/json"),
+                (b"cache-control", b"no-store"),
+                (b"content-length", str(len(body)).encode()),
+            ],
+        }
+    )
+    await send({"type": "http.response.body", "body": body})
+    return True
+
+
 class Router:
     def __init__(self) -> None:
         self.execution = ExecutionApp(execution_service(), ExecutionOwners())
@@ -58,7 +119,9 @@ class Router:
         self.placement = PlacementReservationApp(
             PlacementReservations(
                 Postgres(),
-                NativePoolSnapshots(Path(os.environ.get("LIFECYCLE_POOL_OWNERS_FILE", "/uncommissioned"))),
+                NativePoolSnapshots(
+                    Path(os.environ.get("LIFECYCLE_POOL_OWNERS_FILE", "/uncommissioned"))
+                ),
                 lambda: int(time.time()),
             ),
             capacity_caller,
@@ -68,6 +131,8 @@ class Router:
     async def __call__(
         self, scope: Scope, receive: ASGIReceiveCallable, send: ASGISendCallable
     ) -> None:
+        if await reject_unpublished_route(scope, send):
+            return
         if scope["type"] == "http" and "/placement-reservations/" in scope["path"]:
             await self.placement(scope, receive, send)
         elif scope["type"] == "http" and "/migration-observations/" in scope["path"]:

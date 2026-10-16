@@ -14,6 +14,7 @@ from test_planning_http import exchange
 from planning.application.migration_plans import MigrationPlans
 from planning.application.validation import MigrationValidation, PlanValidation
 from planning.domain.migration import bind_migration
+from planning.domain.migration_api_selection import pin as pin_api_selection
 from planning.domain.migration_plan import DELTA, compose_migration, stage_order
 from planning.domain.model import Actor, Rejected, digest
 from planning.infrastructure.migration_recipes import recipe_for
@@ -54,7 +55,7 @@ def values(
         "ownership": [],
         "native_api": {"custody_id": str(uuid4()), "custody_generation": 1},
     }
-    recipe = {
+    recipe: dict[str, Any] = {
         "schema_version": 1,
         "scope": scope,
         "base_content_sha256": digest(base),
@@ -108,6 +109,37 @@ def values(
         },
     }
     return base, bound, recipe
+
+
+def qualified_api_readiness(now: int = 1000) -> dict[str, Any]:
+    return {
+        "schema_version": 2,
+        "kind": "migration_workload_readiness",
+        "status": "eligible",
+        "holds": [],
+        "native_write_authorized": False,
+        "expires_at": now + 100,
+        "route_sha256": digest("route"),
+        "release_sha256": digest("release"),
+        "source": {"platform": "vmware", "profile_sha256": digest("src")},
+        "target": {"platform": "openstack", "profile_sha256": digest("tgt")},
+        "api_compatibility": {
+            "operationally_eligible": True,
+            "cases": [
+                {
+                    "capability_id": "vm.disk.export",
+                    "side": "source",
+                    "criticality": "critical",
+                    "status": "eligible",
+                    "omission_accepted": False,
+                    "selected_api_family": "vmware.vi_json",
+                    "selected_api_version": "9.0.0.0",
+                    "evidence_sha256": digest("native-e3"),
+                    "expires_at": now + 100,
+                }
+            ],
+        },
+    }
 
 
 @pytest.mark.parametrize(
@@ -211,14 +243,14 @@ def test_complete_plan_http_requires_idempotency_and_authority_before_compile() 
     authority, service = Mock(), Mock()
     service.create.return_value = {"native_write_authorized": False, "id": str(uuid4())}
     app: Any = MigrationPreparationApp(authority, Mock(), service)
-    body = {
+    body: dict[str, Any] = {
         "site_id": SITE,
         "review": {"revision": 1, "digest": digest("review")},
         "disks": mapping(),
         "recipe_id": str(uuid4()),
         "base_plan_id": str(uuid4()),
     }
-    headers = [
+    headers: list[Any] = [
         (b"authorization", b"Bearer " + b"a" * 64),
         (b"content-type", b"application/json"),
         (b"x-actor-delegation", b"b" * 64),
@@ -243,7 +275,9 @@ def test_plan_revalidation_observes_recipe_revocation_and_inventory_changes() ->
     planner = Mock()
     planner.clock.return_value = 1000
     prepare, recipes = Mock(return_value=bound), Mock(return_value=recipe)
-    validation = MigrationValidation(prepare, recipes, Mock(), planner.clock)
+    validation = MigrationValidation(
+        prepare, recipes, Mock(return_value=qualified_api_readiness()), planner.clock
+    )
     planner.validation.migration = validation
     service = MigrationPlans(planner, validation)
     content = compose_migration(base, bound, recipe, 1000)
@@ -254,8 +288,11 @@ def test_plan_revalidation_observes_recipe_revocation_and_inventory_changes() ->
         recipe["scope"]["resource_id"],
         recipe["scope"]["environment"],
     )
+    content["native_migration"]["api_selection"] = pin_api_selection(
+        qualified_api_readiness(), 1000
+    )
     content["native_migration"]["recipe_id"] = str(uuid4())
-    plan = {"content": content}
+    plan: dict[str, Any] = {"content": content}
     service.current(actor, plan, {recipe["scope"]["site_id"]: "delegation"})
     assert prepare.call_args.kwargs == {"action": "plan.read"}
     prepare.return_value = bound | {"owner_inputs_sha256": "e" * 64}
@@ -317,7 +354,9 @@ def test_complete_plan_options_persistence_retry_and_wire_schema(database: Any) 
     recipes = Mock(return_value=recipe)
     from planning.application.planning import Planning
 
-    validation = MigrationValidation(prepare, recipes, Mock(), planner.clock)
+    validation = MigrationValidation(
+        prepare, recipes, Mock(return_value=qualified_api_readiness(NOW)), planner.clock
+    )
     planner = Planning(
         planner.database,
         planner.sources,
@@ -327,7 +366,7 @@ def test_complete_plan_options_persistence_retry_and_wire_schema(database: Any) 
     service = MigrationPlans(
         planner, validation, lambda a, s: [{"id": recipe_id, "recipe": recipe}]
     )
-    body = {
+    body: dict[str, Any] = {
         "site_id": SITE,
         "review": bound["review"],
         "disks": [
@@ -345,7 +384,7 @@ def test_complete_plan_options_persistence_retry_and_wire_schema(database: Any) 
     assert receipt["native_write_authorized"] is False
     validity = planner.validity(actor, saved, {SITE: "delegation"})
     assert validity["current"] is True
-    spec = json.loads((Path(__file__).with_name("fixtures") / "planning-v1.1.json").read_text())
+    spec = json.loads((Path(__file__).with_name("fixtures") / "planning-v1.2.json").read_text())
     Draft202012Validator(
         {"$ref": "#/components/schemas/Plan", "components": spec["components"]},
         format_checker=FormatChecker(),
@@ -369,7 +408,16 @@ def test_unattended_execution_and_governance_reads_recheck_recipe_revocation() -
     base, bound, recipe = values()
     content = compose_migration(base, bound, recipe, 1000)
     content["native_migration"].update(recipe_id=str(uuid4()), base_plan_id=str(uuid4()))
-    payload = {"content": content, "binding": {"requested_by": str(uuid4())}}
+    content["native_migration"]["api_selection"] = pin_api_selection(
+        qualified_api_readiness(), 1000
+    )
+    payload: dict[str, Any] = {
+        "content": content,
+        "binding": {
+            "requested_by": str(uuid4()),
+            "tenant_id": recipe["scope"]["tenant_id"],
+        },
+    }
     database = MagicMock()
     tx = database.transaction.return_value.__enter__.return_value
     recipes = Mock(return_value=recipe)
@@ -380,25 +428,47 @@ def test_unattended_execution_and_governance_reads_recheck_recipe_revocation() -
     denied = Planning(database, Mock(), clock, PlanValidation.unavailable(clock))
     validation = PlanValidation.unavailable(clock)
     validation = PlanValidation(
-        validation.native, MigrationValidation(Mock(), recipes, Mock(), clock), Mock()
+        validation.native,
+        MigrationValidation(
+            Mock(),
+            recipes,
+            Mock(return_value=qualified_api_readiness()),
+            clock,
+        ),
+        Mock(),
     )
     planning = Planning(database, Mock(), clock, validation)
     key, tenant = str(uuid4()), recipe["scope"]["tenant_id"]
-    tx.one.side_effect = [{"payload": payload}]
+
+    # Query-aware test doubles must represent both the plan and its independent
+    # qualification head; static row lists silently under-count revalidation.
+    def record_lookup(query: str, args: Any) -> dict[str, Any] | None:
+        if "planning_plan_qualification_scopes" in query:
+            return {"scope_sha256": "a" * 64, "state": "qualified", "invalidated": False}
+        if "SELECT tenant,payload" in query:
+            assert "WHERE tenant=%s AND id=%s" in query
+            return {"tenant": tenant, "payload": payload} if args[0] == tenant else None
+        return {"payload": payload}
+
+    tx.one.side_effect = record_lookup
     with pytest.raises(Rejected, match="validation_authority"):
         denied.execution_plan(tenant, key, 1)
-    tx.one.side_effect = [{"payload": payload}, None, {"payload": payload}]
     assert planning.execution_plan(tenant, key, 1)["invalidated"] is False
-    assert planning.bound_plan(key, 1) == payload["binding"]
+    assert planning.bound_plan(tenant, key, 1) == payload["binding"]
+    with pytest.raises(Rejected, match="not_found"):
+        planning.bound_plan(str(uuid4()), key, 1)
     assert recipes.call_count == 2
+    payload["binding"]["tenant_id"] = str(uuid4())
+    with pytest.raises(Rejected, match="plan_tenant_mismatch"):
+        planning.bound_plan(tenant, key, 1)
+    payload["binding"]["tenant_id"] = tenant
     recipes.return_value = recipe | {"expires_at": 999}
     for native in (True, False):
-        tx.one.side_effect = [{"payload": payload}]
         with pytest.raises(Rejected, match="recipe_changed"):
             if native:
                 planning.execution_plan(tenant, key, 1)
             else:
-                planning.bound_plan(key, 1)
+                planning.bound_plan(tenant, key, 1)
 
 
 def test_ahv_recipe_binds_exact_reviewed_destination_devices() -> None:

@@ -13,6 +13,7 @@ from temporalio.service import TLSConfig
 from temporalio.api.workflowservice.v1 import RegisterNamespaceRequest
 from temporalio.worker import Replayer
 from lifecycle.bootstrap.server import execution_service
+from lifecycle.domain.execution import identity
 from lifecycle.infrastructure.store import Postgres
 from lifecycle.infrastructure.temporal import Dispatcher
 from lifecycle.infrastructure.workflows import SimulationJourney
@@ -58,15 +59,18 @@ async def main():
             raise RuntimeError('fault_not_injected')
         await Dispatcher(Postgres(),c).dispatch();return
     service=execution_service();tenant,job=sys.argv[2:4]
+    worker=identity(os.environ['LIFECYCLE_SIMULATION_WORKER_ID'])
     if mode=='reconcile':service.reconcile(tenant,job);return
     if mode=='checkpoint':service.checkpoint(tenant,job);return
     if mode in ['crash_before','crash_after']:
-        grant=service.acquire(tenant,job,sys.argv[4],'sim-worker')
+        grant=service.acquire(tenant,job,sys.argv[4],worker)
+        if grant.pop('completed') is not False:
+            raise RuntimeError('fault_requires_uncompleted_operation')
         path=Path(sys.argv[5]);path.write_text(json.dumps(grant));path.chmod(0o600)
         if mode=='crash_after':service.effects.execute(grant)
         os._exit(75)
     if mode=='effect':
-        result=service.activity(tenant,job,sys.argv[4],'sim-worker')
+        result=service.activity(tenant,job,sys.argv[4],worker)
         if result['state']!='confirmed_succeeded':raise RuntimeError(result['state'])
         return
     raise ValueError('unknown witness')

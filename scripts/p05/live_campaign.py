@@ -78,17 +78,31 @@ def campaign(c, extension=None):
         'from': 'foreign-tenant', 'to': model['intent']['workloads'][0]['id'],
         'protocol': 'tcp', 'port': 22,
     }]
+    # Current controlled E2 network and recovery policy inputs. These are
+    # simulation specimens, not enrolled reviewer/observer or provider evidence.
+    _, _, _, current_policy, _ = capability_fixture.inputs()
+    policy['recovery_profile'] = copy.deepcopy(current_policy['recovery_profile'])
+    flows = [d for d in model['intent']['dependencies'] if d['kind'] == 'communication'] + policy['forbidden_flows']
+    flows += [{'from': 'foreign-domain-'+str(i), 'to': w['id'], 'protocol': 'tcp', 'port': 22}
+              for i,w in enumerate(model['intent']['workloads'])]
+    policy['network_flow_contexts'] = {canonical_digest({k: flow[k] for k in ['from','to','protocol','port']}): {
+        'address_family': 'ipv4', 'vrf_id': 'p05-fixture-vrf-'+c['site'], 'vpc_id': 'p05-fixture-vpc-'+c['site'],
+        'direction': 'source_to_destination', 'return_path_policy': 'stateful_allow',
+    } for flow in flows}
     # Rewrite the independently mounted policy after adding the explicit assessment controls.
     registry_file.write_text(json.dumps(registry))
     quals={'schema_version':2,'records':[]}
     trust={'schema_version':1,'keys':{}}
-    for d in [a,b]:
+    def enroll_qualification(d, action='application.provision', method='native_api'):
+        enrolled_at=int(time.time())
+        capability_fixture.NOW=enrolled_at
         q=copy.deepcopy(model['qualification']);q['scope'].update({k:d[k] for k in ['tenant_id','site_id','endpoint_id','native_scope','installed_tuple']})
+        q['scope'].update(action=action,method=method)
         q['version']=2
-        capability_fixture.verify_fixture(q, now)
+        capability_fixture.verify_fixture(q, enrolled_at)
         d['capability_snapshot']=capability_fixture.snapshot_fixture(model['intent'],d,policy,q)
         bundle,keys=signed_fixture(
-            q,private/('fixture-keys-'+d['site_id']),inventory=d,
+            q,private/('fixture-keys-'+d['site_id']),now=enrolled_at,inventory=d,
             snapshot=d['capability_snapshot']['data'],
         )
         # Scope-specific enrolled keys; these are isolated E2 peer fixtures.
@@ -97,19 +111,31 @@ def campaign(c, extension=None):
             envelope['key_id']=prefix+envelope['key_id']
         trust['keys'].update({prefix+k:v for k,v in keys.items()})
         quals['records'].append(bundle)
+        return bundle
+    for d in [a,b]:
+        enroll_qualification(d)
     qualification_file=private/'qualification-registry.json';qualification_file.write_text(json.dumps(quals))
     qualification_file.chmod(0o600)
     trust_file=private/'qualification-trust.json';trust_file.write_text(json.dumps(trust));trust_file.chmod(0o600)
     envs['assurance']['ASSURANCE_QUALIFICATION_TRUST_FILE']=str(trust_file)
     runtime_file=private/'qualification-runtime.json'
-    c['proxies'].append(FixtureRuntimePublisher(runtime_file,quals,private))
+    runtime_publisher=FixtureRuntimePublisher(runtime_file,quals,private)
+    c['proxies'].append(runtime_publisher)
+    def publish_qualification(d, action, method):
+        enroll_qualification(d,action,method)
+        # Install trust and current proof before exposing the newly signed scope.
+        for path,value in [(trust_file,trust),(qualification_file,quals)]:
+            temporary=path.with_suffix('.next')
+            temporary.write_text(json.dumps(value));temporary.chmod(0o600)
+            temporary.replace(path)
+            if path==trust_file:runtime_publisher.refresh()
     envs['assurance']['ASSURANCE_QUALIFICATION_RUNTIME_FILE']=str(runtime_file)
     envs['planning']['PLANNING_REGISTRY_FILE']=str(registry_file)
     envs['assurance']['ASSURANCE_QUALIFICATION_REGISTRY_FILE']=str(qualification_file)
     for service in ['planning','assurance']:c['stop'](service);c['start'](service)
     candidates=[{k:d[k] for k in ['site_id','endpoint_id','generation_id']} for d in [a,b]]
     base=f'/v1/tenants/{tenant}/applications/{application}/environments/{environment}'
-    api=json.loads((root/'contracts/openapi/planning-v1.json').read_text());validate_spec(api)
+    api=json.loads((root/'contracts/openapi/planning-v1.2.json').read_text());validate_spec(api)
     def grants(sites,action='plan.create',token=None):
         headers=[]
         for site in dict.fromkeys(sites):
@@ -138,10 +164,13 @@ def campaign(c, extension=None):
     with ThreadPoolExecutor(2) as pool:replies=list(pool.map(lambda _:planning('assessments',create,key=key,expected=201),range(2)))
     check('live-concurrent-idempotency-one-result',replies[0]==replies[1])
     assessment=planning('assessments/'+replies[0]['id'])
+    (out/'initial-assessment.json').write_text(json.dumps(assessment,indent=2)+'\n')
     check('two-authorized-destinations-explain-positive-and-blocked',[r['status'] for r in assessment['results']]==['eligible','blocked'])
     planning('assessments',dict(create,method='native_api_export_import'),key=key,expected=409)
     req={'action':'application.provision','method':'native_api','lane':'operational','executor_ids':[fixture['operator_id']],'valid_until':int(time.time())+900}
-    first=planning('plans',{'assessment_id':assessment['id'],'candidate':0,'request':req},expected=201)
+    first_key=str(uuid.uuid4())
+    plan_body={'assessment_id':assessment['id'],'candidate':0,'request':req}
+    first=planning('plans',plan_body,key=first_key,expected=201)
     saved=planning('plans/'+first['id'],sites=[a['site_id']])
     check('immutable-plan-is-current-without-native-authority',saved['validity']['current'] and saved['content']['native_write_authorized'] is False)
     second=planning('plans',{'assessment_id':assessment['id'],'candidate':0,'request':req},expected=201)
@@ -155,10 +184,43 @@ def campaign(c, extension=None):
     check('real-governance-approval-content-binding-and-changed-digest-denial',True)
     c['stop']('planning');c['start']('planning')
     check('service-restart-preserves-immutable-plan',planning('plans/'+first['id'],sites=[a['site_id']])['content']==saved['content'])
-    original_qual=copy.deepcopy(quals);quals['records'][0]['record']['revoked']=True;qualification_file.write_text(json.dumps(quals))
+    original_qual=copy.deepcopy(quals)
+    revoked_qual=copy.deepcopy(quals);revoked_qual['records'][0]['record']['revoked']=True
+    qualification_file.write_text(json.dumps(revoked_qual))
     held=planning('plans/'+first['id'],sites=[a['site_id']])
     check('current-qualification-revocation-holds-without-changing-plan',not held['validity']['current'] and held['content']==saved['content'])
     qualification_file.write_text(json.dumps(original_qual))
+    # Challenge the shipped consumer and live denials while the author is
+    # currently authorized. The browser later revokes this same membership.
+    planning('plans/'+first['id']+'/validity',{},sites=[a['site_id']])
+    planning('plans/'+first['id']+'/diff',{'other_plan_id':second['id']},sites=[a['site_id']])
+    prefix='/v1/tenants/{tenant}/applications/{application}/environments/{environment}/'
+    read_faults=['id','tenant_id','application_id','environment']
+    binding_faults=['binding.plan_id','binding.tenant_id','binding.resource_id','binding.environment','binding.site_id']
+    calls=[]
+    for method,tail,template,body,idem,sites,faults,status in [
+        ('POST','assessments','assessments',create,key,[a['site_id'],b['site_id']],['kind'],201),
+        ('GET','assessments/'+assessment['id'],'assessments/{record}',[],None,[a['site_id'],b['site_id']],read_faults,200),
+        ('POST','plans','plans',plan_body,first_key,[a['site_id'],b['site_id']],['kind',*binding_faults],201),
+        ('GET','plans/'+first['id'],'plans/{record}',[],None,[a['site_id']],
+         [*read_faults,*binding_faults,*['content.scope.'+field for field in ['tenant_id','resource_id','environment','site_id']]],200),
+        ('POST','plans/'+first['id']+'/validity','plans/{record}/validity',{},str(uuid.uuid4()),[a['site_id']],[],200),
+        ('POST','plans/'+first['id']+'/diff','plans/{record}/diff',{'other_plan_id':second['id']},str(uuid.uuid4()),[a['site_id']],[],200),
+    ]:
+        calls.append({'method':method,'tail':tail,'path':prefix+template,'body':body,'key':idem,
+                      'sites':sites,'faults':[*faults,'uncontracted','status_code'],'status':status})
+    consumer_input=private/'planning-console-consumer.json'
+    consumer_input.write_text(json.dumps({'session':fixture['author_token'],'tenant':tenant,'application':application,
+        'environment':environment,'base':base,'fault_file':str(c['fault_file']),'calls':calls}))
+    consumer_input.chmod(0o600)
+    before_faults=sum(getattr(p,'injected',0) for p in c['proxies'])
+    run(['php','scripts/p05/verify_console_consumers.php',str(consumer_input),str(out/'planning-consumer-conformance.json')],
+        env=envs['console'],label='p05-real-console-contract-consumers')
+    check('p05-six-console-consumers-reject-response-substitutions',not c['fault_file'].exists()
+          and sum(getattr(p,'injected',0) for p in c['proxies'])-before_faults==sum(len(call['faults']) for call in calls))
+    from planning_security import security_probes
+    security_probes(c,calls,base,application,environment,[assessment['id'],first['id'],second['id'],binding['digest']])
+    faults_before_browser=sum(getattr(p,'injected',0) for p in c['proxies'])
     # Browser runs before queued historical hints conservatively invalidate existing plans.
     fixture.update(ca_file=str(c['certificate']),application=application,environment=environment,revision=revision,assessment=assessment['id'],sites=[a['site_id'],b['site_id']],site=a['site_id'],qualification_file=str(qualification_file),fault_file=str(c['fault_file']),planning_api_base=base,console_workload=credentials['console-governance'][0],governance_url='https://127.0.0.1:8442')
     c['fixture_file'].write_text(json.dumps(fixture))
@@ -167,7 +229,7 @@ def campaign(c, extension=None):
     browser_path=root/'apps/console/test-results/p05-browser.json';browser=json.loads(browser_path.read_text());(out/'browser.json').write_text(c['redact'](browser_path.read_text()));c['report']['browser_stats']=browser['stats']
     check('required-browser-no-skips-retries-or-failures',browser['config']['projects'][0]['name']==c['engine'] and browser['stats']['expected']==1 and all(browser['stats'][k]==0 for k in ['unexpected','flaky','skipped']))
     check('uncertain-browser-retry-created-one-plan',int(sql("SELECT count(*) FROM app.planning_records WHERE kind='plan';",'planning'))==before_plans+1)
-    check('post-commit-response-loss-was-injected',sum(getattr(p,'injected',0) for p in c['proxies'])==1)
+    check('post-commit-response-loss-was-injected',sum(getattr(p,'injected',0) for p in c['proxies'])==faults_before_browser+1)
     broker=PlanningBroker(root,private,run,private_values);c['proxies'].append(broker)
     envs['planning'].update(broker.environment);envs['inventory'].update(broker.environment)
     publisher=[str(root/'services/planning/.venv/bin/planning-facts'),'publish','--limit','100']

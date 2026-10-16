@@ -163,3 +163,19 @@ test('maps VMware placement, every disk and isolated NICs while preserving sourc
   await page.screenshot({ path: info.outputPath('vmware-destination.png'), fullPage: true });
   expect(errors).toEqual([]);
 });
+
+test('describes feature translations and separates mandatory Console evidence from native observations', async ({ page, request }) => {
+  await request.post('/__fixture', { data: { reset: true } });
+  const state = await (await request.get('/__fixture')).json();
+  await page.goto(base);
+  await page.getByLabel('Source VM profile').selectOption(state.workspace.profiles[0].id);
+  await page.getByLabel('Destination profile').selectOption(state.workspace.profiles[1].id);
+  await expect(page.getByRole('heading', { name: 'Cross-platform feature mapping (not qualification)' })).toBeVisible();
+  await expect(page.getByText('Mandatory operator and independent evidence', { exact: true })).toBeVisible();
+  await page.getByText('Show feature-by-feature mappings and migration holds').click();
+  await expect(page.getByText(/Required source attributes have not been observed/)).toBeVisible();
+  await page.getByText('Show all applicable owner, security and receiving requirements').click();
+  await expect(page.getByText('security · tenant isolation')).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Open operator readiness and independent verification' })).toHaveAttribute('href', new RegExp('/operator-inputs$'));
+  await expect(page.getByRole('button', { name: 'Save migration review', exact: true })).toBeDisabled();
+});

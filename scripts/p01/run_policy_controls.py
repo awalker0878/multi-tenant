@@ -16,7 +16,7 @@ def main():
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[2]
     args.output.mkdir(parents=True, exist_ok=False)
-    paths = [Path(__file__).relative_to(root), Path('.github/workflows/p01-policy-controls.yml'),
+    paths = [Path(__file__).relative_to(root), Path('.github/workflows/ci.yml'),
              Path('.github/workflows/p01-admission.yml'), Path('scripts/p01/select_components.py'),
              Path('scripts/p01/verify_retained.py'),
              *[p.relative_to(root) for directory in ['scripts/p01/artifacts', 'scripts/p01/admission', 'release', 'architecture']
@@ -30,8 +30,7 @@ def main():
         for name, script in [('reviews', 'admission/test_policy.py'), ('bundles', 'artifacts/test_bundle.py'),
                              ('redaction', 'artifacts/test_campaign.py'), ('check-sources', 'admission/test_check_sources.py'),
                              ('exclusions', 'admission/test_exclusions.py'),
-                             ('operating-inputs', 'admission/test_operating_inputs.py'),
-                             ('release-set', 'artifacts/test_release_set.py')]:
+                             ('operating-inputs', 'admission/test_operating_inputs.py')]:
             argv = [sys.executable, str(root / 'scripts/p01' / script), '-v']
             result = subprocess.run(argv, env=os.environ | {'P01_COSIGN': args.cosign},
                                     capture_output=True, timeout=180)

@@ -8,6 +8,7 @@ import pytest
 from planning_fixture import ACTOR, APP, ENDPOINT, ENV, GENERATION, SITE, TENANT
 
 from planning.domain.model import Actor, Rejected
+from planning.interfaces.migration import MigrationPreparationApp
 from planning.interfaces.planning import PlanningApp
 
 BASE = f"/v1/tenants/{TENANT}/applications/{APP}/environments/{ENV}"
@@ -15,7 +16,7 @@ CANDIDATE = {"site_id": SITE, "endpoint_id": ENDPOINT, "generation_id": GENERATI
 
 
 def exchange(
-    app: PlanningApp,
+    app: PlanningApp | MigrationPreparationApp,
     tail: str,
     body: bytes | None = None,
     headers: list[tuple[bytes, bytes]] | None = None,
@@ -136,7 +137,8 @@ def test_bounded_strict_request_precedes_source_reads(payload: bytes, expected: 
 
 def test_missing_workload_cannot_lookup_record() -> None:
     app, planning, _ = setup()
-    assert exchange(app, "/plans/" + str(uuid4()), headers=[])[0] == 400
+    # Missing bearer is an authentication failure, not a request-shape error.
+    assert exchange(app, "/plans/" + str(uuid4()), headers=[])[0] == 401
     planning.get.assert_not_called()
 
 

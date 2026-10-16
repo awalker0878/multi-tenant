@@ -30,10 +30,30 @@ def affected(paths, base_components, head_components, base_graph, head_graph):
         if path.startswith(('scripts/', '.github/', 'deploy/', 'release/', 'architecture/')):
             selected.update(ids)
         elif path.startswith('contracts/'):
-            found = set(base_graph.get('contracts', {}).get(path, [])) | set(head_graph.get('contracts', {}).get(path, []))
+            impacted = {path}
+            reverse = {}
+            for graph in (base_graph, head_graph):
+                for release in graph.get('active_releases', []):
+                    dependencies = release.get('depends_on', [])
+                    need(isinstance(dependencies, list) and all(isinstance(d, str) for d in dependencies),
+                         'invalid_contract_dependency_record')
+                    for dependency in dependencies:
+                        reverse.setdefault(dependency, set()).add(release['path'])
+            pending = [path]
+            while pending:
+                for dependent in reverse.get(pending.pop(), set()) - impacted:
+                    impacted.add(dependent)
+                    pending.append(dependent)
+            # Trusted Git bases may precede the release catalogue. Their original
+            # index remains input to conservative change-impact calculation.
+            found = {context for graph in (base_graph, head_graph) for canonical in impacted
+                     for context in graph.get('contracts', {}).get(canonical, [])}
+            found.update(context for graph in (base_graph, head_graph)
+                         for release in graph.get('active_releases', []) if release.get('path') in impacted
+                         for context in [release.get('owner'), *release.get('consumers', [])])
             if not found:
                 unknown.append(path)
-            selected.update(found or ids)
+            selected.update(found & ids or ids)
         elif path.startswith(('apps/', 'services/', 'workers/', 'packages/')):
             owners = {name for graph in (base_components, head_components) for name, item in graph.items()
                       if path == item['path'] or path.startswith(item['path'] + '/')}
@@ -45,11 +65,27 @@ def affected(paths, base_components, head_components, base_graph, head_graph):
             unknown.append(path); selected.update(ids)
         if path.startswith('tests/contracts/'):
             selected.update(ids)
+    # Derive impacted dependent components from each versioned release, not
+    # the removed, manually maintained architectural dependency map.
+    # Use BOTH base and head; removing an edge must not hide its former clients.
     edges = {}
     for graph in (base_graph, head_graph):
-        for consumer, producers in graph.get('dependencies', {}).items():
-            need(consumer in ids and set(producers) <= ids, 'unregistered_consumer')
-            edges.setdefault(consumer, set()).update(producers)
+        releases = graph.get('active_releases', [])
+        need(isinstance(releases, list), 'invalid_contract_release_inventory')
+        for release in releases:
+            need(isinstance(release, dict), 'invalid_contract_release_record')
+            owner = release.get('owner')
+            consumers = release.get('consumers', [])
+            need(isinstance(consumers, list) and all(isinstance(c, str) for c in consumers),
+                 'invalid_contract_consumer_record')
+            # Contract-platform is a shared specification, not a runnable
+            # service. Its change impact is directly captured by the
+            # release owner/consumer records above.
+            if owner not in ids:
+                continue
+            for consumer in consumers:
+                if consumer in ids and consumer != owner:
+                    edges.setdefault(consumer, set()).add(owner)
     for _ in range(len(ids) + 1):
         expanded = selected | {consumer for consumer, deps in edges.items() if deps & selected}
         if expanded == selected:

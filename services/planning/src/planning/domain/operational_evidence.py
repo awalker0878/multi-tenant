@@ -1,5 +1,6 @@
 """A declaration cannot replace a current evidence-bound native snapshot."""
 
+from copy import deepcopy
 from typing import Any
 
 from planning.domain.capability_definitions import DEFINITION_SHA256
@@ -30,8 +31,31 @@ def inventory_digest(destination: dict[str, Any]) -> str:
     data = {k: v for k, v in destination.items() if k != "expires_at"}
     current = data.get("capability_snapshot")
     if isinstance(current, dict):
-        data["capability_snapshot"] = {
-            k: v for k, v in current.items()
+        stable = {
+            k: v
+            for k, v in current.items()
             if k not in {"source_sha256", "observed_at", "expires_at"}
         }
+        measured = deepcopy(stable.get("data", {}))
+
+        def observation(value: dict[str, Any]) -> None:
+            # Only observation freshness is transport metadata. Sequence, scope,
+            # readback, policy and all actual recovery event times stay pinned.
+            value.pop("observed_at", None)
+            value.pop("expires_at", None)
+
+        network = measured.get("network", {})
+        for name in ("measurements", "return_paths"):
+            for row in network.get(name, []):
+                observation(row)
+        for row in network.get("application_flow_selections", {}).values():
+            observation(row)
+        isolation = measured.get("isolation", {})
+        observation(isolation)
+        for row in isolation.get("boundary_controls", {}).values():
+            observation(row)
+        for row in measured.get("recovery_measurements", []):
+            observation(row)
+        stable["data"] = measured
+        data["capability_snapshot"] = stable
     return digest(data)

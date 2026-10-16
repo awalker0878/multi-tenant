@@ -1,0 +1,74 @@
+[
+  {
+    "id": "app.datasets",
+    "label": "Dataset coverage and mounts",
+    "mapping": "operator_and_native",
+    "criticality": "critical",
+    "crosswalk_groups": [
+      "owner.application.datasets"
+    ],
+    "operator_attributes": [
+      "application.datasets"
+    ],
+    "qualification": "unqualified",
+    "notes": "Application owner maps all datasets to real disks and validates complete capture."
+  },
+  {
+    "id": "app.consistency",
+    "label": "Application consistency and quiescence",
+    "mapping": "operator_and_native",
+    "criticality": "critical",
+    "crosswalk_groups": [
+      "owner.application.consistency"
+    ],
+    "operator_attributes": [
+      "application.consistency"
+    ],
+    "qualification": "unqualified",
+    "notes": "Application-specific correctness requires owner protocols and native validation."
+  },
+  {
+    "id": "app.dependencies",
+    "label": "External service and application dependencies",
+    "mapping": "operator_and_native",
+    "criticality": "critical",
+    "crosswalk_groups": [
+      "owner.application.dependencies"
+    ],
+    "operator_attributes": [
+      "application.dependencies"
+    ],
+    "qualification": "unqualified",
+    "notes": "Identity, trust, backup, monitoring and app dependencies need owner mapping."
+  },
+  {
+    "id": "app.objectives",
+    "label": "Maximum outage and data loss",
+    "mapping": "operator_and_native",
+    "criticality": "critical",
+    "crosswalk_groups": [
+      "owner.application.outage_objective",
+      "owner.application.data_loss_objective"
+    ],
+    "operator_attributes": [
+      "application.outage_objective",
+      "application.data_loss_objective"
+    ],
+    "qualification": "unqualified",
+    "notes": "SLO/RTO/RPO targets are accepted by the application owner."
+  },
+  {
+    "id": "app.validation",
+    "label": "Post-migration application behavior",
+    "mapping": "operator_and_native",
+    "criticality": "critical",
+    "crosswalk_groups": [
+      "owner.guest.application_health"
+    ],
+    "operator_attributes": [
+      "guest.application_health"
+    ],
+    "qualification": "unqualified",
+    "notes": "VM power-on success is insufficient to prove application acceptance."
+  }
+]

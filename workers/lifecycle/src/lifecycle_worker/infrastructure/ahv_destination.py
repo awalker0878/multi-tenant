@@ -20,6 +20,8 @@ from lifecycle_worker.infrastructure.image_conversion import file_digest
 from lifecycle_worker.infrastructure.migration_custody import ArtifactCustody
 from lifecycle_worker.infrastructure.native_files import protected_read
 
+MIGRATION_API_CAPABILITIES = frozenset({"vm.disk.import"})
+
 
 def owned(document: dict[str, Any], key: str, p: dict[str, Any], b: NativeBinding) -> None:
     project = document.get("projectExtId", document.get("project", {}).get("extId"))

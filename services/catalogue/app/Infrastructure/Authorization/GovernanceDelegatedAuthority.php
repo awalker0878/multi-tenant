@@ -34,6 +34,7 @@ final class GovernanceDelegatedAuthority implements DelegatedAuthority
         }
         try {
             $response = Http::acceptJson()->asJson()->withToken($credential)->withHeader('X-Actor-Delegation', $token)
+                ->withHeader('Idempotency-Key', hash('sha256', json_encode(['tenant' => $tenant, 'action' => $action, 'scope' => $scope], JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES)))
                 ->connectTimeout(2)->timeout(5)->withOptions(['allow_redirects' => false, 'verify' => $ca ?? true])
                 ->post($base.'/v1/tenants/'.$tenant.'/delegated-authorizations', ['action' => $action, 'scope' => $scope]);
             if ($response->status() !== 200) {

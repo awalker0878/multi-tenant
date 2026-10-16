@@ -1,0 +1,67 @@
+"""Combine ephemeral, measured service-owned assurance observations into a coverage report."""
+from __future__ import annotations
+
+import argparse
+import json
+from pathlib import Path
+
+from assurance import assess
+from contract_io import read
+
+
+def combine(folder: Path) -> list[dict]:
+    # No checked-in JSON ledger can qualify a service. Only files created in
+    # ephemeral CI job workspaces are accepted by the workflow's download step.
+    paths = sorted(folder.rglob("*.json"))
+    # Missing upstream artifacts must produce a complete, red gap report rather
+    # than crashing before the report can be uploaded. No proof is inferred.
+    evidence = []
+    for file in paths:
+        value = read(file)
+        if not isinstance(value, list):
+            raise ValueError(f"Malformed measured contract assurance evidence: {file}")
+        evidence.extend(value)
+    return evidence
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--input-directory", required=True, type=Path)
+    parser.add_argument("--output", required=True, type=Path)
+    parser.add_argument("--require-qualified", action="store_true")
+    parser.add_argument("--journey-directory", type=Path)
+    args = parser.parse_args()
+    observations = combine(args.input_directory)
+    if args.journey_directory:
+        from journey_assurance import producers, security, consumers
+        observations.extend(producers(args.journey_directory, observations))
+        observations.extend(security(args.journey_directory, observations))
+        observations.extend(consumers(args.journey_directory, observations))
+    outcome = assess(observations=observations,
+                     require_provenance=args.require_qualified)
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    missing = (outcome["summary"]["unqualified_http_operations"]
+               + outcome["summary"]["unqualified_canonical_releases"])
+    by_claim = {}
+    missing_by_owner = {}
+    for row in [*outcome["coverage"], *(
+            release for release in outcome["release_coverage"]
+            if release["kind"] != "openapi")]:
+        owner = row.get("key", row.get("path", "unknown"))
+        for claim in row["missing"]:
+            by_claim[claim] = by_claim.get(claim, 0) + 1
+        if row["missing"]:
+            missing_by_owner[owner] = row["missing"]
+    outcome["missing_by_claim"] = by_claim
+    outcome["missing_by_boundary"] = missing_by_owner
+    args.output.write_text(json.dumps(outcome, indent=2) + "\n", encoding="utf-8")
+    print(json.dumps({"summary": outcome["summary"], "missing_by_claim": by_claim,
+                      "missing_boundaries": len(missing_by_owner)},
+                     indent=2, sort_keys=True))
+    # An incomplete report is a diagnostic, never a passing assurance decision.
+    # A release/qualification gate must explicitly request all evidence.
+    return int(args.require_qualified and missing > 0)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

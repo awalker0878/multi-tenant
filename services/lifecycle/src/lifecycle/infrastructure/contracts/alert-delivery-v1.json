@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.multi-tenant.local/contracts/schemas/lifecycle/alert-delivery-v1.json",
+  "title": "Lifecycle outbound held-state alert request and acknowledged receipt",
+  "description": "Contract-bound integration with a commissioned external alert sink; does not grant native-effect authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "command",
+    "receipt"
+  ],
+  "properties": {
+    "command": {
+      "$ref": "#/$defs/Command"
+    },
+    "receipt": {
+      "$ref": "#/$defs/Receipt"
+    }
+  },
+  "$defs": {
+    "Command": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "job_id",
+        "reason",
+        "simulation"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "job_id": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "simulation": {
+          "const": true
+        }
+      }
+    },
+    "Receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "event_id",
+        "acknowledged",
+        "receipt_id"
+      ],
+      "properties": {
+        "event_id": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "acknowledged": {
+          "const": true
+        },
+        "receipt_id": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        }
+      }
+    }
+  }
+}

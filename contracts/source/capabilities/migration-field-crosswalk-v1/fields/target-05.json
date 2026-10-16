@@ -1,0 +1,104 @@
+[
+  {
+    "canonical_id": "target.openstack.target.identity_catalog",
+    "scope": "target",
+    "relationship": "platform_specific",
+    "normalization": "no_direct_equivalent",
+    "platforms": {
+      "vmware": null,
+      "ahv": null,
+      "openstack": {
+        "manifest_attribute_ids": [
+          "target.identity_catalog"
+        ],
+        "api_fields": [
+          "GET /auth/catalog"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_list"
+        ],
+        "max_age_seconds": 3600,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 3600,
+    "semantic_constraints": "No safe field-level equivalent currently established in the other platforms; treat destination support as unknown and qualify a method or adapter.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "target.openstack.target.network_dhcp",
+    "scope": "target",
+    "relationship": "platform_specific",
+    "normalization": "no_direct_equivalent",
+    "platforms": {
+      "vmware": null,
+      "ahv": null,
+      "openstack": {
+        "manifest_attribute_ids": [
+          "target.network_dhcp"
+        ],
+        "api_fields": [
+          "subnets[*].enable_dhcp + dns_nameservers + allocation_pools"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_list"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "when:ip_assignment"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 60,
+    "semantic_constraints": "No safe field-level equivalent currently established in the other platforms; treat destination support as unknown and qualify a method or adapter.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "target.openstack.placement_traits",
+    "scope": "target",
+    "relationship": "platform_specific",
+    "normalization": "no_direct_equivalent",
+    "platforms": {
+      "vmware": null,
+      "ahv": null,
+      "openstack": {
+        "manifest_attribute_ids": [
+          "target.placement_traits"
+        ],
+        "api_fields": [
+          "GET /traits.traits[*]"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_list"
+        ],
+        "max_age_seconds": 120,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 120,
+    "semantic_constraints": "OpenStack Placement traits describe provider capabilities, not available vCPU/RAM, inventory allocations, or an exclusive reservation. A distinct owner capacity measurement is mandatory.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  }
+]

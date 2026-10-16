@@ -92,7 +92,7 @@ source/log bindings at evidence commit
 
 | Observation | Compose | Kubernetes |
 | --- | --- | --- |
-| Retained report | [Run 37278731868](../../verification/p01/local/run-37278731868/report.json) | [Run 37278731990](../../verification/p01/kubernetes/run-37278731990/report.json) |
+| Retained report | Run 37278731868 | Run 37278731990 |
 | Passing campaign checks | 249, including 70 telemetry checks | 266, including 70 telemetry checks |
 | Retained telemetry | 22 snapshots and three signal export files | 22 snapshots and three signal export files |
 | Collected journey population | 21 records, 21 spans, 21 metric series | 30 records, 30 spans, 21 metric series |

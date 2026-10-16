@@ -15,11 +15,11 @@ final class LoginLocalAdministrator
 {
     public function __construct(private readonly IssueLocalSession $sessions, private readonly CheckIdentityAdmission $admission) {}
 
-    public function handle(string $username, #[\SensitiveParameter] string $password): SessionCredentials
+    public function handle(string $username, #[\SensitiveParameter] string $password, string $key, #[\SensitiveParameter] string $workload): SessionCredentials
     {
         $this->admission->handle();
         // Return denials from the transaction so failed-attempt state is committed.
-        $result = DB::transaction(function () use ($username, $password): SessionCredentials|IdentityDenied {
+        $result = DB::transaction(function () use ($username, $password, $key, $workload): SessionCredentials|IdentityDenied {
             $administrator = BootstrapAdministrator::query()->lockForUpdate()->findOrFail(1);
             if (! $administrator->allowsLocalLogin()) {
                 return new IdentityDenied('invalid_credentials');
@@ -39,6 +39,7 @@ final class LoginLocalAdministrator
 
                 return new IdentityDenied('invalid_credentials');
             }
+            IdentityLedger::command('bootstrap-admin', 'loginLocalAdministrator', $key, $workload, ['username' => $username, 'password' => $password]);
             $administrator->forceFill(['failed_attempts' => 0, 'locked_until' => null])->save();
             IdentityLedger::record('identity.login.succeeded');
 

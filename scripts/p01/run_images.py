@@ -17,7 +17,7 @@ import tomllib
 from typing import Any
 
 from python_lock import production_inventory
-from alpine_inputs import validate_apks
+from alpine_inputs import validate_apks, validate_cache
 
 
 def sha256(path: Path) -> str:
@@ -66,7 +66,7 @@ def load_inputs(workspace: Path, component_id: str) -> tuple[dict[str, Any], dic
         require(component["target"] == "php-runtime", "Unexpected PHP target")
         expected_inputs.update({"composer.json", "composer.lock", "artisan", "app", "bootstrap/app.php",
                                "bootstrap/providers.php", "config", "public/index.php", "routes",
-                               "build/apk.lock.json", "build/download-apks.php"})
+                               "build/apk.lock.json", "build/download-apks.php", "build/apk-cache"})
         if component["id"] == "console":
             expected_inputs.update({"resources", "package.json", "package-lock.json", "tsconfig.json", "vite.config.ts"})
         if component_id == "catalogue":
@@ -129,6 +129,7 @@ def load_inputs(workspace: Path, component_id: str) -> tuple[dict[str, Any], dic
     if component['language'] == 'php':
         require((root / 'build/apk.lock.json').read_bytes() == apk_lock.read_bytes(),
                 'Owned APK closure differs from reviewed lock')
+        validate_cache(root / 'build/apk-cache', json.loads(apk_lock.read_bytes()))
         require('libpq=' + lock['runtime_os']['php_runtime_packages']['libpq'] in dockerfile,
                 'Runtime libpq differs from input lock')
     for key in bases:
@@ -263,7 +264,7 @@ def main() -> int:
     bound = sources + [workspace / path for path in (
         "scripts/p01/run_images.py", "deploy/build/components.json", "deploy/build/inputs.lock.json",
         "scripts/p01/python_lock.py", "scripts/p01/alpine_inputs.py", "deploy/build/alpine-packages.lock.json",
-        ".github/workflows/p01-images.yml", "scripts/p01/select_components.py",
+        ".github/workflows/qualification.yml", "scripts/p01/select_components.py",
         "scripts/p01/check_jobs.py", "scripts/p01/candidates.json",
     )]
     if component["language"] == "php":

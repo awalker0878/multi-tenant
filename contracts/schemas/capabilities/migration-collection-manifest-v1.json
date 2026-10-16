@@ -1,0 +1,663 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Migration VM collection manifest v1 — requirements, not evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "manifest_version",
+    "title",
+    "status",
+    "capability_registry",
+    "freshness_policy",
+    "collection_methods",
+    "documentation",
+    "platforms"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "manifest_version": {
+      "const": "1.0.0"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "const": "requirements_only_not_installed_support"
+    },
+    "capability_registry": {
+      "const": "contracts/capabilities/definitions-v1.json"
+    },
+    "freshness_policy": {
+      "type": "string",
+      "minLength": 25
+    },
+    "collection_methods": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "native_get",
+        "native_list",
+        "derive",
+        "operator",
+        "probe",
+        "independent"
+      ],
+      "properties": {
+        "native_get": {
+          "type": "string",
+          "minLength": 15
+        },
+        "native_list": {
+          "type": "string",
+          "minLength": 15
+        },
+        "derive": {
+          "type": "string",
+          "minLength": 15
+        },
+        "operator": {
+          "type": "string",
+          "minLength": 15
+        },
+        "probe": {
+          "type": "string",
+          "minLength": 15
+        },
+        "independent": {
+          "type": "string",
+          "minLength": 15
+        }
+      }
+    },
+    "documentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "vmware",
+        "ahv",
+        "openstack"
+      ],
+      "properties": {
+        "vmware": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^https://"
+          }
+        },
+        "ahv": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^https://"
+          }
+        },
+        "openstack": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^https://"
+          }
+        }
+      }
+    },
+    "platforms": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "vmware",
+        "ahv",
+        "openstack"
+      ],
+      "properties": {
+        "vmware": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "source_profile",
+            "target_profile",
+            "attributes"
+          ],
+          "properties": {
+            "source_profile": {
+              "const": "SourceWorkloadProfile"
+            },
+            "target_profile": {
+              "const": "TargetCapabilityProfile"
+            },
+            "attributes": {
+              "type": "array",
+              "minItems": 60,
+              "maxItems": 512,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "scope",
+                  "api_family",
+                  "api_field",
+                  "owner_evidence_field",
+                  "collection_method",
+                  "max_age_seconds",
+                  "severity",
+                  "condition",
+                  "collector_source",
+                  "collection_status"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*){1,7}$"
+                  },
+                  "scope": {
+                    "enum": [
+                      "source",
+                      "target",
+                      "owner"
+                    ]
+                  },
+                  "api_family": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+                  },
+                  "api_field": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "minLength": 1,
+                    "maxLength": 280
+                  },
+                  "owner_evidence_field": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "minLength": 1,
+                    "maxLength": 180
+                  },
+                  "collection_method": {
+                    "enum": [
+                      "native_get",
+                      "native_list",
+                      "derive",
+                      "operator",
+                      "probe",
+                      "independent"
+                    ]
+                  },
+                  "max_age_seconds": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 86400
+                  },
+                  "severity": {
+                    "enum": [
+                      "critical",
+                      "optional"
+                    ]
+                  },
+                  "condition": {
+                    "type": "string",
+                    "pattern": "^(always|cutover|when:[a-z][a-z0-9_]*)$"
+                  },
+                  "collector_source": {
+                    "type": "string",
+                    "pattern": "^(workers|services)/[a-z0-9_./-]+\\.py$"
+                  },
+                  "collection_status": {
+                    "enum": [
+                      "native_field_candidate",
+                      "external_evidence_required"
+                    ]
+                  }
+                },
+                "allOf": [
+                  {
+                    "if": {
+                      "properties": {
+                        "api_family": {
+                          "type": "null"
+                        }
+                      },
+                      "required": [
+                        "api_family"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "api_field": {
+                          "type": "null"
+                        },
+                        "owner_evidence_field": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "api_family": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "api_family"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "api_field": {
+                          "type": "string"
+                        },
+                        "owner_evidence_field": {
+                          "type": "null"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "collection_method": {
+                          "enum": [
+                            "operator",
+                            "independent",
+                            "probe"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "collection_method"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "collection_status": {
+                          "const": "external_evidence_required"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "ahv": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "source_profile",
+            "target_profile",
+            "attributes"
+          ],
+          "properties": {
+            "source_profile": {
+              "const": "SourceWorkloadProfile"
+            },
+            "target_profile": {
+              "const": "TargetCapabilityProfile"
+            },
+            "attributes": {
+              "type": "array",
+              "minItems": 60,
+              "maxItems": 512,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "scope",
+                  "api_family",
+                  "api_field",
+                  "owner_evidence_field",
+                  "collection_method",
+                  "max_age_seconds",
+                  "severity",
+                  "condition",
+                  "collector_source",
+                  "collection_status"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*){1,7}$"
+                  },
+                  "scope": {
+                    "enum": [
+                      "source",
+                      "target",
+                      "owner"
+                    ]
+                  },
+                  "api_family": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+                  },
+                  "api_field": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "minLength": 1,
+                    "maxLength": 280
+                  },
+                  "owner_evidence_field": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "minLength": 1,
+                    "maxLength": 180
+                  },
+                  "collection_method": {
+                    "enum": [
+                      "native_get",
+                      "native_list",
+                      "derive",
+                      "operator",
+                      "probe",
+                      "independent"
+                    ]
+                  },
+                  "max_age_seconds": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 86400
+                  },
+                  "severity": {
+                    "enum": [
+                      "critical",
+                      "optional"
+                    ]
+                  },
+                  "condition": {
+                    "type": "string",
+                    "pattern": "^(always|cutover|when:[a-z][a-z0-9_]*)$"
+                  },
+                  "collector_source": {
+                    "type": "string",
+                    "pattern": "^(workers|services)/[a-z0-9_./-]+\\.py$"
+                  },
+                  "collection_status": {
+                    "enum": [
+                      "native_field_candidate",
+                      "external_evidence_required"
+                    ]
+                  }
+                },
+                "allOf": [
+                  {
+                    "if": {
+                      "properties": {
+                        "api_family": {
+                          "type": "null"
+                        }
+                      },
+                      "required": [
+                        "api_family"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "api_field": {
+                          "type": "null"
+                        },
+                        "owner_evidence_field": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "api_family": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "api_family"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "api_field": {
+                          "type": "string"
+                        },
+                        "owner_evidence_field": {
+                          "type": "null"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "collection_method": {
+                          "enum": [
+                            "operator",
+                            "independent",
+                            "probe"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "collection_method"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "collection_status": {
+                          "const": "external_evidence_required"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "openstack": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "source_profile",
+            "target_profile",
+            "attributes"
+          ],
+          "properties": {
+            "source_profile": {
+              "const": "SourceWorkloadProfile"
+            },
+            "target_profile": {
+              "const": "TargetCapabilityProfile"
+            },
+            "attributes": {
+              "type": "array",
+              "minItems": 60,
+              "maxItems": 512,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "scope",
+                  "api_family",
+                  "api_field",
+                  "owner_evidence_field",
+                  "collection_method",
+                  "max_age_seconds",
+                  "severity",
+                  "condition",
+                  "collector_source",
+                  "collection_status"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*){1,7}$"
+                  },
+                  "scope": {
+                    "enum": [
+                      "source",
+                      "target",
+                      "owner"
+                    ]
+                  },
+                  "api_family": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+                  },
+                  "api_field": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "minLength": 1,
+                    "maxLength": 280
+                  },
+                  "owner_evidence_field": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "minLength": 1,
+                    "maxLength": 180
+                  },
+                  "collection_method": {
+                    "enum": [
+                      "native_get",
+                      "native_list",
+                      "derive",
+                      "operator",
+                      "probe",
+                      "independent"
+                    ]
+                  },
+                  "max_age_seconds": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 86400
+                  },
+                  "severity": {
+                    "enum": [
+                      "critical",
+                      "optional"
+                    ]
+                  },
+                  "condition": {
+                    "type": "string",
+                    "pattern": "^(always|cutover|when:[a-z][a-z0-9_]*)$"
+                  },
+                  "collector_source": {
+                    "type": "string",
+                    "pattern": "^(workers|services)/[a-z0-9_./-]+\\.py$"
+                  },
+                  "collection_status": {
+                    "enum": [
+                      "native_field_candidate",
+                      "external_evidence_required"
+                    ]
+                  }
+                },
+                "allOf": [
+                  {
+                    "if": {
+                      "properties": {
+                        "api_family": {
+                          "type": "null"
+                        }
+                      },
+                      "required": [
+                        "api_family"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "api_field": {
+                          "type": "null"
+                        },
+                        "owner_evidence_field": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "api_family": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "api_family"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "api_field": {
+                          "type": "string"
+                        },
+                        "owner_evidence_field": {
+                          "type": "null"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "collection_method": {
+                          "enum": [
+                            "operator",
+                            "independent",
+                            "probe"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "collection_method"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "collection_status": {
+                          "const": "external_evidence_required"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

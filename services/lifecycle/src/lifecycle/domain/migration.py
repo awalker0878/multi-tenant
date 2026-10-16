@@ -11,17 +11,17 @@ from lifecycle.domain.admission import digest
 from lifecycle.domain.capability_definitions import AFTER as AFTER
 from lifecycle.domain.capability_definitions import BEFORE as BEFORE
 from lifecycle.domain.capability_definitions import (
-    LEGACY_METHODS,
     METHOD_DELTA,
     RECOVERY_MODES,
     STAGES,
+    WIRE_METHODS,
 )
 from lifecycle.domain.capability_definitions import MODES as MODES
 from lifecycle.domain.capability_definitions import TERMINALS as TERMINALS
 from lifecycle.domain.execution import Rejected, identity
 from lifecycle.domain.native_workflow import checksum, exact, integer
 
-METHODS = LEGACY_METHODS
+METHODS = WIRE_METHODS
 RECOVERY = RECOVERY_MODES
 DELTA = frozenset(
     method for method, kind in METHOD_DELTA.items() if kind in {"application", "file"}

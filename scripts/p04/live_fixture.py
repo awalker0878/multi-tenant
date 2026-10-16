@@ -10,6 +10,7 @@ import ssl
 import subprocess
 import threading
 import time
+import uuid
 from urllib.parse import parse_qs, urlsplit
 
 
@@ -104,7 +105,26 @@ class TlsProxy:
                     connection.request(self.command, self.path, body, dict(self.headers))
                     response = connection.getresponse()
                     wire = response.read()
+                    response_status = response.status
                     peer.forwarded += 1
+                    if peer.fault_file and peer.fault_file.exists() and 200 <= response.status < 300:
+                        rule = json.loads(peer.fault_file.read_text())
+                        if rule.get('mode') == 'poison_response' and rule.get('path') == self.path and rule.get('method') == self.command:
+                            data = json.loads(wire)
+                            field = rule['field']
+                            if field == 'status_code':
+                                response_status = 201 if response.status == 200 else 200
+                            else:
+                                parts = field.split('.')
+                                target = data
+                                for part in parts[:-1]:
+                                    target = target[part]
+                                target[parts[-1]] = (True if field == 'uncontracted' else
+                                    ('assessment' if data['kind'] == 'plan' else 'plan') if field == 'kind' else
+                                    '0'*64 if parts[-1] == 'digest' else str(uuid.uuid4()))
+                            wire = json.dumps(data).encode()
+                            peer.fault_file.unlink()
+                            peer.injected += 1
                     inject = False
                     if peer.fault_file and peer.fault_file.exists() and self.command == 'POST' and response.status == 201:
                         rule = json.loads(peer.fault_file.read_text())
@@ -114,7 +134,7 @@ class TlsProxy:
                             peer.injected += 1
                     if inject:
                         wire = b'{"error":"synthetic_response_loss"}'
-                    self.send_response(503 if inject else response.status)
+                    self.send_response(503 if inject else response_status)
                     for name, value in response.getheaders():
                         if name.lower() not in ['content-length', 'transfer-encoding', 'connection']:
                             self.send_header(name, value)

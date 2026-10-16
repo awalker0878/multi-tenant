@@ -1,0 +1,61 @@
+{
+  "/v1/tenants/{tenant}/sites/{site}/health": {
+    "get": {
+      "operationId": "siteHealth",
+      "x-inventory-action": "inventory.read",
+      "x-response-schema": "Health",
+      "x-status": 200,
+      "parameters": [
+        {
+          "name": "tenant",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "site",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Authorized result",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Health"
+              }
+            }
+          }
+        },
+        "default": {
+          "description": "No disclosed operational details",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Error"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

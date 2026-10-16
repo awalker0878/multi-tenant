@@ -41,7 +41,7 @@ illustrates the shape and supplies no deployable production inputs.
 
 Assurance independently mounts `ASSURANCE_QUALIFICATION_REGISTRY_FILE`, at most
 512 KiB, with `schema_version: 1` and `records` conforming to the
-[qualification schema](../../../contracts/schemas/planning/qualification-v1.json).
+[qualification schema](../../../contracts/schemas/planning/qualification-v3.json).
 Only independently authorized Assurance custody publishes or revokes a dossier.
 Exact scope includes tenant/site/endpoint/native scope/installed tuple, action,
 method, profile and artifacts. E3/E4 evidence must actually exist, be current and

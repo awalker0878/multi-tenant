@@ -61,7 +61,7 @@ def main() -> int:
         report['generator_version'] = run('generator-version', ['openapi-generator-cli', 'version']).strip()
         if report['generator_version'] != '7.25.0':
             raise ValueError('Unexpected generator version')
-        run('compatibility-negative-cases', [sys.executable, str(HERE / 'test_compatibility.py')])
+        run('active-release-negative-cases', [sys.executable, str(HERE / 'test_compatibility.py')])
         if args.base:
             report['compatibility'] = check(ROOT, args.base)
         else:

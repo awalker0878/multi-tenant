@@ -5,6 +5,7 @@ import json
 import os
 import ssl
 from importlib.resources import files
+from types import MappingProxyType
 from typing import Any
 from uuid import uuid4
 
@@ -14,6 +15,8 @@ from jsonschema import Draft202012Validator
 from planning.application.planning import Planning
 from planning.domain.model import Rejected, decode
 from planning.infrastructure.foundation import mounted_secret, required
+
+FACT_FILES = MappingProxyType({"inventory": "inventory.json", "catalogue": "catalogue.json"})
 
 
 def connection() -> Any:
@@ -63,7 +66,7 @@ def publish(fact: dict[str, Any]) -> None:
 
 
 def consume_one(channel: Any, planning: Planning, owner: str) -> str:
-    if owner not in {"inventory", "catalogue"}:
+    if owner not in FACT_FILES:
         raise ValueError("invalid_owner")
     queue = "planning.inventory" if owner == "inventory" else "planning.intent"
     method, properties, raw = channel.basic_get(queue, auto_ack=False)
@@ -78,7 +81,7 @@ def consume_one(channel: Any, planning: Planning, owner: str) -> str:
             raise Rejected("producer_or_message_bound")
         event = decode(raw)
         schema = json.loads(
-            files("planning.infrastructure.facts").joinpath(owner + ".json").read_text()
+            files("planning.infrastructure.facts").joinpath(FACT_FILES[owner]).read_text()
         )
         if (
             not Draft202012Validator(schema).is_valid(event)

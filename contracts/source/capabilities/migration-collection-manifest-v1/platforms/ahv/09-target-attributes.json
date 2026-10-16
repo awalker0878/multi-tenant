@@ -1,0 +1,28 @@
+[
+  {
+    "id": "target.subnet_external",
+    "scope": "target",
+    "api_family": "networking",
+    "api_field": "subnets[*].isExternal",
+    "owner_evidence_field": null,
+    "collection_method": "native_list",
+    "max_age_seconds": 60,
+    "severity": "critical",
+    "condition": "when:external_connectivity",
+    "collector_source": "workers/inventory/src/inventory_worker/infrastructure/ahv_profile.py",
+    "collection_status": "native_field_candidate"
+  },
+  {
+    "id": "target.subnet_vpc",
+    "scope": "target",
+    "api_family": "networking",
+    "api_field": "subnets[*].vpcReference",
+    "owner_evidence_field": null,
+    "collection_method": "native_list",
+    "max_age_seconds": 60,
+    "severity": "critical",
+    "condition": "when:vpc_required",
+    "collector_source": "workers/inventory/src/inventory_worker/infrastructure/ahv_profile.py",
+    "collection_status": "native_field_candidate"
+  }
+]

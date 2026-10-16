@@ -1,0 +1,517 @@
+[
+  {
+    "canonical_id": "source.disks.complete",
+    "scope": "source",
+    "relationship": "conditional",
+    "normalization": "complete_disk_enumeration",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "storage.disk_inventory"
+        ],
+        "api_fields": [
+          "VirtualMachine.config.hardware.device[*]._typeName=VirtualDisk"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "storage.disk_inventory"
+        ],
+        "api_fields": [
+          "data.disks[*].extId"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": {
+        "manifest_attribute_ids": [
+          "storage.volume_attachments",
+          "storage.server_volume_refs"
+        ],
+        "api_fields": [
+          "GET /servers/{id}/os-volume_attachments.volumeAttachments[*].volumeId",
+          "server.os-extended-volumes:volumes_attached"
+        ],
+        "owner_evidence_fields": [
+          null,
+          null
+        ],
+        "methods": [
+          "native_list",
+          "native_get"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 60,
+    "semantic_constraints": "Nova attachment list omits image-backed local root and ephemeral disks.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.disk.native_identity",
+    "scope": "source",
+    "relationship": "conditional",
+    "normalization": "native_per_disk_fingerprint",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "storage.disk_identity"
+        ],
+        "api_fields": [
+          "VirtualDisk.key + backing"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "derive"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "storage.disk_backing_identity"
+        ],
+        "api_fields": [
+          "data.disks[*].backingInfo"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": {
+        "manifest_attribute_ids": [
+          "storage.volume_id"
+        ],
+        "api_fields": [
+          "volume.id"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "when:volume_backed"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 60,
+    "semantic_constraints": "Native disk keys/volume IDs are never portable.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.disk.capacity_bytes",
+    "scope": "source",
+    "relationship": "conditional",
+    "normalization": "gib_to_bytes_per_disk",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "storage.disk_size"
+        ],
+        "api_fields": [
+          "VirtualDisk.capacityInBytes"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 120,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "storage.disk_capacity"
+        ],
+        "api_fields": [
+          "data.disks[*].backingInfo.diskSizeBytes"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 120,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": {
+        "manifest_attribute_ids": [
+          "storage.volume_size",
+          "compute.local_disk_gib"
+        ],
+        "api_fields": [
+          "volume.size",
+          "flavor.disk"
+        ],
+        "owner_evidence_fields": [
+          null,
+          null
+        ],
+        "methods": [
+          "native_get",
+          "native_get"
+        ],
+        "max_age_seconds": 120,
+        "severity": "critical",
+        "conditions": [
+          "when:volume_backed",
+          "always"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 120,
+    "semantic_constraints": "Cinder/Flavor sizes are GiB; retain separate root/volume device identities.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.disk.controller",
+    "scope": "source",
+    "relationship": "conditional",
+    "normalization": "guest_controller_bus_adapter",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "storage.disk_controller"
+        ],
+        "api_fields": [
+          "VirtualDisk.controllerKey + unitNumber"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 120,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "storage.disk_address",
+          "storage.disk_bus"
+        ],
+        "api_fields": [
+          "data.disks[*].diskAddress.index",
+          "data.disks[*].diskAddress.busType"
+        ],
+        "owner_evidence_fields": [
+          null,
+          null
+        ],
+        "methods": [
+          "native_get",
+          "native_get"
+        ],
+        "max_age_seconds": 120,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": {
+        "manifest_attribute_ids": [
+          "guest.boot_device"
+        ],
+        "api_fields": [
+          "server.OS-EXT-SRV-ATTR:root_device_name"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 120,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 120,
+    "semantic_constraints": "SCSI/NVMe controller key, AHV bus/index, and Nova root name differ.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.disk.backing",
+    "scope": "source",
+    "relationship": "conditional",
+    "normalization": "qualified_storage_backing_adapter",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "storage.disk_backing_chain"
+        ],
+        "api_fields": [
+          "VirtualDisk.backing.parent[*] + _typeName"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "storage.disk_backing_type",
+          "storage.storage_config"
+        ],
+        "api_fields": [
+          "data.disks[*].backingInfo.$objectType",
+          "data.storageConfig"
+        ],
+        "owner_evidence_fields": [
+          null,
+          null
+        ],
+        "methods": [
+          "native_get",
+          "native_get"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": {
+        "manifest_attribute_ids": [
+          "storage.volume_type",
+          "storage.volume_image_metadata"
+        ],
+        "api_fields": [
+          "volume.volume_type",
+          "volume.volume_image_metadata"
+        ],
+        "owner_evidence_fields": [
+          null,
+          null
+        ],
+        "methods": [
+          "native_get",
+          "native_get"
+        ],
+        "max_age_seconds": 120,
+        "severity": "critical",
+        "conditions": [
+          "when:volume_backed"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 60,
+    "semantic_constraints": "Backings and snapshot chains do not map one-to-one.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.disk.sharing",
+    "scope": "source",
+    "relationship": "conditional",
+    "normalization": "shared_writer_classification",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "storage.disk_sharing"
+        ],
+        "api_fields": [
+          "VirtualDisk.backing.sharing + controller.sharedBus"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "storage.shared_external"
+        ],
+        "api_fields": [
+          "data.disks[*].backingInfo.$objectType + owner_mapping"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "derive"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": {
+        "manifest_attribute_ids": [
+          "storage.multiattach",
+          "storage.attachments"
+        ],
+        "api_fields": [
+          "volume.multiattach",
+          "volume.attachments[*].server_id"
+        ],
+        "owner_evidence_fields": [
+          null,
+          null
+        ],
+        "methods": [
+          "native_get",
+          "native_get"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "when:volume_backed"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 60,
+    "semantic_constraints": "Shared/external disks and multiattach require fencing and special methods.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.disk.encryption",
+    "scope": "source",
+    "relationship": "conditional",
+    "normalization": "separate_key_custody",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "storage.disk_encryption"
+        ],
+        "api_fields": [
+          "VirtualDisk.backing.keyId + VirtualMachine.config.keyId"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": {
+        "manifest_attribute_ids": [
+          "storage.encryption"
+        ],
+        "api_fields": [
+          null
+        ],
+        "owner_evidence_fields": [
+          "storage_encryption_and_key_custody"
+        ],
+        "methods": [
+          "operator"
+        ],
+        "max_age_seconds": 300,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "openstack": {
+        "manifest_attribute_ids": [
+          "storage.encrypted"
+        ],
+        "api_fields": [
+          "volume.encrypted"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "when:volume_backed"
+        ]
+      }
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 60,
+    "semantic_constraints": "Boolean or key ID does not establish exportable encryption keys.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  }
+]

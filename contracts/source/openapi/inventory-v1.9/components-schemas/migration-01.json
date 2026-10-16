@@ -1,0 +1,916 @@
+{
+  "MigrationDataset": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 240
+      },
+      "disk_keys": {
+        "type": "array",
+        "items": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "maxItems": 32,
+        "minItems": 1,
+        "uniqueItems": true
+      },
+      "mounts": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240
+        },
+        "maxItems": 32,
+        "minItems": 1
+      },
+      "consistency_group": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 240
+      },
+      "validation_reference": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 240
+      }
+    },
+    "required": [
+      "id",
+      "name",
+      "disk_keys",
+      "mounts",
+      "consistency_group",
+      "validation_reference"
+    ]
+  },
+  "MigrationObjectives": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "owner_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "acceptance_sha256": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "max_outage_seconds": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 31536000
+      },
+      "max_data_loss_bytes": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 9007199254740991
+      }
+    },
+    "required": [
+      "owner_id",
+      "acceptance_sha256",
+      "max_outage_seconds",
+      "max_data_loss_bytes"
+    ]
+  },
+  "MigrationReviewInput": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "source_profile_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "target_profile_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "method": {
+        "enum": [
+          "APPLICATION_REBUILD_RESTORE",
+          "VM_SNAPSHOT_BASELINE_APP_DELTA",
+          "VM_SNAPSHOT_BASELINE_FILE_DELTA",
+          "VM_COLD_EXPORT",
+          "EXTERNAL_BLOCK_REPLICATION"
+        ]
+      },
+      "datasets": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/MigrationDataset"
+        },
+        "maxItems": 256,
+        "minItems": 1
+      },
+      "owner_inputs": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "application_consistency": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240
+          },
+          "dependencies": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240
+          },
+          "guest_transformation_profile": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240
+          },
+          "delta_protocol": {
+            "type": "string",
+            "minLength": 0,
+            "maxLength": 240
+          },
+          "recovery_protocol": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240
+          },
+          "service_and_policy_validation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240
+          },
+          "writer_fencing": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240
+          },
+          "retention_and_cleanup": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240
+          }
+        },
+        "required": [
+          "application_consistency",
+          "dependencies",
+          "guest_transformation_profile",
+          "delta_protocol",
+          "recovery_protocol",
+          "service_and_policy_validation",
+          "writer_fencing",
+          "retention_and_cleanup"
+        ]
+      },
+      "objectives": {
+        "$ref": "#/components/schemas/MigrationObjectives"
+      },
+      "overrides": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "field": {
+              "enum": [
+                "application_consistency",
+                "dependencies",
+                "guest_transformation_profile",
+                "delta_protocol",
+                "recovery_protocol",
+                "service_and_policy_validation",
+                "writer_fencing",
+                "retention_and_cleanup"
+              ]
+            },
+            "interpretation": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 240
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 240
+            }
+          },
+          "required": [
+            "field",
+            "interpretation",
+            "reason"
+          ]
+        },
+        "maxItems": 8
+      },
+      "destination": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/AhvDestinationSelection"
+          },
+          {
+            "$ref": "#/components/schemas/VmwareDestinationSelection"
+          },
+          {
+            "$ref": "#/components/schemas/OpenstackSecurityDestinationSelection"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      }
+    },
+    "required": [
+      "source_profile_id",
+      "target_profile_id",
+      "method",
+      "datasets",
+      "owner_inputs",
+      "objectives",
+      "overrides"
+    ]
+  },
+  "MigrationReview": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "revision": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 9007199254740991
+      },
+      "digest": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "input": {
+        "$ref": "#/components/schemas/MigrationReviewInput"
+      },
+      "source": {
+        "$ref": "#/components/schemas/WorkloadProfile"
+      },
+      "target": {
+        "$ref": "#/components/schemas/WorkloadProfile"
+      },
+      "holds": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240
+        },
+        "maxItems": 128
+      },
+      "confirmed_by": {
+        "anyOf": [
+          {
+            "type": "string",
+            "format": "uuid"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "confirmed_at": {
+        "anyOf": [
+          {
+            "type": "number",
+            "minimum": 0
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "confirmation_current": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "revision",
+      "digest",
+      "input",
+      "source",
+      "target",
+      "holds",
+      "confirmed_by",
+      "confirmed_at",
+      "confirmation_current"
+    ]
+  },
+  "MigrationWorkspace": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "profiles": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/WorkloadProfile"
+        },
+        "maxItems": 50
+      },
+      "review": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/MigrationReview"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "methods": {
+        "type": "array",
+        "items": {
+          "enum": [
+            "APPLICATION_REBUILD_RESTORE",
+            "VM_SNAPSHOT_BASELINE_APP_DELTA",
+            "VM_SNAPSHOT_BASELINE_FILE_DELTA",
+            "VM_COLD_EXPORT",
+            "EXTERNAL_BLOCK_REPLICATION"
+          ]
+        },
+        "maxItems": 5
+      },
+      "owner_fields": {
+        "type": "array",
+        "items": {
+          "enum": [
+            "application_consistency",
+            "dependencies",
+            "guest_transformation_profile",
+            "delta_protocol",
+            "recovery_protocol",
+            "service_and_policy_validation",
+            "writer_fencing",
+            "retention_and_cleanup"
+          ]
+        },
+        "maxItems": 8
+      },
+      "native_write_authorized": {
+        "const": false
+      }
+    },
+    "required": [
+      "profiles",
+      "review",
+      "methods",
+      "owner_fields",
+      "native_write_authorized"
+    ]
+  },
+  "MigrationCandidate": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "resource_id",
+      "endpoint_id",
+      "endpoint_label",
+      "native_scope",
+      "native_id",
+      "name",
+      "generation_id",
+      "profile_id",
+      "source_identity_sha256",
+      "power_state",
+      "cpu",
+      "memory_mb",
+      "guest_id",
+      "disk_count",
+      "disk_bytes",
+      "collected_at",
+      "expires_at",
+      "holds",
+      "readiness"
+    ],
+    "properties": {
+      "resource_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "endpoint_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "endpoint_label": {
+        "type": "string",
+        "maxLength": 255
+      },
+      "native_scope": {
+        "type": "string",
+        "maxLength": 255
+      },
+      "native_id": {
+        "type": "string",
+        "maxLength": 255
+      },
+      "name": {
+        "type": "string",
+        "maxLength": 255
+      },
+      "generation_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "profile_id": {
+        "anyOf": [
+          {
+            "type": "string",
+            "format": "uuid"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "source_identity_sha256": {
+        "anyOf": [
+          {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "power_state": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 255
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "cpu": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "memory_mb": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "guest_id": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 255
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "disk_count": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "disk_bytes": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "collected_at": {
+        "type": "number"
+      },
+      "expires_at": {
+        "type": "number"
+      },
+      "holds": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "maxLength": 120
+        },
+        "maxItems": 150
+      },
+      "readiness": {
+        "enum": [
+          "held",
+          "review_required"
+        ]
+      }
+    }
+  },
+  "MigrationTarget": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "id",
+      "native_id",
+      "current",
+      "expires_at",
+      "holds",
+      "disk_formats",
+      "platform"
+    ],
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "native_id": {
+        "type": "string",
+        "maxLength": 255
+      },
+      "current": {
+        "type": "boolean"
+      },
+      "expires_at": {
+        "type": "number"
+      },
+      "holds": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "maxLength": 120
+        },
+        "maxItems": 150
+      },
+      "disk_formats": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "maxLength": 255
+        },
+        "maxItems": 100
+      },
+      "platform": {
+        "enum": [
+          "openstack",
+          "ahv",
+          "vmware"
+        ]
+      }
+    }
+  },
+  "MigrationGroupInput": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "name",
+      "application_id",
+      "environment_id",
+      "target_profile_id",
+      "format",
+      "resource_ids"
+    ],
+    "properties": {
+      "name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 120
+      },
+      "application_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "environment_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "target_profile_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "format": {
+        "enum": [
+          "raw",
+          "qcow2",
+          "vmdk"
+        ]
+      },
+      "resource_ids": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "maxItems": 50,
+        "minItems": 1,
+        "uniqueItems": true
+      }
+    }
+  },
+  "MigrationGroupStored": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "name",
+      "application_id",
+      "environment_id",
+      "target_profile_id",
+      "format",
+      "members"
+    ],
+    "properties": {
+      "name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 120
+      },
+      "application_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "environment_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "target_profile_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "format": {
+        "enum": [
+          "raw",
+          "qcow2",
+          "vmdk"
+        ]
+      },
+      "members": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "resource_id",
+            "source_identity_sha256"
+          ],
+          "properties": {
+            "resource_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "source_identity_sha256": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        },
+        "maxItems": 50
+      }
+    }
+  },
+  "MigrationGroup": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "id",
+      "revision",
+      "digest",
+      "input"
+    ],
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "revision": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "digest": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "input": {
+        "$ref": "#/components/schemas/MigrationGroupStored"
+      }
+    }
+  },
+  "MigrationGroupResult": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "id",
+      "revision",
+      "digest",
+      "native_write_authorized"
+    ],
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "revision": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "digest": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "native_write_authorized": {
+        "const": false
+      }
+    }
+  },
+  "MigrationFleet": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "items",
+      "next_cursor",
+      "targets",
+      "groups",
+      "native_write_authorized"
+    ],
+    "properties": {
+      "items": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/MigrationCandidate"
+        },
+        "maxItems": 50
+      },
+      "next_cursor": {
+        "anyOf": [
+          {
+            "type": "string",
+            "format": "uuid"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "targets": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/MigrationTarget"
+        },
+        "maxItems": 50
+      },
+      "groups": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/MigrationGroup"
+        },
+        "maxItems": 100
+      },
+      "native_write_authorized": {
+        "const": false
+      }
+    }
+  },
+  "MigrationPreparationRequest": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "site_id",
+      "review",
+      "disks"
+    ],
+    "properties": {
+      "site_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "review": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "revision",
+          "digest"
+        ],
+        "properties": {
+          "revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      },
+      "disks": {
+        "type": "array",
+        "minItems": 1,
+        "maxItems": 32,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "source_disk_sha256",
+            "target_key",
+            "format"
+          ],
+          "properties": {
+            "source_disk_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "target_key": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "format": {
+              "type": "string",
+              "enum": [
+                "raw",
+                "qcow2",
+                "vmdk"
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "MigrationGroupDetail": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "group",
+      "members",
+      "native_write_authorized"
+    ],
+    "properties": {
+      "group": {
+        "$ref": "#/components/schemas/MigrationGroup"
+      },
+      "members": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "candidate",
+            "holds",
+            "preparation"
+          ],
+          "properties": {
+            "candidate": {
+              "$ref": "#/components/schemas/MigrationCandidate"
+            },
+            "holds": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "maxLength": 120
+              },
+              "maxItems": 150
+            },
+            "preparation": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/MigrationPreparationRequest"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        },
+        "maxItems": 50
+      },
+      "native_write_authorized": {
+        "const": false
+      }
+    }
+  }
+}

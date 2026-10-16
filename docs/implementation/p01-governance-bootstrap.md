@@ -24,7 +24,7 @@ The manifest pins Laravel 13.34.0, Pint 1.32.1, Larastan 3.12.2, PHPStan 2.2.16,
 | Cached HTTP boot | Configuration and route cache, real HTTP liveness/readiness from the built-in development server | Passed in the retained private-package replay |
 | Independent lock replay | Clean installation and platform checks from the captured service-only lock | Passed; lock unchanged and installed versions/references equal |
 
-PHP and Composer were unavailable in the local authoring environment, so these results come from the hosted execution, not local source inspection. The [Governance report](../../verification/p01/packages/run-37239193553/governance/report.json) records 15 successful expected command outcomes and 14 Pest tests / 44 assertions on PHP 8.5.11 and Composer 2.10.3. Cached loopback HTTP returned liveness 200 and readiness 503 with the required bodies and headers. The earlier Pint failure remains in the [package history](p01-laravel-foundations.md).
+PHP and Composer were unavailable in the local authoring environment, so these results come from the hosted execution, not local source inspection. The Governance report records 15 successful expected command outcomes and 14 Pest tests / 44 assertions on PHP 8.5.11 and Composer 2.10.3. Cached loopback HTTP returned liveness 200 and readiness 503 with the required bodies and headers. The earlier Pint failure remains in the [package history](p01-laravel-foundations.md).
 
 ## Remaining work and limits
 

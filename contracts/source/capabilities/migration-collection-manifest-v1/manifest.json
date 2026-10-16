@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "target": "contracts/capabilities/migration-collection-manifest-v1.json",
+  "base": "base.json",
+  "parts": {
+    "platforms": {
+      "kind": "object",
+      "files": [
+        "platforms/platform-vmware.json",
+        "platforms/platform-ahv.json",
+        "platforms/platform-openstack.json"
+      ]
+    },
+    "platforms.vmware.attributes": {
+      "kind": "array",
+      "files": [
+        "platforms/vmware/01-source-attributes.json",
+        "platforms/vmware/02-source-attributes.json",
+        "platforms/vmware/03-source-attributes.json",
+        "platforms/vmware/04-target-attributes.json",
+        "platforms/vmware/05-owner-attributes.json",
+        "platforms/vmware/06-owner-attributes.json",
+        "platforms/vmware/07-source-attributes.json",
+        "platforms/vmware/08-owner-attributes.json"
+      ]
+    },
+    "platforms.ahv.attributes": {
+      "kind": "array",
+      "files": [
+        "platforms/ahv/01-source-attributes.json",
+        "platforms/ahv/02-source-attributes.json",
+        "platforms/ahv/03-source-attributes.json",
+        "platforms/ahv/04-target-attributes.json",
+        "platforms/ahv/05-target-attributes.json",
+        "platforms/ahv/06-owner-attributes.json",
+        "platforms/ahv/07-owner-attributes.json",
+        "platforms/ahv/08-source-attributes.json",
+        "platforms/ahv/09-target-attributes.json",
+        "platforms/ahv/10-owner-attributes.json"
+      ]
+    },
+    "platforms.openstack.attributes": {
+      "kind": "array",
+      "files": [
+        "platforms/openstack/01-source-attributes.json",
+        "platforms/openstack/02-source-attributes.json",
+        "platforms/openstack/03-source-attributes.json",
+        "platforms/openstack/04-target-attributes.json",
+        "platforms/openstack/05-target-attributes.json",
+        "platforms/openstack/06-owner-attributes.json",
+        "platforms/openstack/07-owner-attributes.json",
+        "platforms/openstack/08-source-attributes.json",
+        "platforms/openstack/09-target-attributes.json",
+        "platforms/openstack/10-source-attributes.json",
+        "platforms/openstack/11-owner-attributes.json"
+      ]
+    }
+  },
+  "copies": []
+}

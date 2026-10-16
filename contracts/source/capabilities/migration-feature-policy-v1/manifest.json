@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "target": "contracts/capabilities/migration-feature-policy-v1.json",
+  "base": "base.json",
+  "parts": {
+    "features": {
+      "kind": "array",
+      "files": [
+        "features/platform-01.json",
+        "features/vm-01.json",
+        "features/guest-01.json",
+        "features/storage-01.json",
+        "features/network-01.json",
+        "features/security-01.json",
+        "features/app-01.json",
+        "features/cutover-01.json",
+        "features/recovery-01.json",
+        "features/operations-01.json",
+        "features/metadata-01.json",
+        "features/network-02.json"
+      ]
+    },
+    "directions": {
+      "kind": "array",
+      "files": [
+        "directions/01-vmware-to-vmware.json",
+        "directions/02-vmware-to-ahv.json",
+        "directions/03-vmware-to-openstack.json",
+        "directions/04-ahv-to-vmware.json",
+        "directions/05-ahv-to-ahv.json",
+        "directions/06-ahv-to-openstack.json",
+        "directions/07-openstack-to-vmware.json",
+        "directions/08-openstack-to-ahv.json",
+        "directions/09-openstack-to-openstack.json"
+      ]
+    },
+    "operator_requirements": {
+      "kind": "array",
+      "files": [
+        "operator_requirements/owner-requirements.json"
+      ]
+    }
+  },
+  "copies": [
+    "apps/console/resources/contracts/migration-feature-policy-v1.json"
+  ]
+}

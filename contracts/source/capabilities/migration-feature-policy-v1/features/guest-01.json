@@ -1,0 +1,52 @@
+[
+  {
+    "id": "guest.firmware",
+    "label": "Firmware, Secure Boot, vTPM",
+    "mapping": "qualified_adapter",
+    "criticality": "critical",
+    "crosswalk_groups": [
+      "source.guest.firmware",
+      "source.guest.secure_boot",
+      "source.guest.vtpm"
+    ],
+    "operator_attributes": [],
+    "qualification": "unqualified",
+    "notes": "BIOS/EFI mapping alone does not transfer secure boot keys and TPM state."
+  },
+  {
+    "id": "guest.drivers",
+    "label": "Guest OS, agents, activation, drivers",
+    "mapping": "owner_and_native",
+    "criticality": "critical",
+    "crosswalk_groups": [
+      "source.guest.tools",
+      "target.guest.boot_drivers",
+      "owner.guest.boot_drivers",
+      "owner.guest.os_activation",
+      "source.openstack.guest.image_id",
+      "source.openstack.guest.config_drive",
+      "source.openstack.guest.user_key",
+      "source.openstack.guest.image_metadata",
+      "source.guest.os_identity"
+    ],
+    "operator_attributes": [
+      "guest.boot_drivers",
+      "guest.os_activation"
+    ],
+    "qualification": "unqualified",
+    "notes": "Guest identity metadata is not successful target guest boot."
+  },
+  {
+    "id": "guest.devices",
+    "label": "GPU/PCI and removable devices",
+    "mapping": "qualified_adapter",
+    "criticality": "critical",
+    "crosswalk_groups": [
+      "source.passthrough",
+      "source.ahv.compute.cdrom"
+    ],
+    "operator_attributes": [],
+    "qualification": "unqualified",
+    "notes": "Special hardware generally lacks generic live migration portability."
+  }
+]

@@ -1,0 +1,80 @@
+[
+  {
+    "id": "network.nics",
+    "label": "NIC count, MAC address and hardware",
+    "mapping": "qualified_adapter",
+    "criticality": "critical",
+    "crosswalk_groups": [
+      "source.nic.inventory",
+      "source.nic.mac",
+      "source.nic.guest_model"
+    ],
+    "operator_attributes": [],
+    "qualification": "unqualified",
+    "notes": "MAC values normalize; guest adapter models and backed network semantics do not."
+  },
+  {
+    "id": "network.routing",
+    "label": "IPAM, DNS, segments and routing",
+    "mapping": "owner_and_native",
+    "criticality": "critical",
+    "crosswalk_groups": [
+      "source.nic.attachment",
+      "target.network.segment",
+      "owner.network.address_ownership",
+      "owner.operations.dns_cutover",
+      "source.ahv.network.nic_subnet",
+      "source.openstack.network.port_project",
+      "source.openstack.network.nic_binding",
+      "target.openstack.target.network_extensions",
+      "target.openstack.target.network_trunks",
+      "source.openstack.network.declared_addresses",
+      "target.openstack.target.network_dhcp",
+      "target.ahv.target.subnet_external",
+      "target.ahv.target.subnet_vpc"
+    ],
+    "operator_attributes": [
+      "network.address_ownership",
+      "operations.dns_cutover"
+    ],
+    "qualification": "unqualified",
+    "notes": "Network UUIDs do not translate across providers; operator chooses approved target intent."
+  },
+  {
+    "id": "network.flows",
+    "label": "Required connectivity and link state",
+    "mapping": "owner_and_native",
+    "criticality": "critical",
+    "crosswalk_groups": [
+      "source.nic.connected",
+      "owner.network.required_paths",
+      "source.vmware.network.nic_guest_control"
+    ],
+    "operator_attributes": [
+      "network.required_paths"
+    ],
+    "qualification": "unqualified",
+    "notes": "Required inbound and outbound application paths must be independently validated."
+  },
+  {
+    "id": "network.security",
+    "label": "Firewall, microsegmentation and isolation",
+    "mapping": "owner_and_native",
+    "criticality": "critical",
+    "crosswalk_groups": [
+      "source.nic.security",
+      "target.network.security_policy",
+      "target.network.isolation",
+      "owner.network.firewall_flows",
+      "owner.security.tenant_isolation",
+      "owner.network.optional_firewall_flows"
+    ],
+    "operator_attributes": [
+      "network.firewall_flows",
+      "security.tenant_isolation",
+      "network.optional_firewall_flows"
+    ],
+    "qualification": "unqualified",
+    "notes": "Security policy requires equivalence and negative deny-path tests."
+  }
+]

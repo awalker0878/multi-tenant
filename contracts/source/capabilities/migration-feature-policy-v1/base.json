@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "version": "1.0.0",
+  "status": "proposed_not_qualified",
+  "source_manifest": "contracts/capabilities/migration-collection-manifest-v1.json",
+  "source_crosswalk": "contracts/capabilities/migration-field-crosswalk-v1.json",
+  "rules": {
+    "criticality": "critical if any contributing mapped attribute is critical; conditional criticality remains mandatory when applicable",
+    "native": "VM/disk/network/capacity/API data must be collected from source owners; Console must not override",
+    "operator": "Console accepts named references, objectives, datasets and explicit mappings; independent evidence separately verified",
+    "optional": "Only nonessential features may be omitted with independent E4 acceptance and native effect suppression",
+    "decision": "All nine source-target feature mappings are candidate translations, not supported or migration-ready decisions"
+  }
+}

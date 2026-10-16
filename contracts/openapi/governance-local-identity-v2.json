@@ -1,0 +1,797 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Governance Console identity",
+    "version": "2.0.0",
+    "description": "Current bootstrap and federated session identity. Strict server-held identity/session wire; installation-scoped at-most-once credential issuance with no credential replay. No tenant or native authority is minted by this response."
+  },
+  "security": [
+    {
+      "ConsoleWorkload": [],
+      "ConsoleSession": []
+    }
+  ],
+  "paths": {
+    "/identity/local-sessions": {
+      "post": {
+        "operationId": "loginLocalAdministrator",
+        "description": "Authenticate the deployment-created account. A change-required session cannot access setup.",
+        "responses": {
+          "200": {
+            "description": "Success. Responses use Cache-Control: no-store, private.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Session"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Login"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ConsoleWorkload": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{32,64}$",
+              "minLength": 32,
+              "maxLength": 64
+            },
+            "description": "Strong installation/principal/operation command identity; credential issuance is at most once and raw credentials are never replayed."
+          }
+        ],
+        "x-idempotency": {
+          "scope": [
+            "tenant_id",
+            "actor_id",
+            "operation_id",
+            "request_digest"
+          ],
+          "ttl_seconds": 604800,
+          "conflict_status": 409,
+          "description": "tenant_id is null for these installation operations, never a fabricated tenant or a client-selected authority. Additional namespace is the verified installation admission binding and authenticated workload. Actor and session scope are derived by Governance. Credential-issuing retries conflict without secret replay; sign-out remains idempotent."
+        }
+      }
+    },
+    "/identity/session": {
+      "get": {
+        "operationId": "inspectLocalSession",
+        "description": "Read minimal current session authority. Does not grant tenant access.",
+        "responses": {
+          "200": {
+            "description": "Success. Responses use Cache-Control: no-store, private.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentIdentity"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/identity/password": {
+      "post": {
+        "operationId": "changeLocalPassword",
+        "description": "Verify the current password, reject reuse, revoke all prior sessions and issue rotated authority atomically.",
+        "responses": {
+          "200": {
+            "description": "Success. Responses use Cache-Control: no-store, private.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Session"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordChange"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{32,64}$",
+              "minLength": 32,
+              "maxLength": 64
+            },
+            "description": "Strong installation/principal/operation command identity; credential issuance is at most once and raw credentials are never replayed."
+          }
+        ],
+        "x-idempotency": {
+          "scope": [
+            "tenant_id",
+            "actor_id",
+            "operation_id",
+            "request_digest"
+          ],
+          "ttl_seconds": 604800,
+          "conflict_status": 409,
+          "description": "tenant_id is null for these installation operations, never a fabricated tenant or a client-selected authority. Additional namespace is the verified installation admission binding and authenticated workload. Actor and session scope are derived by Governance. Credential-issuing retries conflict without secret replay; sign-out remains idempotent."
+        }
+      }
+    },
+    "/identity/logout": {
+      "post": {
+        "operationId": "logoutLocalSession",
+        "description": "Revoke this local session; idempotent.",
+        "responses": {
+          "200": {
+            "description": "Success. Responses use Cache-Control: no-store, private.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Logout"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{32,64}$",
+              "minLength": 32,
+              "maxLength": 64
+            },
+            "description": "Strong installation/principal/operation command identity; credential issuance is at most once and raw credentials are never replayed."
+          }
+        ],
+        "x-idempotency": {
+          "scope": [
+            "tenant_id",
+            "actor_id",
+            "operation_id",
+            "request_digest"
+          ],
+          "ttl_seconds": 604800,
+          "conflict_status": 409,
+          "description": "tenant_id is null for these installation operations, never a fabricated tenant or a client-selected authority. Additional namespace is the verified installation admission binding and authenticated workload. Actor and session scope are derived by Governance. Credential-issuing retries conflict without secret replay; sign-out remains idempotent."
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/identity/setup": {
+      "get": {
+        "operationId": "readLocalSetup",
+        "description": "Require the password change and current setup permission. This first slice does not implement external OIDC configuration or activation.",
+        "responses": {
+          "200": {
+            "description": "Success. Responses use Cache-Control: no-store, private.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Setup"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Denied, invalid input, replay/conflict or dependency unavailable; no authority or credential replay.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ConsoleWorkload": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Independent mounted Console workload credential; not a health token."
+      },
+      "ConsoleSession": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Console-Session",
+        "description": "Opaque user authority retained only in the encrypted server-side console session."
+      }
+    },
+    "schemas": {
+      "LocalIdentity": {
+        "type": "object",
+        "required": [
+          "subject",
+          "password_change_required",
+          "permissions"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "subject": {
+            "const": "bootstrap-admin"
+          },
+          "password_change_required": {
+            "type": "boolean"
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "identity.password.change",
+                "identity.logout",
+                "identity.setup"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 2,
+            "maxItems": 3
+          }
+        },
+        "oneOf": [
+          {
+            "properties": {
+              "password_change_required": {
+                "const": true
+              },
+              "permissions": {
+                "const": [
+                  "identity.password.change",
+                  "identity.logout"
+                ]
+              }
+            }
+          },
+          {
+            "properties": {
+              "password_change_required": {
+                "const": false
+              },
+              "permissions": {
+                "const": [
+                  "identity.setup",
+                  "identity.password.change",
+                  "identity.logout"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "Session": {
+        "type": "object",
+        "required": [
+          "session_token",
+          "expires_at",
+          "identity"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "session_token": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$",
+            "description": "Opaque, console-audience credential; server-side custody only. Persisted as SHA-256 in Governance."
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "identity": {
+            "$ref": "#/components/schemas/Identity"
+          }
+        }
+      },
+      "CurrentIdentity": {
+        "type": "object",
+        "required": [
+          "identity"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "identity": {
+            "$ref": "#/components/schemas/Identity"
+          }
+        }
+      },
+      "Setup": {
+        "type": "object",
+        "required": [
+          "identity",
+          "oidc"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "identity": {
+            "$ref": "#/components/schemas/Identity"
+          },
+          "oidc": {
+            "type": "object",
+            "required": [
+              "state"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "state": {
+                "enum": [
+                  "not_configured",
+                  "active"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "Logout": {
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "status": {
+            "const": "signed_out"
+          }
+        }
+      },
+      "Error": {
+        "title": "Contracted API error v2",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "message",
+          "correlation_id",
+          "retryable"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{2,95}$"
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          },
+          "correlation_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "retryable": {
+            "type": "boolean"
+          },
+          "details": {
+            "type": "array",
+            "maxItems": 64,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field",
+                "reason"
+              ],
+              "properties": {
+                "field": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256
+                }
+              }
+            }
+          }
+        }
+      },
+      "Login": {
+        "type": "object",
+        "required": [
+          "username",
+          "password"
+        ],
+        "properties": {
+          "username": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "password": {
+            "type": "string",
+            "writeOnly": true,
+            "maxLength": 512
+          }
+        },
+        "additionalProperties": false
+      },
+      "PasswordChange": {
+        "type": "object",
+        "required": [
+          "current_password",
+          "password",
+          "password_confirmation"
+        ],
+        "properties": {
+          "current_password": {
+            "type": "string",
+            "writeOnly": true,
+            "maxLength": 512
+          },
+          "password": {
+            "type": "string",
+            "writeOnly": true,
+            "minLength": 15,
+            "maxLength": 128
+          },
+          "password_confirmation": {
+            "type": "string",
+            "writeOnly": true,
+            "minLength": 15,
+            "maxLength": 128
+          }
+        },
+        "additionalProperties": false
+      },
+      "FederatedIdentity": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "subject",
+          "kind",
+          "password_change_required",
+          "permissions"
+        ],
+        "properties": {
+          "subject": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "const": "federated"
+          },
+          "password_change_required": {
+            "const": false
+          },
+          "permissions": {
+            "oneOf": [
+              {
+                "const": [
+                  "identity.logout"
+                ]
+              },
+              {
+                "const": [
+                  "identity.setup",
+                  "tenants.create",
+                  "identity.logout"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "Identity": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/LocalIdentity"
+          },
+          {
+            "$ref": "#/components/schemas/FederatedIdentity"
+          }
+        ]
+      }
+    }
+  }
+}

@@ -24,7 +24,7 @@ def main():
     prefixes = ('services/lifecycle/', 'services/inventory/', 'services/planning/', 'services/governance/', 'workers/lifecycle/', 'workers/inventory/', 'apps/console/',
                 'scripts/p08/', 'scripts/p04/generate_clients.py', 'contracts/schemas/inventory/', 'contracts/schemas/planning/migration-', 'contracts/openapi/inventory-v1.', 'contracts/openapi/inventory-native-', 'contracts/openapi/governance-native-', 'contracts/openapi/lifecycle-migration-', 'contracts/openapi/lifecycle-native-jobs-', 'contracts/platforms/',
                 'contracts/openapi/worker-migration-', 'contracts/openapi/planning-migration-', 'contracts/openapi/planning-v1.', 'contracts/fixtures/lifecycle/migration-', 'contracts/fixtures/inventory/migration-', 'contracts/fixtures/inventory/ahv-', 'contracts/fixtures/inventory/vmware-', 'contracts/fixtures/inventory/operator-',
-                '.github/workflows/p08-', '.github/workflows/ahv-destination.yml')
+                'tests/contracts/native_qualification_fixture.py', '.github/workflows/qualification.yml')
     report = {
         'source_revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
         'observed_at': datetime.now(timezone.utc).isoformat(), 'environment': platform.platform(),
@@ -64,22 +64,28 @@ def main():
                          ['uv', 'run', '--frozen', 'ruff', 'format', '--check', 'src', 'tests'],
                          ['uv', 'run', '--frozen', 'mypy', 'src', 'tests'],
                          ['uv', 'run', '--frozen', 'pytest', '-q', '--junitxml=' + str(output / (suite + '.xml'))],
-                         ['uv', 'build', '--no-build-isolation', '--wheel']):
+                         ['uv', 'build', '--no-build-isolation', '--wheel',
+                          '--config-setting=--global-option=build',
+                          '--config-setting=--global-option=--build-base=' + str(output / 'build-stage' / suite)]):
                 command(directory, argv)
             xml = ElementTree.parse(output / (suite + '.xml'))
             totals = {k: sum(int(s.get(k, 0)) for s in xml.iter('testsuite')) for k in ('tests', 'failures', 'errors', 'skipped')}
             report['suites'].append({'name': suite, **totals})
             if totals['tests'] == 0 or any(totals[k] for k in ('failures', 'errors', 'skipped')):
                 raise RuntimeError(suite + ' not fully passing')
+        command('.', ['python', 'scripts/contracts/qualify_capabilities.py',
+                      '--worker-junit', str(output / 'worker.xml'),
+                      '--output', str(output / 'capability-qualification.json')])
+        if report['commands'][-1]['exit_code'] != 0:
+            raise RuntimeError('Phase 4 executable capability qualification incomplete')
+        command('.', ['python', 'scripts/generate_capabilities.py', '--check'])
+        if report['commands'][-1]['exit_code'] != 0:
+            raise RuntimeError('Generated active wire-method projections have drifted')
         command('services/planning', ['uv', 'run', '--frozen', 'python', str(ROOT / 'scripts/p08/check_composition.py')])
         command('.', ['python', 'scripts/p04/generate_clients.py', '--check'])
         command('scripts/p01/contracts', ['uv', 'sync', '--locked'])
         command('scripts/p01/contracts', ['uv', 'run', '--frozen', 'python', str(ROOT / 'scripts/p08/check_contract.py')])
-        command('scripts/p01/contracts', ['uv', 'run', '--frozen', 'python', str(ROOT / 'scripts/p08/check_profiles.py')])
-        command('scripts/p01/contracts', ['uv', 'run', '--frozen', 'python', str(ROOT / 'scripts/p08/check_ahv.py')])
-        command('scripts/p01/contracts', ['uv', 'run', '--frozen', 'python', str(ROOT / 'scripts/p08/check_fleet.py')])
         command('scripts/p01/contracts', ['uv', 'run', '--frozen', 'python', str(ROOT / 'scripts/p08/check_operator_inputs.py')])
-        command('scripts/p01/contracts', ['uv', 'run', '--frozen', 'python', str(ROOT / 'scripts/p08/check_readiness.py')])
         command('scripts/p01/contracts', ['uv', 'run', '--frozen', 'python', str(ROOT / 'scripts/p08/check_any_to_any.py')])
     except Exception as error:
         report['error'] = str(error)

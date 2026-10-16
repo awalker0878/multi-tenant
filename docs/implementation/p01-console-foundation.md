@@ -21,7 +21,7 @@ The server session uses a named Console cookie with Secure-by-default, HttpOnly 
 | Local source/build | `npm run typecheck`, `npm run test:boundaries` and `npm run build` passed. Boundary check inspected three implemented source files and ten allowed/forbidden import fixtures. Vite transformed 565 modules and produced a main bundle, lazy Foundation page chunk and stylesheet. |
 | PHP / browser execution | Hosted run 37239193553 passed 23 expected commands, 24 Pest tests / 86 assertions, formatting, type analysis, Deptrac/canaries, cached HTTP probes and one Chromium hydration test with no retries, skips or unexpected outcomes. |
 
-The [package record](p01-laravel-foundations.md) binds the independent Console lock and actual source at `4142571874a53b351a9c6023313185fe718d0dac`; its [Console report](../../verification/p01/packages/run-37239193553/console/report.json) preserves the raw observations. The earlier Pest exception-handler binding failure remains in the failed-run record. P00 measurements do not substitute for these product-source results.
+The [package record](p01-laravel-foundations.md) binds the independent Console lock and actual source at `4142571874a53b351a9c6023313185fe718d0dac`; its Console report preserves the raw observations. The earlier Pest exception-handler binding failure remains in the failed-run record. P00 measurements do not substitute for these product-source results.
 
 ## Code controls
 

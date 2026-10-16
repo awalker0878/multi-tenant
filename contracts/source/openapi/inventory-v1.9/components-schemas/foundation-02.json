@@ -1,0 +1,308 @@
+{
+  "Health": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "items",
+      "observed_at"
+    ],
+    "properties": {
+      "items": {
+        "type": "array",
+        "maxItems": 4,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "count",
+            "last_activity"
+          ],
+          "properties": {
+            "status": {
+              "type": "string",
+              "maxLength": 255
+            },
+            "count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "last_activity": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "observed_at": {
+        "type": "number"
+      }
+    }
+  },
+  "EndpointCommand": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "endpoint_id",
+      "revision",
+      "state",
+      "native_write_authorized"
+    ],
+    "properties": {
+      "endpoint_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "revision": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "state": {
+        "enum": [
+          "registered",
+          "revoked"
+        ]
+      },
+      "native_write_authorized": {
+        "const": false
+      }
+    }
+  },
+  "DiscoveryCommand": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "discovery_id",
+      "status",
+      "native_write_authorized"
+    ],
+    "properties": {
+      "discovery_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "status": {
+        "const": "queued"
+      },
+      "native_write_authorized": {
+        "const": false
+      }
+    }
+  },
+  "MatchCommand": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "match_id",
+      "state",
+      "ownership_granted"
+    ],
+    "properties": {
+      "match_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "state": {
+        "const": "proposed_unverified"
+      },
+      "ownership_granted": {
+        "const": false
+      }
+    }
+  },
+  "Enroll": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "policy_id",
+      "label"
+    ],
+    "properties": {
+      "policy_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "label": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 120
+      }
+    }
+  },
+  "Empty": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [],
+    "properties": {}
+  },
+  "Match": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "resource_id",
+      "application_id",
+      "intent_revision",
+      "generation_id"
+    ],
+    "properties": {
+      "resource_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "application_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "intent_revision": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "generation_id": {
+        "type": "string",
+        "format": "uuid"
+      }
+    }
+  },
+  "Error": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "error"
+    ],
+    "properties": {
+      "error": {
+        "type": "string",
+        "maxLength": 255
+      }
+    }
+  },
+  "ConfigurationItem": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "string",
+        "maxLength": 200
+      },
+      "name": {
+        "type": "string",
+        "maxLength": 255
+      },
+      "attributes": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "key": {
+              "type": "string",
+              "maxLength": 80
+            },
+            "value": {
+              "type": "string",
+              "maxLength": 2000
+            }
+          },
+          "required": [
+            "key",
+            "value"
+          ]
+        },
+        "maxItems": 20
+      }
+    },
+    "required": [
+      "id",
+      "name",
+      "attributes"
+    ]
+  },
+  "ConfigurationQuery": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "query": {
+        "type": "string",
+        "maxLength": 240
+      },
+      "status": {
+        "type": "string",
+        "maxLength": 240
+      },
+      "items": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/ConfigurationItem"
+        },
+        "maxItems": 1000
+      },
+      "item_count": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 1000
+      },
+      "collected_at": {
+        "type": "number"
+      },
+      "expires_at": {
+        "type": "number"
+      }
+    },
+    "required": [
+      "query",
+      "status",
+      "items",
+      "item_count",
+      "collected_at",
+      "expires_at"
+    ]
+  },
+  "ConfigurationSnapshot": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "endpoint_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "generation_id": {
+        "anyOf": [
+          {
+            "type": "string",
+            "format": "uuid"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "current": {
+        "type": "boolean"
+      },
+      "digest": {
+        "type": "string",
+        "maxLength": 64
+      },
+      "queries": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/ConfigurationQuery"
+        },
+        "maxItems": 18
+      }
+    },
+    "required": [
+      "endpoint_id",
+      "generation_id",
+      "current",
+      "digest",
+      "queries"
+    ]
+  }
+}

@@ -1,0 +1,1050 @@
+{
+  "schema_version": 1,
+  "nodes": [
+    "assurance",
+    "catalogue",
+    "console",
+    "contract-platform",
+    "governance",
+    "inventory",
+    "inventory-workers",
+    "lifecycle",
+    "lifecycle-workers",
+    "planning"
+  ],
+  "edges": [
+    {
+      "consumer": "assurance",
+      "provider": "contract-platform",
+      "release": "contracts/openapi/foundation-health-v1.json",
+      "kind": "http",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "assurance",
+      "provider": "governance",
+      "release": "contracts/openapi/governance-service-checks-v1.json",
+      "kind": "http",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "assurance",
+      "provider": "inventory",
+      "release": "contracts/capabilities/definitions-v1.json",
+      "kind": "capability",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "assurance",
+      "provider": "lifecycle",
+      "release": "contracts/openapi/lifecycle-internal-authority-v1.json",
+      "kind": "http",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "assurance",
+      "provider": "lifecycle-workers",
+      "release": "contracts/openapi/worker-simulation-v1.json",
+      "kind": "http",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "assurance",
+      "provider": "planning",
+      "release": "contracts/openapi/planning-qualification-events-v1.json",
+      "kind": "http",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "catalogue",
+      "provider": "contract-platform",
+      "release": "contracts/openapi/foundation-health-v1.json",
+      "kind": "http",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "catalogue",
+      "provider": "contract-platform",
+      "release": "contracts/schemas/common/error-v1.json",
+      "kind": "schema",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "catalogue",
+      "provider": "governance",
+      "release": "contracts/openapi/governance-catalogue-owners-v1.json",
+      "kind": "http",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "catalogue",
+      "provider": "governance",
+      "release": "contracts/openapi/governance-service-checks-v1.json",
+      "kind": "http",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "console",
+      "provider": "catalogue",
+      "release": "contracts/openapi/catalogue-v1.0.1.json",
+      "kind": "http",
+      "installed_copies": [
+        "apps/console/resources/contracts/catalogue-v1.0.1.json"
+      ],
+      "evidence": "installed-loader"
+    },
+    {
+      "consumer": "console",
+      "provider": "contract-platform",
+      "release": "contracts/openapi/foundation-health-v1.json",
+      "kind": "http",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "console",
+      "provider": "governance",
+      "release": "contracts/asyncapi/governance.yaml",
+      "kind": "event",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "console",
+      "provider": "governance",
+      "release": "contracts/asyncapi/identity.yaml",
+      "kind": "event",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "console",
+      "provider": "governance",
+      "release": "contracts/openapi/governance-approvals-v1.json",
+      "kind": "http",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "console",
+      "provider": "governance",
+      "release": "contracts/openapi/governance-delegation-v2.json",
+      "kind": "http",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "console",
+      "provider": "governance",
+      "release": "contracts/openapi/governance-directory-v1.json",
+      "kind": "http",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "console",
+      "provider": "governance",
+      "release": "contracts/openapi/governance-federation-v1.json",
+      "kind": "http",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "console",
+      "provider": "governance",
+      "release": "contracts/openapi/governance-local-identity-v2.json",
+      "kind": "http",
+      "installed_copies": [
+        "apps/console/resources/contracts/governance-local-identity-v2.json"
+      ],
+      "evidence": "installed-loader"
+    },
+    {
+      "consumer": "console",
+      "provider": "governance",
+      "release": "contracts/openapi/governance-tenancy-v1.json",
+      "kind": "http",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "console",
+      "provider": "governance",
+      "release": "contracts/schemas/events/governance-change-v1.json",
+      "kind": "schema",
+      "installed_copies": [
+        "apps/console/resources/contracts/governance-change-v1.json"
+      ],
+      "evidence": "installed-loader"
+    },
+    {
+      "consumer": "console",
+      "provider": "governance",
+      "release": "contracts/schemas/events/identity-change-v1.json",
+      "kind": "schema",
+      "installed_copies": [
+        "apps/console/resources/contracts/identity-change-v1.json"
+      ],
+      "evidence": "installed-loader"
+    },
+    {
+      "consumer": "console",
+      "provider": "inventory",
+      "release": "contracts/capabilities/definitions-v1.json",
+      "kind": "capability",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "console",
+      "provider": "inventory",
+      "release": "contracts/capabilities/migration-feature-policy-v1.json",
+      "kind": "capability",
+      "installed_copies": [
+        "apps/console/resources/contracts/migration-feature-policy-v1.json"
+      ],
+      "evidence": "installed-loader"
+    },
+    {
+      "consumer": "console",
+      "provider": "inventory",
+      "release": "contracts/openapi/inventory-v1.9.json",
+      "kind": "http",
+      "installed_copies": [
+        "apps/console/resources/contracts/inventory-v1.9.json"
+      ],
+      "evidence": "installed-loader"
+    },
+    {
+      "consumer": "console",
+      "provider": "lifecycle",
+      "release": "contracts/openapi/lifecycle-migration-campaigns-v1.json",
+      "kind": "http",
+      "installed_copies": [
+        "apps/console/resources/contracts/lifecycle-migration-campaigns-v1.json"
+      ],
+      "evidence": "installed-loader"
+    },
+    {
+      "consumer": "console",
+      "provider": "lifecycle",
+      "release": "contracts/openapi/lifecycle-native-jobs-v1.1.json",
+      "kind": "http",
+      "installed_copies": [
+        "apps/console/resources/contracts/lifecycle-native-jobs-v1.1.json"
+      ],
+      "evidence": "installed-loader"
+    },
+    {
+      "consumer": "console",
+      "provider": "lifecycle",
+      "release": "contracts/openapi/lifecycle-v1.json",
+      "kind": "http",
+      "installed_copies": [
+        "apps/console/resources/contracts/lifecycle-v1.json"
+      ],
+      "evidence": "installed-loader"
+    },
+    {
+      "consumer": "console",
+      "provider": "planning",
+      "release": "contracts/openapi/planning-migration-v2.json",
+      "kind": "http",
+      "installed_copies": [
+        "apps/console/resources/contracts/planning-migration-v2.json"
+      ],
+      "evidence": "installed-loader"
+    },
+    {
+      "consumer": "console",
+      "provider": "planning",
+      "release": "contracts/openapi/planning-v1.2.json",
+      "kind": "http",
+      "installed_copies": [
+        "apps/console/resources/contracts/planning-v1.2.json"
+      ],
+      "evidence": "installed-loader"
+    },
+    {
+      "consumer": "governance",
+      "provider": "contract-platform",
+      "release": "contracts/openapi/foundation-health-v1.json",
+      "kind": "http",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "governance",
+      "provider": "contract-platform",
+      "release": "contracts/schemas/common/error-v1.json",
+      "kind": "schema",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "governance",
+      "provider": "planning",
+      "release": "contracts/openapi/planning-immutable-plan-v2.json",
+      "kind": "http",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "inventory",
+      "provider": "contract-platform",
+      "release": "contracts/openapi/foundation-health-v1.json",
+      "kind": "http",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "inventory",
+      "provider": "contract-platform",
+      "release": "contracts/schemas/common/error-v1.json",
+      "kind": "schema",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "inventory",
+      "provider": "governance",
+      "release": "contracts/openapi/governance-inventory-collection-v1.1.json",
+      "kind": "http",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "inventory",
+      "provider": "governance",
+      "release": "contracts/openapi/governance-service-checks-v1.json",
+      "kind": "http",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "inventory-workers",
+      "provider": "inventory",
+      "release": "contracts/capabilities/definitions-v1.json",
+      "kind": "capability",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "inventory-workers",
+      "provider": "inventory",
+      "release": "contracts/openapi/inventory-collection-worker-v1.json",
+      "kind": "http",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "lifecycle",
+      "provider": "assurance",
+      "release": "contracts/openapi/assurance-evidence-v1.json",
+      "kind": "http",
+      "installed_copies": [
+        "services/lifecycle/src/lifecycle/infrastructure/contracts/assurance-evidence-v1.json"
+      ],
+      "evidence": "installed-loader"
+    },
+    {
+      "consumer": "lifecycle",
+      "provider": "catalogue",
+      "release": "contracts/openapi/catalogue-internal-v1.json",
+      "kind": "http",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "lifecycle",
+      "provider": "contract-platform",
+      "release": "contracts/openapi/foundation-health-v1.json",
+      "kind": "http",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "lifecycle",
+      "provider": "contract-platform",
+      "release": "contracts/schemas/common/error-v1.json",
+      "kind": "schema",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "lifecycle",
+      "provider": "governance",
+      "release": "contracts/openapi/governance-delegation-v2.json",
+      "kind": "http",
+      "installed_copies": [
+        "services/lifecycle/src/lifecycle/infrastructure/contracts/governance-delegation-v2.json"
+      ],
+      "evidence": "installed-loader"
+    },
+    {
+      "consumer": "lifecycle",
+      "provider": "governance",
+      "release": "contracts/openapi/governance-native-approval-v1.1.json",
+      "kind": "http",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "lifecycle",
+      "provider": "governance",
+      "release": "contracts/openapi/governance-service-checks-v1.json",
+      "kind": "http",
+      "installed_copies": [
+        "services/lifecycle/src/lifecycle/infrastructure/contracts/governance-service-checks-v1.json"
+      ],
+      "evidence": "installed-loader"
+    },
+    {
+      "consumer": "lifecycle",
+      "provider": "inventory",
+      "release": "contracts/capabilities/definitions-v1.json",
+      "kind": "capability",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "lifecycle",
+      "provider": "inventory",
+      "release": "contracts/openapi/inventory-native-input-v1.3.json",
+      "kind": "http",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "lifecycle",
+      "provider": "lifecycle-workers",
+      "release": "contracts/openapi/worker-simulation-v1.json",
+      "kind": "http",
+      "installed_copies": [
+        "services/lifecycle/src/lifecycle/infrastructure/contracts/worker-simulation-v1.json"
+      ],
+      "evidence": "installed-loader"
+    },
+    {
+      "consumer": "lifecycle",
+      "provider": "planning",
+      "release": "contracts/openapi/planning-lifecycle-reads-v1.json",
+      "kind": "http",
+      "installed_copies": [
+        "services/lifecycle/src/lifecycle/infrastructure/contracts/planning-lifecycle-reads-v1.json"
+      ],
+      "evidence": "installed-loader"
+    },
+    {
+      "consumer": "lifecycle",
+      "provider": "planning",
+      "release": "contracts/schemas/planning/migration-outcomes-v1.json",
+      "kind": "schema",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "lifecycle",
+      "provider": "planning",
+      "release": "contracts/schemas/planning/migration-readiness-v2.2.json",
+      "kind": "schema",
+      "installed_copies": [
+        "services/lifecycle/src/lifecycle/infrastructure/contracts/migration-readiness-v2.2.json"
+      ],
+      "evidence": "installed-loader"
+    },
+    {
+      "consumer": "lifecycle-workers",
+      "provider": "inventory",
+      "release": "contracts/capabilities/definitions-v1.json",
+      "kind": "capability",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "lifecycle-workers",
+      "provider": "inventory-workers",
+      "release": "contracts/platforms/ahv/source-profile-v1.json",
+      "kind": "platform",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "lifecycle-workers",
+      "provider": "inventory-workers",
+      "release": "contracts/platforms/openstack/source-profile-v1.json",
+      "kind": "platform",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "lifecycle-workers",
+      "provider": "lifecycle",
+      "release": "contracts/openapi/lifecycle-internal-authority-v1.json",
+      "kind": "http",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "lifecycle-workers",
+      "provider": "lifecycle",
+      "release": "contracts/openapi/lifecycle-migration-boundary-v2.json",
+      "kind": "http",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "lifecycle-workers",
+      "provider": "lifecycle",
+      "release": "contracts/openapi/worker-migration-effect-v2.1.json",
+      "kind": "http",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "planning",
+      "provider": "assurance",
+      "release": "contracts/openapi/assurance-qualification-v2.json",
+      "kind": "http",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "planning",
+      "provider": "assurance",
+      "release": "contracts/schemas/planning/migration-support-v2.json",
+      "kind": "schema",
+      "installed_copies": [
+        "services/planning/src/planning/infrastructure/inputs/migration-support-v2.json"
+      ],
+      "evidence": "installed-loader"
+    },
+    {
+      "consumer": "planning",
+      "provider": "assurance",
+      "release": "contracts/schemas/planning/qualification-v3.json",
+      "kind": "schema",
+      "installed_copies": [
+        "services/planning/src/planning/infrastructure/inputs/qualification-v3.json"
+      ],
+      "evidence": "installed-loader"
+    },
+    {
+      "consumer": "planning",
+      "provider": "catalogue",
+      "release": "contracts/asyncapi/catalogue-intent.yaml",
+      "kind": "event",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "planning",
+      "provider": "catalogue",
+      "release": "contracts/asyncapi/catalogue.yaml",
+      "kind": "event",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "planning",
+      "provider": "catalogue",
+      "release": "contracts/openapi/catalogue-internal-v1.json",
+      "kind": "http",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "planning",
+      "provider": "catalogue",
+      "release": "contracts/schemas/catalogue/intent-v1.json",
+      "kind": "schema",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "planning",
+      "provider": "catalogue",
+      "release": "contracts/schemas/events/catalogue-foundation-recorded-v1.json",
+      "kind": "schema",
+      "installed_copies": [
+        "services/planning/src/planning/infrastructure/messaging/foundation-event.json"
+      ],
+      "evidence": "installed-loader"
+    },
+    {
+      "consumer": "planning",
+      "provider": "catalogue",
+      "release": "contracts/schemas/events/catalogue-intent-v1.json",
+      "kind": "schema",
+      "installed_copies": [
+        "services/planning/src/planning/infrastructure/facts/catalogue.json"
+      ],
+      "evidence": "installed-loader"
+    },
+    {
+      "consumer": "planning",
+      "provider": "catalogue",
+      "release": "contracts/schemas/planning/catalogue-current-v2.json",
+      "kind": "schema",
+      "installed_copies": [
+        "services/planning/src/planning/infrastructure/inputs/catalogue-current-v2.json"
+      ],
+      "evidence": "installed-loader"
+    },
+    {
+      "consumer": "planning",
+      "provider": "catalogue",
+      "release": "contracts/schemas/planning/catalogue-input-v1.json",
+      "kind": "schema",
+      "installed_copies": [
+        "services/planning/src/planning/infrastructure/inputs/catalogue-input-v1.json"
+      ],
+      "evidence": "installed-loader"
+    },
+    {
+      "consumer": "planning",
+      "provider": "contract-platform",
+      "release": "contracts/openapi/foundation-health-v1.json",
+      "kind": "http",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "planning",
+      "provider": "contract-platform",
+      "release": "contracts/schemas/common/error-v1.json",
+      "kind": "schema",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "planning",
+      "provider": "contract-platform",
+      "release": "contracts/schemas/common/error-v2.json",
+      "kind": "schema",
+      "installed_copies": [
+        "services/planning/src/planning/infrastructure/inputs/error-v2.json"
+      ],
+      "evidence": "installed-loader"
+    },
+    {
+      "consumer": "planning",
+      "provider": "governance",
+      "release": "contracts/openapi/governance-delegation-v2.json",
+      "kind": "http",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "planning",
+      "provider": "governance",
+      "release": "contracts/schemas/planning/governance-delegation-response-v2.json",
+      "kind": "schema",
+      "installed_copies": [
+        "services/planning/src/planning/infrastructure/inputs/governance-delegation-response-v2.json"
+      ],
+      "evidence": "installed-loader"
+    },
+    {
+      "consumer": "planning",
+      "provider": "inventory",
+      "release": "contracts/capabilities/definitions-v1.json",
+      "kind": "capability",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "planning",
+      "provider": "inventory",
+      "release": "contracts/capabilities/migration-collection-manifest-v1.json",
+      "kind": "capability",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "planning",
+      "provider": "inventory",
+      "release": "contracts/capabilities/native-security-api-registry-v1.json",
+      "kind": "capability",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "planning",
+      "provider": "inventory",
+      "release": "contracts/openapi/inventory-native-input-v1.3.json",
+      "kind": "http",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "planning",
+      "provider": "inventory",
+      "release": "contracts/schemas/inventory/fact-v1.1.json",
+      "kind": "schema",
+      "installed_copies": [
+        "services/planning/src/planning/infrastructure/facts/inventory.json"
+      ],
+      "evidence": "installed-loader"
+    },
+    {
+      "consumer": "planning",
+      "provider": "inventory",
+      "release": "contracts/schemas/planning/inventory-input-v2.json",
+      "kind": "schema",
+      "installed_copies": [
+        "services/planning/src/planning/infrastructure/inputs/inventory-input-v2.json"
+      ],
+      "evidence": "installed-loader"
+    },
+    {
+      "consumer": "planning",
+      "provider": "inventory",
+      "release": "contracts/schemas/planning/migration-input-v4.json",
+      "kind": "schema",
+      "installed_copies": [
+        "services/planning/src/planning/infrastructure/inputs/migration-input-v4.json"
+      ],
+      "evidence": "installed-loader"
+    },
+    {
+      "consumer": "planning",
+      "provider": "lifecycle",
+      "release": "contracts/openapi/lifecycle-internal-authority-v1.json",
+      "kind": "http",
+      "installed_copies": [],
+      "evidence": "registry-declaration"
+    },
+    {
+      "consumer": "planning",
+      "provider": "lifecycle",
+      "release": "contracts/schemas/planning/placement-reservation-v1.json",
+      "kind": "schema",
+      "installed_copies": [
+        "services/planning/src/planning/infrastructure/inputs/placement-reservation-v1.json"
+      ],
+      "evidence": "installed-loader"
+    }
+  ],
+  "release_dependencies": [
+    {
+      "release": "contracts/asyncapi/catalogue-intent.yaml",
+      "depends_on": "contracts/schemas/events/catalogue-intent-v1.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/asyncapi/catalogue.yaml",
+      "depends_on": "contracts/schemas/events/catalogue-foundation-recorded-v1.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/asyncapi/governance.yaml",
+      "depends_on": "contracts/schemas/events/governance-change-v1.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/asyncapi/identity.yaml",
+      "depends_on": "contracts/schemas/events/identity-change-v1.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/asyncapi/support.yaml",
+      "depends_on": "contracts/schemas/events/support-change-v1.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/capabilities/definitions-v1.json",
+      "depends_on": "contracts/schemas/capabilities/definitions-v1.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/capabilities/migration-collection-manifest-v1.json",
+      "depends_on": "contracts/capabilities/definitions-v1.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/capabilities/migration-collection-manifest-v1.json",
+      "depends_on": "contracts/schemas/capabilities/migration-collection-manifest-v1.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/capabilities/migration-feature-policy-v1.json",
+      "depends_on": "contracts/capabilities/migration-collection-manifest-v1.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/capabilities/migration-feature-policy-v1.json",
+      "depends_on": "contracts/capabilities/migration-field-crosswalk-v1.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/capabilities/migration-feature-policy-v1.json",
+      "depends_on": "contracts/schemas/capabilities/migration-feature-policy-v1.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/capabilities/migration-field-crosswalk-v1.json",
+      "depends_on": "contracts/capabilities/migration-collection-manifest-v1.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/capabilities/migration-field-crosswalk-v1.json",
+      "depends_on": "contracts/schemas/capabilities/migration-field-crosswalk-v1.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/capabilities/native-security-api-registry-v1.json",
+      "depends_on": "contracts/schemas/capabilities/native-security-api-registry-v1.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/openapi/assurance-qualification-v2.json",
+      "depends_on": "contracts/schemas/common/error-v2.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/openapi/assurance-qualification-v2.json",
+      "depends_on": "contracts/schemas/planning/migration-support-v2.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/openapi/assurance-qualification-v2.json",
+      "depends_on": "contracts/schemas/planning/qualification-v3.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/openapi/catalogue-internal-v1.json",
+      "depends_on": "contracts/schemas/catalogue/intent-v1.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/openapi/catalogue-internal-v1.json",
+      "depends_on": "contracts/schemas/common/error-v1.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/openapi/catalogue-internal-v1.json",
+      "depends_on": "contracts/schemas/planning/catalogue-current-v2.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/openapi/catalogue-internal-v1.json",
+      "depends_on": "contracts/schemas/planning/catalogue-input-v1.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/openapi/catalogue-v1.0.1.json",
+      "depends_on": "contracts/schemas/catalogue/intent-v1.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/openapi/governance-delegation-v2.json",
+      "depends_on": "contracts/schemas/common/error-v2.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/openapi/governance-inventory-collection-v1.1.json",
+      "depends_on": "contracts/schemas/common/error-v1.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/openapi/governance-local-identity-v2.json",
+      "depends_on": "contracts/schemas/common/error-v2.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/openapi/governance-native-approval-v1.1.json",
+      "depends_on": "contracts/schemas/common/error-v1.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/openapi/governance-service-checks-v1.json",
+      "depends_on": "contracts/schemas/common/error-v1.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/openapi/inventory-collection-worker-v1.json",
+      "depends_on": "contracts/schemas/common/error-v1.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/openapi/inventory-native-input-v1.3.json",
+      "depends_on": "contracts/schemas/common/error-v1.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/openapi/inventory-native-input-v1.3.json",
+      "depends_on": "contracts/schemas/planning/inventory-input-v1.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/openapi/inventory-native-input-v1.3.json",
+      "depends_on": "contracts/schemas/planning/inventory-input-v2.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/openapi/inventory-native-input-v1.3.json",
+      "depends_on": "contracts/schemas/planning/migration-input-v4.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/openapi/lifecycle-internal-authority-v1.json",
+      "depends_on": "contracts/schemas/common/error-v1.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/openapi/lifecycle-internal-authority-v1.json",
+      "depends_on": "contracts/schemas/planning/placement-reservation-v1.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/openapi/planning-immutable-plan-v2.json",
+      "depends_on": "contracts/schemas/common/error-v2.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/openapi/planning-lifecycle-reads-v1.json",
+      "depends_on": "contracts/openapi/planning-v1.2.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/openapi/planning-lifecycle-reads-v1.json",
+      "depends_on": "contracts/schemas/planning/migration-readiness-v2.2.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/openapi/planning-migration-v2.json",
+      "depends_on": "contracts/schemas/common/error-v2.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/openapi/planning-migration-v2.json",
+      "depends_on": "contracts/schemas/planning/migration-readiness-v2.2.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/openapi/planning-qualification-events-v1.json",
+      "depends_on": "contracts/schemas/common/error-v1.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/openapi/worker-simulation-v1.json",
+      "depends_on": "contracts/schemas/common/error-v2.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/platforms/ahv/source-profile-v1.json",
+      "depends_on": "contracts/schemas/platforms/source-profile-v1.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/platforms/openstack/source-profile-v1.json",
+      "depends_on": "contracts/schemas/platforms/source-profile-v1.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/schemas/capabilities/migration-collection-manifest-v1.json",
+      "depends_on": "contracts/capabilities/definitions-v1.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/schemas/capabilities/migration-feature-policy-v1.json",
+      "depends_on": "contracts/capabilities/migration-collection-manifest-v1.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/schemas/capabilities/migration-feature-policy-v1.json",
+      "depends_on": "contracts/capabilities/migration-field-crosswalk-v1.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/schemas/capabilities/migration-field-crosswalk-v1.json",
+      "depends_on": "contracts/capabilities/migration-collection-manifest-v1.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/schemas/planning/catalogue-current-v2.json",
+      "depends_on": "contracts/schemas/catalogue/intent-v1.json",
+      "evidence": "independently-discovered"
+    },
+    {
+      "release": "contracts/schemas/planning/catalogue-input-v1.json",
+      "depends_on": "contracts/schemas/catalogue/intent-v1.json",
+      "evidence": "independently-discovered"
+    }
+  ],
+  "producer_local_copies": [
+    {
+      "provider": "catalogue",
+      "release": "contracts/schemas/catalogue/intent-v1.json",
+      "copy": "services/catalogue/resources/contracts/intent-v1.json",
+      "kind": "schema"
+    },
+    {
+      "provider": "catalogue",
+      "release": "contracts/schemas/events/catalogue-foundation-recorded-v1.json",
+      "copy": "services/catalogue/resources/contracts/foundation-event.json",
+      "kind": "schema"
+    },
+    {
+      "provider": "governance",
+      "release": "contracts/schemas/events/governance-change-v1.json",
+      "copy": "services/governance/resources/contracts/governance-change-v1.json",
+      "kind": "schema"
+    },
+    {
+      "provider": "governance",
+      "release": "contracts/schemas/events/identity-change-v1.json",
+      "copy": "services/governance/resources/contracts/identity-change-v1.json",
+      "kind": "schema"
+    },
+    {
+      "provider": "governance",
+      "release": "contracts/schemas/events/support-change-v1.json",
+      "copy": "services/governance/resources/contracts/support-change-v1.json",
+      "kind": "schema"
+    },
+    {
+      "provider": "lifecycle",
+      "release": "contracts/schemas/lifecycle/alert-delivery-v1.json",
+      "copy": "services/lifecycle/src/lifecycle/infrastructure/contracts/alert-delivery-v1.json",
+      "kind": "schema"
+    },
+    {
+      "provider": "lifecycle",
+      "release": "contracts/schemas/planning/placement-reservation-v1.json",
+      "copy": "services/lifecycle/src/lifecycle/infrastructure/contracts/placement-reservation-v1.json",
+      "kind": "schema"
+    },
+    {
+      "provider": "planning",
+      "release": "contracts/schemas/planning/migration-readiness-v2.2.json",
+      "copy": "services/planning/src/planning/infrastructure/inputs/migration-readiness-v2.2.json",
+      "kind": "schema"
+    }
+  ],
+  "summary": {
+    "producer_local_copies": 8,
+    "declared_relationships": 83,
+    "canonical_dependency_edges": 49,
+    "with_installed_loader": 29,
+    "without_installed_loader": 54,
+    "by_kind": {
+      "capability": 9,
+      "event": 4,
+      "http": 46,
+      "platform": 2,
+      "schema": 22
+    }
+  }
+}

@@ -92,7 +92,7 @@ no native effect, automatic restore re-enable or production support is implied.
 ## P07 implemented native control component
 
 The [native workflow runbook](../operations/runbooks/native-workflow-control.md)
-and [internal boundary contract](../../contracts/openapi/lifecycle-native-boundary-v1.json)
+and [internal boundary contract](../../contracts/openapi/lifecycle-migration-boundary-v2.json)
 define durable single-use stage grants, exact native-plan worker bindings,
 independent readiness/reconciliation and separately approved retirement. The
 controller is a local authority/journal component for the native Temporal journey;

@@ -46,7 +46,7 @@ def main():
               and hashlib.sha256(head_script).hexdigest() == request['expected_script_sha256']
               and marker in head_script and marker not in result.stdout + result.stderr)
     files = ['scripts/p01/admission/check_pr.py', 'scripts/p01/admission/policy.py',
-             'scripts/p01/admission/probe_pr.py', '.github/workflows/p01-admission-probe.yml',
+             'scripts/p01/admission/probe_pr.py', '.github/workflows/p01-admission.yml',
              'release/review-policy.json', 'release/exceptions.json', 'release/admission-probe.json']
     summary = {'result': 'PASSED' if passed else 'FAILED', 'source_revision': probe_source, 'evaluated_base': base,
                'head_revision': pr['head']['sha'], 'pull_request': pr['number'],

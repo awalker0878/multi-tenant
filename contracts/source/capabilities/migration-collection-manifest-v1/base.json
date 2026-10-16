@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "manifest_version": "1.0.0",
+  "title": "Migration attribute collection requirements for VMware, AHV and OpenStack",
+  "status": "requirements_only_not_installed_support",
+  "capability_registry": "contracts/capabilities/definitions-v1.json",
+  "freshness_policy": "max_age_seconds from observation timestamp at plan evaluation and native-effect boundary, revoked upon any source identity/version/configuration/policy change even before TTL",
+  "collection_methods": {
+    "native_get": "Read authenticated allowlisted native API object with exact enrolled scope and response identity",
+    "native_list": "Read all pages of scoped native list and fail on incomplete/ambiguous paging",
+    "derive": "Derive from verified native fields; preserve canonical raw response checksum",
+    "operator": "Record attributed operator assertion as owner evidence; never pretend a vendor API emitted it",
+    "probe": "Authorized create/read/cleanup against exact version, followed by independent native qualification",
+    "independent": "Independent measured operating or security check with reviewer evidence"
+  },
+  "documentation": {
+    "vmware": [
+      "https://developer.broadcom.com/xapis/virtual-infrastructure-json-api/latest/data-structures/VirtualMachineConfigInfo/",
+      "https://developer.broadcom.com/xapis/vsphere-automation-api/latest/"
+    ],
+    "ahv": [
+      "https://developers.nutanix.com/",
+      "https://www.nutanix.dev/api-reference-v4/"
+    ],
+    "openstack": [
+      "https://docs.openstack.org/api-ref/compute/",
+      "https://docs.openstack.org/api-ref/block-storage/v3/",
+      "https://docs.openstack.org/api-ref/network/v2/",
+      "https://docs.openstack.org/api-ref/image/v2/",
+      "https://docs.openstack.org/api-ref/placement/"
+    ]
+  }
+}

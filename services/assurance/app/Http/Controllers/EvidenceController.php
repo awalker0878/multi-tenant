@@ -37,6 +37,8 @@ final class EvidenceController
 
     public function review(Request $request, string $tenant, string $evidence, ManageEvidence $manager): JsonResponse
     {
+        abort_unless($request->isJson(), 415);
+        abort_if(strlen($request->getContent()) > 1024 || array_keys($request->all()) !== ['decision'], 422);
         $input = $request->validate(['decision' => ['required', 'in:accepted_simulation,rejected']]);
 
         return response()->json($manager->review($tenant, $evidence, $request->headers->all(), $input['decision']), 201)->header('Cache-Control', 'no-store, private');

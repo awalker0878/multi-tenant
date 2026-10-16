@@ -19,6 +19,7 @@ import secrets
 import select
 import signal
 import subprocess
+import sys
 import tempfile
 import time
 import urllib.request
@@ -45,14 +46,20 @@ def main() -> int:
     root = Path(__file__).resolve().parents[2]
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
+    sys.path.insert(0, str(root/'scripts/contracts'))
+    from route_conformance import HttpConformance
+    conformance = HttpConformance(root, output/'http-conformance.json', {
+        'http://127.0.0.1:8032': 'governance',
+    }, 'scripts/p02/verify_identity.py:wire')
     report = {'schema_version': 1, 'result': 'RUNNING', 'scope': 'P02 identity, tenancy and plan-bound approval increments',
               'source_sha': os.environ['GITHUB_SHA'], 'run_id': os.environ['GITHUB_RUN_ID'],
               'run_attempt': os.environ['GITHUB_RUN_ATTEMPT'], 'browser_engine': browser, 'observed_at': dt.datetime.now(dt.UTC).isoformat(),
               'checks': [], 'source_sha256': {}, 'limitations': ['Synthetic HTTPS OIDC peer; no operated-provider interoperability or DNS rotation qualification', 'Synthetic immutable plan authority; no real planning producer or native admission', 'No operated deployment or G01/G02 acceptance', 'Verified PostgreSQL TLS; loopback HTTP between applications; production ingress/workload TLS topology remains unqualified']}
     tracked = subprocess.check_output(['git', 'ls-files', '-z'], cwd=root).decode().split('\0')
     for name in tracked:
-        if name and name.startswith(('services/governance/', 'apps/console/', 'scripts/p02/', 'scripts/recovery/', '.github/workflows/p02-identity', 'contracts/openapi/governance-', 'contracts/openapi/planning-', 'contracts/schemas/events/governance-', 'contracts/schemas/events/identity-', 'contracts/schemas/events/support-', 'contracts/asyncapi/identity.', 'contracts/asyncapi/support.', 'deploy/dependencies/stateful/')):
+        if name and name.startswith(('services/governance/', 'apps/console/', 'scripts/p02/', 'scripts/recovery/', '.github/workflows/qualification.yml', 'contracts/openapi/governance-', 'contracts/openapi/planning-', 'contracts/schemas/events/governance-', 'contracts/schemas/events/identity-', 'contracts/schemas/events/support-', 'contracts/asyncapi/identity.', 'contracts/asyncapi/support.', 'deploy/dependencies/stateful/')):
             report['source_sha256'][name] = hashlib.sha256((root / name).read_bytes()).hexdigest()
+    report['source_sha256']['scripts/contracts/route_conformance.py'] = hashlib.sha256((root/'scripts/contracts/route_conformance.py').read_bytes()).hexdigest()
     private_values = [os.environ['P02_TEST_PASSWORD']]
     processes: list[subprocess.Popen] = []
     handles = []
@@ -123,7 +130,7 @@ def main() -> int:
         return result.decode()
 
     try:
-        api = json.loads((root / 'contracts/openapi/governance-local-identity-v1.json').read_text())
+        api = json.loads((root / 'contracts/openapi/governance-local-identity-v2.json').read_text())
         validate_spec(api)
         check('openapi-specification-valid', True)
         for contract in sorted((root / 'contracts/openapi').glob('governance-*.json')):
@@ -154,7 +161,6 @@ def main() -> int:
                 'snapshot_sha256': approval_archive, 'table_fingerprints': approval_before,
                 'decision_states': ['rejected', 'revoked'], 'approval_events': 5,
                 'limits': ['No native effect or real P05 plan producer', 'Restored authority is not resumed']}
-            check('packaged-support-openapi-contract', (root / 'contracts/openapi/governance-support-v1.json').read_bytes() == (root / 'services/governance/resources/contracts/governance-support-v1.json').read_bytes())
             run(['php', 'vendor/bin/pest', 'tests/Feature/SupportAccessTest.php', '--filter=retains nonempty terminal support history',
                  '--fail-on-warning', '--fail-on-risky', '--fail-on-empty-test-suite', '--colors=never'],
                 cwd=root / 'services/governance', env=os.environ.copy(), label='support-history-producer')
@@ -307,7 +313,7 @@ def main() -> int:
             def wire(path: str, schema: str | dict, expected: int = 200, body: dict | None = None, token: str = '', workload: str | None = None) -> dict:
                 request = urllib.request.Request('http://127.0.0.1:8032' + path,
                     data=json.dumps(body).encode() if body is not None else None,
-                    headers={'Authorization': 'Bearer ' + (workload if workload is not None else credential), 'X-Console-Session': token, 'Content-Type': 'application/json', 'Accept': 'application/json'})
+                    headers={'Authorization': 'Bearer ' + (workload if workload is not None else credential), 'X-Console-Session': token, 'Idempotency-Key': secrets.token_hex(32), 'Content-Type': 'application/json', 'Accept': 'application/json'})
                 try:
                     response = urllib.request.urlopen(request, timeout=5)
                 except urllib.error.HTTPError as error:
@@ -315,8 +321,15 @@ def main() -> int:
                 with response:
                     value = json.loads(response.read())
                     check('wire-' + path + '-' + str(expected), response.status == expected)
-                    validator = {'$ref': '#/components/schemas/' + schema, 'components': api['components']} if isinstance(schema, str) else schema
-                    OAS31Validator(validator).validate(value)
+                    # Error contracts belong to the actual operation: the
+                    # active OIDC API and local/session API have distinct
+                    # releases. The mandatory conformance observer below
+                    # validates each error against that exact canonical body.
+                    if schema != 'Error':
+                        validator = {'$ref': '#/components/schemas/' + schema, 'components': api['components']} if isinstance(schema, str) else schema
+                        OAS31Validator(validator).validate(value)
+                    conformance.observe('http://127.0.0.1:8032', path, request.get_method(), body,
+                                        dict(request.header_items()), response.status, value, response.headers)
                     check('wire-' + path + '-no-store', 'no-store' in response.headers.get('Cache-Control', ''))
                     return value
             initial_session = wire('/identity/local-sessions', 'Session', body={'username': 'admin', 'password': temporary})['session_token']

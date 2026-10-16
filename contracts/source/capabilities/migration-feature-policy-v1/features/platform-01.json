@@ -1,0 +1,18 @@
+[
+  {
+    "id": "platform.api",
+    "label": "API releases and entitlement",
+    "mapping": "version_qualified",
+    "criticality": "critical",
+    "crosswalk_groups": [
+      "source.platform.release",
+      "source.api.releases",
+      "source.vm.revision",
+      "target.api.versions",
+      "target.ahv.target.prism_identity"
+    ],
+    "operator_attributes": [],
+    "qualification": "unqualified",
+    "notes": "Installed API families/versions and permissions must be observed and separately qualified."
+  }
+]

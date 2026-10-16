@@ -1,0 +1,786 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:multi-tenant:planning:migration-readiness-validation:v2.2",
+  "title": "Resolved exact-route migration readiness: Planning source, Console and Lifecycle consumers",
+  "type": "object",
+  "additionalProperties": false,
+  "$defs": {
+    "sha": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "side": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "platform": {
+          "enum": [
+            "vmware",
+            "ahv",
+            "openstack"
+          ]
+        },
+        "installation_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "profile_sha256": {
+          "$ref": "#/$defs/sha"
+        },
+        "versions": {
+          "type": "object",
+          "minProperties": 1,
+          "maxProperties": 20,
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          }
+        }
+      },
+      "required": [
+        "platform",
+        "installation_id",
+        "profile_sha256",
+        "versions"
+      ]
+    },
+    "case": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "capability_id": {
+          "type": "string"
+        },
+        "side": {
+          "enum": [
+            "source",
+            "target"
+          ]
+        },
+        "criticality": {
+          "enum": [
+            "critical",
+            "optional"
+          ]
+        },
+        "status": {
+          "enum": [
+            "eligible",
+            "blocked",
+            "conditional",
+            "unknown"
+          ]
+        },
+        "reason": {
+          "type": "string"
+        },
+        "evidence_sha256": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/sha"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "selected_api_family": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "selected_api_version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "omission_accepted": {
+          "type": "boolean"
+        },
+        "expires_at": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        }
+      },
+      "required": [
+        "capability_id",
+        "side",
+        "criticality",
+        "status",
+        "reason",
+        "evidence_sha256",
+        "selected_api_family",
+        "selected_api_version",
+        "omission_accepted",
+        "expires_at"
+      ]
+    }
+  },
+  "properties": {
+    "schema_version": {
+      "const": 2
+    },
+    "kind": {
+      "const": "migration_workload_readiness"
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tenant_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "application_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "environment_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "site_id": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "tenant_id",
+        "application_id",
+        "environment_id",
+        "site_id"
+      ]
+    },
+    "route_sha256": {
+      "$ref": "#/$defs/sha"
+    },
+    "tranche_sha256": {
+      "$ref": "#/$defs/sha"
+    },
+    "release_sha256": {
+      "$ref": "#/$defs/sha"
+    },
+    "source": {
+      "$ref": "#/$defs/side"
+    },
+    "target": {
+      "$ref": "#/$defs/side"
+    },
+    "method": {
+      "type": "string",
+      "minLength": 1
+    },
+    "api_compatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "eligible",
+            "blocked",
+            "conditional",
+            "unknown"
+          ]
+        },
+        "operationally_eligible": {
+          "type": "boolean"
+        },
+        "cases": {
+          "type": "array",
+          "maxItems": 256,
+          "items": {
+            "$ref": "#/$defs/case"
+          }
+        },
+        "administrator_alerts": {
+          "type": "array",
+          "maxItems": 256,
+          "items": {
+            "type": "object"
+          }
+        },
+        "native_write_authorized": {
+          "const": false
+        }
+      },
+      "required": [
+        "status",
+        "operationally_eligible",
+        "cases",
+        "administrator_alerts",
+        "native_write_authorized"
+      ]
+    },
+    "native_e3_qualified": {
+      "type": "boolean"
+    },
+    "receiving_e4_accepted": {
+      "type": "boolean"
+    },
+    "status": {
+      "enum": [
+        "eligible",
+        "held"
+      ]
+    },
+    "holds": {
+      "type": "array",
+      "maxItems": 256,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 200
+      }
+    },
+    "expires_at": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "evaluated_at": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "workload_admission_authorized": {
+      "const": false
+    },
+    "native_write_authorized": {
+      "const": false
+    },
+    "readiness_sha256": {
+      "$ref": "#/$defs/sha"
+    },
+    "workload_reconciliation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "catalogue_revision_id",
+        "catalogue_sha256",
+        "source_identity_sha256",
+        "source_generation_id",
+        "source_profile_sha256",
+        "source_observation_sha256",
+        "native_review_sha256",
+        "status",
+        "workloads",
+        "holds",
+        "expires_at",
+        "native_write_authorized",
+        "reconciliation_sha256"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": 1
+        },
+        "catalogue_revision_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "catalogue_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "source_identity_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "source_generation_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "source_profile_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "source_observation_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "native_review_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "status": {
+          "enum": [
+            "matched",
+            "held"
+          ]
+        },
+        "workloads": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 100,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "workload_id",
+              "status",
+              "holds",
+              "source_identity_sha256",
+              "field_dispositions"
+            ],
+            "properties": {
+              "workload_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "status": {
+                "enum": [
+                  "matched",
+                  "held"
+                ]
+              },
+              "holds": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "source_identity_sha256": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "field_dispositions": {
+                "type": "array",
+                "maxItems": 256,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "field": {
+                      "type": "string"
+                    },
+                    "disposition": {
+                      "type": "string"
+                    },
+                    "required": {
+                      "type": "boolean"
+                    },
+                    "desired_value": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "maxLength": 500
+                    },
+                    "observed_value": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "maxLength": 500
+                    },
+                    "evidence_source": {
+                      "type": "string",
+                      "enum": [
+                        "inventory_native_profile",
+                        "unobserved",
+                        "independent_e4"
+                      ]
+                    },
+                    "evidence_age_seconds": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ],
+                      "minimum": 0
+                    },
+                    "next_action": {
+                      "type": "string",
+                      "enum": [
+                        "none",
+                        "review_independently_qualified_transformation",
+                        "collect_native_or_independent_guest_and_key_evidence",
+                        "resolve_native_drift_with_owner_and_independent_e4_assurance"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "field",
+                    "disposition",
+                    "required",
+                    "desired_value",
+                    "observed_value",
+                    "evidence_source",
+                    "evidence_age_seconds",
+                    "next_action"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "holds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "expires_at": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "native_write_authorized": {
+          "const": false
+        },
+        "reconciliation_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "collection_coverages": {
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "schema_version",
+          "platform",
+          "scope",
+          "installation_id",
+          "generation_id",
+          "installed_tuple_sha256",
+          "manifest_sha256",
+          "evaluated_at",
+          "status",
+          "attributes",
+          "holds",
+          "independent_e3_e4_qualification",
+          "native_write_authorized",
+          "coverage_sha256",
+          "expires_at"
+        ],
+        "properties": {
+          "schema_version": {
+            "const": 1
+          },
+          "platform": {
+            "enum": [
+              "vmware",
+              "ahv",
+              "openstack"
+            ]
+          },
+          "scope": {
+            "enum": [
+              "source",
+              "target",
+              "owner"
+            ]
+          },
+          "installation_id": {
+            "type": "string"
+          },
+          "generation_id": {
+            "type": "string"
+          },
+          "installed_tuple_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "manifest_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "evaluated_at": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "enum": [
+              "complete",
+              "held"
+            ]
+          },
+          "attributes": {
+            "type": "array",
+            "maxItems": 256,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "attribute_id",
+                "status",
+                "reason",
+                "severity"
+              ],
+              "properties": {
+                "attribute_id": {
+                  "type": "string"
+                },
+                "status": {
+                  "enum": [
+                    "observed",
+                    "not_applicable",
+                    "held"
+                  ]
+                },
+                "reason": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "holds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "independent_e3_e4_qualification": {
+            "const": false
+          },
+          "native_write_authorized": {
+            "const": false
+          },
+          "coverage_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "expires_at": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "kind",
+    "scope",
+    "route_sha256",
+    "tranche_sha256",
+    "release_sha256",
+    "source",
+    "target",
+    "method",
+    "api_compatibility",
+    "native_e3_qualified",
+    "receiving_e4_accepted",
+    "status",
+    "holds",
+    "expires_at",
+    "evaluated_at",
+    "workload_admission_authorized",
+    "native_write_authorized",
+    "readiness_sha256",
+    "workload_reconciliation",
+    "collection_coverages"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "eligible"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "holds": {
+            "maxItems": 0
+          },
+          "native_e3_qualified": {
+            "const": true
+          },
+          "receiving_e4_accepted": {
+            "const": true
+          },
+          "api_compatibility": {
+            "properties": {
+              "operationally_eligible": {
+                "const": true
+              },
+              "status": {
+                "const": "eligible"
+              }
+            }
+          },
+          "workload_reconciliation": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "const": "matched"
+              },
+              "holds": {
+                "maxItems": 0
+              },
+              "native_write_authorized": {
+                "const": false
+              },
+              "workloads": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "const": "matched"
+                    },
+                    "holds": {
+                      "maxItems": 0
+                    },
+                    "field_dispositions": {
+                      "type": "array",
+                      "items": {
+                        "allOf": [
+                          {
+                            "if": {
+                              "properties": {
+                                "required": {
+                                  "const": true
+                                }
+                              },
+                              "required": [
+                                "required"
+                              ]
+                            },
+                            "then": {
+                              "properties": {
+                                "disposition": {
+                                  "const": "matched"
+                                },
+                                "evidence_source": {
+                                  "enum": [
+                                    "inventory_native_profile",
+                                    "independent_e4"
+                                  ]
+                                },
+                                "evidence_age_seconds": {
+                                  "type": "integer",
+                                  "minimum": 0
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "if": {
+                              "properties": {
+                                "evidence_source": {
+                                  "const": "independent_e4"
+                                }
+                              },
+                              "required": [
+                                "evidence_source"
+                              ]
+                            },
+                            "then": {
+                              "properties": {
+                                "evidence_age_seconds": {
+                                  "type": "integer",
+                                  "minimum": 0,
+                                  "maximum": 29
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "collection_coverages": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 3,
+            "items": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "const": "complete"
+                },
+                "holds": {
+                  "maxItems": 0
+                },
+                "attributes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "enum": [
+                          "observed",
+                          "not_applicable"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "allOf": [
+              {
+                "contains": {
+                  "type": "object",
+                  "properties": {
+                    "scope": {
+                      "const": "source"
+                    }
+                  },
+                  "required": [
+                    "scope"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "type": "object",
+                  "properties": {
+                    "scope": {
+                      "const": "target"
+                    }
+                  },
+                  "required": [
+                    "scope"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "type": "object",
+                  "properties": {
+                    "scope": {
+                      "const": "owner"
+                    }
+                  },
+                  "required": [
+                    "scope"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

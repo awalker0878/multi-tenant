@@ -1,0 +1,93 @@
+[
+  {
+    "id": "target.provider_allocations",
+    "scope": "target",
+    "api_family": "placement",
+    "api_field": "GET /allocations/{consumer_uuid}",
+    "owner_evidence_field": null,
+    "collection_method": "native_get",
+    "max_age_seconds": 15,
+    "severity": "critical",
+    "condition": "always",
+    "collector_source": "workers/inventory/src/inventory_worker/infrastructure/openstack_capabilities.py",
+    "collection_status": "native_field_candidate"
+  },
+  {
+    "id": "target.project_quotas",
+    "scope": "target",
+    "api_family": null,
+    "api_field": null,
+    "owner_evidence_field": "project_quotas_and_policy_grants",
+    "collection_method": "operator",
+    "max_age_seconds": 60,
+    "severity": "critical",
+    "condition": "always",
+    "collector_source": "workers/inventory/src/inventory_worker/infrastructure/openstack_capabilities.py",
+    "collection_status": "external_evidence_required"
+  },
+  {
+    "id": "target.secret_key_backends",
+    "scope": "target",
+    "api_family": null,
+    "api_field": null,
+    "owner_evidence_field": "barbican_key_and_volume_backend_mapping",
+    "collection_method": "operator",
+    "max_age_seconds": 300,
+    "severity": "critical",
+    "condition": "when:encrypted",
+    "collector_source": "workers/inventory/src/inventory_worker/infrastructure/openstack_capabilities.py",
+    "collection_status": "external_evidence_required"
+  },
+  {
+    "id": "target.image_import_probe",
+    "scope": "target",
+    "api_family": "glance",
+    "api_field": "POST /v2/images + import + GET /v2/images/{id}",
+    "owner_evidence_field": null,
+    "collection_method": "probe",
+    "max_age_seconds": 300,
+    "severity": "critical",
+    "condition": "when:import",
+    "collector_source": "workers/inventory/src/inventory_worker/infrastructure/openstack_capabilities.py",
+    "collection_status": "external_evidence_required"
+  },
+  {
+    "id": "target.vm_create_probe",
+    "scope": "target",
+    "api_family": "nova",
+    "api_field": "POST /servers + GET /servers/{id}",
+    "owner_evidence_field": null,
+    "collection_method": "probe",
+    "max_age_seconds": 300,
+    "severity": "critical",
+    "condition": "always",
+    "collector_source": "workers/inventory/src/inventory_worker/infrastructure/openstack_capabilities.py",
+    "collection_status": "external_evidence_required"
+  },
+  {
+    "id": "target.network_isolation",
+    "scope": "target",
+    "api_family": null,
+    "api_field": null,
+    "owner_evidence_field": "verified_negative_ingress_egress_paths",
+    "collection_method": "independent",
+    "max_age_seconds": 60,
+    "severity": "critical",
+    "condition": "always",
+    "collector_source": "workers/inventory/src/inventory_worker/infrastructure/openstack_capabilities.py",
+    "collection_status": "external_evidence_required"
+  },
+  {
+    "id": "target.boot_guest_drivers",
+    "scope": "target",
+    "api_family": null,
+    "api_field": null,
+    "owner_evidence_field": "tested_guest_boot_device_driver_matrix",
+    "collection_method": "independent",
+    "max_age_seconds": 3600,
+    "severity": "critical",
+    "condition": "always",
+    "collector_source": "workers/inventory/src/inventory_worker/infrastructure/openstack_capabilities.py",
+    "collection_status": "external_evidence_required"
+  }
+]

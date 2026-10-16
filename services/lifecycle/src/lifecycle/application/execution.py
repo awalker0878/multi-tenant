@@ -289,6 +289,7 @@ class Execution:
         return {"state": "held", "reason": reason}
 
     def acquire(self, tenant: str, job_id: str, step: str, worker: str) -> dict[str, Any]:
+        worker = identity(worker)
         with self.database.transaction() as tx:
             job = self.job(tx, tenant, job_id)
         snapshot = self.current(job)
@@ -371,6 +372,8 @@ class Execution:
             }
 
     def redeem(self, grant: dict[str, Any], worker: str) -> dict[str, Any]:
+        worker = identity(worker)
+        identity(grant["worker_id"])
         with self.database.transaction() as tx:
             job = self.job(tx, grant["tenant_id"], grant["job_id"])
         snapshot = self.current(job)

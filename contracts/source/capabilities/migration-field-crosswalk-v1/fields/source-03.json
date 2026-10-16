@@ -1,0 +1,376 @@
+[
+  {
+    "canonical_id": "source.vmware.identity.vcenter_uuid",
+    "scope": "source",
+    "relationship": "platform_specific",
+    "normalization": "no_direct_equivalent",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "identity.vcenter_uuid"
+        ],
+        "api_fields": [
+          "ServiceInstance.content.about.instanceUuid"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 3600,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": null,
+      "openstack": null
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 3600,
+    "semantic_constraints": "No safe field-level equivalent currently established in the other platforms; treat destination support as unknown and qualify a method or adapter.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.vmware.compute.hardware_version",
+    "scope": "source",
+    "relationship": "platform_specific",
+    "normalization": "no_direct_equivalent",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "compute.hardware_version"
+        ],
+        "api_fields": [
+          "VirtualMachine.config.version"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 3600,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": null,
+      "openstack": null
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 3600,
+    "semantic_constraints": "No safe field-level equivalent currently established in the other platforms; treat destination support as unknown and qualify a method or adapter.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.vmware.compute.cpu_hot_add",
+    "scope": "source",
+    "relationship": "platform_specific",
+    "normalization": "no_direct_equivalent",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "compute.cpu_hot_add"
+        ],
+        "api_fields": [
+          "VirtualMachine.config.cpuHotAddEnabled"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 120,
+        "severity": "optional",
+        "conditions": [
+          "when:nonessential_hot_add"
+        ]
+      },
+      "ahv": null,
+      "openstack": null
+    },
+    "criticality": "optional",
+    "maximum_age_seconds": 120,
+    "semantic_constraints": "No safe field-level equivalent currently established in the other platforms; treat destination support as unknown and qualify a method or adapter.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.vmware.compute.memory_hot_add",
+    "scope": "source",
+    "relationship": "platform_specific",
+    "normalization": "no_direct_equivalent",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "compute.memory_hot_add"
+        ],
+        "api_fields": [
+          "VirtualMachine.config.memoryHotAddEnabled"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 120,
+        "severity": "optional",
+        "conditions": [
+          "when:nonessential_hot_add"
+        ]
+      },
+      "ahv": null,
+      "openstack": null
+    },
+    "criticality": "optional",
+    "maximum_age_seconds": 120,
+    "semantic_constraints": "No safe field-level equivalent currently established in the other platforms; treat destination support as unknown and qualify a method or adapter.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.vmware.storage.disk_mode",
+    "scope": "source",
+    "relationship": "platform_specific",
+    "normalization": "no_direct_equivalent",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "storage.disk_mode"
+        ],
+        "api_fields": [
+          "VirtualDisk.backing.diskMode"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": null,
+      "openstack": null
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 60,
+    "semantic_constraints": "No safe field-level equivalent currently established in the other platforms; treat destination support as unknown and qualify a method or adapter.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.vmware.storage.datastore",
+    "scope": "source",
+    "relationship": "platform_specific",
+    "normalization": "no_direct_equivalent",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "storage.datastore"
+        ],
+        "api_fields": [
+          "VirtualDisk.backing.datastore"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "always"
+        ]
+      },
+      "ahv": null,
+      "openstack": null
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 60,
+    "semantic_constraints": "No safe field-level equivalent currently established in the other platforms; treat destination support as unknown and qualify a method or adapter.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.vmware.storage.snapshots",
+    "scope": "source",
+    "relationship": "platform_specific",
+    "normalization": "no_direct_equivalent",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "storage.snapshots"
+        ],
+        "api_fields": [
+          "VirtualMachine.snapshot"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 60,
+        "severity": "critical",
+        "conditions": [
+          "when:snapshot_method"
+        ]
+      },
+      "ahv": null,
+      "openstack": null
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 60,
+    "semantic_constraints": "No safe field-level equivalent currently established in the other platforms; treat destination support as unknown and qualify a method or adapter.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.vmware.storage.snapshot_supported",
+    "scope": "source",
+    "relationship": "platform_specific",
+    "normalization": "no_direct_equivalent",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "storage.snapshot_supported"
+        ],
+        "api_fields": [
+          "VirtualMachine.capability.snapshotConfigSupported"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 300,
+        "severity": "critical",
+        "conditions": [
+          "when:snapshot_method"
+        ]
+      },
+      "ahv": null,
+      "openstack": null
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 300,
+    "semantic_constraints": "No safe field-level equivalent currently established in the other platforms; treat destination support as unknown and qualify a method or adapter.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.vmware.storage.clone_from_snapshot",
+    "scope": "source",
+    "relationship": "platform_specific",
+    "normalization": "no_direct_equivalent",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "storage.clone_from_snapshot"
+        ],
+        "api_fields": [
+          "HostSystem.capability.cloneFromSnapshotSupported"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 300,
+        "severity": "critical",
+        "conditions": [
+          "when:snapshot_method"
+        ]
+      },
+      "ahv": null,
+      "openstack": null
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 300,
+    "semantic_constraints": "No safe field-level equivalent currently established in the other platforms; treat destination support as unknown and qualify a method or adapter.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.vmware.network.nic_guest_control",
+    "scope": "source",
+    "relationship": "platform_specific",
+    "normalization": "no_direct_equivalent",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "network.nic_guest_control"
+        ],
+        "api_fields": [
+          "VirtualEthernetCard.connectable.allowGuestControl"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "native_get"
+        ],
+        "max_age_seconds": 120,
+        "severity": "critical",
+        "conditions": [
+          "when:quarantine_required"
+        ]
+      },
+      "ahv": null,
+      "openstack": null
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 120,
+    "semantic_constraints": "No safe field-level equivalent currently established in the other platforms; treat destination support as unknown and qualify a method or adapter.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  },
+  {
+    "canonical_id": "source.vmware.storage.ovf_descriptor",
+    "scope": "source",
+    "relationship": "platform_specific",
+    "normalization": "no_direct_equivalent",
+    "platforms": {
+      "vmware": {
+        "manifest_attribute_ids": [
+          "storage.ovf_descriptor"
+        ],
+        "api_fields": [
+          "OvfManager.CreateDescriptor + import spec"
+        ],
+        "owner_evidence_fields": [
+          null
+        ],
+        "methods": [
+          "probe"
+        ],
+        "max_age_seconds": 3600,
+        "severity": "critical",
+        "conditions": [
+          "when:ovf_migration"
+        ]
+      },
+      "ahv": null,
+      "openstack": null
+    },
+    "criticality": "critical",
+    "maximum_age_seconds": 3600,
+    "semantic_constraints": "No safe field-level equivalent currently established in the other platforms; treat destination support as unknown and qualify a method or adapter.",
+    "qualification": "not_qualified",
+    "migration_policy": "independent_qualification_required"
+  }
+]

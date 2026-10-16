@@ -4,6 +4,7 @@ import asyncio
 import json
 import re
 from typing import Any
+from uuid import uuid4
 
 from uvicorn._types import ASGIReceiveCallable, ASGISendCallable, Scope
 
@@ -77,12 +78,12 @@ class PlanningApp:
             headers = list(scope["headers"])
             if len(headers) > 40 or scope["query_string"]:
                 raise Rejected("request_bound", 413)
-            authorization = single(headers, b"authorization")
+            authorization = single(headers, b"authorization", optional=True)
             if not re.fullmatch(r"Bearer [A-Za-z0-9_-]{32,4096}", authorization):
                 raise Rejected("invalid_workload", 401)
             credential = authorization[7:]
             immutable = re.fullmatch(
-                rf"/v1/plans/({UUID})/revisions/([1-9][0-9]{{0,8}})", scope["path"]
+                rf"/v1/tenants/({UUID})/plans/({UUID})/revisions/([1-9][0-9]{{0,8}})", scope["path"]
             )
             execution = re.fullmatch(
                 rf"/v1/tenants/({UUID})/execution-plans/({UUID})/revisions/([1-9][0-9]{{0,8}})",
@@ -90,7 +91,8 @@ class PlanningApp:
             )
             placement = re.fullmatch(
                 rf"/internal/tenants/({UUID})/placement-proposals/({UUID})/"
-                rf"revisions/([1-9][0-9]{{0,8}})", scope["path"],
+                rf"revisions/([1-9][0-9]{{0,8}})",
+                scope["path"],
             )
             if placement and scope["method"] == "GET":
                 await asyncio.to_thread(self.authority.caller, credential, "lifecycle_reader")
@@ -107,7 +109,7 @@ class PlanningApp:
             elif immutable and scope["method"] == "GET":
                 await asyncio.to_thread(self.authority.caller, credential, "governance_reader")
                 payload = await asyncio.to_thread(
-                    self.planning.bound_plan, immutable[1], int(immutable[2])
+                    self.planning.bound_plan, immutable[1], immutable[2], int(immutable[3])
                 )
                 status = 200
             else:
@@ -247,6 +249,23 @@ class PlanningApp:
             status, payload = 422, {"error": "invalid_request"}
         except Exception:
             status, payload = 503, {"error": "planning_unavailable"}
+        # The current Governance-only API is the sole Planning operation
+        # published with the closed Error v2 response envelope. Other API
+        # releases retain their own explicitly versioned error contracts.
+        if status >= 400 and re.fullmatch(
+            rf"/v1/tenants/({UUID})/plans/({UUID})/revisions/([1-9][0-9]{{0,8}})",
+            scope["path"],
+        ):
+            original = payload.get("error", "plan-authority-unavailable")
+            reason = original.replace("_", "-") if isinstance(original, str) else ""
+            if not re.fullmatch(r"[a-z][a-z0-9_.-]{2,95}", reason):
+                reason = "plan-authority-unavailable"
+            payload = {
+                "code": reason,
+                "message": reason.replace("_", " "),
+                "correlation_id": str(uuid4()),
+                "retryable": status >= 500,
+            }
         encoded = json.dumps(payload, allow_nan=False, separators=(",", ":")).encode()
         await send(
             {

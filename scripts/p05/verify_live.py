@@ -15,6 +15,7 @@ import secrets
 import signal
 import ssl
 import subprocess
+import sys
 import tempfile
 import time
 import urllib.error
@@ -45,6 +46,13 @@ def main(extension=None):
     root = Path(__file__).resolve().parents[2]
     out = args.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
+    sys.path.insert(0, str(root/'scripts/contracts'))
+    from route_conformance import HttpConformance
+    conformance = HttpConformance(root, out/'http-conformance.json', {
+        'https://127.0.0.1:8442': 'governance', 'https://127.0.0.1:8443': 'catalogue',
+        'https://127.0.0.1:8444': 'inventory', 'https://127.0.0.1:8446': 'planning',
+        'https://127.0.0.1:8447': 'assurance',
+    }, 'scripts/p05/verify_live.py:wire' if extension is None else 'scripts/p06/verify_live.py:wire')
     report = {'result': 'RUNNING', 'source_revision': os.environ['GITHUB_SHA'], 'run_id': os.environ['GITHUB_RUN_ID'],
         'run_attempt': os.environ['GITHUB_RUN_ATTEMPT'], 'browser_engine': engine, 'observed_at': datetime.datetime.now(datetime.UTC).isoformat(),
         'checks': [], 'commands': [], 'limitations': ['Synthetic OIDC transport used only by the separate principal bootstrap process; live requests use real Governance current authority.',
@@ -53,7 +61,8 @@ def main(extension=None):
             'TLS application peers terminate at disposable loopback forwarding proxies; no operated ingress qualification.',
             'Automated browser checks do not establish representative operator, screen-reader or independent G05 receiving acceptance.']}
     paths = subprocess.check_output(['git', 'ls-files'], cwd=root, text=True).splitlines()
-    report['source_sha256'] = {n: hashlib.sha256((root/n).read_bytes()).hexdigest() for n in paths if n.startswith(('services/planning/', 'services/lifecycle/', 'services/assurance/', 'services/inventory/', 'workers/inventory/', 'workers/lifecycle/', 'scripts/p06/', '.github/workflows/p06', 'services/governance/', 'services/catalogue/', 'apps/console/', 'contracts/', 'scripts/p03/seed_', 'scripts/p04/', 'scripts/p05/', '.github/workflows/p05', 'deploy/dependencies/stateful/inventory-facts.json'))}
+    report['source_sha256'] = {n: hashlib.sha256((root/n).read_bytes()).hexdigest() for n in paths if n.startswith(('services/planning/', 'services/lifecycle/', 'services/assurance/', 'services/inventory/', 'workers/inventory/', 'workers/lifecycle/', 'scripts/p06/', '.github/workflows/qualification.yml', 'services/governance/', 'services/catalogue/', 'apps/console/', 'contracts/', 'scripts/p03/seed_', 'scripts/p04/', 'scripts/p05/', '.github/workflows/qualification.yml', 'deploy/dependencies/stateful/inventory-facts.json'))}
+    report['source_sha256']['scripts/contracts/route_conformance.py'] = hashlib.sha256((root/'scripts/contracts/route_conformance.py').read_bytes()).hexdigest()
     private_values = [os.environ['P05_ADMIN_PASSWORD']]
     processes, handles, proxies = {}, [], []
     broker = None
@@ -107,7 +116,7 @@ def main(extension=None):
                     (out/'browser.json').write_text(redact(browser_file.read_text()))
 
     try:
-        api = json.loads((root/'contracts/openapi/inventory-v1.1.json').read_text())
+        api = json.loads((root/'contracts/openapi/inventory-v1.9.json').read_text())
         validate_spec(api)
         check('independent-openapi-specification-validation', True)
         run(['python', 'scripts/p04/generate_clients.py', '--check'], label='generated-clients')
@@ -244,10 +253,12 @@ def main(extension=None):
                     payload = response.read(310001)
                     if len(payload) > 310000:
                         raise RuntimeError('unbounded_wire_response')
-                    return response.status, json.loads(payload), response.headers, len(payload)
+                    value = json.loads(payload)
+                    conformance.observe(base, path, method, body, headers or {}, response.status, value, response.headers)
+                    return response.status, value, response.headers, len(payload)
 
             def gov(path, body, token=None, expected=201):
-                status, value, _, _ = wire('https://127.0.0.1:8442', path, 'POST', body, {'Authorization': 'Bearer '+credentials['console-governance'][0], 'X-Console-Session': token or fixture['admin_token'], 'Idempotency-Key': str(uuid.uuid4())})
+                status, value, _, _ = wire('https://127.0.0.1:8442', path, 'POST', body, {'Authorization': 'Bearer '+credentials['console-governance'][0], 'X-Console-Session': token or fixture['admin_token'], 'Idempotency-Key': secrets.token_hex(32)})
                 if status != expected:
                     raise RuntimeError('governance_wire_'+path+'_'+str(status))
                 return value

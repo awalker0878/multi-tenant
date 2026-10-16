@@ -9,6 +9,9 @@ use App\Application\Identity\Data\ConsoleActor;
 use App\Application\Identity\Data\ConsoleSession;
 use App\Domain\Identity\IdentityFailure;
 use App\Infrastructure\Governance\GovernanceClient;
+use DateTimeImmutable;
+use Opis\JsonSchema\Validator;
+use Throwable;
 
 final class GovernanceIdentityGateway implements IdentityGateway
 {
@@ -21,7 +24,10 @@ final class GovernanceIdentityGateway implements IdentityGateway
 
     public function current(#[\SensitiveParameter] string $token): ConsoleActor
     {
-        return $this->actor($this->http->send('GET', '/identity/session', $token));
+        $data = $this->http->send('GET', '/identity/session', $token);
+        $this->validate('CurrentIdentity', $data);
+
+        return $this->actor($data);
     }
 
     public function changePassword(#[\SensitiveParameter] string $token, #[\SensitiveParameter] string $currentPassword, #[\SensitiveParameter] string $password): ConsoleSession
@@ -31,7 +37,7 @@ final class GovernanceIdentityGateway implements IdentityGateway
 
     public function logout(#[\SensitiveParameter] string $token): void
     {
-        $this->http->send('POST', '/identity/logout', $token);
+        $this->validate('Logout', $this->http->send('POST', '/identity/logout', $token));
     }
 
     /** @return array<string, mixed> */
@@ -92,13 +98,32 @@ final class GovernanceIdentityGateway implements IdentityGateway
     }
 
     /** @param array<string, mixed> $data */
+    private function validate(string $schema, #[\SensitiveParameter] array $data): void
+    {
+        try {
+            $api = json_decode(file_get_contents(resource_path('contracts/governance-local-identity-v2.json')) ?: '', true, 64, JSON_THROW_ON_ERROR);
+            $definition = ['$ref' => '#/components/schemas/'.$schema, 'components' => $api['components']];
+            if (! (new Validator)->validate(json_decode(json_encode($data, JSON_THROW_ON_ERROR)), json_decode(json_encode($definition, JSON_THROW_ON_ERROR)))->isValid()) {
+                throw new IdentityFailure(503);
+            }
+        } catch (Throwable) {
+            throw new IdentityFailure(503);
+        }
+    }
+
+    /** @param array<string, mixed> $data */
     private function session(#[\SensitiveParameter] array $data): ConsoleSession
     {
+        $this->validate('Session', $data);
         $token = $data['session_token'] ?? null;
         if (! is_string($token) || ! preg_match('/\A[0-9a-f]{64}\z/', $token)) {
             throw new IdentityFailure(503);
         }
 
-        return new ConsoleSession($token, $this->actor($data));
+        if ((new DateTimeImmutable($data['expires_at'])) <= new DateTimeImmutable) {
+            throw new IdentityFailure(503);
+        }
+
+        return new ConsoleSession($token, $this->actor($data), $data['expires_at']);
     }
 }

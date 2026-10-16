@@ -7,7 +7,7 @@ approved native-admission or exceptional-access policy.
 
 ## Issuance and current authority
 
-The [new HTTP contract](../../contracts/openapi/governance-delegation-v1.json)
+The [new HTTP contract](../../contracts/openapi/governance-delegation-v2.json)
 requires the Console workload credential and current federated user session to
 issue a random opaque delegation. Only its SHA-256 is persisted. The credential
 binds one tenant, target service, named action and exact site/environment/resource

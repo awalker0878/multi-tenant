@@ -1,0 +1,41 @@
+[
+  {
+    "id": "target.identity_catalog",
+    "scope": "target",
+    "api_family": "keystone",
+    "api_field": "GET /auth/catalog",
+    "owner_evidence_field": null,
+    "collection_method": "native_list",
+    "max_age_seconds": 3600,
+    "severity": "critical",
+    "condition": "always",
+    "collector_source": "workers/inventory/src/inventory_worker/infrastructure/openstack_capabilities.py",
+    "collection_status": "native_field_candidate"
+  },
+  {
+    "id": "target.network_dhcp",
+    "scope": "target",
+    "api_family": "neutron",
+    "api_field": "subnets[*].enable_dhcp + dns_nameservers + allocation_pools",
+    "owner_evidence_field": null,
+    "collection_method": "native_list",
+    "max_age_seconds": 60,
+    "severity": "critical",
+    "condition": "when:ip_assignment",
+    "collector_source": "workers/inventory/src/inventory_worker/infrastructure/openstack_capabilities.py",
+    "collection_status": "native_field_candidate"
+  },
+  {
+    "id": "target.security_stateful",
+    "scope": "target",
+    "api_family": "neutron",
+    "api_field": "security_groups[*].stateful",
+    "owner_evidence_field": null,
+    "collection_method": "native_list",
+    "max_age_seconds": 60,
+    "severity": "critical",
+    "condition": "always",
+    "collector_source": "workers/inventory/src/inventory_worker/infrastructure/openstack_capabilities.py",
+    "collection_status": "native_field_candidate"
+  }
+]

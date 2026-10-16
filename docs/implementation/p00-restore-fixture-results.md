@@ -29,9 +29,9 @@ Execution status is taken from the retained `report.json`, not from this procedu
 
 Run `37233785398`, source `ae634e325aa1e88bbcd8b35bf8d790e9e7d04f2b`, measured PostgreSQL 18.6 and reached the initial archive transfer. `pg_dump` exited zero, but the following `docker cp` could not find `/tmp/capture-1.dump`; cleanup succeeded. The observed copy failure is retained without asserting an unproven cause. The corrected runner streams binary `pg_dump` stdout directly into the host bundle, captures stderr separately, and records the archive header, exact byte count and hash. Its bounded process handling and lossless stdout evidence also retain partial output if export fails. Host Python identity is now recorded alongside the Docker and database tool inventory.
 
-The [passing replay report](../../spikes/compatibility/results/restore/run-37234051654/report.json) binds source `fcb9fe0ea9bde275b09dfc8c0547e89021edafc9` to [GitHub run 37234051654](https://github.com/awalker0878/multi-tenant/actions/runs/37234051654). It ran from `2026-10-04T20:56:48.135355Z` to `2026-10-04T20:57:07.088924Z`. Of 76 commands, 72 returned success and four returned their required rejection exit/diagnostic; all 138 explicit checks passed. Three input-lock mutations and four invalid bundle variants were rejected. Each invalid bundle left the rejected target database absent. The observed interval describes this tiny fixture, not an accepted application outage or capacity target.
+The passing replay report binds source `fcb9fe0ea9bde275b09dfc8c0547e89021edafc9` to [GitHub run 37234051654](https://github.com/awalker0878/multi-tenant/actions/runs/37234051654). It ran from `2026-10-04T20:56:48.135355Z` to `2026-10-04T20:57:07.088924Z`. Of 76 commands, 72 returned success and four returned their required rejection exit/diagnostic; all 138 explicit checks passed. Three input-lock mutations and four invalid bundle variants were rejected. Each invalid bundle left the rejected target database absent. The observed interval describes this tiny fixture, not an accepted application outage or capacity target.
 
-The [retrieval record](../../spikes/compatibility/results/restore/run-37234051654/retrieval.json) records verified source bindings, raw logs and capture envelopes. Report SHA-256: `96be5bc02a704b0a1fe739a4f4db93b09ec40396d7776f2139c8c322beef0f8b`. GitHub artifact ZIP SHA-256: `8cbcff75bfb899ba0465356e9126a56189c028e55fa7e043ed0ecfb7f2ed6368`. All 11 source/workflow bindings, command-log hashes, streamed archive bytes and complete base64 bundle envelopes were verified on retrieval. The [first run report](../../spikes/compatibility/results/restore/run-37233785398/report.json) remains separate and failed; the later pass does not rewrite that outcome.
+The [retrieval record](../../spikes/compatibility/results/restore/run-37234051654/retrieval.json) records verified source bindings, raw logs and capture envelopes. Report SHA-256: `96be5bc02a704b0a1fe739a4f4db93b09ec40396d7776f2139c8c322beef0f8b`. GitHub artifact ZIP SHA-256: `8cbcff75bfb899ba0465356e9126a56189c028e55fa7e043ed0ecfb7f2ed6368`. All 11 source/workflow bindings, command-log hashes, streamed archive bytes and complete base64 bundle envelopes were verified on retrieval. The first run report remains separate and failed; the later pass does not rewrite that outcome.
 
 ### Measured image and runtime
 
@@ -46,7 +46,7 @@ The [retrieval record](../../spikes/compatibility/results/restore/run-3723405165
 | Container operating system / user | Debian GNU/Linux 12 Bookworm; PostgreSQL UID/GID `999:999` |
 | Host tools | Python `3.12.3`; Docker client/server `28.0.4`; Buildx `0.37.1` |
 
-The [committed input lock](../../spikes/compatibility/restore/inputs.lock.json) was resolved during the first run and consumed by the corrected replay without tag resolution. The retained [runtime log](../../spikes/compatibility/results/restore/run-37234051654/010-server-runtime.log), [OS package inventory](../../spikes/compatibility/results/restore/run-37234051654/011-os-packages.log) and image/container inspection logs establish the observed environment. The runner verified no network, published ports or PostgreSQL TCP listener; the root filesystem was read-only, with 1 CPU, 768 MiB memory and bounded disposable data mounts. Cleanup removed the container and its disposable data.
+The [committed input lock](../../spikes/compatibility/restore/inputs.lock.json) was resolved during the first run and consumed by the corrected replay without tag resolution. The retained runtime log, OS package inventory and image/container inspection logs establish the observed environment. The runner verified no network, published ports or PostgreSQL TCP listener; the root filesystem was read-only, with 1 CPU, 768 MiB memory and bounded disposable data mounts. Cleanup removed the container and its disposable data.
 
 ### Preserved state and recovery observations
 
@@ -58,9 +58,9 @@ After target quiescence, its complete state restored into a third clean database
 
 | Complete evidence envelope | Captured state | Artifact bytes, excluding manifest |
 | --- | --- | ---: |
-| [Initial capture](../../spikes/compatibility/results/restore/run-37234051654/initial-capture-bundle.json) | Initial source dataset and first source marker | 10,804 |
-| [Final capture](../../spikes/compatibility/results/restore/run-37234051654/final-capture-bundle.json) | Source dataset plus accepted source-return marker | 10,982 |
-| [Post-write capture](../../spikes/compatibility/results/restore/run-37234051654/post-write-capture-bundle.json) | Five permits/attachments and three markers, including the known target write | 11,800 |
+| Initial capture | Initial source dataset and first source marker | 10,804 |
+| Final capture | Source dataset plus accepted source-return marker | 10,982 |
+| Post-write capture | Five permits/attachments and three markers, including the known target write | 11,800 |
 
 Each envelope preserves its original binary custom archive, synthetic configuration, writer inventory, logical snapshot, attachment files and manifest. Digests identify each actual capture; separately captured archives need not be byte-identical because PostgreSQL archive metadata includes run-specific values.
 

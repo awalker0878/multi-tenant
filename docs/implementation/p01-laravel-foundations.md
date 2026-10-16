@@ -4,21 +4,21 @@ Date: 2026-10-04. Work packages: P01.01/P01.04. Evidence: EV-P01-007. These resu
 
 ## Executed source and dependency replay
 
-[Package run 37239193553](https://github.com/awalker0878/multi-tenant/actions/runs/37239193553) passed all nine component jobs at source `4142571874a53b351a9c6023313185fe718d0dac`. The [retrieval index](../../verification/p01/packages/run-37239193553/retrieval.json) binds artifact identities and checksums; [source verification](../../verification/p01/packages/run-37239193553/source-verification.json) binds 226 unique input files to that immutable commit. This is the measured revision, not an assertion that every later edit was executed by this run.
+[Package run 37239193553](https://github.com/awalker0878/multi-tenant/actions/runs/37239193553) passed all nine component jobs at source `4142571874a53b351a9c6023313185fe718d0dac`. The [retrieval index](../../verification/p01/packages/run-37239193553/retrieval.json) binds artifact identities and checksums; source verification binds 226 unique input files to that immutable commit. This is the measured revision, not an assertion that every later edit was executed by this run.
 
 Each component was copied into its own clean directory without sibling application source, installed dependencies or earlier verification output. PHP used the committed private Composer lock in explicit `replay` mode. Both installation passes preserved the lock and produced equal installed package versions/references. Python used its private lock, quality checks and independently installed wheel. All 158 recorded commands had their expected outcomes; 316 command-log hashes and 350 retained package-artifact hashes were checked. Browser and wheel envelopes preserve the corresponding binary report/build bytes.
 
 | Component | Runtime checks observed | Report |
 | --- | --- | --- |
-| Governance | 15 commands; 14 Pest tests / 44 assertions; locked install, quality, boundary canaries and cached HTTP boot | [Governance](../../verification/p01/packages/run-37239193553/governance/report.json) |
-| Catalogue | 15 commands; 14 Pest tests / 44 assertions; locked install, quality, boundary canaries and cached HTTP boot | [Catalogue](../../verification/p01/packages/run-37239193553/catalogue/report.json) |
-| Assurance | 15 commands; 14 Pest tests / 44 assertions; locked install, quality, boundary canaries and cached HTTP boot | [Assurance](../../verification/p01/packages/run-37239193553/assurance/report.json) |
-| Console | 23 commands; 24 Pest tests / 86 assertions; PHP/frontend quality, production asset build and one passing Chromium test, without retries, skips or unexpected results | [Console](../../verification/p01/packages/run-37239193553/console/report.json) |
-| Planning | 18 commands; private locked installation, Ruff, mypy, tests, wheel and isolated installed diagnostics | [Planning](../../verification/p01/packages/run-37239193553/planning/report.json) |
-| Inventory | 18 commands; private locked installation, Ruff, mypy, tests, wheel and isolated installed diagnostics | [Inventory](../../verification/p01/packages/run-37239193553/inventory/report.json) |
-| Lifecycle | 18 commands; private locked installation, Ruff, mypy, tests, wheel and isolated installed diagnostics | [Lifecycle](../../verification/p01/packages/run-37239193553/lifecycle/report.json) |
-| Inventory worker | 18 commands; private locked installation, Ruff, mypy, tests, wheel and isolated installed diagnostics | [Inventory worker](../../verification/p01/packages/run-37239193553/inventory-workers/report.json) |
-| Lifecycle worker | 18 commands; private locked installation, Ruff, mypy, tests, wheel and isolated installed diagnostics | [Lifecycle worker](../../verification/p01/packages/run-37239193553/lifecycle-workers/report.json) |
+| Governance | 15 commands; 14 Pest tests / 44 assertions; locked install, quality, boundary canaries and cached HTTP boot | Governance |
+| Catalogue | 15 commands; 14 Pest tests / 44 assertions; locked install, quality, boundary canaries and cached HTTP boot | Catalogue |
+| Assurance | 15 commands; 14 Pest tests / 44 assertions; locked install, quality, boundary canaries and cached HTTP boot | Assurance |
+| Console | 23 commands; 24 Pest tests / 86 assertions; PHP/frontend quality, production asset build and one passing Chromium test, without retries, skips or unexpected results | Console |
+| Planning | 18 commands; private locked installation, Ruff, mypy, tests, wheel and isolated installed diagnostics | Planning |
+| Inventory | 18 commands; private locked installation, Ruff, mypy, tests, wheel and isolated installed diagnostics | Inventory |
+| Lifecycle | 18 commands; private locked installation, Ruff, mypy, tests, wheel and isolated installed diagnostics | Lifecycle |
+| Inventory worker | 18 commands; private locked installation, Ruff, mypy, tests, wheel and isolated installed diagnostics | Inventory worker |
+| Lifecycle worker | 18 commands; private locked installation, Ruff, mypy, tests, wheel and isolated installed diagnostics | Lifecycle worker |
 
 The PHP checks used PHP 8.5.11 and Composer 2.10.3; Console used Node 24.19.0. Python checks used Python 3.12.14 and uv 0.12.19. The hosted environment was Ubuntu 24.04. The exact framework, direct/transitive dependency and interpreter inventories remain in each report and its retained logs.
 

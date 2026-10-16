@@ -17,18 +17,22 @@ The [foundation candidate registry](../../scripts/p01/candidates.json) identifie
 
 Image selection intersects affected component IDs with [the image registry](../../deploy/build/components.json). An unknown image component fails selection. Each build receives only copied inputs from the owning component root, rather than access to sibling source. The [build procedure](../../deploy/build/README.md) documents image pins, runtime constraints and the distinction between process probes and operating readiness. The first five Python image builds and isolation probes passed in [run 37238148501](https://github.com/awalker0878/multi-tenant/actions/runs/37238148501) at source `ba6acd71513c7d999cf51249d70d9c2be50967d9`; that execution does not establish a PHP image result or G01 acceptance.
 
-| Workflow | Stable check name | Result rule |
+The 2026-10-04 five-workflow configuration and its run IDs below this
+section are **historical measurements**, not active CI definitions. See the
+[current workflow audit](../engineering/ci-rationalization-2026-10-12.md)
+for the full removal inventory, security boundary and protection blocker.
+
+| Current workflow | Stable check name | Result rule |
 | --- | --- | --- |
-| [Context policy](../../.github/workflows/architecture-policy.yml) | `Architecture registry and documentation` | Registry, supported source checks, architecture/documentation tests and document/status validation must complete successfully |
-| [Foundation packages](../../.github/workflows/p01-foundations.yml) | `Foundation checks` | Selection must succeed; every selected language matrix must succeed; a matrix may be skipped only when its selection is empty |
-| [Foundation images](../../.github/workflows/p01-images.yml) | `Foundation images` | Selection must succeed; the selected image matrix must succeed; a skipped matrix is accepted only for an empty selection |
-| [Foundation contracts](../../.github/workflows/p01-contracts.yml) | `Foundation contracts` | Existing base-version artifacts remain unchanged; locked generation, cross-language fixtures and compilation succeed |
+| [Pull-request CI](../../.github/workflows/ci.yml) | `CI / Required` | Every selected component and applicable architecture, contract, security and native check succeeds; only unaffected lanes skip |
+| [On-demand qualification](../../.github/workflows/qualification.yml) | Explicit dispatch | Controlled image, infrastructure, browser and cross-service evidence; not a PR check |
+| [Trusted-base admission](../../.github/workflows/p01-admission.yml) | `Admission policy` | Executes policy on trusted base; policy remains `UNCONFIGURED` pending authorized setup |
 
-The hosted check-runs response for source `7aced8f2cba673a500c060116eb431627f727aeb` confirmed the exact names `Foundation checks` and `Architecture registry and documentation`, both successful, reported by GitHub Actions (`app.id=15368`, slug `github-actions`). [Package run 37238841029](https://github.com/awalker0878/multi-tenant/actions/runs/37238841029) selected no package work and accepted the intentionally skipped Python/PHP matrices through the stable aggregate. This proves the documentation-only result path, not a fresh execution of the skipped package suites. The nine-image aggregate correctly failed run `37239193485` when Console failed. The Console-only correction in run `37239487917` passed its selected image and aggregate at source `d0a7cefb23352ffc112638178bb225d20bf12368`; see the [image evidence](p01-laravel-images.md).
-
-Both foundation workflows run on every push to, and pull request targeting, the active branch. Their final jobs use `always()` and [the outcome validator](../../scripts/p01/check_jobs.py). Missing, failed, cancelled or incorrectly skipped selected work cannot produce an accepted aggregate result. Invalid selection output, unknown or duplicate component IDs and wrong-language selection are rejected. The aggregate relies on GitHub's matrix outcome and the reviewed matrix definition; it is not a separate proof against malicious workflow replacement.
-
-The workflows use commit-pinned actions, ephemeral hosted runners, `contents: read` and checkout with credential persistence disabled. Build jobs do not publish images or obtain signing authority. The observed branch has not been configured to require these check names. A successful job currently supplies feedback and evidence; it does not prevent an ordinary direct update.
+The old names `Foundation checks`, `Foundation images`,
+`Foundation contracts`, and `Architecture registry and documentation`
+in previous run evidence do not designate live workflows. The replacement
+uses [`scripts/ci/check.py`](../../scripts/ci/check.py) instead of the
+former foundation aggregate script.
 
 ## Local verification and coverage limits
 

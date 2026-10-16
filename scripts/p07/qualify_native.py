@@ -21,7 +21,7 @@ def main():
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
     paths = subprocess.check_output(['git', 'ls-files'], cwd=ROOT, text=True).splitlines()
-    selected = [p for p in paths if p.startswith(('workers/lifecycle/', 'services/lifecycle/', 'contracts/openapi/lifecycle-native-', 'contracts/openapi/worker-native-', 'contracts/fixtures/lifecycle/', 'scripts/p07/', '.github/workflows/p07-'))
+    selected = [p for p in paths if p.startswith(('workers/lifecycle/', 'services/lifecycle/', 'contracts/openapi/lifecycle-native-', 'contracts/openapi/worker-native-', 'contracts/fixtures/lifecycle/', 'scripts/p07/', '.github/workflows/qualification.yml'))
                 and '/verification/' not in p and (ROOT / p).is_file()]
     report = {
         'source_revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
@@ -53,6 +53,7 @@ def main():
         if not env.get('P07_POSTGRES_BIN'):
             raise RuntimeError('P07_POSTGRES_BIN is required; skipped persistence tests cannot qualify the worker')
         command(ROOT / 'scripts/p01/contracts', ['uv', 'sync', '--locked'])
+        command(ROOT / 'scripts/p01/contracts', ['uv', 'run', '--frozen', 'python', str(ROOT / 'scripts/p08/check_contract.py')])
         command(ROOT / 'scripts/p01/contracts', ['uv', 'run', '--frozen', 'python', str(ROOT / 'scripts/p07/check_native_contract.py')])
         env['P05_POSTGRES_BIN'] = env['P07_POSTGRES_BIN']
         service = ROOT / 'services/lifecycle'

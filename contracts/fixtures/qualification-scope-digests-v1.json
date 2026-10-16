@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "canonicalization": "sorted_keys_compact_ascii_unicode_unescaped_slashes_v1",
+  "cases": [
+    {
+      "id": "openstack-ascii",
+      "scope": {
+        "tenant_id": "10000000-0000-4000-8000-000000000001",
+        "site_id": "10000000-0000-4000-8000-000000000004",
+        "endpoint_id": "10000000-0000-4000-8000-000000000005",
+        "native_scope": "project:legacy-prod",
+        "installed_tuple": {
+          "platform": "openstack",
+          "network_backend": "ovn",
+          "compute_api": "2.1",
+          "storage_api": "3"
+        },
+        "action": "application.provision",
+        "method": "native_api",
+        "profile_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "artifacts": {
+          "adapter": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "contracts": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+        }
+      },
+      "sha256": "15bdef3d12dbcfe9efe1a3d4d1835376b99b3ff491a14b454516f5d8c805f7c9"
+    },
+    {
+      "id": "vmware-unicode-and-slashes",
+      "scope": {
+        "tenant_id": "20000000-0000-4000-8000-000000000001",
+        "site_id": "20000000-0000-4000-8000-000000000004",
+        "endpoint_id": "20000000-0000-4000-8000-000000000005",
+        "native_scope": "project/café-☃",
+        "installed_tuple": {
+          "platform": "vmware",
+          "guest": "Windows 11 / UEFI",
+          "network_backend": "vSphere/NSX"
+        },
+        "action": "application.migrate",
+        "method": "VM_COLD_EXPORT",
+        "profile_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "artifacts": {
+          "adapter": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+          "automation": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+        }
+      },
+      "sha256": "60136e2784c3c7171a50ec1326e861a5e72b7cbbd447ec892070b3291a0bae11"
+    }
+  ]
+}

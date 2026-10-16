@@ -1,0 +1,590 @@
+name: Pull request CI
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  scope:
+    name: CI / Scope
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    outputs:
+      python: ${{ steps.selection.outputs.python }}
+      php: ${{ steps.selection.outputs.php }}
+      docs: ${{ steps.selection.outputs.docs }}
+      contracts: ${{ steps.selection.outputs.contracts }}
+      security: ${{ steps.selection.outputs.security }}
+      native: ${{ steps.selection.outputs.native }}
+      authority: ${{ steps.selection.outputs.authority }}
+      routes: ${{ steps.selection.outputs.routes }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Validate fail-closed scope and completion rules
+        run: python3 -m unittest discover -s tests/ci -p 'test_*.py' -v
+      - id: selection
+        name: Calculate base/head transitive component and assurance impact
+        run: |
+          python3 scripts/p01/select_components.py --workspace "$GITHUB_WORKSPACE"
+          python3 scripts/ci/scope.py
+
+  architecture:
+    name: CI / Architecture
+    needs: scope
+    if: needs.scope.outputs.docs == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12.14'
+          cache: pip
+          cache-dependency-path: requirements-docs.txt
+      - run: python -m pip install --disable-pip-version-check -r requirements-docs.txt
+      - run: |
+          python scripts/validate_architecture.py
+          python scripts/validate_docs.py
+          python scripts/validate_p00_inputs.py
+          python scripts/render_delivery_views.py --check
+          python -m unittest discover -s tests/documentation -p 'test_*.py' -q
+          python -m unittest discover -s scripts/p01 -p 'test_*.py' -q
+
+  python:
+    name: CI / Python (${{ matrix.component }})
+    needs: scope
+    if: needs.scope.outputs.python != '[]'
+    strategy:
+      fail-fast: false
+      matrix:
+        component: ${{ fromJSON(needs.scope.outputs.python) }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12.14'
+      - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78
+        with:
+          version: '0.12.19'
+          enable-cache: true
+      - name: Run locked package lint, types, tests and wheel validation
+        env:
+          P01_COMPONENT: ${{ matrix.component }}
+          P04_POSTGRES_BIN: /usr/lib/postgresql/16/bin
+          P05_POSTGRES_BIN: /usr/lib/postgresql/16/bin
+          P06_POSTGRES_BIN: /usr/lib/postgresql/16/bin
+          P07_POSTGRES_BIN: /usr/lib/postgresql/16/bin
+          P08_POSTGRES_BIN: /usr/lib/postgresql/16/bin
+        run: python3 scripts/p01/run_quality.py --workspace "$GITHUB_WORKSPACE" --output "$RUNNER_TEMP/quality" --component "$P01_COMPONENT"
+      - name: Retain Python quality and test logs on failure
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: python-quality-${{ matrix.component }}-${{ github.sha }}
+          path: ${{ runner.temp }}/quality/evidence/
+          if-no-files-found: warn
+          retention-days: 7
+      - name: Execute bounded Inventory owner runtime test and verify JUnit
+        if: ${{ !cancelled() && matrix.component == 'inventory' }}
+        env:
+          P04_POSTGRES_BIN: /usr/lib/postgresql/16/bin
+        run: |
+          python3 scripts/contracts/run_owner_boundaries.py \
+            --root "$GITHUB_WORKSPACE" --service inventory \
+            --output "$RUNNER_TEMP/inventory-owner-status.json"
+      - name: Retain Inventory owner runtime receipt
+        if: ${{ always() && matrix.component == 'inventory' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: bounded-owner-inventory-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/inventory-owner-status.json
+            ${{ runner.temp }}/inventory-owner-junit.xml
+          if-no-files-found: error
+          retention-days: 14
+
+  php:
+    name: CI / Laravel (${{ matrix.component }})
+    needs: scope
+    if: needs.scope.outputs.php != '[]'
+    strategy:
+      fail-fast: false
+      matrix:
+        component: ${{ fromJSON(needs.scope.outputs.php) }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240
+        with:
+          php-version: '8.5.11'
+          extensions: ctype, curl, dom, fileinfo, filter, hash, mbstring, openssl, pcre, pdo, pdo_pgsql, pdo_sqlite, session, sockets, tokenizer, xml, xmlwriter
+          coverage: none
+          tools: composer:2.10.3
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        if: matrix.component == 'console'
+        with:
+          node-version: '24.19.0'
+          cache: npm
+          cache-dependency-path: apps/console/package-lock.json
+      - name: Run lockfile-based PHP or Console quality and browser tests
+        env:
+          P01_COMPONENT: ${{ matrix.component }}
+        run: python3 scripts/p01/run_quality.py --workspace "$GITHUB_WORKSPACE" --output "$RUNNER_TEMP/quality" --component "$P01_COMPONENT"
+      - name: Retain bounded quality evidence on failure
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: php-quality-${{ matrix.component }}-${{ github.sha }}
+          path: ${{ runner.temp }}/quality/evidence/
+          if-no-files-found: warn
+          retention-days: 1
+      - name: Execute bounded Governance owner runtime test and verify JUnit
+        if: ${{ !cancelled() && matrix.component == 'governance' }}
+        run: |
+          python3 scripts/contracts/run_owner_boundaries.py \
+            --root "$GITHUB_WORKSPACE" --service governance \
+            --output "$RUNNER_TEMP/governance-owner-status.json"
+      - name: Retain Governance owner runtime receipt
+        if: ${{ always() && matrix.component == 'governance' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: bounded-owner-governance-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/governance-owner-status.json
+            ${{ runner.temp }}/governance-owner-junit.xml
+          if-no-files-found: error
+          retention-days: 14
+
+  contracts:
+    name: CI / Contracts
+    needs: scope
+    if: needs.scope.outputs.contracts == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12.14'
+          cache: pip
+          cache-dependency-path: scripts/contracts/requirements.txt
+      - name: Install pinned contract validators and tested service routers
+        run: |
+          python -m pip install --disable-pip-version-check -r scripts/contracts/requirements.txt
+          python -m pip install --disable-pip-version-check -e services/planning -e services/lifecycle -e services/inventory -e workers/lifecycle pytest==9.1.1
+      - name: Enforce strict new-publication quality against the trusted review base
+        env:
+          REVIEW_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$REVIEW_BASE" =~ ^[0-9a-f]{40}$ ]] || [[ "$REVIEW_BASE" =~ ^0{40}$ ]]; then
+            REVIEW_BASE="$(git rev-parse HEAD^)"
+          fi
+          git cat-file -e "$REVIEW_BASE^{commit}"
+          python scripts/p01/contracts/compatibility.py --base "$REVIEW_BASE" > "$RUNNER_TEMP/contract-integrity.json"
+          python scripts/p01/contracts/test_compatibility.py
+          # On first adoption of the quality policy, releases that predate
+          # the policy are the baseline, not newly published strict versions.
+          # Derive the cutover from Git provenance; do not keep historical
+          # contracts, aliases, snapshots or an editable exclusion list.
+          if ! git cat-file -e "$REVIEW_BASE:architecture/contract-quality-policy.json" 2>/dev/null; then
+            POLICY_BASE="$(git log --diff-filter=A --format=%H -- architecture/contract-quality-policy.json | tail -1)"
+            if [[ ! "$POLICY_BASE" =~ ^[0-9a-f]{40}$ ]]; then
+              echo "Missing verifiable quality-policy adoption commit" >&2
+              exit 1
+            fi
+            git merge-base --is-ancestor "$POLICY_BASE" HEAD
+            REVIEW_BASE="$POLICY_BASE"
+          fi
+          python scripts/contracts/quality.py --base "$REVIEW_BASE" --output "$RUNNER_TEMP/contract-quality.json"
+      - name: Validate active canonicals, generated consumers, ownership and negative canaries
+        run: |
+          python scripts/contracts/generate_authority_releases.py --check
+          python scripts/contracts/build.py --check
+          python scripts/p03/generate_clients.py --check
+          python scripts/p04/generate_clients.py --check
+          python scripts/p06/generate_contracts.py --check
+          python scripts/contracts/runtime_binding_coverage.py
+          python scripts/contracts/check.py
+          python scripts/contracts/dependency_graph.py --output "$RUNNER_TEMP/contract-dependencies.json"
+          python scripts/contracts/dependency_graph.py --output architecture/contract-dependencies.json --check
+          python scripts/contracts/release_inventory.py --output architecture/contract-release-inventory.json --check
+          python -m unittest discover -s tests/contracts -p 'test_*.py' -q
+      # Keep diagnostic observations independent from unrelated test-suite
+      # failures. The failing tests still make CI / Required red; no receipt is
+      # invented or treated as passing without executing its specific probe.
+      - name: Verify actual Python router and producer boundaries
+        if: ${{ !cancelled() }}
+        env:
+          PYTHONPATH: services/inventory/src:services/planning/src:services/lifecycle/src
+        run: |
+          python scripts/contracts/route_conformance.py --app inventory
+          python scripts/contracts/route_conformance.py --app planning-migration
+          python scripts/contracts/route_conformance.py --app python-composed
+          python scripts/contracts/route_conformance.py --app lifecycle-native
+          python scripts/contracts/route_conformance.py --app planning-immutable
+          python scripts/contracts/route_conformance.py --app planning-lifecycle
+      - name: Measure executable producer and consumer pairs
+        if: ${{ !cancelled() }}
+        run: python scripts/contracts/measured_consumers.py --output "$RUNNER_TEMP/measured-consumers.json"
+      - name: Record independently checked Python route evidence
+        if: ${{ !cancelled() }}
+        run: |
+          python scripts/contracts/assurance_routes.py --app inventory --output "$RUNNER_TEMP/inventory-routes.json"
+          python scripts/contracts/assurance_routes.py --app python-composed --output "$RUNNER_TEMP/python-routes.json"
+          python scripts/contracts/assurance_routes.py --app lifecycle-native --output "$RUNNER_TEMP/lifecycle-native-routes.json"
+          python scripts/contracts/assurance_routes.py --app lifecycle-native-jobs --output "$RUNNER_TEMP/lifecycle-native-jobs-routes.json"
+          python scripts/contracts/assurance_routes.py --app lifecycle-worker-effects --output "$RUNNER_TEMP/lifecycle-worker-effects-routes.json"
+          python scripts/contracts/assurance_routes.py --app planning-immutable --producer-only --output "$RUNNER_TEMP/planning-immutable-producer.json"
+          python scripts/contracts/assurance_routes.py --app planning-lifecycle --producer-only --output "$RUNNER_TEMP/planning-lifecycle-producer.json"
+      - name: Measure missing-credential Python owner denials
+        if: ${{ !cancelled() }}
+        run: |
+          python scripts/contracts/python_denials.py --owner inventory --output "$RUNNER_TEMP/inventory-denials.json"
+          python scripts/contracts/python_denials.py --owner planning --output "$RUNNER_TEMP/planning-denials.json"
+          python scripts/contracts/python_denials.py --owner lifecycle --output "$RUNNER_TEMP/lifecycle-denials.json"
+      - name: Retain independently executed Python contract observations
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: contract-assurance-python-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/measured-consumers.json
+            ${{ runner.temp }}/inventory-routes.json
+            ${{ runner.temp }}/python-routes.json
+            ${{ runner.temp }}/lifecycle-native-routes.json
+            ${{ runner.temp }}/lifecycle-native-jobs-routes.json
+            ${{ runner.temp }}/lifecycle-worker-effects-routes.json
+            ${{ runner.temp }}/planning-immutable-producer.json
+            ${{ runner.temp }}/planning-lifecycle-producer.json
+            ${{ runner.temp }}/inventory-denials.json
+            ${{ runner.temp }}/planning-denials.json
+            ${{ runner.temp }}/lifecycle-denials.json
+          if-no-files-found: warn
+          retention-days: 14
+
+  security:
+    name: CI / Security
+    needs: scope
+    if: needs.scope.outputs.security == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - name: Install digest-verified security binaries
+        run: python3 scripts/p01/artifacts/tools.py --output "$RUNNER_TEMP/security-tools"
+      - name: Exercise signing failure paths and scan tracked content for secrets
+        run: |
+          python3 scripts/p01/run_policy_controls.py --output "$RUNNER_TEMP/security-controls" --cosign "$RUNNER_TEMP/security-tools/cosign"
+          python3 scripts/p01/artifacts/repository_scan.py --trivy "$RUNNER_TEMP/security-tools/trivy" --output "$RUNNER_TEMP/security-scan"
+      - name: Retain scan evidence only when checks fail
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: ci-security-failure-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/security-controls/
+            ${{ runner.temp }}/security-scan/
+          if-no-files-found: warn
+          retention-days: 7
+
+  native:
+    name: CI / Native contracts
+    needs: scope
+    if: needs.scope.outputs.native == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      P04_POSTGRES_BIN: /usr/lib/postgresql/16/bin
+      P05_POSTGRES_BIN: /usr/lib/postgresql/16/bin
+      P07_POSTGRES_BIN: /usr/lib/postgresql/16/bin
+      P08_POSTGRES_BIN: /usr/lib/postgresql/16/bin
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12.14'
+      - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78
+        with:
+          version: '0.12.19'
+          enable-cache: true
+      - run: python -m pip install --disable-pip-version-check -r requirements-docs.txt
+      - name: Qualify affected migration method contracts and native non-equivalence
+        run: |
+          python -m pip install --disable-pip-version-check -r scripts/contracts/requirements.txt
+          python scripts/generate_capabilities.py --check
+          python scripts/p08/qualify.py --output "$RUNNER_TEMP/native-p08"
+          python scripts/p09/qualify.py --output "$RUNNER_TEMP/native-p09"
+      - name: Retain exact native qualification failures
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: native-qualification-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/native-p08/
+            ${{ runner.temp }}/native-p09/
+          if-no-files-found: warn
+          retention-days: 7
+
+  authority:
+    needs: scope
+    if: needs.scope.outputs.authority == 'true'
+    name: E2 authority SQL triggers and epoch transaction tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres@sha256:9e73daeb439141c2b11eea2463f5f1a3b269fd90d897b41cddb7cb440f21aa5d
+        env:
+          POSTGRES_PASSWORD: synthetic-authority-postgres
+          POSTGRES_DB: postgres
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      PGHOST: 127.0.0.1
+      PGPORT: '5432'
+      PGUSER: postgres
+      PGPASSWORD: synthetic-authority-postgres
+      ASSURANCE_AUTHORITY_TEST_DATABASE: '1'
+      ASSURANCE_AUTHORITY_TEST_PASSWORD: synthetic-authority-runtime
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240
+        with:
+          php-version: '8.5.11'
+          extensions: ctype, curl, dom, fileinfo, mbstring, openssl, pdo, pdo_pgsql, tokenizer, xml, xmlwriter
+          coverage: none
+          tools: composer:2.10.3
+      - name: Provision isolated, least-privilege PostgreSQL authority
+        run: |
+          psql -X -v ON_ERROR_STOP=1 -d postgres <<'SQL'
+          CREATE ROLE assurance_owner NOLOGIN;
+          CREATE ROLE assurance_runtime LOGIN NOINHERIT PASSWORD 'synthetic-authority-runtime';
+          CREATE ROLE assurance_migrator LOGIN NOINHERIT PASSWORD 'synthetic-authority-migrator';
+          GRANT assurance_owner TO assurance_migrator WITH INHERIT FALSE, SET TRUE;
+          CREATE DATABASE assurance OWNER assurance_owner;
+          SQL
+          psql -X -v ON_ERROR_STOP=1 -d assurance <<'SQL'
+          CREATE SCHEMA app AUTHORIZATION assurance_owner;
+          GRANT USAGE ON SCHEMA app TO assurance_runtime;
+          SQL
+          for migration in services/assurance/database/migrations/*.sql; do
+            PGUSER=assurance_migrator PGPASSWORD=synthetic-authority-migrator \
+              psql -X -v ON_ERROR_STOP=1 -d assurance -f "$migration"
+          done
+      - name: Install pinned Assurance dependencies
+        run: |
+          mkdir -p services/assurance/bootstrap/cache services/assurance/storage/framework/{cache,sessions,views} services/assurance/storage/logs
+          touch services/assurance/.env
+          composer install --working-dir=services/assurance --no-interaction --prefer-dist --no-progress --no-scripts
+      - name: Verify durable authority, replay, isolation and suspension (E2 only)
+        working-directory: services/assurance
+        run: |
+          ./vendor/bin/pest tests/Feature/QualificationAuthorityLedgerTest.php --fail-on-warning --fail-on-risky
+          ./vendor/bin/pest tests/Feature/QualificationPublicationTest.php --fail-on-warning --fail-on-risky
+          ./vendor/bin/pest tests/Feature/QualificationInvalidationPublisherTest.php --fail-on-warning --fail-on-risky
+          ./vendor/bin/pest tests/Feature/QualificationScopeDigestTest.php --fail-on-warning --fail-on-risky
+          ./vendor/bin/pest tests/Feature/MigrationQualificationTest.php --fail-on-warning --fail-on-risky
+      - name: Verify migration and service file formatting
+        working-directory: services/assurance
+        run: |
+          ./vendor/bin/pint --test \
+            app/Application/Qualification/Actions/QualificationAuthorityLedger.php \
+            app/Application/Qualification/Actions/DeliverQualificationInvalidation.php \
+            app/Application/Qualification/Contracts/ConfirmedInvalidationPublisher.php \
+            app/Http/Controllers/QualificationPublicationController.php \
+            app/Infrastructure/Qualification/ConfirmedHttpInvalidationPublisher.php \
+            app/Console/Commands/DeliverQualificationInvalidations.php \
+            app/Providers/AppServiceProvider.php bootstrap/app.php config/planning.php \
+            tests/Feature/QualificationAuthorityLedgerTest.php \
+            tests/Feature/QualificationPublicationTest.php \
+            tests/Feature/QualificationInvalidationPublisherTest.php \
+            tests/Feature/QualificationScopeDigestTest.php \
+            app/Http/Controllers/MigrationQualificationController.php \
+            tests/Feature/MigrationQualificationTest.php
+
+  laravel-routes:
+    needs: scope
+    if: needs.scope.outputs.routes == 'true'
+    name: Live Laravel routes / OpenAPI (${{ matrix.app }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [governance, catalogue, assurance]
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12.14'
+      - name: Install pinned assurance schema validators
+        run: python -m pip install --disable-pip-version-check -r scripts/contracts/requirements.txt
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240
+        with:
+          php-version: '8.5.11'
+          extensions: ctype, curl, dom, fileinfo, mbstring, openssl, pdo, pdo_pgsql, sockets, tokenizer, xml, xmlwriter
+          coverage: none
+          tools: composer:2.10.3
+      - name: Install isolated application from its lockfile
+        run: |
+          mkdir -p services/${{ matrix.app }}/bootstrap/cache services/${{ matrix.app }}/storage/framework/{cache,sessions,views} services/${{ matrix.app }}/storage/logs
+          touch services/${{ matrix.app }}/.env
+          composer install --working-dir=services/${{ matrix.app }} --no-dev --no-plugins --no-scripts --no-interaction --no-progress --prefer-dist
+      - name: Verify independent E3/E4 signed method/mode evidence and receiving controls
+        if: matrix.app == 'assurance'
+        run: python -m unittest discover -s tests/contracts -p 'test_native_qualification.py' -v
+      - name: Verify Governance approval 409 producer behavior
+        if: matrix.app == 'governance'
+        run: php scripts/contracts/verify_governance_approval_status.php
+      - name: Compare the deployed router with every owned active OpenAPI release
+        run: |
+          php services/${{ matrix.app }}/artisan route:list --json > "$RUNNER_TEMP/laravel-routes.json"
+          python scripts/contracts/route_conformance.py --app "${{ matrix.app }}" --routes "$RUNNER_TEMP/laravel-routes.json"
+          python scripts/contracts/assurance_routes.py --app "${{ matrix.app }}" --routes "$RUNNER_TEMP/laravel-routes.json" --output "$RUNNER_TEMP/${{ matrix.app }}-routes.json"
+      - name: Probe missing credentials on every published secured Laravel operation
+        run: php scripts/contracts/laravel_denials.php "${{ matrix.app }}" "$RUNNER_TEMP/${{ matrix.app }}-denials.json"
+      - name: Verify Catalogue event with Planning installed decoder
+        if: matrix.app == 'catalogue'
+        env:
+          PYTHONPATH: services/planning/src
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_SHA: ${{ github.sha }}
+        run: python scripts/contracts/catalogue_foundation_assurance.py --output "$RUNNER_TEMP/catalogue-foundation-evidence.json"
+      - name: Retain measured Laravel route and denial evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: contract-assurance-${{ matrix.app }}-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/${{ matrix.app }}-routes.json
+            ${{ runner.temp }}/${{ matrix.app }}-denials.json
+            ${{ runner.temp }}/catalogue-foundation-evidence.json
+          if-no-files-found: warn
+          retention-days: 14
+
+
+  contract-assurance:
+    name: CI / Contract assurance
+    if: always() && needs.scope.outputs.contracts == 'true'
+    needs: [scope, contracts, laravel-routes, runtime-integration]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12.14'
+      - name: Install pinned contract assurance validators
+        run: python -m pip install --disable-pip-version-check -r scripts/contracts/requirements.txt
+      - name: Download measured receipts from this exact run
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        # Upstream jobs may fail before they upload a receipt. Keep going so
+        # the strict aggregator writes an explicit red gap report instead of
+        # ending here with no diagnostic. No missing receipt earns a pass.
+        continue-on-error: true
+        with:
+          pattern: contract-assurance-*-${{ github.sha }}
+          path: ${{ runner.temp }}/contract-measurements
+          merge-multiple: true
+      - name: Download source-bound live wire campaigns from this exact attempt
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        continue-on-error: true
+        with:
+          pattern: p0[56]-live-*-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/journey-measurements
+          merge-multiple: false
+      - name: Fail closed on absent, stale or incomplete contract qualification
+        env:
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_SHA: ${{ github.sha }}
+        run: |
+          python scripts/contracts/combine_assurance.py \
+            --input-directory "$RUNNER_TEMP/contract-measurements" \
+            --journey-directory "$RUNNER_TEMP/journey-measurements" \
+            --output "$RUNNER_TEMP/contract-assurance-report.json" \
+            --require-qualified
+      - name: Retain explicit qualification gaps even on failed admission
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: contract-assurance-report-${{ github.sha }}
+          path: ${{ runner.temp }}/contract-assurance-report.json
+          if-no-files-found: warn
+          retention-days: 14
+
+  artifact-binding-assurance:
+    name: CI / Built contract bindings
+    needs: scope
+    if: needs.scope.outputs.contracts == 'true'
+    permissions:
+      contents: read
+    uses: ./.github/workflows/qualification.yml
+    with:
+      suite: contract-artifacts
+
+  runtime-integration:
+    name: CI / Runtime integration
+    needs: scope
+    if: needs.scope.outputs.contracts == 'true'
+    permissions:
+      contents: read
+    uses: ./.github/workflows/qualification.yml
+    with:
+      suite: integration
+
+  required:
+    name: CI / Required
+    if: always()
+    needs: [scope, architecture, python, php, contracts, contract-assurance, artifact-binding-assurance, runtime-integration, security, native, authority, laravel-routes]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - env:
+          CI_NEEDS_JSON: ${{ toJSON(needs) }}
+        run: python3 scripts/ci/check.py
+      - name: Bind required outcome to the exact checkout for trusted-base admission
+        run: python3 scripts/p01/record_check_source.py --name "CI / Required"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: check-source-required-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/p01-check-source/report.json
+          if-no-files-found: error
+          retention-days: 7

@@ -12,10 +12,19 @@ $fixture = json_decode(file_get_contents($argv[1]), true, 64, JSON_THROW_ON_ERRO
 $resolver = new NativeQualification;
 $now = time();
 $result = $resolver->resolve($fixture['bundle'], $fixture['keys'], $fixture['scope'], $now);
+if (($argv[2] ?? null) === '--wire') {
+    echo json_encode($result, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
+    exit;
+}
 if ($result['verification']['valid'] !== true || $result['version'] !== 2) {
     throw new RuntimeException('signed_native_record_failed');
 }
-foreach (['unresolved', 'tampered', 'signature', 'foreign', 'expired', 'role', 'runtime', 'definition'] as $fault) {
+$unordered = array_reverse($fixture['bundle']['record']['method_modes'], true);
+if (NativeQualification::canonical($unordered)
+    !== NativeQualification::canonical($fixture['bundle']['record']['method_modes'])) {
+    throw new RuntimeException('method_matrix_canonicalization_failed');
+}
+foreach (['unresolved', 'tampered', 'signature', 'foreign', 'expired', 'role', 'runtime', 'definition', 'missing_method', 'false_support', 'revoked', 'missing_revocation'] as $fault) {
     $bundle = $fixture['bundle'];
     $keys = $fixture['keys'];
     $scope = $fixture['scope'];
@@ -29,10 +38,19 @@ foreach (['unresolved', 'tampered', 'signature', 'foreign', 'expired', 'role', '
         $scope['tenant_id'] = '00000000-0000-4000-8000-000000000001';
     } elseif ($fault === 'expired') {
         $keys['observer']['expires_at'] = $now;
+    } elseif ($fault === 'revoked') {
+        $keys['observer']['revoked'] = true;
+    } elseif ($fault === 'missing_revocation') {
+        unset($keys['observer']['revoked']);
     } elseif ($fault === 'role') {
         $keys['reviewer']['role'] = 'observer';
     } elseif ($fault === 'runtime') {
         $bundle['runtime'] = $bundle['evidence'][0];
+    } elseif ($fault === 'missing_method') {
+        array_pop($bundle['record']['method_modes']);
+    } elseif ($fault === 'false_support') {
+        $name = array_key_first($bundle['record']['method_modes']);
+        $bundle['record']['method_modes'][$name] = 'passed';
     } else {
         $bundle['record']['scope']['artifacts']['adapter'] = str_repeat('f', 64);
     }
@@ -43,4 +61,4 @@ foreach (['unresolved', 'tampered', 'signature', 'foreign', 'expired', 'role', '
     }
     throw new RuntimeException('unsafe_qualification_accepted:'.$fault);
 }
-echo "Native qualification cryptographic positive and eight negative controls passed (E2)\n";
+echo "Native qualification cryptographic positive and twelve negative controls passed (E2)\n";

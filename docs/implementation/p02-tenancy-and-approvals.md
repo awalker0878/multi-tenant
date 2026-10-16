@@ -71,7 +71,7 @@ increment adds no recovery bypass or support impersonation path.
 
 The [approval HTTP contract](../../contracts/openapi/governance-approvals-v1.json)
 fetches an exact immutable Planning revision through the
-[consumer binding contract](../../contracts/openapi/planning-immutable-plan-v1.json).
+[consumer binding contract](../../contracts/openapi/planning-immutable-plan-v2.json).
 The record binds plan ID/revision/digest, tenant, action, site, environment, resource,
 requestor, explicit executor actor IDs and validity. Digest calculation sorts object
 keys recursively, preserves array order and hashes compact UTF-8 JSON without

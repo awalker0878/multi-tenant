@@ -39,6 +39,14 @@ afterEach(function (): void {
     $this->travelBack();
 });
 
+it('rejects cross-tenant immutable plan reads before approving any authority', function (): void {
+    $other = '550e8400-e29b-41d4-a716-446655440099';
+    expect(fn () => $this->source->fetch($other, $this->plan['plan_id'], 1))
+        ->toThrow(IdentityDenied::class, 'plan_authority_unavailable');
+    expect($this->source->fetch($this->tenant, $this->plan['plan_id'], 1))
+        ->toBe($this->plan);
+});
+
 function requestApproval(object $test): string
 {
     return tenantCommand($test, $test->path, $test->input, $test->author)->assertCreated()->json('id');

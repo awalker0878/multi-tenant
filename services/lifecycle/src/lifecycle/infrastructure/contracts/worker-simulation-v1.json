@@ -1,0 +1,573 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Lifecycle simulation worker internal owner API",
+    "version": "1.0.0",
+    "description": "Simulation-only effects and independently sealed readback. No native write authority."
+  },
+  "security": [
+    {
+      "WorkloadBearer": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "WorkloadBearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "Error": {
+        "title": "Contracted API error v2",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "message",
+          "correlation_id",
+          "retryable"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{2,95}$"
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          },
+          "correlation_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "retryable": {
+            "type": "boolean"
+          },
+          "details": {
+            "type": "array",
+            "maxItems": 64,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field",
+                "reason"
+              ],
+              "properties": {
+                "field": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256
+                }
+              }
+            }
+          }
+        }
+      },
+      "SimulationGrant": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "tenant_id",
+          "job_id",
+          "operation_id",
+          "attempt_id",
+          "plan_digest",
+          "epoch",
+          "simulation",
+          "id",
+          "step",
+          "worker_id",
+          "expires_at",
+          "campaign_id",
+          "scope",
+          "adapter"
+        ],
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "job_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "operation_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "attempt_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "plan_digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "epoch": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "simulation": {
+            "const": true
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "step": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "worker_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "expires_at": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "campaign_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "scope": {
+            "type": "object",
+            "minProperties": 1
+          },
+          "adapter": {
+            "const": "p06-simulator-v1"
+          }
+        }
+      },
+      "ObservationBinding": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "tenant_id",
+          "job_id",
+          "operation_id",
+          "attempt_id",
+          "plan_digest",
+          "epoch",
+          "simulation"
+        ],
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "job_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "operation_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "attempt_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "plan_digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "epoch": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "simulation": {
+            "const": true
+          }
+        }
+      },
+      "EffectReceipt": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "accepted",
+          "duplicate"
+        ],
+        "properties": {
+          "accepted": {
+            "const": true
+          },
+          "duplicate": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ObservationReceipt": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "tenant_id",
+          "job_id",
+          "operation_id",
+          "attempt_id",
+          "plan_digest",
+          "epoch",
+          "simulation",
+          "sealed",
+          "effect_count",
+          "observed_at",
+          "outcome"
+        ],
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "job_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "operation_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "attempt_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "plan_digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "epoch": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "simulation": {
+            "const": true
+          },
+          "sealed": {
+            "const": true
+          },
+          "effect_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "observed_at": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "outcome": {
+            "enum": [
+              "confirmed_succeeded",
+              "confirmed_failed"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/v1/effects": {
+      "post": {
+        "operationId": "simulationExecute",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 32,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SimulationGrant"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Bounded simulation-only receipt",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EffectReceipt"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Denied 401",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Denied 403",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Denied 409",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Denied 422",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Denied 503",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-idempotency": {
+          "scope": [
+            "tenant_id",
+            "actor_id",
+            "operation_id",
+            "request_digest"
+          ],
+          "ttl_seconds": 604800,
+          "conflict_status": 409
+        }
+      }
+    },
+    "/v1/reconciliations": {
+      "post": {
+        "operationId": "simulationReconcile",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 32,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObservationBinding"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Bounded simulation-only receipt",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObservationReceipt"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Denied 401",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Denied 403",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Denied 409",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Denied 422",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Denied 503",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-idempotency": {
+          "scope": [
+            "tenant_id",
+            "actor_id",
+            "operation_id",
+            "request_digest"
+          ],
+          "ttl_seconds": 604800,
+          "conflict_status": 409
+        }
+      }
+    },
+    "/v1/observations": {
+      "post": {
+        "operationId": "simulationObserve",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 32,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObservationBinding"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Bounded simulation-only receipt",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObservationReceipt"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Denied 401",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Denied 403",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Denied 409",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Denied 422",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Denied 503",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-idempotency": {
+          "scope": [
+            "tenant_id",
+            "actor_id",
+            "operation_id",
+            "request_digest"
+          ],
+          "ttl_seconds": 604800,
+          "conflict_status": 409
+        }
+      }
+    }
+  }
+}

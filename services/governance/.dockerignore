@@ -24,3 +24,6 @@
 !resources/**
 !build/
 !build/snapshot.sh
+
+!build/apk-cache/
+!build/apk-cache/*.apk

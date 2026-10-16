@@ -6,5 +6,5 @@ namespace App\Application\Identity\Data;
 
 final readonly class ConsoleSession
 {
-    public function __construct(#[\SensitiveParameter] public string $token, public ConsoleActor $actor) {}
+    public function __construct(#[\SensitiveParameter] public string $token, public ConsoleActor $actor, public string $expiresAt) {}
 }

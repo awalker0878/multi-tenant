@@ -23,8 +23,9 @@ def main():
     files = subprocess.check_output(['git', 'ls-files', '--cached', '--others', '--exclude-standard'], cwd=ROOT, text=True).splitlines()
     prefixes = ('services/planning/', 'services/lifecycle/', 'workers/lifecycle/',
                 'scripts/p09/', 'scripts/generate_capabilities.py', 'tests/contracts/test_capabilities.py',
+                'tests/contracts/native_qualification_fixture.py',
                 'contracts/capabilities/', 'contracts/schemas/capabilities/', 'contracts/schemas/expansion/', 'contracts/fixtures/expansion/',
-                'contracts/openapi/expansion-', '.github/workflows/p09-')
+                'contracts/openapi/expansion-', '.github/workflows/ci.yml')
     report = {
         'source_revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
         'observed_at': datetime.now(timezone.utc).isoformat(), 'environment': platform.platform(),
@@ -75,7 +76,9 @@ def main():
                          ['uv', 'run', '--frozen', 'ruff', 'format', '--check', 'src', 'tests'],
                          ['uv', 'run', '--frozen', 'mypy', 'src', 'tests'],
                          ['uv', 'run', '--frozen', 'pytest', '-q', '--junitxml=' + str(output / (suite + '.xml'))],
-                         ['uv', 'build', '--no-build-isolation', '--wheel']):
+                         ['uv', 'build', '--no-build-isolation', '--wheel',
+                          '--config-setting=--global-option=build',
+                          '--config-setting=--global-option=--build-base=' + str(output / 'build-stage' / suite)]):
                 command(directory, argv)
             xml = ElementTree.parse(output / (suite + '.xml'))
             totals = {k: sum(int(s.get(k, 0)) for s in xml.iter('testsuite')) for k in ('tests', 'failures', 'errors', 'skipped')}
